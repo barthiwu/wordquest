@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "WordQuest",
+    "slug": "wordquest",
+    "version": "0.1.0",
+    "scheme": "wordquest",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#12102A"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "WordQuest uses your photo library so you can submit evidence of a word used in the real world.",
+          "cameraPermission": "WordQuest uses your camera so you can photograph a word used in the real world."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#12102A"
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.wordquest.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#12102A"
+      },
+      "package": "com.wordquest.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "apiUrl": "http://localhost:3000/api/v1"
+    }
+  }
+}

@@ -1,0 +1,167 @@
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { colors, radius, spacing, typography } from '@/constants/theme';
+import { getShopCatalog, purchaseShopItem, type ShopItem } from '@/services/shop';
+import { getMyProgression } from '@/services/progression';
+import { ApiError } from '@/services/apiClient';
+import { useAuthStore } from '@/state/authStore';
+import { BackButton } from '@/components/BackButton';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '@/app/navigation/RootNavigator';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Shop'>;
+
+/**
+ * The Glyph shop (spec §9) — cosmetic ALI outfits/accessories bought with
+ * Glyphs. Deliberately no equip/wear state here, matching the backend's
+ * own "foundation" framing: pricing/inventory/ownership only.
+ */
+export function ShopScreen({ navigation }: Props) {
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const [items, setItems] = useState<ShopItem[] | null>(null);
+  const [glyphBalance, setGlyphBalance] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [purchasingId, setPurchasingId] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    if (!accessToken) return;
+    Promise.all([getShopCatalog(accessToken), getMyProgression(accessToken)])
+      .then(([catalog, progression]) => {
+        setItems(catalog);
+        setGlyphBalance(progression.glyphBalance);
+      })
+      .catch(() => setError('Could not load the shop right now.'));
+  }, [accessToken]);
+
+  useFocusEffect(load);
+
+  const onPurchase = async (item: ShopItem) => {
+    if (!accessToken || purchasingId) return;
+    setPurchasingId(item.id);
+    setMessage(null);
+    try {
+      await purchaseShopItem(accessToken, item.id);
+      setMessage(`${item.name} added to your collection.`);
+      load();
+    } catch (err) {
+      setMessage(
+        err instanceof ApiError && err.status === 400
+          ? 'Not enough Glyphs for that yet.'
+          : 'Could not complete that purchase.',
+      );
+    } finally {
+      setPurchasingId(null);
+    }
+  };
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <BackButton onPress={() => navigation.goBack()} />
+        <Text style={styles.error}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (!items) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator color={colors.arcaneSoft} />
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <BackButton onPress={() => navigation.goBack()} />
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Shop</Text>
+        {glyphBalance !== null && <Text style={styles.balance}>{glyphBalance} Glyphs</Text>}
+      </View>
+
+      {message && <Text style={styles.message}>{message}</Text>}
+
+      {items.length === 0 && (
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>Nothing in the shop yet — check back soon.</Text>
+        </View>
+      )}
+
+      {items.map((item) => (
+        <View key={item.id} style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>{item.name}</Text>
+            <Text style={styles.cardPrice}>{item.priceGlyphs} Glyphs</Text>
+          </View>
+          <Text style={styles.cardBody}>{item.description}</Text>
+          <Pressable
+            style={[
+              styles.buyButton,
+              (item.owned || purchasingId === item.id) && styles.buyButtonDisabled,
+            ]}
+            onPress={() => onPurchase(item)}
+            disabled={item.owned || purchasingId !== null}
+            accessibilityRole="button"
+            accessibilityLabel={item.owned ? `${item.name} (owned)` : `Purchase ${item.name}`}
+          >
+            {purchasingId === item.id ? (
+              <ActivityIndicator color={colors.ink} />
+            ) : (
+              <Text style={styles.buyButtonText}>{item.owned ? 'Owned' : 'Purchase'}</Text>
+            )}
+          </Pressable>
+        </View>
+      ))}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { padding: spacing.xl, paddingTop: spacing.xxl, gap: spacing.md },
+  centered: {
+    flex: 1,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  error: { color: colors.danger, fontSize: typography.scale.md },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  title: {
+    color: colors.ink,
+    fontSize: typography.scale.xl,
+    fontWeight: typography.display.weight,
+  },
+  balance: { color: colors.glyph, fontSize: typography.scale.md, fontWeight: '700' },
+  message: { color: colors.arcaneSoft, fontSize: typography.scale.sm },
+  empty: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.lg,
+  },
+  emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  cardTitle: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+  cardPrice: { color: colors.glyph, fontSize: typography.scale.sm, fontWeight: '700' },
+  cardBody: { color: colors.inkMuted, fontSize: typography.scale.sm },
+  buyButton: {
+    backgroundColor: colors.arcane,
+    borderRadius: radius.md,
+    paddingVertical: spacing.sm,
+    alignItems: 'center',
+  },
+  buyButtonDisabled: { backgroundColor: colors.surfaceRaised },
+  buyButtonText: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
+});

@@ -1,0 +1,129 @@
+name: Deploy (backend)
+
+# V19 Stabilization Pass §14: WordQuest's chosen hosting target is
+# Railway — managed Postgres with built-in daily volume backups + PITR,
+# usage-based pricing appropriate for beta scale, and no VPC/IAM/ECS
+# surface to misconfigure. See docs/DEPLOYMENT.md for the full setup
+# (Railway project/service creation, env vars, backup/restore runbook).
+#
+# What's wired up and will genuinely run once the one-time Railway setup
+# in docs/DEPLOYMENT.md is done and this workflow's secrets are set:
+#   1. Build the backend's Dockerfile and push it to GitHub Container
+#      Registry (ghcr.io) — needs no secrets beyond the automatic
+#      GITHUB_TOKEN. This image is NOT what Railway deploys (Railway
+#      builds independently from the same Dockerfile — see the `deploy`
+#      job below); ghcr.io's copy exists as a versioned, pull-able audit
+#      trail / manual-rollback reference, tagged by both short SHA and
+#      `latest`.
+#   2. Run `prisma migrate deploy` against staging — the REAL migration
+#      command (see backend/README.md's "Schema changes and migrations"
+#      section), against `STAGING_DATABASE_URL` (the Railway Postgres
+#      service's PUBLIC connection string — Postgres service -> Connect
+#      tab -> "Public Network" — GitHub's runners aren't on Railway's
+#      private network, so the public proxy endpoint is what a CI runner
+#      can actually reach).
+#   3. Deploy the backend service on Railway via the CLI, authenticated
+#      with a Railway PROJECT token (`RAILWAY_TOKEN`) scoped to the
+#      `staging` environment — see docs/DEPLOYMENT.md for how to mint
+#      one and where the `RAILWAY_SERVICE` secret (the service name/id)
+#      comes from.
+#
+# Both `STAGING_DATABASE_URL` and `RAILWAY_TOKEN`/`RAILWAY_SERVICE` are
+# GitHub Environment secrets on the "staging" Environment — they don't
+# exist until someone completes the one-time Railway project setup.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: {}
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}/backend
+
+jobs:
+  build-and-push:
+    name: Build & push image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        run: echo "image_tag=${{ env.IMAGE }}:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v5
+        with:
+          context: backend
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image_tag }}
+            ${{ env.IMAGE }}:latest
+
+  migrate-staging:
+    name: Run migrations against staging
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: staging
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      # This is the real command (see backend/README.md) — non-
+      # interactive, applies only pending migrations, safe to run every
+      # deploy. It needs a STAGING_DATABASE_URL secret configured on
+      # the "staging" GitHub Environment before this job can succeed.
+      - run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+
+  deploy:
+    name: Deploy to Railway (staging)
+    runs-on: ubuntu-latest
+    needs: migrate-staging
+    environment: staging
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      # Railway builds independently from backend/Dockerfile on its own
+      # infrastructure (Root Directory = "backend" on the service, set
+      # once in the Railway dashboard or via .railway/railway.ts — see
+      # docs/DEPLOYMENT.md) — `railway up` uploads this checkout and
+      # triggers that build. It does NOT pull the ghcr.io image built
+      # above; that image is a separate, versioned audit/rollback
+      # artifact, not Railway's deploy source.
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      # -c/--ci streams build logs and exits once the build completes
+      # rather than tailing the running service's logs forever, which is
+      # what a CI job needs. RAILWAY_TOKEN is a project token scoped to
+      # the "staging" environment (see docs/DEPLOYMENT.md) — the CLI
+      # picks it up from the environment automatically, no `railway
+      # login`/`railway link` needed in a non-interactive runner.
+      - name: Deploy backend service
+        run: railway up --service "$RAILWAY_SERVICE" --environment staging --ci
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_SERVICE: ${{ secrets.RAILWAY_SERVICE }}

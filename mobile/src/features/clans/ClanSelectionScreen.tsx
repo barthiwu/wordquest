@@ -1,0 +1,172 @@
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { colors, radius, spacing, typography } from '@/constants/theme';
+import { getClans, type Clan } from '@/services/clans';
+import { updateMe } from '@/services/users';
+import { useAuthStore } from '@/state/authStore';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '@/app/navigation/RootNavigator';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'ClanSelection'>;
+
+/**
+ * Screen 7 of the UI/UX Screen Bible. Fetches the real clan list from
+ * GET /api/v1/clans (seeded via prisma/seed.ts) and persists the choice
+ * via PATCH /users/me — this is real selection, not a local-only UI state.
+ */
+export function ClanSelectionScreen({ navigation }: Props) {
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const [clans, setClans] = useState<Clan[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    getClans()
+      .then((result) => !cancelled && setClans(result))
+      .catch(() => !cancelled && setError('Could not load clans. Pull to retry.'));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const onConfirm = async () => {
+    if (!selectedId || !accessToken || confirming) return;
+    setConfirming(true);
+    try {
+      await updateMe(accessToken, { clanId: selectedId });
+      navigation.replace('Main');
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Choose your clan</Text>
+        <Text style={styles.subtitle}>Your clan’s banner becomes your Kingdom’s identity.</Text>
+      </View>
+
+      {!clans && !error && <ActivityIndicator color={colors.arcaneSoft} style={styles.loader} />}
+      {error && <Text style={styles.error}>{error}</Text>}
+
+      {clans && clans.length === 0 && (
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>No clans are available to join right now.</Text>
+        </View>
+      )}
+
+      {clans && clans.length > 0 && (
+        <FlatList
+          data={clans}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <Pressable
+              style={[styles.card, selectedId === item.id && styles.cardSelected]}
+              onPress={() => setSelectedId(item.id)}
+              accessibilityRole="button"
+              accessibilityLabel={`Select ${item.name}`}
+            >
+              <Text style={styles.cardName}>{item.name}</Text>
+              <Text style={styles.cardDescription}>{item.description}</Text>
+            </Pressable>
+          )}
+        />
+      )}
+
+      <Pressable
+        style={[styles.confirmButton, !selectedId && styles.confirmButtonDisabled]}
+        disabled={!selectedId || confirming}
+        onPress={onConfirm}
+        accessibilityRole="button"
+        accessibilityLabel="Confirm clan"
+      >
+        {confirming ? (
+          <ActivityIndicator color={colors.ink} />
+        ) : (
+          <Text style={styles.confirmButtonText}>Confirm clan</Text>
+        )}
+      </Pressable>
+
+      {clans && clans.length === 0 && (
+        <Pressable
+          style={styles.skipButton}
+          onPress={() => navigation.replace('Main')}
+          accessibilityRole="button"
+          accessibilityLabel="Continue without a clan"
+        >
+          <Text style={styles.skipButtonText}>Continue without a clan</Text>
+        </Pressable>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    padding: spacing.xl,
+    paddingTop: spacing.xxl * 1.5,
+    gap: spacing.lg,
+  },
+  header: { gap: spacing.xs },
+  title: {
+    color: colors.ink,
+    fontSize: typography.scale.xl,
+    fontWeight: typography.display.weight,
+  },
+  subtitle: {
+    color: colors.inkMuted,
+    fontSize: typography.scale.md,
+  },
+  loader: { marginTop: spacing.xl },
+  error: { color: colors.danger, fontSize: typography.scale.sm },
+  list: { gap: spacing.sm, paddingBottom: spacing.md },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    gap: spacing.xs,
+  },
+  cardSelected: {
+    borderColor: colors.arcane,
+    backgroundColor: colors.surfaceRaised,
+  },
+  cardName: {
+    color: colors.ink,
+    fontSize: typography.scale.lg,
+    fontWeight: '700',
+  },
+  cardDescription: {
+    color: colors.inkMuted,
+    fontSize: typography.scale.sm,
+  },
+  empty: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.lg,
+  },
+  emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
+  skipButton: { alignItems: 'center', paddingVertical: spacing.sm },
+  skipButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
+  confirmButton: {
+    backgroundColor: colors.arcane,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  confirmButtonDisabled: { opacity: 0.5 },
+  confirmButtonText: {
+    color: colors.ink,
+    fontSize: typography.scale.md,
+    fontWeight: '700',
+  },
+});

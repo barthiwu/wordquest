@@ -1,0 +1,1283 @@
+// WordQuest — initial schema foundation.
+// Covers: identity/auth, clans, and the ledgered economy/progression
+// tables called out as non-negotiable in BUILD_HANDOFF §16/§24/§41.
+// Learning-domain tables (Quest, Word, Attempt, Mastery detail, Battle,
+// Journey stages, CEFR, etc.) are added module-by-module per the build
+// order in §47 — deliberately not all modeled up front.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Identity ─────────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+  CONTENT_EDITOR
+  SUPPORT
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+model User {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  passwordHash String
+  displayName  String
+  countryCode  String? // ISO 3166-1 alpha-2, e.g. "NG" — drives the Castle's animated flag (§18)
+  role         Role    @default(USER)
+
+  // Player Timezone System (V1 Remaining Systems Spec §15) — IANA tz name,
+  // e.g. "Africa/Lagos". Collected on onboarding/registration. Every
+  // "player local date" the app computes (quest availability, streak,
+  // Master Challenge, notification timing) is derived from THIS + server
+  // UTC time — never from a client-submitted date/time. Nullable only
+  // because an account can exist before onboarding sets it; every localDate
+  // derivation falls back to UTC until it's set (see common/timezone.ts).
+  timezone String?
+
+  // Onboarding (Identity phase, build order §47 item 9)
+  nativeLanguage        String? // BCP-47-ish tag, e.g. "en"
+  targetLanguage        String? // language the player is learning, e.g. "fr"
+  learningGoal          LearningGoal?
+  onboardingCompletedAt DateTime?
+
+  emailVerifiedAt DateTime?
+  // Production auth (V1 Final Systems Spec): account status states.
+  // ACTIVE is the default for a brand-new registration — email
+  // verification is tracked via emailVerifiedAt above but doesn't block
+  // basic app usage; SUSPENDED/DELETED both block login (checked in
+  // AuthService.login), DELETED is a soft delete (deletedAt set, row
+  // preserved) so "account recovery" has something to recover.
+  status          AccountStatus @default(ACTIVE)
+  deletedAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Account lockout (Sprint 5 "Authentication hardening"): a per-IP
+  // rate limit alone doesn't stop an attacker who spreads guesses for
+  // ONE account across many IPs, so this counts failures against the
+  // account itself. Reset to 0 on any successful login. When the count
+  // reaches gameplayRules.auth.maxFailedLoginAttempts, lockedUntil is
+  // set gameplayRules.auth.lockoutDurationMinutes into the future;
+  // AuthService.login() checks it before verifying the password.
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+
+  clanId String?
+  clan   Clan?   @relation(fields: [clanId], references: [id])
+
+  refreshTokens            RefreshToken[]
+  xpTransactions           XpTransaction[]
+  glyphTransactions        GlyphTransaction[]
+  progression              UserProgression?
+  masteries                Mastery[]
+  questAttempts            QuestAttempt[]
+  challengeAttempts        ChallengeAttempt[]
+  wordInTheWildMissions    WordInTheWildMission[]
+  wordInTheWildSubmissions WordInTheWildSubmission[]
+  bossBattlePlayers        BossBattlePlayer[]
+  orderSelections          OrderSelection[]
+  achievementUnlocks       AchievementUnlock[]
+  questCards               QuestCard[]
+  aliMessages              AliMessage[]
+  dailyMasterChallenges    DailyMasterChallenge[]
+  idempotencyKeys          IdempotencyKey[]
+  emailVerificationTokens  EmailVerificationToken[]
+  passwordResetTokens      PasswordResetToken[]
+  learningProfile          LearningProfile?
+  cefrAssessments          CefrAssessment[]
+  notifications            Notification[]
+  notificationPreference   NotificationPreference?
+  pushTokens               PushToken[]
+  securityEvents           SecurityEvent[]
+  shopPurchases            ShopPurchase[]
+
+  @@index([clanId])
+  @@map("users")
+}
+
+enum LearningGoal {
+  CASUAL
+  TRAVEL
+  ACADEMIC
+  CAREER
+  FLUENCY
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  // Set once at login/register and carried forward UNCHANGED by every
+  // rotation in this session's chain (V20 Beta Release Checklist §12:
+  // Session security) — the anchor AuthService.refresh checks against
+  // gameplayRules.auth.absoluteSessionLifetimeDays, since createdAt
+  // above only reflects this one rotated token, not when the session
+  // actually began.
+  sessionStartedAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// ── Email verification & password reset ─────────────────────────────
+// Both follow the same shape: a one-time, expiring, sha256-hashed
+// token (the raw token is only ever emailed to the user, never stored)
+// — same pattern as RefreshToken's own hash-not-plaintext storage.
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("email_verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+// ── Clans (§19) ──────────────────────────────────────────
+
+model Clan {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+  lore        String
+  bannerAsset String // asset key/path for the clan banner — also used as Kingdom visual identity
+
+  users User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("clans")
+}
+
+// ── Progression snapshot ─────────────────────────────────
+// Denormalized current-state view for fast reads (home screen, profile).
+// Source of truth for *how it got there* is always the ledger tables below.
+
+model UserProgression {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  level         Int       @default(1)
+  totalXp       Int       @default(0)
+  glyphBalance  Int       @default(0) // app-level guarded by ProgressionService.spendGlyphs's atomic compare-and-decrement; also backed by a DB CHECK (glyphBalance >= 0) — see migration 20260824040118_glyph_balance_nonnegative_check
+  journeyStage  Int       @default(0) // 0-indexed — see config/journey-stages.ts for the current stage table; NEVER assume City is a fixed index (see hasReachedCityStage)
+  currentStreak Int       @default(0)
+  longestStreak Int       @default(0)
+  lastActiveOn  DateTime?
+
+  masteredWordsCount   Int       @default(0)
+  bossBattlesCompleted Int       @default(0)
+  cefrUnlocked         Boolean   @default(false)
+  cefrUnlockedAt       DateTime?
+  // A rolling estimate from recent Paragraph submissions (mode of the
+  // last 5) — genuinely just evidence, never presented as an official
+  // exam result (spec §3.5/§4.3's explicit warning against that).
+  // Tracked regardless of cefrUnlocked's status; the two are
+  // independent — this is "what the evidence currently suggests," not
+  // the gated official determination.
+  estimatedCefrLevel   String?
+  // System-computed, not the AI's self-reported per-evaluation confidence
+  // (see CefrAssessment.confidence for that) — a 0-1 blend of sample-size
+  // adequacy and cross-dimension consistency, recomputed alongside
+  // estimatedCefrLevel every time ProgressionService.updateUnifiedCefrEstimate
+  // runs. Null until at least one Sentence/Paragraph submission exists.
+  estimatedCefrConfidence Float?
+
+  updatedAt DateTime @updatedAt
+
+  @@map("user_progression")
+}
+
+// ── XP ledger (§24, §41) ─────────────────────────────────
+// XP is never a bare counter increment — every award is a row, and the
+// backend is the only writer. Client-submitted XP amounts are ignored.
+
+model XpTransaction {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int // always positive; XP is not currently spendable/negative
+  reason    String // e.g. "QUEST_COMPLETION", "BOSS_BATTLE_RESULT"
+  source    String // subsystem that issued it, e.g. "quests", "battles"
+  reference String? // e.g. questAttemptId, battleId — for traceability, not a foreign key
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@map("xp_transactions")
+}
+
+// ── Glyph ledger (§16, §17) ───────────────────────────────
+
+enum GlyphDirection {
+  CREDIT
+  DEBIT
+}
+
+model GlyphTransaction {
+  id        String         @id @default(uuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int // always positive; direction says which way it moves the balance
+  direction GlyphDirection
+  reason    String // e.g. "QUEST_COMPLETION", "ALI_OUTFIT_PURCHASE", "INSIGHT_GLYPH_AWARD"
+  source    String
+  reference String?
+  createdAt DateTime       @default(now())
+
+  @@index([userId, createdAt])
+  @@map("glyph_transactions")
+}
+
+// ── Vocabulary (§25 Mastery, §32 Learning Challenges) ─────
+
+// ── Vocabulary (§25 Mastery, §32 Learning Challenges) ─────
+// English-vocabulary spelling/reconstruction model per the Vocabulary
+// Engine spec (7-letter minimum): a word is stored once; the
+// letter-omission challenge shown to a player is generated fresh every
+// time (see src/vocabulary/omission-engine.ts) from baseDifficulty and
+// the player's own Mastery on that word — the omission pattern itself
+// is never persisted on the Word.
+
+enum WordDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model Word {
+  id                     String         @id @default(uuid())
+  word                   String         @unique
+  normalizedWord         String         @unique // lowercase/trimmed `word` — authoritative form for answer comparison AND the case-insensitive uniqueness guard (V20 Vocabulary Vault §1: prevents "Accurate"/"accurate"-style duplicate pairs across CSV batches; `word`'s own @unique is case-sensitive and does not catch this)
+  length                 Int // letter count of `word`; kept in sync at write time (seed/import), not derived on read
+  definition             String
+  partOfSpeech           String
+  exampleSentence        String // the primary sentence — always present, shown as post-answer reinforcement
+  baseDifficulty         WordDifficulty
+  cefrLevel              String? // "A1".."C2"
+  category               String? // e.g. "Nature", "Emotion", "Academic" — Vocabulary Vault §2, drives category-first Adaptive Word Selection
+  difficultyScore        Float? // fine-grained 0-100 selection weight; independent of the coarse baseDifficulty tier
+  frequencyLevel         String? // e.g. "Common", "Rare" — Correction & Completion Spec §5 required metadata
+  usageNotes             String? // register/context notes ("formal", "often used with 'the'", etc.) — Vocabulary Vault §2
+  synonyms               String[]       @default([])
+  antonyms               String[]       @default([])
+  relatedWords           String[]       @default([]) // thematically/semantically related vocabulary, distinct from wordFamily below
+  wordFamily             String[]       @default([]) // inflections/derivations of this same word (e.g. "abandonment, abandoned" for "abandon")
+  pronunciation          String?
+  phoneticRepresentation String? // e.g. IPA "/kəmˈpæʃ.ən/" — distinct from `pronunciation`, which is an audio asset reference
+  audioUrl               String?
+  isActive               Boolean        @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  masteries                Mastery[]
+  challengeAttempts        ChallengeAttempt[]
+  exampleSentences         ExampleSentence[]
+  wordInTheWildMissions    WordInTheWildMission[]
+  wordInTheWildSubmissions WordInTheWildSubmission[]
+  bossBattlePlayers        BossBattlePlayer[]
+  bossBattleEvents         BossBattleEvent[]
+
+  @@index([baseDifficulty])
+  @@index([cefrLevel])
+  @@index([category])
+  @@map("words")
+}
+
+/// Spec v2 §4: exampleSentences is plural/structured, for future contextual
+/// challenges (WL-05/06) beyond the one primary sentence every word has
+/// today. A real table rather than a JSON blob, consistent with how every
+/// other one-to-many relationship in this schema (Mastery, ChallengeAttempt)
+/// is modeled.
+model ExampleSentence {
+  id     String @id @default(uuid())
+  wordId String
+  word   Word   @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  text   String
+
+  createdAt DateTime @default(now())
+
+  @@index([wordId])
+  @@map("example_sentences")
+}
+
+enum MasteryLevel {
+  NEW
+  RECOGNIZING
+  RECALLING
+  STRONG
+  MASTERED
+}
+
+// One row per (user, word) — the word never changes when a player
+// learns it; only this relationship does. `currentLevel` is what the
+// omission engine reads to decide how much of the word to hide (§9) —
+// the same word can be MASTERED for one player and NEW for another.
+model Mastery {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wordId String
+  word   Word   @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  currentLevel         MasteryLevel @default(NEW)
+  masteryScore         Int          @default(0) // 0-100, display/ranking aggregate only — NOT what decides MASTERED (see below)
+  timesPresented       Int          @default(0)
+  timesCorrect         Int          @default(0)
+  timesIncorrect       Int          @default(0)
+  // Consecutive correct guesses; still tracked (feeds guessScore below and
+  // Boss Battle/Word-in-the-Wild XP), but per V1 Remaining Systems Spec §4
+  // a streak can no longer, on its own, produce MASTERED — see
+  // MasteryService.evaluateWordCycleCompletion, the single source of truth.
+  currentCorrectStreak Int          @default(0)
+
+  // The three independently-gated skill areas (Correction & Completion
+  // Spec §2: Speaking/Pronunciation removed from V1 mastery entirely — a
+  // word is MASTERED only when EVERY one of these is >=75. Each is
+  // 0-100, updated as new evidence for that area arrives; a word with no
+  // evidence yet for an area stays at 0, which correctly keeps it out of
+  // MASTERED until the player has actually demonstrated that skill on it.
+  guessScore     Int @default(0) // derived from recent guess accuracy/speed/hint-independence on this word
+  sentenceScore  Int @default(0) // latest Sentence-stage AI score average for this word
+  paragraphScore Int @default(0) // latest Paragraph-stage AI score average for this word
+
+  // Adaptive Word Selection / review scheduling (V1 Remaining Systems Spec
+  // §3) — a lightweight spaced-repetition schedule computed from recency
+  // and correctness, not a full SM-2 implementation. The 0-1 "forgetting
+  // risk" itself is intentionally NOT a stored column here — it's
+  // recomputed live from these two timestamps by
+  // vocabulary/review-schedule.ts's computeForgettingRisk() every time
+  // WordsService ranks candidates, since the whole point of the value is
+  // that it changes daily even with zero new activity; a persisted
+  // snapshot would just go stale between reviews. (A `forgettingRisk`
+  // column existed here through Sprint 1-4 but was dead weight — nothing
+  // ever wrote to it, so it sat permanently at its default of 0 while
+  // ranking already used the live-computed value.)
+  lastReviewedAt  DateTime?
+  nextReviewDueAt DateTime?
+
+  lastPresentedAt DateTime?
+  lastCorrectAt   DateTime?
+  masteredAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, wordId])
+  @@index([userId, currentLevel])
+  @@index([userId, nextReviewDueAt])
+  @@map("masteries")
+}
+
+// ── Quest Engine (§31) ────────────────────────────────────
+// Quest definitions are data, not code — new quests are new rows, not
+// new UI screens. "Daily Quest" is just the QuestType.DAILY row.
+
+enum QuestType {
+  DAILY
+  STANDARD
+}
+
+model Quest {
+  id          String    @id @default(uuid())
+  key         String    @unique // e.g. "morning-quest"
+  title       String
+  description String
+  type        QuestType
+  wordCount   Int       @default(5)
+  baseXp      Int       @default(50) // see config/gameplay-rules.ts — actual award may add per-answer XP on top
+  baseGlyphs  Int       @default(10)
+  isActive    Boolean   @default(true)
+
+  // Player-local hour (0-23) this quest unlocks at — a floor only, never
+  // a ceiling. Once the player's local clock passes windowStartHour, the
+  // quest stays completable indefinitely (today, tonight, tomorrow) —
+  // there is no re-lock and no expiry. windowEndHour is display/labeling
+  // only ("Noon Quest: 12:00-15:59") and is never enforced as a cutoff.
+  // null on both means always available, no window (matches every quest
+  // that existed before this feature).
+  windowStartHour Int?
+  windowEndHour   Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attempts QuestAttempt[]
+
+  @@map("quests")
+}
+
+enum QuestAttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+// V1 Final Systems Spec §3.10's Daily Quest state machine, scoped to one
+// word. ABANDONED/INTERRUPTED/DISCONNECTED/AI_RETRY_REQUIRED/RECOVERING
+// from the spec's fuller machine are represented via QuestAttemptStatus
+// instead (ABANDONED already covers the terminal "didn't finish" case;
+// the others aren't yet meaningfully distinct in this codebase's client
+// integration, so aren't invented here as unused enum values).
+enum WordStage {
+  GUESSING
+  UNDERSTANDING
+  SENTENCE
+  PARAGRAPH
+  OPTIONAL_WILD
+  WORD_COMPLETE
+}
+
+model QuestAttempt {
+  id      String @id @default(uuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questId String
+  quest   Quest  @relation(fields: [questId], references: [id])
+
+  status       QuestAttemptStatus @default(IN_PROGRESS)
+  wordIds      String[] // the words selected for this attempt, in presentation order
+  currentIndex Int                @default(0)
+
+  // The player's local calendar date ("YYYY-MM-DD") this attempt belongs
+  // to — the unit a windowed quest's "already done today" check is
+  // scoped to. Derived server-side from the player's stored timezone via
+  // PlayerClockService/common/timezone.ts's playerLocalDate at creation
+  // — never trusted from the client (see Quest above for the matching
+  // local-hour window check).
+  localDate String
+
+  // The letter-omission challenge currently pending for
+  // wordIds[currentIndex] — persisted so submitAnswer can record exactly
+  // what the player was shown (spec §17: the challenge instance, not
+  // just the word, gets recorded). Regenerating a fresh pattern at
+  // answer time would record something the player never actually saw,
+  // since the omission engine is intentionally non-deterministic (§7/§11).
+  currentDisplayPattern String?
+  currentMissingIndexes Int[]   @default([])
+
+  // Guess stage tracking (V1 Final Systems Spec §3.3) — the XP formula
+  // (see config/gameplay-rules.ts's computeGuessXp) needs exactly these
+  // four numbers to score a correct answer. Counters only ever increase
+  // within one attempt; a fresh attempt (new quest period, or a
+  // restarted attempt after timeout) starts them at their defaults.
+  guessStartedAt  DateTime? // set once, at challenge creation — the 2-minute timer's start instant
+  wrongAttempts   Int       @default(0)
+  hintsUsed       Int       @default(0) // capped at 4 by the service, not the schema
+  synonymsUsed    Int       @default(0) // capped at 2 by the service, not the schema
+  lettersRevealed Int       @default(0) // capped by remaining blanked letters, not a fixed number
+
+  // Which of the word's 6 stages this attempt is currently on (V1 Final
+  // Systems Spec §3.10's state machine). A correct Guess answer moves
+  // this to UNDERSTANDING — it does NOT complete the QuestAttempt;
+  // `status` only becomes COMPLETED once wordStage reaches
+  // WORD_COMPLETE. The old "one correct guess = quest done" behavior
+  // this replaces was itself only a stopgap for when Guess was the
+  // entire loop.
+  wordStage WordStage @default(GUESSING)
+
+  sentenceText      String?
+  sentenceScores    Json? // {grammar, vocabulary, context, naturalness, clarity} — each 0-100, spec §3.4
+  sentenceXpAwarded Int     @default(0)
+
+  paragraphText                 String?
+  paragraphScores               Json? // {grammar, vocabulary, structure, flow, context} — each 0-100, spec §3.5
+  // A rough CEFR-style estimate for THIS ONE submission (spec §3.5:
+  // "not official CEFR until CEFR is unlocked") — previously computed
+  // and returned to the client but never persisted anywhere; this is
+  // the raw evidence ProgressionService.updateEstimatedCefrLevel
+  // aggregates across a player's recent submissions.
+  paragraphEstimatedProficiency String?
+  paragraphXpAwarded            Int     @default(0)
+
+  xpAwarded    Int @default(0)
+  glyphAwarded Int @default(0)
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  challengeAttempts ChallengeAttempt[]
+
+  @@index([userId, status])
+  @@index([userId, questId, localDate])
+  @@map("quest_attempts")
+}
+
+enum ChallengeType {
+  LETTER_OMISSION
+  MULTIPLE_CHOICE
+  FILL_IN_BLANK
+  MEANING_SELECTION
+  CONTEXT_SELECTION
+  DEFINITION_TO_WORD
+  WORD_TO_DEFINITION
+  SYNONYM
+  ANTONYM
+  SENTENCE_CONSTRUCTION
+  WRITING
+  RECALL
+  WORD_IN_THE_WILD
+}
+
+// One row per answered challenge. LETTER_OMISSION is the only type with
+// a real generator + evaluator at foundation stage (see
+// vocabulary/omission-engine.ts + QuestsService) — the enum names the
+// full domain from the Vocabulary Engine spec so later challenge types
+// are additive, not a schema rewrite.
+model ChallengeAttempt {
+  id             String        @id @default(uuid())
+  userId         String // always present — the only way to attribute a WORD_IN_THE_WILD row to a player, since it has no questAttemptId
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Nullable — a Word in the Wild assessment (spec v2 WL-07..10) produces
+  // a ChallengeAttempt too, but doesn't happen inside a Quest session.
+  // Every existing LETTER_OMISSION row still always has one; only
+  // WORD_IN_THE_WILD rows leave it null.
+  questAttemptId String?
+  questAttempt   QuestAttempt? @relation(fields: [questAttemptId], references: [id], onDelete: Cascade)
+  wordId         String
+  word           Word          @relation(fields: [wordId], references: [id])
+
+  challengeType    ChallengeType @default(LETTER_OMISSION)
+  displayPattern   String? // the blanked pattern shown to the player, e.g. "C O _ P A S S _ O N" — LETTER_OMISSION only
+  missingIndexes   Int[]         @default([]) // zero-based indexes into normalizedWord that were blanked — LETTER_OMISSION only
+  presentedOptions String[]      @default([]) // MULTIPLE_CHOICE only — unused by LETTER_OMISSION, kept for that future type
+  submittedAnswer  String
+  isCorrect        Boolean
+  responseTimeMs   Int? // optional client-reported timing; not yet sent by the mobile app
+  xpAwarded        Int           @default(0)
+
+  answeredAt DateTime @default(now())
+
+  wordInTheWildSubmission WordInTheWildSubmission?
+
+  @@index([questAttemptId])
+  @@index([userId])
+  @@map("challenge_attempts")
+}
+
+// ── Word in the Wild (spec v2 WL-07..10) ──────────────────────────────
+// A player finds their target word genuinely used somewhere in the real
+// world (a sign, a book, a conversation) and submits evidence — text
+// they encountered, or a photo — which gets judged and, if approved,
+// feeds into the same Mastery/XP pipeline as any other challenge.
+//
+// Photo evidence needs an S3-compatible bucket (ObjectStorageService)
+// and a configured AI key (EvidenceAssessmentService) — see
+// AppConfigService.isStorageConfigured / isAiConfigured. Text evidence
+// only needs the AI key. Both are unconfigured until real credentials
+// exist; WordInTheWildService returns a clear 503 if used before then,
+// rather than every caller needing to know that detail.
+
+enum WordInTheWildMissionStatus {
+  OPEN
+  SUBMITTED
+}
+
+// One row per (user, word) attempt at a Word in the Wild mission. A
+// fresh mission is created on request (POST .../missions) rather than
+// proactively scheduled — there's no background job/queue in this app
+// yet to generate missions ahead of time, and a player asking "give me
+// something to find" is a perfectly good trigger on its own.
+model WordInTheWildMission {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wordId String
+  word   Word   @relation(fields: [wordId], references: [id])
+
+  status WordInTheWildMissionStatus @default(OPEN)
+
+  createdAt DateTime @default(now())
+
+  submission WordInTheWildSubmission?
+
+  @@index([userId, status])
+  @@map("word_in_the_wild_missions")
+}
+
+enum WordInTheWildEvidenceType {
+  TEXT
+  PHOTO
+}
+
+enum WordInTheWildAssessmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// The evidence answering one mission, and Claude's judgment of it.
+// APPROVED creates a linked WORD_IN_THE_WILD ChallengeAttempt and
+// promotes mastery the same way a correct LETTER_OMISSION answer does;
+// REJECTED has no mastery effect either way (see WordInTheWildService —
+// punishing a genuine attempt with imperfect evidence would be worse
+// than just not rewarding it).
+model WordInTheWildSubmission {
+  id        String               @id @default(uuid())
+  missionId String               @unique
+  mission   WordInTheWildMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wordId    String
+  word      Word                 @relation(fields: [wordId], references: [id])
+
+  evidenceType WordInTheWildEvidenceType
+  evidenceText String? // TEXT evidence verbatim, or PHOTO evidence's Claude-transcribed text
+  photoKey     String? // ObjectStorageService key — PHOTO only; never a public URL, always re-signed on read
+
+  assessmentStatus    WordInTheWildAssessmentStatus @default(PENDING)
+  assessmentReasoning String? // Claude's explanation, shown to the player as-is
+  xpAwarded           Int                           @default(0)
+
+  challengeAttemptId String?           @unique
+  challengeAttempt   ChallengeAttempt? @relation(fields: [challengeAttemptId], references: [id])
+
+  createdAt DateTime  @default(now())
+  // Soft delete only — clears evidenceText/photoKey (and the R2 object
+  // itself, via ObjectStorageService.delete) but keeps the row, so an
+  // already-APPROVED submission's mastery/XP effect stays consistent
+  // with history instead of leaving a dangling reference.
+  deletedAt DateTime?
+
+  @@index([userId])
+  @@map("word_in_the_wild_submissions")
+}
+
+// ── Boss Battle (spec v1.0) ────────────────────────────────────────────
+// A weekly, global, one-hour competitive event: eligible players are
+// randomly grouped in 20s and race to earn the most XP. Reuses the
+// vocabulary/omission engine and MasteryService/ProgressionService
+// exactly as the spec requires ("do not duplicate core vocabulary or
+// scoring logic") — this module only adds matchmaking, the battle-scoped
+// XP ledger, and finalization on top of what already exists.
+//
+// Status on BossBattle/BossBattleGroup is DERIVED from server UTC time,
+// not driven by a background timer (see BossBattleService.deriveStatus)
+// — spec §4/§21's "device clock must never be authoritative" applies
+// just as much to OUR server process as to a player's phone. A process
+// restart at the wrong moment must never leave a battle stuck in the
+// wrong status; computing status fresh on every read is what guarantees
+// that, a timer-driven state flag cannot.
+//
+// Deliberately 4 tables, not the spec's 5 (§19) — boss_battle_players
+// and boss_battle_results describe the same row before and after
+// finalization, not two genuinely separate entities; finalRank/
+// isWinner/rewards just get filled in on the existing player row.
+
+enum BossBattleStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+}
+
+enum BossBattleGroupStatus {
+  FORMING
+  LIVE
+  // V21 §5 "reward duplication prevention": the interim state a group
+  // sits in between the finalization claim and every player's reward
+  // actually landing (see BossBattleService.finalizeGroupIfNeeded).
+  // Replaces an earlier design that flipped straight to COMPLETED
+  // before granting any reward — a crash partway through the reward
+  // loop left the group COMPLETED (and therefore permanently excluded
+  // from every future auto-finalize sweep) with some players never
+  // paid. FINALIZING is retried by the sweep once `finalizingAt` is
+  // older than gameplayRules.bossBattle.finalizationStuckThresholdMs.
+  FINALIZING
+  COMPLETED
+}
+
+model BossBattle {
+  id                String           @id @default(uuid())
+  weekId            String           @unique // ISO week, e.g. "2026-W33" — human-readable, matches the spec's bossbattle_2026_w33_... example
+  scheduledStartUtc DateTime // always a Sunday 17:00:00 UTC
+  scheduledEndUtc   DateTime // always scheduledStartUtc + 60 minutes
+  status            BossBattleStatus @default(SCHEDULED) // a cached last-computed value for cheap listing/display only — never trusted for a live authorization decision; always re-derive from time for anything that matters (see BossBattleService.deriveStatus)
+
+  createdAt   DateTime  @default(now())
+  finalizedAt DateTime?
+
+  groups BossBattleGroup[]
+
+  @@map("boss_battles")
+}
+
+// A 20-player competitive room within one weekly battle. Groups fill
+// dynamically as players join throughout the hour (spec §15 explicitly
+// allows late entry), rather than being assigned all at once up front —
+// there's no way to know who's "eligible and about to join" before they
+// actually do.
+model BossBattleGroup {
+  id          String                @id @default(uuid())
+  battleId    String
+  battle      BossBattle            @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  groupNumber Int // sequential within the battle — the human-readable "_group_N" part of the spec's identifier example
+  status      BossBattleGroupStatus @default(FORMING)
+  playerCount Int                   @default(0) // denormalized for a cheap "is this group full" check without a COUNT query on every join
+
+  // V1 Remaining Systems Spec §13: "no player receives a different
+  // challenge" — a fixed word-ID sequence generated ONCE when the group is
+  // created (see BossBattleService.findOrCreateOpenGroup), shared by every
+  // player who joins it. Each player's progress through it is tracked by
+  // BossBattlePlayer.questionIndex; the word at sharedWordIds[questionIndex]
+  // is authoritative for everyone, replacing the old per-player independent
+  // pickWordsForQuest call.
+  sharedWordIds String[] @default([])
+
+  createdAt DateTime @default(now())
+  // Set when this group is claimed into FINALIZING (see
+  // BossBattleGroupStatus.FINALIZING doc comment) — the auto-finalize
+  // sweep uses this to tell a legitimately-still-running finalization
+  // apart from one that crashed and needs to be retried.
+  finalizingAt DateTime?
+
+  players BossBattlePlayer[]
+
+  @@unique([battleId, groupNumber])
+  @@index([battleId, status])
+  @@map("boss_battle_groups")
+}
+
+// One row per player per group — their live battle state while playing,
+// and their final result once the battle is finalized. battleXp is
+// completely separate from UserProgression.totalXp (spec §20's
+// "Lifetime XP vs Boss Battle XP" distinction) — a correct answer during
+// a battle still awards real lifetime XP via ProgressionService exactly
+// as any other correct answer would, AND increments battleXp here for
+// ranking within this one event.
+model BossBattlePlayer {
+  id      String          @id @default(uuid())
+  groupId String
+  group   BossBattleGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  joinedAt DateTime @default(now())
+
+  battleXp         Int       @default(0)
+  correctAnswers   Int       @default(0)
+  incorrectAnswers Int       @default(0)
+  // Set on every battleXp change — feeds tie-break rule 3 (spec §10:
+  // "earliest player to reach the final tied XP total"). Without this,
+  // a tie between two players who both finished at 18,000 XP would have
+  // no way to know who got there first.
+  lastXpAt         DateTime?
+
+  finalRank Int?
+  isWinner  Boolean @default(false)
+
+  // Snapshotted at finalization from bossBattleRewardForRank(finalRank) —
+  // battleXp above is the in-battle score used for ranking; these are the
+  // actual XP/Glyph amounts awarded to the player's lifetime totals, kept
+  // here too so the post-completion screen can show them (V19
+  // Stabilization Spec §4: "After Completion: Show... Rewards").
+  rewardXp     Int @default(0)
+  rewardGlyphs Int @default(0)
+
+  // Index into BossBattleGroup.sharedWordIds — which shared question this
+  // player is currently on. Players can still answer at their own pace,
+  // but always see the SAME word at a given index as everyone else in the
+  // group (spec §13's "no player receives a different challenge").
+  questionIndex Int @default(0)
+
+  // Current pending challenge — same reasoning as
+  // QuestAttempt.currentDisplayPattern: submitAnswer must record exactly
+  // what was shown, and the omission engine is intentionally
+  // non-deterministic, so a freshly regenerated pattern would very
+  // likely differ from what the player actually saw.
+  currentWordId         String?
+  currentWord           Word?   @relation(fields: [currentWordId], references: [id])
+  currentDisplayPattern String?
+  currentMissingIndexes Int[]   @default([])
+
+  events BossBattleEvent[]
+
+  @@unique([groupId, userId])
+  @@index([groupId, battleXp])
+  @@map("boss_battle_players")
+}
+
+// One row per answered challenge during a battle — the audit trail spec
+// §19 calls for (boss_battle_events), and what the "earliest to reach
+// final tied XP" tie-break is computed from.
+model BossBattleEvent {
+  id       String           @id @default(uuid())
+  playerId String
+  player   BossBattlePlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  wordId   String
+  word     Word             @relation(fields: [wordId], references: [id])
+
+  submittedAnswer String
+  isCorrect       Boolean
+  xpAwarded       Int
+
+  createdAt DateTime @default(now())
+
+  @@index([playerId])
+  @@map("boss_battle_events")
+}
+
+// ── The Order (Final Core Progression Spec §5) ─────────────────────────
+// A Kingdom-level identity/belonging system — "provides no XP, score,
+// mastery, or gameplay benefit" (§5.1). Four fixed Orders (§5.3); the
+// catalog (name, symbol, motto, philosophy) lives in
+// config/order-catalog.ts as static content, not this table — only the
+// player's selection history needs to be a real row.
+
+enum OrderName {
+  SCRIBES
+  SEEKERS
+  ORATORS
+  ARTISANS
+}
+
+// One row per Order selection ever made — "previous Orders are retained
+// as private identity history" (§5.4), never deleted on a change. The
+// most recent row for a user is their current Order; its selectedAt +
+// 30 days is the 30-day change-cooldown check (§5.4) — no separate
+// cached "next eligible" field to keep in sync, it's derived from this
+// table every time.
+model OrderSelection {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order      OrderName
+  selectedAt DateTime  @default(now())
+
+  @@index([userId, selectedAt])
+  @@map("order_selections")
+}
+
+// ── Achievement System (Final Core Progression Spec §6) ────────────────
+// The catalog (name, category, unlock condition, reward) is static
+// config in config/achievement-catalog.ts, not a table — "each
+// achievement has an immutable unique ID" (§6.1) lives there;
+// achievementId below is that catalog key.
+
+model AchievementUnlock {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  // "Each achievement is awarded once" (§6.1) — enforced here, not just
+  // in application logic, so a race between two concurrent triggers
+  // can't double-award.
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@map("achievement_unlocks")
+}
+
+enum QuestCardSource {
+  JOURNEY_COMPLETION
+  BOSS_BATTLE_WIN
+  ACHIEVEMENT
+}
+
+enum QuestCardRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+// "Permanent identity collectibles" (§6.7) — auto-created for Journey
+// completions, Boss Battle wins, and selected major-milestone
+// achievements. No artwork_id here — that implies an art-asset pipeline
+// this codebase doesn't have; a column that would always be null
+// forever is worse than not having it. journey_id from the spec's field
+// list is folded into sourceEventId (the stage key) rather than being a
+// separate column that would only ever apply to one of the three source
+// types.
+model QuestCard {
+  id                        String          @id @default(uuid())
+  userId                    String
+  user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source                    QuestCardSource
+  sourceEventId             String // journey stage key, BossBattleGroup id, or AchievementUnlock id, depending on `source`
+  title                     String
+  category                  String? // the Achievement's category, when source = ACHIEVEMENT
+  playerDisplayNameSnapshot String // captured at creation — a later display-name change must not rewrite this card's history
+  artwork                   String? // asset key — resolved client-side to real art; null renders a category-default frame
+  rarity                    QuestCardRarity @default(COMMON)
+  journeyStageKey           String? // the Journey stage in effect when this card was earned, for display context
+  earnedAt                  DateTime        @default(now())
+
+  // Quest Cards Finalization (V19 Stabilization Spec §8): a player picks
+  // a bounded subset of their cards to feature on their profile.
+  // showcaseOrder is only meaningful while isShowcased is true (1-based
+  // display position); a card that's never been showcased keeps it null
+  // rather than a stale value from a previous showcase.
+  isShowcased   Boolean @default(false)
+  showcaseOrder Int?
+
+  // Correction & Completion Spec §6 ("Quest Cards: add duplicate
+  // protection, ensure unique achievement generation") — one card per
+  // (player, source event) ever, enforced at the database level so a
+  // race (e.g. two near-simultaneous finalization attempts) can't mint
+  // two cards for the same journey stage / achievement / battle result.
+  // The unique index's leftmost column (userId) also serves ordinary
+  // "this player's cards" lookups, so no separate @@index([userId]).
+  @@unique([userId, source, sourceEventId])
+  @@map("quest_cards")
+}
+
+// ── Adaptive AI Learning Engine (V1 Remaining Systems Spec §1) ─────────
+// One row per player — the continuously-updated Learning Profile. Per-word
+// detail (weak/strong, mastery, review schedule) lives on Mastery; this
+// table is the cross-word aggregate plus the one-time Initial Calibration
+// result. Deliberately NOT storing "mastered/learning/weak/strong word"
+// lists here — those are just filtered views over Mastery, recomputing
+// them live avoids a second source of truth that can drift.
+model LearningProfile {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Initial Calibration (§1): the first 3 Daily Quest words act as a
+  // diagnostic. calibrationWordsCompleted counts toward 3; once it hits 3,
+  // recommendedDifficulty/initialCefrEstimate are computed once and
+  // calibrated flips true. recommendedDifficultyAcceptedAt is set when
+  // the player accepts the recommendation (spec: "may accept or reject")
+  // — a rejection leaves it null and currentDifficulty unchanged.
+  //
+  // weaknessAreas is NOT calibration-locked (Correction & Completion
+  // Spec §6 "improve weakness detection") — LearningProfileService
+  // recomputes it from the latest rolling aggregates on every completed
+  // word, so it tracks the player's current weak spots rather than
+  // freezing whatever was true after their first 3 words.
+  calibrated                      Boolean         @default(false)
+  calibrationWordsCompleted       Int             @default(0)
+  currentDifficulty               WordDifficulty  @default(BEGINNER)
+  recommendedDifficulty           WordDifficulty?
+  recommendedDifficultyAcceptedAt DateTime?
+  initialCefrEstimate             String?
+  weaknessAreas                   String[]        @default([])
+
+  // Continuously-updated performance aggregates (§1) — rolling values
+  // updated after each relevant submission, not point-in-time snapshots.
+  avgGuessAccuracy   Float? @default(0) // 0-1
+  // Correction & Completion Spec §6 ("connect all available learning
+  // signals"): rolling averages of the AI-scored Sentence/Paragraph
+  // dimensions from each completed word cycle, 0-100 — the same scale
+  // and the same per-cycle average as Mastery.sentenceScore/
+  // paragraphScore (see common/score-average.ts). Previously only the
+  // Guess-stage signal above was tracked here, so calibration and
+  // weakness detection never saw a player's writing at all.
+  avgSentenceScore    Float? @default(0)
+  avgParagraphScore   Float? @default(0)
+  avgResponseSpeedMs  Int?   @default(0)
+  hintDependencyRate  Float? @default(0) // 0-1, hints-used / hints-available across recent guesses
+  learningConsistency Float? @default(0) // 0-1, derived from streak/activity regularity
+
+  updatedAt DateTime @updatedAt
+
+  @@map("learning_profiles")
+}
+
+// ── CEFR assessment history (V1 Remaining Systems Spec §6) ─────────────
+// UserProgression.estimatedCefrLevel stays the single "current" value for
+// fast reads; this table is the append-only history + confidence score
+// behind it, and what the CEFR progress UI charts over time.
+enum CefrAssessmentSource {
+  PARAGRAPH_SUBMISSION
+  CALIBRATION
+  // The blended Vocabulary growth / Writing ability / Sentence quality /
+  // Paragraph quality / Grammar-context estimate (V19 Stabilization Spec
+  // §13) — recorded every time the aggregate runs, alongside (not instead
+  // of) the raw per-submission PARAGRAPH_SUBMISSION evidence rows.
+  UNIFIED_ASSESSMENT
+}
+
+model CefrAssessment {
+  id         String               @id @default(uuid())
+  userId     String
+  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source     CefrAssessmentSource
+  level      String // "A1".."C2"
+  confidence Float // 0-1
+  dimensions Json? // {grammar, vocabulary, writing} — whichever this submission actually measured (Speaking/Pronunciation removed from V1 — Correction & Completion Spec §2/§3)
+  createdAt  DateTime             @default(now())
+
+  @@index([userId, createdAt])
+  @@map("cefr_assessments")
+}
+
+// ── Notification Engine (V1 Remaining Systems Spec §19) ────────────────
+
+enum NotificationType {
+  MORNING_QUEST
+  AFTERNOON_QUEST
+  EVENING_QUEST
+  REVIEW_REMINDER
+  FORGETTING_CURVE_REMINDER
+  WEAK_SKILL_REMINDER
+  LEVEL_UP
+  JOURNEY_UNLOCK
+  ACHIEVEMENT_UNLOCK
+  CEFR_UNLOCK
+  BOSS_BATTLE_REMINDER
+  BOSS_BATTLE_RESULT
+  LEADERBOARD_UPDATE
+}
+
+// A notification is always written here first (in-app history/inbox),
+// then optionally pushed — sentAt distinguishes "delivered as a push" from
+// "in-app only" (e.g. push skipped: no token, quiet hours, preference off).
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  deepLink  String? // e.g. "wordquest://boss-battle/<id>"
+  data      Json?
+  readAt    DateTime?
+  sentAt    DateTime? // when a push was actually dispatched; null = in-app only (so far)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+// One row per user — category toggles + quiet hours. Quiet-hour bounds are
+// PLAYER-LOCAL hours (0-23), evaluated against the same server-derived
+// local time as everything else in §15 — never the device clock.
+model NotificationPreference {
+  userId                   String   @id
+  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyQuestsEnabled       Boolean  @default(true)
+  learningRemindersEnabled Boolean  @default(true)
+  progressEnabled          Boolean  @default(true)
+  competitionEnabled       Boolean  @default(true)
+  quietHoursStartHour      Int? // player-local hour, 0-23; null = no quiet hours set
+  quietHoursEndHour        Int?
+  updatedAt                DateTime @updatedAt
+
+  @@map("notification_preferences")
+}
+
+// Expo push tokens — one device can re-register (upsert on token), a user
+// can have several (multiple devices). Delivery goes through Expo's push
+// API, which needs no server-side secret for the common case (see
+// notifications/push.provider.ts) — real iOS/Android production credentials
+// (APNs key, FCM server key) are an Expo/EAS project-level configuration
+// step outside this codebase, not something this table blocks on.
+model PushToken {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token      String   @unique
+  platform   String // "ios" | "android"
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("push_tokens")
+}
+
+// ── Security / audit events (V1 Remaining Systems Spec §14) ────────────
+
+enum SecurityEventType {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGIN_BLOCKED_LOCKED
+  PASSWORD_CHANGED
+  PASSWORD_RESET_REQUESTED
+  EMAIL_VERIFIED
+  ACCOUNT_RECOVERED
+  ACCOUNT_DELETED
+  REFRESH_TOKEN_REUSE_DETECTED
+  SESSION_LIFETIME_EXCEEDED
+  DATA_EXPORTED
+}
+
+model SecurityEvent {
+  id        String            @id @default(uuid())
+  userId    String
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      SecurityEventType
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime          @default(now())
+
+  @@index([userId, createdAt])
+  @@map("security_events")
+}
+
+// ── Glyph shop foundation (V1 Remaining Systems Spec §9) ───────────────
+// Deliberately minimal: a static-ish catalog + a purchase ledger entry per
+// buy. Cosmetic-only by construction — nothing here ever touches XP,
+// mastery, level, or ranking; ShopService.purchase only ever calls
+// ProgressionService.spendGlyphs.
+
+model ShopItem {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String
+  category    String // e.g. "ALI_OUTFIT", "ALI_ACCESSORY"
+  priceGlyphs Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  purchases ShopPurchase[]
+
+  @@map("shop_items")
+}
+
+model ShopPurchase {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId      String
+  item        ShopItem @relation(fields: [itemId], references: [id])
+  priceGlyphs Int
+  purchasedAt DateTime @default(now())
+
+  // Glyph Economy Hardening (V19 Stabilization Spec §9): one purchase per
+  // item per player, enforced at the DB level so two concurrent purchase
+  // requests can't both succeed and double-charge/double-own the same item.
+  @@unique([userId, itemId])
+  @@index([userId, purchasedAt])
+  @@map("shop_purchases")
+}
+
+// ── ALI — Adaptive Learning Intelligence (Final Core Progression Spec §4) ──
+// A persistent AI companion that reads authoritative state and generates
+// contextual reactions — "ALI is never the authority for progression"
+// (§4.1), true by construction here: this table is the ONLY thing this
+// feature ever writes to.
+
+enum AliEventType {
+  LEVEL_UP
+  QUEST_COMPLETION
+  JOURNEY_COMPLETION
+  ACHIEVEMENT_UNLOCK
+  BOSS_BATTLE_RESULT
+  STREAK_MILESTONE
+  MASTERY_EVENT
+  ORDER_SELECTION
+  // On-demand Learning Assistant / AI Tutor capabilities (spec §4.2) —
+  // player-initiated rather than fired off an authoritative progression
+  // event, but persisted as AliMessage rows the same as every other type.
+  MISTAKE_EXPLANATION
+  VOCABULARY_ALTERNATIVES
+  WRITING_FEEDBACK
+  FORGETTING_CURVE_REMINDER
+}
+
+// "ALI personality responses are versioned so model/personality changes
+// do not alter historical records" (§4.6) — promptVersion is that
+// version tag; a later prompt/model change only affects NEW rows, past
+// ones keep showing exactly what was generated at the time.
+model AliMessage {
+  id             String       @id @default(uuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventType      AliEventType
+  eventContext   Json // the structured event payload that produced this message — audit trail, not re-derived later
+  text           String
+  recommendation String?
+  tone           String // the tone tier at generation time, e.g. "Kingdom" (§4.4)
+  promptVersion  String
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@map("ali_messages")
+}
+
+// ── Three-Word Master Challenge (V1 Final Systems Spec §3.8) ────────────
+// A daily-level concept, not tied to any single QuestAttempt — it spans
+// all three of a player's daily words (Morning/Afternoon/Evening),
+// keyed by the same player-local calendar date used elsewhere in the
+// quest system.
+
+enum MasterChallengeStatus {
+  LOCKED // not all three daily words are COMPLETED yet
+  AVAILABLE // eligible, not yet attempted
+  COMPLETED
+}
+
+model DailyMasterChallenge {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  localDate String // player-local "YYYY-MM-DD" — same concept QuestAttempt.localDate uses
+
+  status MasterChallengeStatus @default(LOCKED)
+
+  paragraphText String?
+  scores        Json? // {wordUsage, coherence, grammar, structure, vocabulary, context} — each 0-100
+  xpAwarded     Int     @default(0) // max 250 (spec §3.8) — deliberately separate from the per-word rewards, never duplicating them
+
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, localDate])
+  @@map("daily_master_challenges")
+}
+
+// ── Idempotency (V1 Final Systems Spec §3.7: "server-side idempotency
+// [is] mandatory") ───────────────────────────────────────────────────
+// A client-supplied key (Idempotency-Key header), scoped per (user,
+// endpoint) — a retried request with the same key returns the cached
+// response from the first successful attempt instead of re-running the
+// handler and re-granting its reward. Applied specifically to
+// BossBattleService.submitAnswer, the one reward-granting endpoint in
+// this codebase that's designed to be called repeatedly with no
+// natural "already done" state gate of its own to fall back on — every
+// other reward-granting endpoint (the Daily Quest Loop's per-stage
+// submissions, Master Challenge) already rejects a retry-after-success
+// via its own stage/status check, which is genuine idempotency, just
+// not implemented through this table.
+model IdempotencyKey {
+  id           String @id @default(uuid())
+  userId       String
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key          String // client-supplied, e.g. a UUID it generates once per logical action
+  endpoint     String // scopes the key to one specific action, e.g. "boss-battle.submitAnswer"
+  responseBody Json // the cached successful response, returned verbatim on a retry
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, key, endpoint])
+  @@map("idempotency_keys")
+}

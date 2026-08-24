@@ -1,0 +1,6 @@
+-- AlterEnum
+ALTER TYPE "SecurityEventType" ADD VALUE 'SESSION_LIFETIME_EXCEEDED';
+
+-- AlterTable
+ALTER TABLE "refresh_tokens" ADD COLUMN     "sessionStartedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
