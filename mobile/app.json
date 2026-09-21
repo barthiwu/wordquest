@@ -28,6 +28,14 @@
         {
           "color": "#12102A"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
       ]
     ],
     "ios": {
