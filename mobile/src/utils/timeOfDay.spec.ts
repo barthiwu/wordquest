@@ -1,4 +1,4 @@
-import { localDateString, timeOfDayGreeting, timeOfDayPeriod } from './timeOfDay';
+import { formatLocalClock, localDateString, timeOfDayGreeting, timeOfDayPeriod } from './timeOfDay';
 
 function atHour(hour: number, minute = 0): Date {
   const d = new Date(2026, 0, 1, hour, minute, 0);
@@ -45,6 +45,14 @@ describe('timeOfDayGreeting', () => {
     expect(timeOfDayGreeting(atHour(8))).toBe('Good morning');
     expect(timeOfDayGreeting(atHour(13))).toBe('Good afternoon');
     expect(timeOfDayGreeting(atHour(20))).toBe('Good evening');
+  });
+});
+
+describe('formatLocalClock', () => {
+  it('formats HH:MM zero-padded, not just the hour', () => {
+    expect(formatLocalClock(atHour(6, 7))).toBe('06:07');
+    expect(formatLocalClock(atHour(18, 0))).toBe('18:00');
+    expect(formatLocalClock(atHour(23, 59))).toBe('23:59');
   });
 });
 

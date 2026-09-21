@@ -1,6 +1,6 @@
 import { NavigationContainer, type NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { colors } from '@/constants/theme';
+import { useThemeColors, useThemeStore } from '@/state/themeStore';
 import { SplashScreen } from '@/features/splash/SplashScreen';
 import { WelcomeScreen } from '@/features/welcome/WelcomeScreen';
 import { RegistrationScreen } from '@/features/auth/RegistrationScreen';
@@ -31,6 +31,10 @@ import { NotificationsScreen } from '@/features/notifications/NotificationsScree
 import { CalibrationResultScreen } from '@/features/learning-profile/CalibrationResultScreen';
 import { QuestCardGalleryScreen } from '@/features/quest-cards/QuestCardGalleryScreen';
 import { QuestCardDetailScreen } from '@/features/quest-cards/QuestCardDetailScreen';
+import { WordMasteryScreen } from '@/features/passport/WordMasteryScreen';
+import { WordPracticeScreen } from '@/features/passport/WordPracticeScreen';
+import { LevelRoadmapScreen } from '@/features/passport/LevelRoadmapScreen';
+import { PrivacyPolicyScreen } from '@/features/legal/PrivacyPolicyScreen';
 import type { WordCompletionResult } from '@/services/quests';
 import type { Submission } from '@/services/word-in-the-wild';
 import { linking } from './linking';
@@ -79,16 +83,22 @@ export type RootStackParamList = {
   CalibrationResult: undefined;
   QuestCardGallery: undefined;
   QuestCardDetail: { id: string };
+  WordMastery: undefined;
+  WordPractice: { wordId: string };
+  LevelRoadmap: { currentLevel: number; totalXp: number };
+  PrivacyPolicy: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
+  const colors = useThemeColors();
+  const mode = useThemeStore((s) => s.mode);
   return (
     <NavigationContainer
       linking={linking}
       theme={{
-        dark: true,
+        dark: mode === 'dark',
         colors: {
           primary: colors.arcane,
           background: colors.background,
@@ -130,6 +140,10 @@ export function RootNavigator() {
         <Stack.Screen name="CalibrationResult" component={CalibrationResultScreen} />
         <Stack.Screen name="QuestCardGallery" component={QuestCardGalleryScreen} />
         <Stack.Screen name="QuestCardDetail" component={QuestCardDetailScreen} />
+        <Stack.Screen name="WordMastery" component={WordMasteryScreen} />
+        <Stack.Screen name="WordPractice" component={WordPracticeScreen} />
+        <Stack.Screen name="LevelRoadmap" component={LevelRoadmapScreen} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

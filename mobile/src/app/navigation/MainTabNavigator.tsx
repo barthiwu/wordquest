@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { HomeScreen } from '@/features/home/HomeScreen';
 import { QuestScreen } from '@/features/quests/QuestScreen';
 import { JourneyScreen } from '@/features/journey/JourneyScreen';
@@ -37,6 +37,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
  * most directly about.
  */
 export function MainTabNavigator() {
+  const colors = useThemeColors();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({

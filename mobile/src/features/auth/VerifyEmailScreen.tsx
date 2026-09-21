@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { verifyEmail } from '@/services/auth';
 import { useAuthStore } from '@/state/authStore';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -22,6 +24,9 @@ type Status = 'verifying' | 'success' | 'error' | 'missingToken';
  * player who's on a different device than the one the email arrived on.
  */
 export function VerifyEmailScreen({ route, navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const token = route.params?.token;
   const [status, setStatus] = useState<Status>(token ? 'verifying' : 'missingToken');
@@ -99,13 +104,16 @@ export function VerifyEmailScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.xl,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xl,
     gap: spacing.md,
   },
   title: {
@@ -125,3 +133,4 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
 });
+}

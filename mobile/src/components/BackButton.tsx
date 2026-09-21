@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { colors, spacing, typography } from '@/constants/theme';
+import { spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 
 /**
  * Every screen in the stack renders with `headerShown: false` (see
@@ -8,6 +10,8 @@ import { colors, spacing, typography } from '@/constants/theme';
  * than replacing, which therefore needs a way back.
  */
 export function BackButton({ onPress }: { onPress: () => void }) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <Pressable
       onPress={onPress}
@@ -22,7 +26,9 @@ export function BackButton({ onPress }: { onPress: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   button: { alignSelf: 'flex-start', paddingVertical: spacing.xs },
   text: { color: colors.arcaneSoft, fontSize: typography.scale.md, fontWeight: '700' },
 });
+}

@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { FadeInUp } from '@/components/FadeInUp';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
@@ -13,6 +16,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'EvidenceResult'>;
  * with better evidence next time.
  */
 export function EvidenceResultScreen({ route, navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const submission = route.params;
   const approved = submission.assessmentStatus === 'APPROVED';
 
@@ -49,11 +55,14 @@ export function EvidenceResultScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xl,
     justifyContent: 'center',
     gap: spacing.lg,
   },
@@ -79,3 +88,4 @@ const styles = StyleSheet.create({
   },
   doneButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
 });
+}

@@ -34,9 +34,11 @@ export interface PassportOrder {
 
 export interface PassportView {
   displayName: string;
+  avatarUrl: string | null;
   countryCode: string | null;
   clan: { name: string; bannerAsset: string } | null;
   level: number;
+  totalXp: number;
   journeyStageName: string;
   wordsMastered: number;
   currentStreak: number;

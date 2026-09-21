@@ -28,6 +28,19 @@ export function timeOfDayGreeting(date: Date = new Date()): string {
  * in UTC themselves. This is what quest-window gating sends the server,
  * alongside the local hour.
  */
+/**
+ * The player's exact local wall-clock time as "HH:MM" (24-hour,
+ * zero-padded) -- e.g. "18:07", never floored/bucketed to the hour.
+ * QuestScreen's "Your local time" display used to show only
+ * `getHours()` (always ":00"), which read as an approximation rather
+ * than the actual current time.
+ */
+export function formatLocalClock(date: Date = new Date()): string {
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
 export function localDateString(date: Date = new Date()): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');

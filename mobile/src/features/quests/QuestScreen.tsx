@@ -1,10 +1,12 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { listQuests, type QuestCatalogEntry } from '@/services/quests';
 import { useAuthStore } from '@/state/authStore';
-import { timeOfDayPeriod } from '@/utils/timeOfDay';
+import { formatLocalClock, timeOfDayPeriod } from '@/utils/timeOfDay';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -27,6 +29,9 @@ type Props = CompositeScreenProps<
  * the tab bar disappears during actual play.
  */
 export function QuestScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [quests, setQuests] = useState<QuestCatalogEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +45,18 @@ export function QuestScreen({ navigation }: Props) {
 
   useFocusEffect(load);
 
-  const localHour = new Date().getHours();
+  // The player's actual local clock, not a value frozen at mount --
+  // "Your local time should not be approximated, it should be exact
+  // like the actual time" (it used to show only getHours(), always
+  // reading e.g. "18:00" regardless of the real minute). Ticks every
+  // 15s, which is plenty for a clock label and for the quest-unlock
+  // hour boundary below to flip on its own while this screen is open.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 15000);
+    return () => clearInterval(interval);
+  }, []);
+  const localHour = now.getHours();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -97,17 +113,20 @@ export function QuestScreen({ navigation }: Props) {
       })}
 
       <Text style={styles.deviceTime}>
-        Your local time: {timeOfDayPeriod()} ({localHour}:00)
+        Your local time: {timeOfDayPeriod(now)} ({formatLocalClock(now)})
       </Text>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xl,
     gap: spacing.md,
   },
   centered: { alignItems: 'center', paddingVertical: spacing.xl },
@@ -153,3 +172,4 @@ const styles = StyleSheet.create({
   buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
   deviceTime: { color: colors.inkMuted, fontSize: typography.scale.xs, textAlign: 'center' },
 });
+}

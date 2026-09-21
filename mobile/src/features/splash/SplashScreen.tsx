@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-import { colors, spacing, typography } from '@/constants/theme';
+import { spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { useAuthStore } from '@/state/authStore';
 import { syncPushToken } from '@/utils/pushNotifications';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -19,6 +20,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
  * itself is fast, so the wordmark doesn't just flash.
  */
 export function SplashScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const hydrate = useAuthStore((s) => s.hydrate);
 
   useEffect(() => {
@@ -49,7 +52,8 @@ export function SplashScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -67,3 +71,4 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
 });
+}

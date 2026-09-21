@@ -18,6 +18,8 @@ export function register(input: {
   password: string;
   displayName: string;
   countryCode?: string;
+  /** "YYYY-MM-DD" — age gate (COPPA), enforced server-side in AuthService.register. */
+  dateOfBirth: string;
 }): Promise<AuthResult> {
   return apiRequest<AuthResult>('/auth/register', { method: 'POST', body: input });
 }

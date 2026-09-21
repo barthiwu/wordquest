@@ -1,7 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import {
   MAX_SHOWCASE_CARDS,
   getMyQuestCards,
@@ -15,12 +17,14 @@ import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'QuestCardGallery'>;
 
-const RARITY_COLORS: Record<QuestCard['rarity'], string> = {
-  COMMON: colors.inkMuted,
-  RARE: colors.arcaneSoft,
-  EPIC: colors.glyph,
-  LEGENDARY: colors.warning,
-};
+function getRarityColors(colors: ThemeColors): Record<QuestCard['rarity'], string> {
+  return {
+    COMMON: colors.inkMuted,
+    RARE: colors.arcaneSoft,
+    EPIC: colors.glyph,
+    LEGENDARY: colors.warning,
+  };
+}
 
 /**
  * Quest Card gallery — "permanent identity collectibles" (Final Core
@@ -35,6 +39,10 @@ const RARITY_COLORS: Record<QuestCard['rarity'], string> = {
  * change their mind before committing.
  */
 export function QuestCardGalleryScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const RARITY_COLORS = useMemo(() => getRarityColors(colors), [colors]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [cards, setCards] = useState<QuestCard[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -181,9 +189,10 @@ export function QuestCardGalleryScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: spacing.xxl, gap: spacing.md },
+  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
   centered: {
     flex: 1,
     backgroundColor: colors.background,
@@ -234,3 +243,4 @@ const styles = StyleSheet.create({
   saveButtonDisabled: { opacity: 0.5 },
   saveButtonText: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
 });
+}

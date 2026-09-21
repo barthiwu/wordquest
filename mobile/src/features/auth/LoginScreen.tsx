@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -9,7 +9,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { login } from '@/services/auth';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
@@ -20,6 +22,9 @@ import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export function LoginScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const setSession = useAuthStore((s) => s.setSession);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -115,12 +120,14 @@ export function LoginScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
-    paddingTop: spacing.xxl * 1.5,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xxl * 1.5,
     gap: spacing.xl,
   },
   header: { gap: spacing.xs },
@@ -164,3 +171,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
+}

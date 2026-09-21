@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -8,7 +9,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import {
   acknowledgeUnderstanding,
   completeWord,
@@ -25,11 +30,19 @@ import {
   type SentenceResult,
   type UnderstandingContent,
 } from '@/services/quests';
-import { submitTextEvidence } from '@/services/word-in-the-wild';
+import {
+  createPhotoUploadTarget,
+  submitPhotoEvidence,
+  submitTextEvidence,
+  uploadPhotoToR2,
+  type PhotoContentType,
+} from '@/services/word-in-the-wild';
 import { explainMistake } from '@/services/ali';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { useEvidenceModeStore, type EvidenceMode } from '@/state/evidenceModeStore';
 import { FadeInUp } from '@/components/FadeInUp';
+import { AliBubble } from '@/components/AliBubble';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -68,7 +81,18 @@ interface GuessFeedback {
   aliQuickReaction: string | null;
 }
 
+const MODE_ICONS: Record<
+  EvidenceMode,
+  { active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }
+> = {
+  TEXT: { active: 'document-text', inactive: 'document-text-outline' },
+  PHOTO: { active: 'camera', inactive: 'camera-outline' },
+};
+
 export function DailyQuestScreen({ route, navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { questKey } = route.params;
   const accessToken = useAuthStore((s) => s.accessToken);
   const [stage, setStage] = useState<Stage>('loading');
@@ -87,10 +111,38 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   const [paragraphText, setParagraphText] = useState('');
   const [paragraphResult, setParagraphResult] = useState<ParagraphResult | null>(null);
   const [wildText, setWildText] = useState('');
+  const [wildPhoto, setWildPhoto] = useState<{ uri: string; contentType: PhotoContentType } | null>(
+    null,
+  );
+  const [wildError, setWildError] = useState<string | null>(null);
   const [wildBusy, setWildBusy] = useState(false);
+  // Guess/sentence/paragraph submissions all hit the AI evaluator, which
+  // routinely takes several seconds (a real model call generating scored
+  // feedback -- never instant, unlike the Word in the Wild flow's own
+  // wildBusy guard, which already covers this pattern for that stage).
+  // These three didn't have an in-flight guard: the buttons stayed enabled
+  // the whole time the request was outstanding, so a slow response
+  // invited a second tap, which then hit the stage-already-claimed
+  // rejection because the first request was still landing.
+  const [guessBusy, setGuessBusy] = useState(false);
+  const [sentenceBusy, setSentenceBusy] = useState(false);
+  const [paragraphBusy, setParagraphBusy] = useState(false);
   const [mistakeExplanation, setMistakeExplanation] = useState<string | null>(null);
   const [mistakeExplanationLoading, setMistakeExplanationLoading] = useState(false);
+  const [aliBubble, setAliBubble] = useState<{ id: number; message: string } | null>(null);
+  const aliBubbleCounter = useRef(0);
   const inputRefs = useRef<Record<number, TextInput | null>>({});
+
+  // Text vs Photo defaults to whatever the player last used on the standalone
+  // Word in the Wild flow (SubmitEvidenceScreen) — the two share
+  // useEvidenceModeStore so the preference carries over either direction.
+  const lastWildMode = useEvidenceModeStore((s) => s.lastMode);
+  const setLastWildMode = useEvidenceModeStore((s) => s.setLastMode);
+  const [wildMode, setWildModeState] = useState<EvidenceMode>(lastWildMode);
+  const setWildMode = (next: EvidenceMode) => {
+    setWildModeState(next);
+    setLastWildMode(next);
+  };
 
   const load = (attemptIdToResume?: string) => {
     if (!accessToken) return;
@@ -99,7 +151,25 @@ export function DailyQuestScreen({ route, navigation }: Props) {
       .then((view) => {
         setChallenge(view);
         setAttemptId(view.questAttemptId);
-        setStage('guess');
+        // Resuming an in-progress attempt can land anywhere the player
+        // left off, not just Guess — the backend now tells us the real
+        // stage (wordStage) instead of always implying Guess, which used
+        // to send a resumed player into the guess-blank UI for an
+        // attempt already past that stage (every submission then failed
+        // with "not currently at the Guess stage").
+        switch (view.wordStage) {
+          case 'SENTENCE':
+            setStage('sentence');
+            break;
+          case 'PARAGRAPH':
+            setStage('paragraph');
+            break;
+          case 'OPTIONAL_WILD':
+            setStage('optionalWild');
+            break;
+          default:
+            setStage('guess');
+        }
       })
       .catch((err) => {
         // A BadRequestException here is usually the gating rule talking —
@@ -141,7 +211,9 @@ export function DailyQuestScreen({ route, navigation }: Props) {
 
   const onSubmitGuess = async () => {
     if (!accessToken || !challenge || !attemptId || stage !== 'guess' || !allBlanksFilled) return;
+    if (guessBusy) return;
     const answer = buildAnswer(challenge);
+    setGuessBusy(true);
     try {
       const result = await submitAnswer(accessToken, attemptId, answer);
       setGuessFeedback({
@@ -152,12 +224,19 @@ export function DailyQuestScreen({ route, navigation }: Props) {
         xpAwarded: result.xpAwarded,
         aliQuickReaction: result.aliQuickReaction,
       });
+      if (result.aliQuickReaction) {
+        aliBubbleCounter.current += 1;
+        setAliBubble({ id: aliBubbleCounter.current, message: result.aliQuickReaction });
+      }
       if (result.isCorrect && result.understanding) {
         setUnderstanding(result.understanding);
       }
       setStage('guessFeedback');
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError) setErrorMessage(err.message);
       setStage('error');
+    } finally {
+      setGuessBusy(false);
     }
   };
 
@@ -239,19 +318,25 @@ export function DailyQuestScreen({ route, navigation }: Props) {
     try {
       await acknowledgeUnderstanding(accessToken, attemptId);
       setStage('sentence');
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError) setErrorMessage(err.message);
       setStage('error');
     }
   };
 
   const onSubmitSentence = async () => {
     if (!accessToken || !attemptId || !sentenceText.trim()) return;
+    if (sentenceBusy) return;
+    setSentenceBusy(true);
     try {
       const result = await submitSentence(accessToken, attemptId, sentenceText.trim());
       setSentenceResult(result);
       setStage('sentenceFeedback');
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError) setErrorMessage(err.message);
       setStage('error');
+    } finally {
+      setSentenceBusy(false);
     }
   };
 
@@ -262,27 +347,72 @@ export function DailyQuestScreen({ route, navigation }: Props) {
 
   const onSubmitParagraph = async () => {
     if (!accessToken || !attemptId || !paragraphValid) return;
+    if (paragraphBusy) return;
+    setParagraphBusy(true);
     try {
       const result = await submitParagraph(accessToken, attemptId, paragraphText.trim());
       setParagraphResult(result);
       setStage('paragraphFeedback');
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError) setErrorMessage(err.message);
       setStage('error');
+    } finally {
+      setParagraphBusy(false);
     }
   };
 
+  const pickWildPhoto = async (source: 'camera' | 'library') => {
+    setWildError(null);
+    const permission =
+      source === 'camera'
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      setWildError(
+        `WordQuest needs ${source === 'camera' ? 'camera' : 'photo library'} access to do this.`,
+      );
+      return;
+    }
+
+    const result =
+      source === 'camera'
+        ? await ImagePicker.launchCameraAsync({ quality: 0.8 })
+        : await ImagePicker.launchImageLibraryAsync({ quality: 0.8 });
+
+    if (result.canceled) return;
+    const asset = result.assets[0];
+    setWildPhoto({
+      uri: asset.uri,
+      contentType: asset.mimeType === 'image/png' ? 'image/png' : 'image/jpeg',
+    });
+  };
+
+  /**
+   * Optional Wild evidence can be a written description (submitTextEvidence)
+   * or, since the whole point of this step is proving the word got used for
+   * real, a screenshot of that real usage (the same three-step R2 upload
+   * SubmitEvidenceScreen uses: presigned URL -> PUT bytes -> tell the
+   * backend the key so it can assess them). Either way the mission itself
+   * is created fresh here, tied to this quest attempt's word.
+   */
   const finishWord = async (submitWildEvidence: boolean) => {
     if (!accessToken || !attemptId) return;
     setWildBusy(true);
+    setWildError(null);
     try {
-      if (submitWildEvidence && wildText.trim()) {
+      if (submitWildEvidence && wildMode === 'PHOTO' && wildPhoto) {
+        const mission = await createOptionalWildMission(accessToken, attemptId);
+        const target = await createPhotoUploadTarget(accessToken, mission.id, wildPhoto.contentType);
+        await uploadPhotoToR2(target.uploadUrl, wildPhoto.uri, wildPhoto.contentType);
+        await submitPhotoEvidence(accessToken, mission.id, target.key);
+      } else if (submitWildEvidence && wildMode === 'TEXT' && wildText.trim()) {
         const mission = await createOptionalWildMission(accessToken, attemptId);
         await submitTextEvidence(accessToken, mission.id, wildText.trim());
       }
       const result = await completeWord(accessToken, attemptId);
       navigation.replace('QuestComplete', result);
-    } catch {
-      setStage('error');
+    } catch (err) {
+      setWildError(err instanceof ApiError ? err.message : 'Could not submit your evidence.');
     } finally {
       setWildBusy(false);
     }
@@ -307,8 +437,16 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   if (stage === 'guess' || stage === 'guessFeedback') {
     const tokens = challenge.displayPattern.split(' ');
     return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.progressLabel}>Guess</Text>
+      <View style={styles.flexFill}>
+        {aliBubble && (
+          <AliBubble
+            key={aliBubble.id}
+            message={aliBubble.message}
+            onDismiss={() => setAliBubble(null)}
+          />
+        )}
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={styles.progressLabel}>Guess</Text>
 
         <View style={styles.clueCard}>
           <Text style={styles.partOfSpeech}>{challenge.partOfSpeech}</Text>
@@ -373,13 +511,13 @@ export function DailyQuestScreen({ route, navigation }: Props) {
             {synonym && <Text style={styles.affordanceText}>Synonym: {synonym}</Text>}
 
             <Pressable
-              style={[styles.button, !allBlanksFilled && styles.buttonDisabled]}
+              style={[styles.button, (!allBlanksFilled || guessBusy) && styles.buttonDisabled]}
               onPress={onSubmitGuess}
-              disabled={!allBlanksFilled}
+              disabled={!allBlanksFilled || guessBusy}
               accessibilityRole="button"
               accessibilityLabel="Submit"
             >
-              <Text style={styles.buttonText}>Submit</Text>
+              {guessBusy ? <ActivityIndicator color={colors.ink} /> : <Text style={styles.buttonText}>Submit</Text>}
             </Pressable>
           </>
         )}
@@ -402,9 +540,6 @@ export function DailyQuestScreen({ route, navigation }: Props) {
               <Text style={styles.revealText}>
                 The word was <Text style={styles.revealWord}>{guessFeedback.correctAnswer}</Text>
               </Text>
-            )}
-            {guessFeedback.aliQuickReaction && (
-              <Text style={styles.aliReactionText}>{guessFeedback.aliQuickReaction}</Text>
             )}
             {!guessFeedback.isCorrect && !guessFeedback.timedOut && !mistakeExplanation && (
               <Pressable
@@ -436,7 +571,8 @@ export function DailyQuestScreen({ route, navigation }: Props) {
             </Pressable>
           </FadeInUp>
         )}
-      </ScrollView>
+        </ScrollView>
+      </View>
     );
   }
 
@@ -484,13 +620,13 @@ export function DailyQuestScreen({ route, navigation }: Props) {
           accessibilityLabel="Your sentence"
         />
         <Pressable
-          style={[styles.button, !sentenceText.trim() && styles.buttonDisabled]}
+          style={[styles.button, (!sentenceText.trim() || sentenceBusy) && styles.buttonDisabled]}
           onPress={onSubmitSentence}
-          disabled={!sentenceText.trim()}
+          disabled={!sentenceText.trim() || sentenceBusy}
           accessibilityRole="button"
           accessibilityLabel="Submit"
         >
-          <Text style={styles.buttonText}>Submit</Text>
+          {sentenceBusy ? <ActivityIndicator color={colors.ink} /> : <Text style={styles.buttonText}>Submit</Text>}
         </Pressable>
       </ScrollView>
     );
@@ -501,7 +637,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.progressLabel}>Sentence — {sentenceResult.xpAwarded} XP</Text>
         <FadeInUp style={styles.feedbackGroup}>
-          <ScoreList scores={sentenceResult.scores as unknown as Record<string, number>} />
+          <ScoreList scores={sentenceResult.scores as unknown as Record<string, number>} styles={styles} />
           <Text style={styles.definition}>{sentenceResult.whatWentWell}</Text>
           <Text style={styles.affordanceText}>{sentenceResult.whatNeedsImprovement}</Text>
           {sentenceResult.betterVersion && (
@@ -538,13 +674,13 @@ export function DailyQuestScreen({ route, navigation }: Props) {
         />
         <Text style={styles.affordanceText}>{paragraphWordCount} / 30-100 words</Text>
         <Pressable
-          style={[styles.button, !paragraphValid && styles.buttonDisabled]}
+          style={[styles.button, (!paragraphValid || paragraphBusy) && styles.buttonDisabled]}
           onPress={onSubmitParagraph}
-          disabled={!paragraphValid}
+          disabled={!paragraphValid || paragraphBusy}
           accessibilityRole="button"
           accessibilityLabel="Submit"
         >
-          <Text style={styles.buttonText}>Submit</Text>
+          {paragraphBusy ? <ActivityIndicator color={colors.ink} /> : <Text style={styles.buttonText}>Submit</Text>}
         </Pressable>
       </ScrollView>
     );
@@ -555,7 +691,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.progressLabel}>Paragraph — {paragraphResult.xpAwarded} XP</Text>
         <FadeInUp style={styles.feedbackGroup}>
-          <ScoreList scores={paragraphResult.scores as unknown as Record<string, number>} />
+          <ScoreList scores={paragraphResult.scores as unknown as Record<string, number>} styles={styles} />
           <Text style={styles.affordanceText}>
             Estimated proficiency: {paragraphResult.estimatedProficiency}
           </Text>
@@ -575,6 +711,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   }
 
   if (stage === 'optionalWild') {
+    const wildSubmitDisabled = wildBusy || (wildMode === 'TEXT' ? !wildText.trim() : !wildPhoto);
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.progressLabel}>Word in the Wild (optional)</Text>
@@ -582,19 +719,81 @@ export function DailyQuestScreen({ route, navigation }: Props) {
           Spotted “{understanding?.word ?? 'this word'}” out in the real world — a sign, a menu, a
           conversation? Tell ALI about it, or skip.
         </Text>
-        <TextInput
-          style={styles.textArea}
-          value={wildText}
-          onChangeText={setWildText}
-          multiline
-          placeholder="Where did you see or hear it?"
-          placeholderTextColor={colors.inkMuted}
-          accessibilityLabel="Where you saw or heard it"
-        />
+
+        <View style={styles.modeTabs}>
+          <ModeTab
+            label="Text"
+            icon={wildMode === 'TEXT' ? MODE_ICONS.TEXT.active : MODE_ICONS.TEXT.inactive}
+            active={wildMode === 'TEXT'}
+            onPress={() => setWildMode('TEXT')}
+            disabled={wildBusy}
+            styles={styles}
+            colors={colors}
+          />
+          <ModeTab
+            label="Photo"
+            icon={wildMode === 'PHOTO' ? MODE_ICONS.PHOTO.active : MODE_ICONS.PHOTO.inactive}
+            active={wildMode === 'PHOTO'}
+            onPress={() => setWildMode('PHOTO')}
+            disabled={wildBusy}
+            styles={styles}
+            colors={colors}
+          />
+        </View>
+
+        {wildMode === 'TEXT' && (
+          <TextInput
+            style={styles.textArea}
+            value={wildText}
+            onChangeText={setWildText}
+            multiline
+            placeholder="Where did you see or hear it?"
+            placeholderTextColor={colors.inkMuted}
+            editable={!wildBusy}
+            accessibilityLabel="Where you saw or heard it"
+          />
+        )}
+
+        {wildMode === 'PHOTO' && (
+          <View style={styles.wildPhotoSection}>
+            <Text style={styles.affordanceText}>
+              Take or choose a screenshot proving you actually used the word — a text you sent, a
+              post, a caption.
+            </Text>
+
+            {wildPhoto && <Image source={{ uri: wildPhoto.uri }} style={styles.wildPreview} />}
+
+            <View style={styles.photoButtonsRow}>
+              <Pressable
+                style={styles.photoButton}
+                onPress={() => pickWildPhoto('camera')}
+                disabled={wildBusy}
+                accessibilityRole="button"
+                accessibilityLabel="Take Photo"
+              >
+                <Ionicons name="camera-outline" size={16} color={colors.arcaneSoft} />
+                <Text style={styles.affordanceButtonText}>Take Photo</Text>
+              </Pressable>
+              <Pressable
+                style={styles.photoButton}
+                onPress={() => pickWildPhoto('library')}
+                disabled={wildBusy}
+                accessibilityRole="button"
+                accessibilityLabel="Choose Photo"
+              >
+                <Ionicons name="images-outline" size={16} color={colors.arcaneSoft} />
+                <Text style={styles.affordanceButtonText}>Choose Photo</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+
+        {wildError && <Text style={styles.error}>{wildError}</Text>}
+
         <Pressable
-          style={[styles.button, (wildBusy || !wildText.trim()) && styles.buttonDisabled]}
+          style={[styles.button, wildSubmitDisabled && styles.buttonDisabled]}
           onPress={() => finishWord(true)}
-          disabled={wildBusy || !wildText.trim()}
+          disabled={wildSubmitDisabled}
           accessibilityRole="button"
           accessibilityLabel="Submit and finish"
         >
@@ -625,7 +824,13 @@ export function DailyQuestScreen({ route, navigation }: Props) {
 }
 
 /** Every stage's AI feedback is 5 named 0-100 dimensions — rendered generically rather than one bespoke layout per stage. */
-function ScoreList({ scores }: { scores: Record<string, number> }) {
+function ScoreList({
+  scores,
+  styles,
+}: {
+  scores: Record<string, number>;
+  styles: ReturnType<typeof createStyles>;
+}) {
   return (
     <View style={styles.clueCard}>
       {Object.entries(scores).map(([key, value]) => (
@@ -638,11 +843,46 @@ function ScoreList({ scores }: { scores: Record<string, number> }) {
   );
 }
 
-const styles = StyleSheet.create({
+function ModeTab({
+  label,
+  icon,
+  active,
+  onPress,
+  disabled,
+  styles,
+  colors,
+}: {
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  active: boolean;
+  onPress: () => void;
+  disabled: boolean;
+  styles: ReturnType<typeof createStyles>;
+  colors: ThemeColors;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={[styles.modeTab, active && styles.modeTabActive]}
+    >
+      <Ionicons name={icon} size={16} color={active ? colors.ink : colors.inkMuted} />
+      <Text style={[styles.modeTabText, active && styles.modeTabTextActive]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
+  flexFill: { flex: 1 },
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xl,
     gap: spacing.lg,
   },
   centered: {
@@ -725,11 +965,6 @@ const styles = StyleSheet.create({
   feedbackText: { fontSize: typography.scale.md, fontWeight: '700' },
   revealText: { color: colors.inkMuted, fontSize: typography.scale.sm },
   revealWord: { color: colors.ink, fontWeight: '700' },
-  aliReactionText: {
-    color: colors.arcaneSoft,
-    fontSize: typography.scale.sm,
-    fontStyle: 'italic',
-  },
   explainButton: { alignSelf: 'flex-start' },
   explainButtonText: {
     color: colors.arcaneSoft,
@@ -764,4 +999,39 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   scoreValue: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
+  modeTabs: { flexDirection: 'row', gap: spacing.sm },
+  modeTab: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: spacing.sm,
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  modeTabActive: { backgroundColor: colors.arcane, borderColor: colors.arcane },
+  modeTabText: { color: colors.inkMuted, fontSize: typography.scale.sm, fontWeight: '700' },
+  modeTabTextActive: { color: colors.ink },
+  wildPhotoSection: { gap: spacing.sm },
+  wildPreview: {
+    width: '100%',
+    height: 200,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+  },
+  photoButtonsRow: { flexDirection: 'row', gap: spacing.sm },
+  photoButton: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
 });
+}

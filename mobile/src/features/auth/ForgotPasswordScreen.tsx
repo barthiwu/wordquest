@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -9,7 +9,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { requestPasswordReset, resetPassword } from '@/services/auth';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
@@ -26,6 +28,9 @@ type Step = 'request' | 'reset' | 'done';
  * step always succeeds from the UI's point of view.
  */
 export function ForgotPasswordScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const [step, setStep] = useState<Step>('request');
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');
@@ -158,12 +163,14 @@ export function ForgotPasswordScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
-    paddingTop: spacing.xxl * 1.5,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xxl * 1.5,
     gap: spacing.xl,
   },
   header: { gap: spacing.xs },
@@ -194,3 +201,4 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.5 },
   buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
 });
+}

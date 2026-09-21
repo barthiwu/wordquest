@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { getMe } from '@/services/users';
 import { useAuthStore } from '@/state/authStore';
 
@@ -23,6 +24,8 @@ interface Props {
  * remind me," it means "not right now."
  */
 export function VerificationBanner({ onPress }: Props) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [unverified, setUnverified] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -63,7 +66,8 @@ export function VerificationBanner({ onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   banner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -79,3 +83,4 @@ const styles = StyleSheet.create({
   text: { flex: 1, color: colors.ink, fontSize: typography.scale.sm, fontWeight: '600' },
   dismiss: { padding: spacing.xs },
 });
+}

@@ -1,8 +1,32 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useCallback, useState, useMemo } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { getMyPassport, type PassportView } from '@/services/passport';
+import {
+  confirmAvatar,
+  createAvatarUploadTarget,
+  deleteAvatar,
+  uploadAvatarBytes,
+  type AvatarContentType,
+} from '@/services/users';
+import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { countryCodeToFlagEmoji } from '@/utils/countryFlag';
+import { countryNameForCode } from '@/constants/countries';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -22,21 +46,107 @@ type Props = CompositeScreenProps<
  * player's identity and account both naturally belong.
  */
 export function PassportScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [passport, setPassport] = useState<PassportView | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [avatarBusy, setAvatarBusy] = useState(false);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     if (!accessToken) return;
+    setError(null);
     getMyPassport(accessToken)
       .then(setPassport)
       .catch(() => setError('Could not load your Learning Passport.'));
   }, [accessToken]);
 
+  // Refetch every time the Profile tab regains focus (matching Home),
+  // so an earlier failure -- e.g. the backend still coming up -- clears
+  // itself on the next visit instead of sticking until the app reloads.
+  useFocusEffect(load);
+
+  const pickAndUploadAvatar = async (source: 'camera' | 'library') => {
+    if (!accessToken) return;
+    const permission =
+      source === 'camera'
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(
+        'Permission needed',
+        `WordQuest needs ${source === 'camera' ? 'camera' : 'photo library'} access to set a profile picture.`,
+      );
+      return;
+    }
+
+    const result =
+      source === 'camera'
+        ? await ImagePicker.launchCameraAsync({ quality: 0.8, allowsEditing: true, aspect: [1, 1] })
+        : await ImagePicker.launchImageLibraryAsync({
+            quality: 0.8,
+            allowsEditing: true,
+            aspect: [1, 1],
+          });
+    if (result.canceled) return;
+
+    const asset = result.assets[0];
+    const contentType: AvatarContentType = asset.mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
+
+    setAvatarBusy(true);
+    try {
+      const target = await createAvatarUploadTarget(accessToken, contentType);
+      await uploadAvatarBytes(target.uploadUrl, asset.uri, contentType);
+      const confirmed = await confirmAvatar(accessToken, target.key);
+      setPassport((prev) => (prev ? { ...prev, avatarUrl: confirmed.avatarUrl } : prev));
+    } catch (err) {
+      Alert.alert(
+        'Could not set profile picture',
+        err instanceof ApiError ? err.message : 'Please try again.',
+      );
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const onRemoveAvatar = async () => {
+    if (!accessToken) return;
+    setAvatarBusy(true);
+    try {
+      const result = await deleteAvatar(accessToken);
+      setPassport((prev) => (prev ? { ...prev, avatarUrl: result.avatarUrl } : prev));
+    } catch {
+      Alert.alert('Could not remove your profile picture', 'Please try again.');
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const onAvatarPress = () => {
+    const options: Array<{ text: string; style?: 'cancel' | 'destructive'; onPress?: () => void }> = [
+      { text: 'Take photo', onPress: () => pickAndUploadAvatar('camera') },
+      { text: 'Choose from library', onPress: () => pickAndUploadAvatar('library') },
+    ];
+    if (passport?.avatarUrl) {
+      options.push({ text: 'Remove photo', style: 'destructive', onPress: onRemoveAvatar });
+    }
+    options.push({ text: 'Cancel', style: 'cancel' });
+    Alert.alert('Profile picture', undefined, options);
+  };
+
   if (error) {
     return (
       <View style={styles.centered}>
         <Text style={styles.error}>{error}</Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={load}
+          accessibilityRole="button"
+          accessibilityLabel="Retry"
+        >
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </Pressable>
       </View>
     );
   }
@@ -52,18 +162,60 @@ export function PassportScreen({ navigation }: Props) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.name}>{passport.displayName}</Text>
-        <Text style={styles.meta}>
-          {passport.clan ? passport.clan.name : 'No clan yet'}
-          {passport.countryCode ? ` · ${passport.countryCode}` : ''}
-        </Text>
+        <Pressable
+          style={styles.avatarWrapper}
+          onPress={onAvatarPress}
+          disabled={avatarBusy}
+          accessibilityRole="button"
+          accessibilityLabel="Change profile picture"
+        >
+          {passport.avatarUrl ? (
+            <Image source={{ uri: passport.avatarUrl }} style={styles.avatarImage} />
+          ) : (
+            <View style={styles.avatarPlaceholder}>
+              <Text style={styles.avatarInitial}>
+                {passport.displayName?.trim().charAt(0).toUpperCase() || '?'}
+              </Text>
+            </View>
+          )}
+          <View style={styles.avatarBadge}>
+            {avatarBusy ? (
+              <ActivityIndicator size="small" color={colors.ink} />
+            ) : (
+              <Ionicons name="camera" size={13} color={colors.ink} />
+            )}
+          </View>
+        </Pressable>
+        <View style={styles.headerText}>
+          <Text style={styles.name}>{passport.displayName}</Text>
+          <Text style={styles.meta}>
+            {passport.clan ? passport.clan.name : 'No clan yet'}
+            {passport.countryCode
+              ? ` · ${countryCodeToFlagEmoji(passport.countryCode) ?? ''} ${
+                  countryNameForCode(passport.countryCode) ?? passport.countryCode
+                }`
+              : ''}
+          </Text>
+        </View>
       </View>
 
       <View style={styles.statGrid}>
-        <Stat label="Level" value={String(passport.level)} />
-        <Stat label="Journey" value={passport.journeyStageName} />
-        <Stat label="Words mastered" value={String(passport.wordsMastered)} />
-        <Stat label="Longest streak" value={`${passport.longestStreak}d`} />
+        <Stat
+          label="Level"
+          value={String(passport.level)}
+          onPress={() =>
+            navigation.navigate('LevelRoadmap', { currentLevel: passport.level, totalXp: passport.totalXp })
+          }
+          styles={styles}
+        />
+        <Stat label="Journey" value={passport.journeyStageName} styles={styles} />
+        <Stat
+          label="Words mastered"
+          value={String(passport.wordsMastered)}
+          onPress={() => navigation.navigate('WordMastery')}
+          styles={styles}
+        />
+        <Stat label="Longest streak" value={`${passport.longestStreak}d`} styles={styles} />
       </View>
 
       <View style={styles.section}>
@@ -97,14 +249,20 @@ export function PassportScreen({ navigation }: Props) {
         </Text>
       </Pressable>
 
-      <View style={styles.section}>
+
+      <Pressable
+        style={styles.section}
+        onPress={() => navigation.navigate('BossBattle')}
+        accessibilityRole="button"
+        accessibilityLabel="Boss Battle history"
+      >
         <Text style={styles.sectionTitle}>Boss Battle history</Text>
         <Text style={styles.sectionBody}>
           {passport.bossBattleHistory.length > 0
             ? `${passport.bossBattleHistory.length} battles fought · ${passport.bossBattleHistory.filter((b) => b.isWinner).length} won`
             : 'None yet — join this week’s battle from Compete.'}
         </Text>
-      </View>
+      </Pressable>
 
       <Pressable
         style={styles.section}
@@ -179,18 +337,44 @@ export function PassportScreen({ navigation }: Props) {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.stat}>
+function Stat({
+  label,
+  value,
+  styles,
+  onPress,
+}: {
+  label: string;
+  value: string;
+  styles: ReturnType<typeof createStyles>;
+  onPress?: () => void;
+}) {
+  const content = (
+    <>
       <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
-    </View>
+    </>
   );
+
+  if (onPress) {
+    return (
+      <Pressable
+        style={styles.stat}
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+      >
+        {content}
+      </Pressable>
+    );
+  }
+
+  return <View style={styles.stat}>{content}</View>;
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: spacing.xxl, gap: spacing.lg },
+  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.lg },
   centered: {
     flex: 1,
     backgroundColor: colors.background,
@@ -198,7 +382,51 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   error: { color: colors.danger, fontSize: typography.scale.md },
-  header: { gap: 2 },
+  retryButton: {
+    marginTop: spacing.md,
+    backgroundColor: colors.arcane,
+    borderRadius: radius.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+  },
+  retryButtonText: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
+  header: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  headerText: { gap: 2, flex: 1 },
+  avatarWrapper: { position: 'relative' },
+  avatarImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.surfaceRaised,
+  },
+  avatarPlaceholder: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitial: {
+    color: colors.inkMuted,
+    fontSize: typography.scale.lg,
+    fontWeight: typography.display.weight,
+  },
+  avatarBadge: {
+    position: 'absolute',
+    right: -2,
+    bottom: -2,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.arcane,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.background,
+  },
   name: { color: colors.ink, fontSize: typography.scale.xl, fontWeight: typography.display.weight },
   meta: { color: colors.inkMuted, fontSize: typography.scale.sm },
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
@@ -244,3 +472,4 @@ const styles = StyleSheet.create({
   },
   showcaseChipTitle: { color: colors.ink, fontSize: typography.scale.xs },
 });
+}

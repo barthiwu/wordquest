@@ -5,6 +5,7 @@ export interface LeaderboardEntry {
   userId: string;
   displayName: string;
   clanName: string | null;
+  countryCode: string | null;
   level: number;
   totalXp: number;
 }
@@ -20,4 +21,12 @@ export function getGlobalLeaderboard(accessToken: string): Promise<LeaderboardVi
 
 export function getClanLeaderboard(accessToken: string): Promise<LeaderboardView> {
   return apiRequest<LeaderboardView>('/leaderboards/clan', { accessToken });
+}
+
+export function getCountryLeaderboard(accessToken: string): Promise<LeaderboardView> {
+  return apiRequest<LeaderboardView>('/leaderboards/country', { accessToken });
+}
+
+export function getContinentLeaderboard(accessToken: string): Promise<LeaderboardView> {
+  return apiRequest<LeaderboardView>('/leaderboards/continent', { accessToken });
 }

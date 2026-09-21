@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -11,6 +14,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
  * routes toward them so the navigation shell is exercised end to end.
  */
 export function WelcomeScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   return (
     <View style={styles.container}>
       <View style={styles.copy}>
@@ -40,13 +46,14 @@ export function WelcomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
     justifyContent: 'space-between',
-    padding: spacing.xl,
-    paddingTop: spacing.xxl * 2,
+    paddingHorizontal: spacing.xl,
+    paddingTop: topInset + spacing.xxl * 2,
     paddingBottom: spacing.xxl,
   },
   copy: {
@@ -82,3 +89,4 @@ const styles = StyleSheet.create({
     fontSize: typography.scale.md,
   },
 });
+}

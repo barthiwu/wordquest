@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import type { AuthResult, AuthUser } from '@/services/auth';
 
-const ACCESS_TOKEN_KEY = 'wordquest.accessToken';
-const REFRESH_TOKEN_KEY = 'wordquest.refreshToken';
+const ACCESS_TOKEN_KEY = 'wordquest.accessToken.v2';
+const REFRESH_TOKEN_KEY = 'wordquest.refreshToken.v2';
 
 interface AuthState {
   user: AuthUser | null;

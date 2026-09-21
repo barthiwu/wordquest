@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, Line, Polygon, Text as SvgText } from 'react-native-svg';
-import { colors, typography } from '@/constants/theme';
+import { typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 
 export interface RadarChartDatum {
   key: string;
@@ -26,6 +28,8 @@ const GRID_RINGS = [0.25, 0.5, 0.75, 1];
  * rather than the shape lying about a real score.
  */
 export function RadarChart({ data, size = 260 }: Props) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const n = data.length;
   if (n < 3) return null;
 
@@ -114,6 +118,8 @@ export function RadarChart({ data, size = 260 }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   wrapper: { alignItems: 'center', justifyContent: 'center' },
 });
+}

@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { getMySkills, type SkillsView } from '@/services/skills';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
@@ -20,6 +22,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'SkillRadar'>;
  * Vocabulary and Recall are real numbers).
  */
 export function SkillRadarScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [skills, setSkills] = useState<SkillsView | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -81,12 +86,14 @@ export function SkillRadarScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
-    paddingTop: spacing.xxl,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xxl,
     gap: spacing.lg,
     alignItems: 'stretch',
   },
@@ -119,3 +126,4 @@ const styles = StyleSheet.create({
   fill: { height: '100%', backgroundColor: colors.arcane, borderRadius: radius.pill },
   fillUnmeasured: { backgroundColor: 'transparent' },
 });
+}

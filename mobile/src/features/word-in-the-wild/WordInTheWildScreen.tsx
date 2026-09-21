@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -8,7 +8,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { searchWords, type WordSearchResult } from '@/services/words';
 import { createMission } from '@/services/word-in-the-wild';
 import { useAuthStore } from '@/state/authStore';
@@ -27,6 +29,9 @@ const SEARCH_DEBOUNCE_MS = 300;
  * is created for the chosen word.
  */
 export function WordInTheWildScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<WordSearchResult[]>([]);
@@ -77,7 +82,8 @@ export function WordInTheWildScreen({ navigation }: Props) {
       <BackButton onPress={() => navigation.goBack()} />
       <Text style={styles.title}>Word in the Wild</Text>
       <Text style={styles.subtitle}>
-        Pick a word you’ve genuinely encountered out in the world.
+        Pick a word you’ve already answered in a Quest — that’s what Word in the Wild
+        evidence is for.
       </Text>
 
       <TextInput
@@ -98,8 +104,8 @@ export function WordInTheWildScreen({ navigation }: Props) {
         <View style={styles.empty}>
           <Text style={styles.emptyText}>
             {query.trim().length === 0
-              ? 'Start typing a word to find one you can submit evidence for.'
-              : `No words match “${query.trim()}” — try a different search.`}
+              ? 'Start typing a word you’ve already answered in a Quest.'
+              : `No answered words match “${query.trim()}” — Word in the Wild is only for words you’ve met in a Quest.`}
           </Text>
         </View>
       )}
@@ -130,8 +136,16 @@ export function WordInTheWildScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, padding: spacing.xl, gap: spacing.md },
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xl,
+    gap: spacing.md,
+  },
   title: {
     color: colors.ink,
     fontSize: typography.scale.xl,
@@ -172,3 +186,4 @@ const styles = StyleSheet.create({
   resultWord: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
   resultDefinition: { color: colors.inkMuted, fontSize: typography.scale.xs },
 });
+}

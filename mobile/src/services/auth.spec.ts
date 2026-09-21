@@ -21,7 +21,7 @@ describe('auth service', () => {
 
   it('registers a new account', async () => {
     (apiRequest as jest.Mock).mockResolvedValueOnce({});
-    const input = { email: 'a@b.com', password: 'password1', displayName: 'A' };
+    const input = { email: 'a@b.com', password: 'password1', displayName: 'A', dateOfBirth: '2000-01-01' };
     await register(input);
     expect(apiRequest).toHaveBeenCalledWith('/auth/register', { method: 'POST', body: input });
   });

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { updateMe, type LearningGoal } from '@/services/users';
 import { getDeviceTimezone } from '@/utils/timezone';
 import { useAuthStore } from '@/state/authStore';
@@ -27,6 +29,9 @@ const GOALS: { value: LearningGoal; label: string; description: string }[] = [
 
 /** Screen 6 of the UI/UX Screen Bible. */
 export function OnboardingGoalScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [selected, setSelected] = useState<LearningGoal | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -98,12 +103,14 @@ export function OnboardingGoalScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
-    paddingTop: spacing.xxl * 1.5,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xxl * 1.5,
     gap: spacing.lg,
   },
   header: { gap: spacing.xs },
@@ -136,3 +143,4 @@ const styles = StyleSheet.create({
   buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
   error: { color: colors.danger, fontSize: typography.scale.sm },
 });
+}

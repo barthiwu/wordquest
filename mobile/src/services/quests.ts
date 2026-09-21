@@ -2,8 +2,18 @@ import { apiRequest } from './apiClient';
 
 export type MasteryLevel = 'NEW' | 'RECOGNIZING' | 'RECALLING' | 'STRONG' | 'MASTERED';
 
+export type WordStage =
+  | 'GUESSING'
+  | 'UNDERSTANDING'
+  | 'SENTENCE'
+  | 'PARAGRAPH'
+  | 'OPTIONAL_WILD'
+  | 'WORD_COMPLETE';
+
 export interface ChallengeView {
   questAttemptId: string;
+  /** The attempt's actual current stage — resuming an in-progress attempt lands here, not always at Guess. */
+  wordStage: WordStage;
   wordIndex: number;
   wordCount: number;
   /** e.g. "C O M P _ S S I O N" — the blanked word to reconstruct. */
@@ -109,6 +119,8 @@ export interface WordCompletionResult {
   totalCount: number;
   /** True when this word completion was the 3rd Daily Quest word, triggering the Adaptive AI Learning Engine's Initial Calibration. */
   calibrationJustCompleted: boolean;
+  /** ALI's send-off for this word, shown on QuestCompleteScreen before the player heads home. null when ALI wasn't configured or the call failed. */
+  aliMessage: { text: string; recommendation: string | null } | null;
 }
 
 export interface OptionalWildMission {

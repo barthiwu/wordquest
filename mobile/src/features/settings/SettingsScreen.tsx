@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -9,7 +9,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { deleteAccount, logout, resendVerification, verifyEmail } from '@/services/auth';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
@@ -25,6 +27,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
  * server-side, not just clears local storage), and account deletion.
  */
 export function SettingsScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const refreshToken = useAuthStore((s) => s.refreshToken);
   const clearSession = useAuthStore((s) => s.clearSession);
@@ -163,6 +168,18 @@ export function SettingsScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Legal</Text>
+        <Pressable
+          style={styles.secondaryButton}
+          onPress={() => navigation.navigate('PrivacyPolicy')}
+          accessibilityRole="button"
+          accessibilityLabel="Privacy Policy"
+        >
+          <Text style={styles.secondaryButtonText}>Privacy Policy</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Danger zone</Text>
         <Pressable
           style={styles.dangerButton}
@@ -183,9 +200,10 @@ export function SettingsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: spacing.xxl, gap: spacing.lg },
+  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.lg },
   title: {
     color: colors.ink,
     fontSize: typography.scale.xl,
@@ -237,3 +255,4 @@ const styles = StyleSheet.create({
   },
   dangerButtonText: { color: colors.danger, fontSize: typography.scale.md, fontWeight: '700' },
 });
+}

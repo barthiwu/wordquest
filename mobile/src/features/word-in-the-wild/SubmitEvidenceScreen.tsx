@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -10,7 +10,10 @@ import {
   View,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import {
   createPhotoUploadTarget,
   submitPhotoEvidence,
@@ -20,6 +23,7 @@ import {
 } from '@/services/word-in-the-wild';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { useEvidenceModeStore } from '@/state/evidenceModeStore';
 import { BackButton } from '@/components/BackButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
@@ -28,6 +32,14 @@ type Props = NativeStackScreenProps<RootStackParamList, 'SubmitEvidence'>;
 type Mode = 'TEXT' | 'PHOTO';
 type Stage = 'idle' | 'uploading' | 'assessing';
 
+const MODE_ICONS: Record<
+  Mode,
+  { active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }
+> = {
+  TEXT: { active: 'document-text', inactive: 'document-text-outline' },
+  PHOTO: { active: 'camera', inactive: 'camera-outline' },
+};
+
 /**
  * Text evidence goes straight to the backend, which does the assessing.
  * Photo evidence is a three-step client flow: get a presigned R2 URL,
@@ -35,15 +47,29 @@ type Stage = 'idle' | 'uploading' | 'assessing';
  * the backend the key so it can fetch the bytes back server-side and
  * assess them. Each step has its own failure mode, so `stage` drives
  * what the loading indicator actually says.
+ *
+ * The mode tabs default to whatever the player used last (useEvidenceModeStore)
+ * rather than always opening on Text — the camera option exists but was easy
+ * to miss when every mission reset back to the Text tab.
  */
 export function SubmitEvidenceScreen({ route, navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { missionId, word, definition } = route.params;
   const accessToken = useAuthStore((s) => s.accessToken);
-  const [mode, setMode] = useState<Mode>('TEXT');
+  const lastMode = useEvidenceModeStore((s) => s.lastMode);
+  const setLastMode = useEvidenceModeStore((s) => s.setLastMode);
+  const [mode, setModeState] = useState<Mode>(lastMode);
   const [text, setText] = useState('');
   const [photo, setPhoto] = useState<{ uri: string; contentType: PhotoContentType } | null>(null);
   const [stage, setStage] = useState<Stage>('idle');
   const [error, setError] = useState<string | null>(null);
+
+  const setMode = (next: Mode) => {
+    setModeState(next);
+    setLastMode(next);
+  };
 
   const pickPhoto = async (source: 'camera' | 'library') => {
     setError(null);
@@ -112,15 +138,21 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
       <View style={styles.modeTabs}>
         <ModeTab
           label="Text"
+          icon={mode === 'TEXT' ? MODE_ICONS.TEXT.active : MODE_ICONS.TEXT.inactive}
           active={mode === 'TEXT'}
           onPress={() => setMode('TEXT')}
           disabled={busy}
+          styles={styles}
+          colors={colors}
         />
         <ModeTab
           label="Photo"
+          icon={mode === 'PHOTO' ? MODE_ICONS.PHOTO.active : MODE_ICONS.PHOTO.inactive}
           active={mode === 'PHOTO'}
           onPress={() => setMode('PHOTO')}
           disabled={busy}
+          styles={styles}
+          colors={colors}
         />
       </View>
 
@@ -172,6 +204,7 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
               accessibilityRole="button"
               accessibilityLabel="Take Photo"
             >
+              <Ionicons name="camera-outline" size={18} color={colors.arcaneSoft} />
               <Text style={styles.photoButtonText}>Take Photo</Text>
             </Pressable>
             <Pressable
@@ -181,6 +214,7 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
               accessibilityRole="button"
               accessibilityLabel="Choose Photo"
             >
+              <Ionicons name="images-outline" size={18} color={colors.arcaneSoft} />
               <Text style={styles.photoButtonText}>Choose Photo</Text>
             </Pressable>
           </View>
@@ -213,14 +247,20 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
 
 function ModeTab({
   label,
+  icon,
   active,
   onPress,
   disabled,
+  styles,
+  colors,
 }: {
   label: string;
+  icon: keyof typeof Ionicons.glyphMap;
   active: boolean;
   onPress: () => void;
   disabled: boolean;
+  styles: ReturnType<typeof createStyles>;
+  colors: ThemeColors;
 }) {
   return (
     <Pressable
@@ -230,16 +270,20 @@ function ModeTab({
       accessibilityLabel={label}
       style={[styles.modeTab, active && styles.modeTabActive]}
     >
+      <Ionicons name={icon} size={16} color={active ? colors.ink : colors.inkMuted} />
       <Text style={[styles.modeTabText, active && styles.modeTabTextActive]}>{label}</Text>
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xl,
     gap: spacing.md,
   },
   title: {
@@ -251,12 +295,15 @@ const styles = StyleSheet.create({
   modeTabs: { flexDirection: 'row', gap: spacing.sm },
   modeTab: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
     paddingVertical: spacing.sm,
     alignItems: 'center',
+    gap: spacing.xs,
   },
   modeTabActive: { backgroundColor: colors.arcane, borderColor: colors.arcane },
   modeTabText: { color: colors.inkMuted, fontSize: typography.scale.sm, fontWeight: '700' },
@@ -278,12 +325,15 @@ const styles = StyleSheet.create({
   photoButtonsRow: { flexDirection: 'row', gap: spacing.sm },
   photoButton: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
     paddingVertical: spacing.md,
     alignItems: 'center',
+    gap: spacing.xs,
   },
   photoButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
   submitButton: {
@@ -297,3 +347,4 @@ const styles = StyleSheet.create({
   busyRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   error: { color: colors.danger, fontSize: typography.scale.sm },
 });
+}

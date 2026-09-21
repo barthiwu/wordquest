@@ -1,8 +1,10 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { getMyJourney, type JourneyView } from '@/services/journey';
 import { useAuthStore } from '@/state/authStore';
 import { journeyVisualFor, LEGEND_STAGE_KEY } from '@/constants/journeyVisuals';
@@ -42,6 +44,9 @@ type Props = CompositeScreenProps<
  * "just now" celebration for something that happened hours ago.
  */
 export function JourneyScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const countryCode = useAuthStore((s) => s.user?.countryCode);
   const [journey, setJourney] = useState<JourneyView | null>(null);
@@ -249,9 +254,10 @@ export function JourneyScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, gap: spacing.lg, paddingTop: spacing.xxl },
+  content: { padding: spacing.xl, gap: spacing.lg, paddingTop: topInset + spacing.xxl },
   centered: {
     flex: 1,
     backgroundColor: colors.background,
@@ -364,3 +370,4 @@ const styles = StyleSheet.create({
   },
   witwButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
 });
+}

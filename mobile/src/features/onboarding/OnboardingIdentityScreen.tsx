@@ -1,8 +1,11 @@
-import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useState, useMemo } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { updateMe } from '@/services/users';
 import { useAuthStore } from '@/state/authStore';
+import { CountryPickerField } from '@/components/CountryPickerField';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -13,19 +16,22 @@ type Props = NativeStackScreenProps<RootStackParamList, 'OnboardingIdentity'>;
  * flag at the player's Castle later (§18) — collected once, here.
  */
 export function OnboardingIdentityScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
-  const [countryCode, setCountryCode] = useState('');
+  const [countryCode, setCountryCode] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSubmit = /^[A-Za-z]{2}$/.test(countryCode);
+  const canSubmit = countryCode !== null;
 
   const onContinue = async () => {
-    if (!canSubmit || !accessToken || submitting) return;
+    if (countryCode === null || !accessToken || submitting) return;
     setSubmitting(true);
     setError(null);
     try {
-      await updateMe(accessToken, { countryCode: countryCode.toUpperCase() });
+      await updateMe(accessToken, { countryCode });
       navigation.navigate('OnboardingGoal');
     } catch {
       setError('Something went wrong saving your profile. Please try again.');
@@ -44,16 +50,7 @@ export function OnboardingIdentityScreen({ navigation }: Props) {
         </Text>
       </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Country code, e.g. NG"
-        placeholderTextColor={colors.inkMuted}
-        value={countryCode}
-        onChangeText={(v) => setCountryCode(v.slice(0, 2))}
-        autoCapitalize="characters"
-        maxLength={2}
-        accessibilityLabel="Country code"
-      />
+      <CountryPickerField value={countryCode} onChange={setCountryCode} label="Country" />
 
       {error && <Text style={styles.error}>{error}</Text>}
 
@@ -74,12 +71,14 @@ export function OnboardingIdentityScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
-    paddingTop: spacing.xxl * 1.5,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xxl * 1.5,
     gap: spacing.xl,
   },
   header: { gap: spacing.xs },
@@ -90,16 +89,6 @@ const styles = StyleSheet.create({
     fontWeight: typography.display.weight,
   },
   subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
-  input: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    color: colors.ink,
-    fontSize: typography.scale.md,
-  },
   button: {
     backgroundColor: colors.arcane,
     borderRadius: radius.md,
@@ -110,3 +99,4 @@ const styles = StyleSheet.create({
   buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
   error: { color: colors.danger, fontSize: typography.scale.sm },
 });
+}

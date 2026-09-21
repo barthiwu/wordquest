@@ -1,7 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import {
   acceptRecommendedDifficulty,
   getMyLearningProfile,
@@ -30,11 +32,37 @@ const DIFFICULTY_LABELS: Record<string, string> = {
  * exactly as it was.
  */
 export function CalibrationResultScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [profile, setProfile] = useState<LearningProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<'accept' | 'reject' | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  // Accepting or keeping current is a decision, not a destination -- the
+  // player came from either the Learning Profile (Passport) or straight
+  // off Quest Complete's calibration banner, and either way they expect
+  // to land back there once the choice is made, not be left stranded on
+  // this result screen. The brief delay lets them actually see the
+  // "Difficulty updated." confirmation before it navigates away; the ref
+  // guards against a double goBack() if a fast second tap slips in
+  // before this one fires, and the cleanup effect cancels it if the
+  // player has already left some other way.
+  const leftRef = useRef(false);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (leaveTimer.current) clearTimeout(leaveTimer.current);
+    };
+  }, []);
+
+  const returnToCaller = () => {
+    if (leftRef.current) return;
+    leftRef.current = true;
+    leaveTimer.current = setTimeout(() => navigation.goBack(), 900);
+  };
 
   const load = useCallback(() => {
     if (!accessToken) return;
@@ -51,6 +79,7 @@ export function CalibrationResultScreen({ navigation }: Props) {
     try {
       setProfile(await acceptRecommendedDifficulty(accessToken));
       setMessage('Difficulty updated.');
+      returnToCaller();
     } catch {
       setMessage('Could not update your difficulty right now.');
     } finally {
@@ -64,6 +93,7 @@ export function CalibrationResultScreen({ navigation }: Props) {
     try {
       setProfile(await rejectRecommendedDifficulty(accessToken));
       setMessage('Keeping your current difficulty.');
+      returnToCaller();
     } catch {
       setMessage('Could not update that right now.');
     } finally {
@@ -174,9 +204,10 @@ export function CalibrationResultScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: spacing.xxl, gap: spacing.md },
+  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
   centered: {
     flex: 1,
     backgroundColor: colors.background,
@@ -222,3 +253,4 @@ const styles = StyleSheet.create({
   buttonText: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
   rejectButtonText: { color: colors.arcaneSoft },
 });
+}

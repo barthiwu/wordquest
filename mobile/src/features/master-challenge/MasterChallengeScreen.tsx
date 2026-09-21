@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -9,7 +9,9 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import {
   getMasterChallengeStatus,
   submitMasterChallenge,
@@ -31,6 +33,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'MasterChallenge'>;
  * separate from and doesn’t duplicate per-word XP.
  */
 export function MasterChallengeScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [status, setStatus] = useState<MasterChallengeStatus | null>(null);
   const [paragraph, setParagraph] = useState('');
@@ -142,9 +147,10 @@ export function MasterChallengeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: spacing.xxl, gap: spacing.md },
+  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
   centered: {
     flex: 1,
     backgroundColor: colors.background,
@@ -187,3 +193,4 @@ const styles = StyleSheet.create({
   },
   scoreValue: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
 });
+}

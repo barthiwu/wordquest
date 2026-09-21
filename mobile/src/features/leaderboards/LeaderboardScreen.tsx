@@ -1,15 +1,21 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import {
   getClanLeaderboard,
+  getContinentLeaderboard,
+  getCountryLeaderboard,
   getGlobalLeaderboard,
   type LeaderboardEntry,
   type LeaderboardView,
 } from '@/services/leaderboards';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { countryCodeToFlagEmoji } from '@/utils/countryFlag';
+import { ReportButton } from '@/components/ReportButton';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -21,17 +27,37 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-type Category = 'global' | 'clan';
+type Category = 'global' | 'clan' | 'country' | 'continent';
+
+const CATEGORY_UNAVAILABLE_MESSAGE: Record<Category, string> = {
+  global: 'Could not load the leaderboard.',
+  clan: 'Join a clan to see the clan leaderboard.',
+  country: 'Set your country in your profile to see the country leaderboard.',
+  continent: 'Set your country in your profile to see the continent leaderboard.',
+};
+
+const CATEGORY_EMPTY_MESSAGE: Record<Category, string> = {
+  global: 'No one has ranked yet.',
+  clan: 'No one in your clan has ranked yet.',
+  country: 'No one from your country has ranked yet.',
+  continent: 'No one from your continent has ranked yet.',
+};
 
 /**
  * §30 Leaderboards, now the Compete tab (Boss Battles joins this tab
- * later — build order §47 item 26). Global and Clan are real, ranked
- * from the same authoritative data as Home/Passport. Friends isn't
- * shown as a third category — there's no friends graph in WordQuest
- * yet, and a category that always renders empty would look broken
- * rather than honestly unbuilt.
+ * later — build order §47 item 26). Global, Clan, Country and
+ * Continent are all real, ranked from the same authoritative data as
+ * Home/Passport — Country and Continent scope to the viewer's own
+ * countryCode (set via the onboarding flag picker), same pattern as
+ * Clan scoping to the viewer's clan. Friends isn't shown as a fifth
+ * category — there's no friends graph in WordQuest yet, and a
+ * category that always renders empty would look broken rather than
+ * honestly unbuilt.
  */
 export function LeaderboardScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [category, setCategory] = useState<Category>('global');
   const [view, setView] = useState<LeaderboardView | null>(null);
@@ -43,13 +69,19 @@ export function LeaderboardScreen({ navigation }: Props) {
       setView(null);
       setError(null);
       const request =
-        cat === 'global' ? getGlobalLeaderboard(accessToken) : getClanLeaderboard(accessToken);
+        cat === 'global'
+          ? getGlobalLeaderboard(accessToken)
+          : cat === 'clan'
+            ? getClanLeaderboard(accessToken)
+            : cat === 'country'
+              ? getCountryLeaderboard(accessToken)
+              : getContinentLeaderboard(accessToken);
       request.then(setView).catch((err) => {
-        setError(
-          err instanceof ApiError && err.status === 400
-            ? 'Join a clan to see the clan leaderboard.'
-            : 'Could not load the leaderboard.',
-        );
+        if (err instanceof ApiError && err.status === 400) {
+          setError(CATEGORY_UNAVAILABLE_MESSAGE[cat]);
+        } else {
+          setError('Could not load the leaderboard.');
+        }
       });
     },
     [accessToken],
@@ -84,8 +116,26 @@ export function LeaderboardScreen({ navigation }: Props) {
           label="Global"
           active={category === 'global'}
           onPress={() => selectCategory('global')}
+          styles={styles}
         />
-        <Tab label="Clan" active={category === 'clan'} onPress={() => selectCategory('clan')} />
+        <Tab
+          label="Clan"
+          active={category === 'clan'}
+          onPress={() => selectCategory('clan')}
+          styles={styles}
+        />
+        <Tab
+          label="Country"
+          active={category === 'country'}
+          onPress={() => selectCategory('country')}
+          styles={styles}
+        />
+        <Tab
+          label="Continent"
+          active={category === 'continent'}
+          onPress={() => selectCategory('continent')}
+          styles={styles}
+        />
       </View>
 
       {!view && !error && (
@@ -102,9 +152,7 @@ export function LeaderboardScreen({ navigation }: Props) {
 
       {view && view.entries.length === 0 && (
         <View style={styles.centered}>
-          <Text style={styles.emptyText}>
-            {category === 'clan' ? 'No one in your clan has ranked yet.' : 'No one has ranked yet.'}
-          </Text>
+          <Text style={styles.emptyText}>{CATEGORY_EMPTY_MESSAGE[category]}</Text>
         </View>
       )}
 
@@ -114,7 +162,7 @@ export function LeaderboardScreen({ navigation }: Props) {
             data={view.entries}
             keyExtractor={(item) => item.userId}
             renderItem={({ item }) => (
-              <Row entry={item} isViewer={item.userId === view.viewer.userId} />
+              <Row entry={item} isViewer={item.userId === view.viewer.userId} styles={styles} />
             )}
             contentContainerStyle={styles.list}
           />
@@ -131,7 +179,17 @@ export function LeaderboardScreen({ navigation }: Props) {
   );
 }
 
-function Tab({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+function Tab({
+  label,
+  active,
+  onPress,
+  styles,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+  styles: ReturnType<typeof createStyles>;
+}) {
   return (
     <Pressable
       onPress={onPress}
@@ -144,24 +202,46 @@ function Tab({ label, active, onPress }: { label: string; active: boolean; onPre
   );
 }
 
-function Row({ entry, isViewer }: { entry: LeaderboardEntry; isViewer: boolean }) {
+function Row({
+  entry,
+  isViewer,
+  styles,
+}: {
+  entry: LeaderboardEntry;
+  isViewer: boolean;
+  styles: ReturnType<typeof createStyles>;
+}) {
   return (
     <View style={[styles.row, isViewer && styles.rowViewer]}>
       <Text style={styles.rowRank}>#{entry.rank}</Text>
       <View style={styles.rowMeta}>
-        <Text style={styles.rowName}>{entry.displayName}</Text>
+        <Text style={styles.rowName}>
+          {entry.countryCode ? `${countryCodeToFlagEmoji(entry.countryCode) ?? ''} ` : ''}
+          {entry.displayName}
+        </Text>
         <Text style={styles.rowSub}>
           Lvl {entry.level}
           {entry.clanName ? ` · ${entry.clanName}` : ''}
         </Text>
       </View>
       <Text style={styles.rowXp}>{entry.totalXp} XP</Text>
+      {!isViewer && (
+        <ReportButton targetType="USER" targetId={entry.userId} label={entry.displayName} />
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, padding: spacing.xl, gap: spacing.md },
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xl,
+    gap: spacing.md,
+  },
   title: {
     color: colors.ink,
     fontSize: typography.scale.xl,
@@ -177,18 +257,20 @@ const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   error: { color: colors.danger, fontSize: typography.scale.md, textAlign: 'center' },
   emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm, textAlign: 'center' },
-  tabs: { flexDirection: 'row', gap: spacing.sm },
+  tabs: { flexDirection: 'row', gap: spacing.xs, flexWrap: 'wrap' },
   tab: {
-    flex: 1,
+    flexBasis: '23%',
+    flexGrow: 1,
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
     paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xs,
     alignItems: 'center',
   },
   tabActive: { backgroundColor: colors.arcane, borderColor: colors.arcane },
-  tabText: { color: colors.inkMuted, fontSize: typography.scale.sm, fontWeight: '700' },
+  tabText: { color: colors.inkMuted, fontSize: typography.scale.xs, fontWeight: '700' },
   tabTextActive: { color: colors.ink },
   list: { gap: spacing.sm, paddingBottom: spacing.md },
   row: {
@@ -226,3 +308,4 @@ const styles = StyleSheet.create({
   viewerName: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
   viewerXp: { color: colors.glyph, fontSize: typography.scale.sm, fontWeight: '700' },
 });
+}

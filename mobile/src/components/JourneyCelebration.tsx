@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { journeyVisualFor } from '@/constants/journeyVisuals';
 
 interface Props {
@@ -21,6 +22,8 @@ interface Props {
  * renders the moment once told to.
  */
 export function JourneyCelebration({ stageName, primaryTitle, stageKey, onDismiss }: Props) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const scale = useRef(new Animated.Value(0.7)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const visual = journeyVisualFor(stageKey);
@@ -56,7 +59,8 @@ export function JourneyCelebration({ stageName, primaryTitle, stageKey, onDismis
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   backdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.65)',
@@ -104,3 +108,4 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
 });
+}

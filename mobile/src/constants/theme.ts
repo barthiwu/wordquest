@@ -12,7 +12,27 @@
  * accent variants) lands with the relevant feature modules.
  */
 
-export const colors = {
+/**
+ * The "world at night" palette — WordQuest's original and still-default
+ * look. Deep dusk-indigo base, warm parchment ink, arcane purple reserved
+ * for progression moments.
+ */
+export interface ThemeColors {
+  background: string;
+  surface: string;
+  surfaceRaised: string;
+  ink: string;
+  inkMuted: string;
+  arcane: string;
+  arcaneSoft: string;
+  success: string;
+  warning: string;
+  danger: string;
+  glyph: string;
+  border: string;
+}
+
+export const darkColors: ThemeColors = {
   // Base — parchment/ink, not pure black/white
   background: '#12102A', // deep dusk-indigo, the "world at night" base
   surface: '#1C1940',
@@ -35,6 +55,38 @@ export const colors = {
 
   border: '#332D6B',
 } as const;
+
+/**
+ * The "illuminated manuscript by daylight" palette — same structure and
+ * role for every token as darkColors (a light surface reading as parchment
+ * under sun rather than ink at dusk), so a screen that switches its
+ * `colors` import for either object needs no other changes. Arcane and
+ * glyph stay recognizably themselves in both modes — they're brand
+ * accents, not base surfaces, so they only shift slightly for contrast.
+ */
+export const lightColors: ThemeColors = {
+  background: '#F4F1E8', // warm parchment, the daylight mirror of the dusk base
+  surface: '#FFFFFF',
+  surfaceRaised: '#EFE9D8',
+  ink: '#1E1B33', // deep ink-purple for primary text on parchment
+  inkMuted: '#5C5680',
+
+  arcane: '#7C3AED',
+  arcaneSoft: '#8B5CF6',
+
+  success: '#16A34A',
+  warning: '#B45309',
+  danger: '#DC2626',
+
+  glyph: '#9A6B0A',
+
+  border: '#DDD4B8',
+} as const;
+
+/** Default/fallback palette for screens not yet wired to the theme
+ * toggle (see state/themeStore.ts) — keeps every existing `colors.x`
+ * import working exactly as before. */
+export const colors = darkColors;
 
 export const typography = {
   display: {

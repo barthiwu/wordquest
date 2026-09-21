@@ -30,7 +30,7 @@ describe('useAuthStore', () => {
   describe('hydrate', () => {
     it('loads both tokens from SecureStore and marks the store hydrated', async () => {
       (SecureStore.getItemAsync as jest.Mock).mockImplementation((key: string) =>
-        Promise.resolve(key === 'wordquest.accessToken' ? 'stored-access' : 'stored-refresh'),
+        Promise.resolve(key === 'wordquest.accessToken.v2' ? 'stored-access' : 'stored-refresh'),
       );
 
       await useAuthStore.getState().hydrate();
@@ -57,9 +57,9 @@ describe('useAuthStore', () => {
     it('persists both tokens to SecureStore under the expected keys', async () => {
       await useAuthStore.getState().setSession(authResult);
 
-      expect(SecureStore.setItemAsync).toHaveBeenCalledWith('wordquest.accessToken', 'access-123');
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith('wordquest.accessToken.v2', 'access-123');
       expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
-        'wordquest.refreshToken',
+        'wordquest.refreshToken.v2',
         'refresh-456',
       );
     });
@@ -79,8 +79,8 @@ describe('useAuthStore', () => {
       await useAuthStore.getState().setSession(authResult);
       await useAuthStore.getState().clearSession();
 
-      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith('wordquest.accessToken');
-      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith('wordquest.refreshToken');
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith('wordquest.accessToken.v2');
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith('wordquest.refreshToken.v2');
     });
 
     it('resets user and tokens to null in memory', async () => {

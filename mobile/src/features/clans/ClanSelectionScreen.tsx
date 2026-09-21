@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { getClans, type Clan } from '@/services/clans';
 import { updateMe } from '@/services/users';
 import { useAuthStore } from '@/state/authStore';
+import { ReportButton } from '@/components/ReportButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -15,6 +18,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ClanSelection'>;
  * via PATCH /users/me — this is real selection, not a local-only UI state.
  */
 export function ClanSelectionScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [clans, setClans] = useState<Clan[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +76,10 @@ export function ClanSelectionScreen({ navigation }: Props) {
               accessibilityRole="button"
               accessibilityLabel={`Select ${item.name}`}
             >
-              <Text style={styles.cardName}>{item.name}</Text>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardName}>{item.name}</Text>
+                <ReportButton targetType="CLAN" targetId={item.id} label={item.name} />
+              </View>
               <Text style={styles.cardDescription}>{item.description}</Text>
             </Pressable>
           )}
@@ -105,12 +114,14 @@ export function ClanSelectionScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
-    paddingTop: spacing.xxl * 1.5,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingTop: topInset + spacing.xxl * 1.5,
     gap: spacing.lg,
   },
   header: { gap: spacing.xs },
@@ -138,10 +149,17 @@ const styles = StyleSheet.create({
     borderColor: colors.arcane,
     backgroundColor: colors.surfaceRaised,
   },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
   cardName: {
     color: colors.ink,
     fontSize: typography.scale.lg,
     fontWeight: '700',
+    flexShrink: 1,
   },
   cardDescription: {
     color: colors.inkMuted,
@@ -170,3 +188,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
+}

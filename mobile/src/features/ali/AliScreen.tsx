@@ -1,10 +1,13 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { getMyAliMessages, type AliMessage } from '@/services/ali';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
+import { AliMark } from '@/components/AliMark';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -19,6 +22,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Ali'>;
  * has no events yet.
  */
 export function AliScreen({ navigation }: Props) {
+  const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [messages, setMessages] = useState<AliMessage[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -67,20 +73,26 @@ export function AliScreen({ navigation }: Props) {
 
       {messages.map((message, i) => (
         <View key={i} style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View style={styles.avatar}>
+              <AliMark size={13} />
+            </View>
+            <Text style={styles.cardName}>ALI</Text>
+          </View>
           <Text style={styles.cardText}>{message.text}</Text>
           {message.recommendation && (
             <Text style={styles.recommendation}>{message.recommendation}</Text>
           )}
-          <Text style={styles.tone}>{message.tone}</Text>
         </View>
       ))}
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors, topInset: number) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: spacing.xxl, gap: spacing.md },
+  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
   centered: {
     flex: 1,
     backgroundColor: colors.background,
@@ -110,7 +122,23 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.xs,
   },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  avatar: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.arcaneSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardName: {
+    color: colors.arcaneSoft,
+    fontSize: typography.scale.xs,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
   cardText: { color: colors.ink, fontSize: typography.scale.md },
   recommendation: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
-  tone: { color: colors.inkMuted, fontSize: typography.scale.xs, textTransform: 'uppercase' },
 });
+}

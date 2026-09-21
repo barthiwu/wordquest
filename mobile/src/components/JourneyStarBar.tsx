@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing } from '@/constants/theme';
+import { spacing, type ThemeColors } from '@/constants/theme';
+import { useThemeColors } from '@/state/themeStore';
 import { journeyVisualFor } from '@/constants/journeyVisuals';
 
 interface StarBarStage {
@@ -23,6 +25,8 @@ interface Props {
  * us (JourneyStageView.unlocked), no invented in-between progress.
  */
 export function JourneyStarBar({ stages }: Props) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <View style={styles.row}>
       {stages.map((stage, i) => {
@@ -41,7 +45,13 @@ export function JourneyStarBar({ stages }: Props) {
               <Ionicons
                 name={stage.unlocked ? 'star' : 'star-outline'}
                 size={stage.current ? 22 : 16}
-                color={stage.unlocked ? visual.color : colors.inkMuted}
+                // Earned stars read as an achievement, not as a repeat of
+                // each stage's own theme color (visual.color, used for the
+                // connector lines and the stage icon circles elsewhere) --
+                // gold matches the Glyph accent already used app-wide for
+                // "you earned this." Unearned stars stay colors.inkMuted,
+                // unchanged.
+                color={stage.unlocked ? colors.glyph : colors.inkMuted}
               />
             </View>
           </View>
@@ -51,7 +61,8 @@ export function JourneyStarBar({ stages }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm },
   stageWrap: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   connector: { flex: 1, height: 2 },
@@ -62,3 +73,4 @@ const styles = StyleSheet.create({
     borderColor: colors.arcaneSoft,
   },
 });
+}
