@@ -12,12 +12,17 @@ creating the Railway project/services (below) and populating the GitHub
 Environment secrets the pipeline needs — none of that can be done from a
 repo commit alone, since it requires an authenticated Railway account.
 
-**Analytics** (V22 §15): there is currently no backend analytics/event
-tracking implementation (no events, no endpoint). This is a deliberate,
-explicit deferral for the V22 beta-validation phase — building a real
-analytics system is a feature addition, not a validation/testing task,
-and the phase's own scope explicitly excludes major feature work. Revisit
-before a wider production launch.
+**Analytics**: self-hosted — `AnalyticsService` logs events (account
+created, quest completed, Boss Battle joined, shop purchase, ...) to the
+backend's own `analytics_events` table via a fire-and-forget `track()`
+call, never a third-party analytics product. No extra credentials or
+provider setup needed; it's already wired into the services above and
+ships with the same migrations as everything else.
+
+**Mobile / Android build**: not covered by this file — see
+[`ANDROID_BUILD.md`](./ANDROID_BUILD.md) for the EAS/Play Console
+checklist (separate from this backend deploy pipeline, and equally
+gated on one-time account setup only you can do).
 
 **Why Railway:** managed Postgres with automatic volume backups and
 opt-in point-in-time recovery built in (a provider setting, not application
