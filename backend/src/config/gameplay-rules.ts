@@ -206,6 +206,13 @@ export const gameplayRules = {
    */
   auth: {
     emailVerificationGraceDays: 3,
+    // Age gate (COPPA): the minimum age, in whole years as of today,
+    // required to register. Registration is rejected below this —
+    // see common/age.ts (calculateAge) and AuthService.register. 13
+    // is the COPPA line in the US (the default this product targets,
+    // per the privacy policy); revisit per-region if WordQuest ever
+    // needs a stricter EU/UK-style 16 minimum for a specific market.
+    minimumAgeYears: 13,
     // Account lockout (Sprint 5 "Authentication hardening") — a
     // complement to the per-IP @Throttle limits on the auth endpoints,
     // which alone don't stop guesses against one account spread across

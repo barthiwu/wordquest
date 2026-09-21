@@ -6,6 +6,7 @@ import { JOURNEY_STAGES } from '../config/journey-stages';
 import { ACHIEVEMENT_CATALOG } from '../achievement/achievement-catalog';
 import { ORDER_CATALOG } from '../order/order-catalog';
 import { QuestCardService } from '../quest-card/quest-card.service';
+import { ObjectStorageService } from '../storage/object-storage.service';
 
 /**
  * GET /api/v1/passport/me — Screen Bible screen 28 (Learning Passport,
@@ -24,6 +25,7 @@ export class PassportController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly questCards: QuestCardService,
+    private readonly storage: ObjectStorageService,
   ) {}
 
   @Get('me')
@@ -54,11 +56,18 @@ export class PassportController {
       ? (ORDER_CATALOG.find((o) => o.key === latestOrder.order) ?? null)
       : null;
 
+    const avatarUrl =
+      user.avatarKey && this.storage.isStorageConfigured()
+        ? await this.storage.getDownloadUrl(user.avatarKey)
+        : null;
+
     return {
       displayName: user.displayName,
+      avatarUrl,
       countryCode: user.countryCode,
       clan: user.clan ? { name: user.clan.name, bannerAsset: user.clan.bannerAsset } : null,
       level: user.progression?.level ?? 1,
+      totalXp: user.progression?.totalXp ?? 0,
       journeyStageName,
       wordsMastered: user.progression?.masteredWordsCount ?? 0,
       currentStreak: user.progression?.currentStreak ?? 0,

@@ -1,6 +1,7 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { AppConfigService } from '../config/config.service';
+import { stripJsonCodeFence } from '../common/ai-json';
 
 export interface MasterChallengeScores {
   wordUsage: number;
@@ -56,10 +57,24 @@ export class MasterChallengeEvaluationService {
 
     const response = await client.messages.create({
       model: this.config.aiModel,
-      max_tokens: 700,
+      // Was 700 -- confirmed too tight: synthesizing three words into one
+      // coherent paragraph draws noticeably more critique text (what
+      // went well/needs improvement/next action) than a single-word
+      // stage, and the model's response was getting cut off mid-JSON
+      // before the closing brace (see the stop_reason check below,
+      // added after that failure so it's diagnosable next time instead
+      // of looking like generic malformed output).
+      max_tokens: 1000,
       system: this.buildSystemPrompt(),
       messages: [{ role: 'user', content: this.buildPrompt(words, paragraph) }],
     });
+
+    if (response.stop_reason === 'max_tokens') {
+      throw new Error(
+        'Master Challenge evaluation response was truncated by max_tokens before completing its JSON -- ' +
+          'raise max_tokens further if this recurs.',
+      );
+    }
 
     return this.parseResponse(response);
   }
@@ -108,7 +123,7 @@ Respond with ONLY a JSON object, no other text, in this exact shape:
       nextAction?: unknown;
     };
     try {
-      parsed = JSON.parse(textBlock.text);
+      parsed = JSON.parse(stripJsonCodeFence(textBlock.text));
     } catch {
       throw new Error(
         `Master Challenge evaluation returned unparseable output: ${textBlock.text.slice(0, 200)}`,

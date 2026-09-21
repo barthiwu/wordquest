@@ -27,14 +27,25 @@ import { generateOmissionChallenge } from '../vocabulary/omission-engine';
 import { gameplayRules, computeGuessXp } from '../config/gameplay-rules';
 import { LearningProfileService } from '../learning-profile/learning-profile.service';
 import { averageScoreDimensions } from '../common/score-average';
-import { AliService } from '../ali/ali.service';
+import { AliService, type AliResponse } from '../ali/ali.service';
 import { quickAliReaction } from '../ali/ali-quick-reactions';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 /** Either the real PrismaService or the `tx` handle inside a $transaction callback — same query surface either way. */
 type Db = PrismaService | Prisma.TransactionClient;
 
 export interface ChallengeView {
   questAttemptId: string;
+  /**
+   * The attempt's actual current stage. Always populated — GUESSING for
+   * a brand-new attempt, or whatever stage a resumed IN_PROGRESS attempt
+   * is really on (see startTimedQuest's resume branch). The client uses
+   * this to open the right screen on resume instead of always assuming
+   * Guess, which used to send a resumed player back into a guess-blank
+   * UI for an attempt the backend considered already past that stage —
+   * any submission then failed with "not currently at the Guess stage".
+   */
+  wordStage: WordStage;
   wordIndex: number;
   wordCount: number;
   /** e.g. "C O M P _ S S I O N" — the blanked word to reconstruct. */
@@ -128,6 +139,16 @@ export interface WordCompletionResult {
   totalCount: number;
   /** True exactly once, the call after which the player's 3-word Initial Calibration finished — client should surface the recommendation. */
   calibrationJustCompleted: boolean;
+  /**
+   * ALI's send-off for this word, generated after the transaction below
+   * commits (unlike every other reactive ALI trigger, which fires and
+   * forgets — QuestCompleteScreen actually displays this one before the
+   * player leaves, so it has to be awaited and returned here). null
+   * when ALI isn't configured or the call failed — a missing farewell
+   * must never fail quest completion itself, which has already
+   * committed by the time this runs.
+   */
+  aliMessage: Pick<AliResponse, 'text' | 'recommendation'> | null;
 }
 
 /**
@@ -154,6 +175,7 @@ export class QuestsService {
     private readonly wordInTheWild: WordInTheWildService,
     private readonly learningProfile: LearningProfileService,
     private readonly ali: AliService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   /**
@@ -209,11 +231,25 @@ export class QuestsService {
       where: { userId, questId: quest.id, status: 'IN_PROGRESS' },
     });
     if (inProgress) {
+      // Understanding's explanation content is generated once at guess
+      // time and never persisted (see submitAnswer's result.understanding),
+      // so there's nothing to resume a player INTO for that stage — the
+      // closest honest option is to complete it on their behalf (it's a
+      // read-only informational step, not a scored input) and resume at
+      // Sentence instead, same place a normal "Continue" tap would land.
+      let resumeStage: WordStage = inProgress.wordStage;
+      if (resumeStage === 'UNDERSTANDING') {
+        await this.claimStageTransition(this.prisma, inProgress.id, 'UNDERSTANDING', {
+          wordStage: 'SENTENCE',
+        });
+        resumeStage = 'SENTENCE';
+      }
       return this.buildChallengeView(
         inProgress.id,
         userId,
         inProgress.wordIds,
         inProgress.currentIndex,
+        resumeStage,
       );
     }
 
@@ -255,7 +291,7 @@ export class QuestsService {
       },
     });
 
-    return this.buildChallengeView(attempt.id, userId, attempt.wordIds, attempt.currentIndex);
+    return this.buildChallengeView(attempt.id, userId, attempt.wordIds, attempt.currentIndex, 'GUESSING');
   }
 
   async submitAnswer(
@@ -594,7 +630,7 @@ export class QuestsService {
   async completeWord(userId: string, questAttemptId: string): Promise<WordCompletionResult> {
     const attempt = await this.loadInProgressAttempt(userId, questAttemptId, 'OPTIONAL_WILD');
 
-    return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const { result, aliContext } = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const quest = await tx.quest.findUniqueOrThrow({ where: { id: attempt.questId } });
       const correctCount = await tx.challengeAttempt.count({
         where: { questAttemptId: attempt.id, isCorrect: true },
@@ -688,31 +724,63 @@ export class QuestsService {
       // event (Mastery, Journey, Achievements, Boss Battle) already
       // fires ALI from its own service; Quest completion was the one
       // gap, since QuestsService never held an AliService reference
-      // before.
+      // before. V23: this is now awaited (below, outside the
+      // transaction) instead of fire-and-forget, because
+      // QuestCompleteScreen actually shows the player what ALI says
+      // before they leave — every other ALI trigger stays
+      // fire-and-forget since nothing waits on those.
       const wordRow = await tx.word.findUnique({ where: { id: wordId }, select: { word: true } });
       const progressionRow = await tx.userProgression.findUnique({
         where: { userId },
         select: { journeyStage: true },
       });
-      this.ali.reactFireAndForget(userId, {
-        type: 'QUEST_COMPLETION',
-        journeyStage: progressionRow?.journeyStage ?? 0,
-        context: {
-          word: wordRow?.word,
-          xpAwarded: quest.baseXp,
-          glyphAwarded: quest.baseGlyphs,
-          currentStreak,
-        },
-      });
 
       return {
-        xpAwarded: quest.baseXp,
-        glyphAwarded: quest.baseGlyphs,
-        correctCount,
-        totalCount: attempt.wordIds.length,
-        calibrationJustCompleted,
+        result: {
+          xpAwarded: quest.baseXp,
+          glyphAwarded: quest.baseGlyphs,
+          correctCount,
+          totalCount: attempt.wordIds.length,
+          calibrationJustCompleted,
+        },
+        aliContext: {
+          journeyStage: progressionRow?.journeyStage ?? 0,
+          context: {
+            word: wordRow?.word,
+            xpAwarded: quest.baseXp,
+            glyphAwarded: quest.baseGlyphs,
+            currentStreak,
+          },
+        },
       };
     });
+
+    this.analytics.track(userId, 'quest_completed', {
+      questId: attempt.questId,
+      xpAwarded: result.xpAwarded,
+      glyphAwarded: result.glyphAwarded,
+      correctCount: result.correctCount,
+      totalCount: result.totalCount,
+    });
+
+    // Generated after the transaction commits, not inside it — an
+    // Anthropic call has no business holding a DB transaction open, and
+    // a failure here must never roll back progress that already
+    // committed above. Caught rather than propagated for the same
+    // reason reactFireAndForget swallows errors everywhere else: ALI is
+    // decoration, never the authority for whether a quest completed.
+    let aliMessage: WordCompletionResult['aliMessage'] = null;
+    try {
+      const response = await this.ali.react(userId, {
+        type: 'QUEST_COMPLETION',
+        ...aliContext,
+      });
+      aliMessage = { text: response.text, recommendation: response.recommendation };
+    } catch {
+      // QuestCompleteScreen just won't show a message this time.
+    }
+
+    return { ...result, aliMessage };
   }
 
   /**
@@ -891,6 +959,7 @@ export class QuestsService {
     userId: string,
     wordIds: string[],
     wordIndex: number,
+    wordStage: WordStage = 'GUESSING',
     db: Db = this.prisma,
   ): Promise<ChallengeView> {
     const wordId = wordIds[wordIndex];
@@ -913,6 +982,7 @@ export class QuestsService {
 
     return {
       questAttemptId,
+      wordStage,
       wordIndex,
       wordCount: wordIds.length,
       displayPattern: challenge.displayPattern,

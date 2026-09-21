@@ -9,6 +9,7 @@ import { AliModule } from '../ali/ali.module';
 import { NotificationModule } from '../notifications/notification.module';
 import { IdempotencyModule } from '../idempotency/idempotency.module';
 import { QuestCardModule } from '../quest-card/quest-card.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { QuestCardModule } from '../quest-card/quest-card.module';
     NotificationModule,
     IdempotencyModule,
     QuestCardModule,
+    AnalyticsModule,
   ],
   controllers: [BossBattleController],
   providers: [BossBattleService],

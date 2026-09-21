@@ -15,6 +15,7 @@ import { AliService } from '../ali/ali.service';
 import { NotificationService } from '../notifications/notification.service';
 import { IdempotencyService } from '../idempotency/idempotency.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { gameplayRules, bossBattleRewardForRank } from '../config/gameplay-rules';
 
 function utc(y: number, m: number, d: number, h = 0, min = 0, s = 0): Date {
@@ -75,6 +76,7 @@ describe('BossBattleService', () => {
     recordInTransaction: jest.fn().mockResolvedValue(undefined),
   };
   const questCardsMock = { createCard: jest.fn().mockResolvedValue(undefined) };
+  const analyticsMock = { track: jest.fn() };
 
   const greetingWord = {
     id: 'w1',
@@ -101,6 +103,7 @@ describe('BossBattleService', () => {
         { provide: NotificationService, useValue: notificationsMock },
         { provide: IdempotencyService, useValue: idempotencyMock },
         { provide: QuestCardService, useValue: questCardsMock },
+        { provide: AnalyticsService, useValue: analyticsMock },
       ],
     }).compile();
     service = moduleRef.get(BossBattleService);

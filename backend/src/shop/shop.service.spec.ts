@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import { ShopService } from './shop.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProgressionService } from '../progression/progression.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 describe('ShopService', () => {
   let service: ShopService;
@@ -23,6 +24,7 @@ describe('ShopService', () => {
   const progressionMock = {
     spendGlyphs: jest.fn().mockResolvedValue(undefined),
   };
+  const analyticsMock = { track: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -31,6 +33,7 @@ describe('ShopService', () => {
         ShopService,
         { provide: PrismaService, useValue: prismaMock },
         { provide: ProgressionService, useValue: progressionMock },
+        { provide: AnalyticsService, useValue: analyticsMock },
       ],
     }).compile();
     service = moduleRef.get(ShopService);

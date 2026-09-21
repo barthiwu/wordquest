@@ -30,12 +30,26 @@ enum AccountStatus {
 }
 
 model User {
-  id           String  @id @default(uuid())
-  email        String  @unique
+  id           String    @id @default(uuid())
+  email        String    @unique
   passwordHash String
   displayName  String
   countryCode  String? // ISO 3166-1 alpha-2, e.g. "NG" — drives the Castle's animated flag (§18)
-  role         Role    @default(USER)
+  // Age gate (COPPA, gameplayRules.auth.minimumAgeYears): collected once
+  // at registration and never edited by the player afterward (no PATCH
+  // exposes it — see UsersController). Nullable only because accounts
+  // created before this field existed have none; every account created
+  // from here on has AuthService.register reject the request outright
+  // when the submitted date of birth is under the minimum age, so a
+  // non-null dateOfBirth on a post-rollout account is always
+  // age-gate-compliant by construction.
+  dateOfBirth  DateTime? @db.Date
+  // Profile picture: an S3-compatible object storage key (never a URL
+  // directly), same pattern as WordInTheWild's evidence photoKey --
+  // resolved to a short-lived signed download URL on read via
+  // ObjectStorageService.getDownloadUrl(). Null means no avatar set.
+  avatarKey    String?
+  role         Role      @default(USER)
 
   // Player Timezone System (V1 Remaining Systems Spec §15) — IANA tz name,
   // e.g. "Africa/Lagos". Collected on onboarding/registration. Every
@@ -102,6 +116,9 @@ model User {
   pushTokens               PushToken[]
   securityEvents           SecurityEvent[]
   shopPurchases            ShopPurchase[]
+  reportsFiled             Report[]                  @relation("ReportsFiled")
+  reportsReviewed          Report[]                  @relation("ReportsReviewed")
+  analyticsEvents          AnalyticsEvent[]
 
   @@index([clanId])
   @@map("users")
@@ -116,20 +133,20 @@ enum LearningGoal {
 }
 
 model RefreshToken {
-  id        String    @id @default(uuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash String    @unique
-  expiresAt DateTime
-  revokedAt DateTime?
-  createdAt DateTime  @default(now())
+  id               String    @id @default(uuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash        String    @unique
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
   // Set once at login/register and carried forward UNCHANGED by every
   // rotation in this session's chain (V20 Beta Release Checklist §12:
   // Session security) — the anchor AuthService.refresh checks against
   // gameplayRules.auth.absoluteSessionLifetimeDays, since createdAt
   // above only reflects this one rotated token, not when the session
   // actually began.
-  sessionStartedAt DateTime @default(now())
+  sessionStartedAt DateTime  @default(now())
 
   @@index([userId])
   @@map("refresh_tokens")
@@ -199,17 +216,17 @@ model UserProgression {
   longestStreak Int       @default(0)
   lastActiveOn  DateTime?
 
-  masteredWordsCount   Int       @default(0)
-  bossBattlesCompleted Int       @default(0)
-  cefrUnlocked         Boolean   @default(false)
-  cefrUnlockedAt       DateTime?
+  masteredWordsCount      Int       @default(0)
+  bossBattlesCompleted    Int       @default(0)
+  cefrUnlocked            Boolean   @default(false)
+  cefrUnlockedAt          DateTime?
   // A rolling estimate from recent Paragraph submissions (mode of the
   // last 5) — genuinely just evidence, never presented as an official
   // exam result (spec §3.5/§4.3's explicit warning against that).
   // Tracked regardless of cefrUnlocked's status; the two are
   // independent — this is "what the evidence currently suggests," not
   // the gated official determination.
-  estimatedCefrLevel   String?
+  estimatedCefrLevel      String?
   // System-computed, not the AI's self-reported per-evaluation confidence
   // (see CefrAssessment.confidence for that) — a 0-1 blend of sample-size
   // adequacy and cross-dimension consistency, recomputed alongside
@@ -640,6 +657,19 @@ enum WordInTheWildAssessmentStatus {
   REJECTED
 }
 
+// Trust & safety review of PHOTO evidence content itself (is this photo
+// appropriate to have on file at all), entirely separate from
+// assessmentStatus above (does this photo correctly demonstrate the
+// target word). Only ever set for evidenceType = PHOTO — a TEXT
+// submission has no photo to review, so its moderationStatus stays
+// null. REJECTED redacts the submission (see ModerationService) the
+// same way deleteSubmission does.
+enum WordInTheWildModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // The evidence answering one mission, and Claude's judgment of it.
 // APPROVED creates a linked WORD_IN_THE_WILD ChallengeAttempt and
 // promotes mastery the same way a correct LETTER_OMISSION answer does;
@@ -663,6 +693,11 @@ model WordInTheWildSubmission {
   assessmentReasoning String? // Claude's explanation, shown to the player as-is
   xpAwarded           Int                           @default(0)
 
+  // Photo review queue (moderation, Sept 2026 request) — see the enum's
+  // own doc comment. Set to PENDING at creation for PHOTO evidence only;
+  // left null for TEXT.
+  moderationStatus WordInTheWildModerationStatus?
+
   challengeAttemptId String?           @unique
   challengeAttempt   ChallengeAttempt? @relation(fields: [challengeAttemptId], references: [id])
 
@@ -674,6 +709,7 @@ model WordInTheWildSubmission {
   deletedAt DateTime?
 
   @@index([userId])
+  @@index([moderationStatus])
   @@map("word_in_the_wild_submissions")
 }
 
@@ -757,7 +793,7 @@ model BossBattleGroup {
   // pickWordsForQuest call.
   sharedWordIds String[] @default([])
 
-  createdAt DateTime @default(now())
+  createdAt    DateTime  @default(now())
   // Set when this group is claimed into FINALIZING (see
   // BossBattleGroupStatus.FINALIZING doc comment) — the auto-finalize
   // sweep uses this to tell a legitimately-still-running finalization
@@ -989,7 +1025,7 @@ model LearningProfile {
 
   // Continuously-updated performance aggregates (§1) — rolling values
   // updated after each relevant submission, not point-in-time snapshots.
-  avgGuessAccuracy   Float? @default(0) // 0-1
+  avgGuessAccuracy    Float? @default(0) // 0-1
   // Correction & Completion Spec §6 ("connect all available learning
   // signals"): rolling averages of the AI-scored Sentence/Paragraph
   // dimensions from each completed word cycle, 0-100 — the same scale
@@ -1280,4 +1316,70 @@ model IdempotencyKey {
 
   @@unique([userId, key, endpoint])
   @@map("idempotency_keys")
+}
+
+// ── Analytics ────────────────────────────────────────────
+
+// Self-hosted usage analytics (Sept 2026 request) — deliberately not a
+// third-party SaaS product (see docs/PRIVACY_POLICY.md's "Analytics"
+// section): a handful of core lifecycle events logged to our own DB,
+// fire-and-forget from the services that already know they happened
+// (see AnalyticsService.track — same fire-and-forget shape as
+// AliService.reactFireAndForget). userId is nullable so a future
+// pre-auth event (e.g. "registration abandoned") has somewhere to go
+// without inventing a placeholder user; every event wired up today
+// does have a userId.
+model AnalyticsEvent {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventName  String
+  properties Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@index([eventName, createdAt])
+  @@index([userId])
+  @@map("analytics_events")
+}
+
+// ── Trust & safety ───────────────────────────────────────
+
+enum ReportTargetType {
+  USER // a player's profile (display name, avatar)
+  CLAN // a clan's name
+  WORD_IN_THE_WILD_SUBMISSION // a piece of evidence (photo or text)
+}
+
+enum ReportStatus {
+  PENDING
+  ACTIONED // reviewer took action against the reported content/account
+  DISMISSED // reviewer found nothing actionable
+}
+
+// User-filed reports (moderation, Sept 2026 request) — polymorphic by
+// design: targetType + targetId point at whatever was reported (a User
+// row, a Clan row, or a WordInTheWildSubmission row) rather than three
+// separate report tables, since the review workflow (list, triage,
+// action/dismiss) is identical regardless of what's reported. No FK on
+// targetId for the same reason a polymorphic reference can't have one —
+// reviewers resolve it by targetType-specific lookup.
+model Report {
+  id         String           @id @default(uuid())
+  reporterId String
+  reporter   User             @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
+  targetType ReportTargetType
+  targetId   String
+  reason     String // short free-text reason from the reporter, e.g. "inappropriate photo"
+
+  status       ReportStatus @default(PENDING)
+  reviewedById String?
+  reviewedBy   User?        @relation("ReportsReviewed", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?
+  reviewNotes  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([status, createdAt])
+  @@index([targetType, targetId])
+  @@map("reports")
 }

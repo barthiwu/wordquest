@@ -11,7 +11,7 @@ describe('AchievementService', () => {
   let service: AchievementService;
 
   const prismaMock = {
-    achievementUnlock: { create: jest.fn(), findMany: jest.fn() },
+    achievementUnlock: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn() },
     challengeAttempt: { count: jest.fn() },
     bossBattleEvent: { count: jest.fn() },
     questAttempt: { count: jest.fn(), findMany: jest.fn() },
@@ -258,11 +258,28 @@ describe('AchievementService', () => {
   });
 
   describe('unlocking (via any check method)', () => {
-    it('is a no-op — no reward granted — when the achievement is already unlocked (unique constraint)', async () => {
+    it('is a no-op — no reward granted — when the achievement is already unlocked (pre-check finds an existing row)', async () => {
+      prismaMock.challengeAttempt.count.mockResolvedValueOnce(1);
+      prismaMock.bossBattleEvent.count.mockResolvedValueOnce(0);
+      prismaMock.achievementUnlock.findUnique.mockResolvedValueOnce({
+        userId: 'u1',
+        achievementId: 'first_step',
+        unlockedAt: new Date(),
+      });
+
+      await service.checkDiscoveryAndMastery('u1', 0);
+
+      expect(prismaMock.achievementUnlock.create).not.toHaveBeenCalled();
+      expect(progressionMock.awardXp).not.toHaveBeenCalled();
+      expect(progressionMock.awardGlyphs).not.toHaveBeenCalled();
+    });
+
+    it('is still a no-op when the pre-check misses but create() hits the unique constraint (concurrent-unlock race)', async () => {
       const err: any = new Error('duplicate');
       err.code = 'P2002';
       prismaMock.challengeAttempt.count.mockResolvedValueOnce(1);
       prismaMock.bossBattleEvent.count.mockResolvedValueOnce(0);
+      prismaMock.achievementUnlock.findUnique.mockResolvedValueOnce(null);
       prismaMock.achievementUnlock.create.mockRejectedValueOnce(err);
 
       await service.checkDiscoveryAndMastery('u1', 0);
@@ -274,6 +291,7 @@ describe('AchievementService', () => {
     it('awards the correct category XP/Glyph reward on a genuine new unlock', async () => {
       prismaMock.challengeAttempt.count.mockResolvedValueOnce(1);
       prismaMock.bossBattleEvent.count.mockResolvedValueOnce(0);
+      prismaMock.achievementUnlock.findUnique.mockResolvedValueOnce(null);
       prismaMock.achievementUnlock.create.mockResolvedValueOnce({});
 
       await service.checkDiscoveryAndMastery('u1', 0);
@@ -299,6 +317,7 @@ describe('AchievementService', () => {
     it('rethrows a non-unique-constraint database error rather than silently swallowing it', async () => {
       prismaMock.challengeAttempt.count.mockResolvedValueOnce(1);
       prismaMock.bossBattleEvent.count.mockResolvedValueOnce(0);
+      prismaMock.achievementUnlock.findUnique.mockResolvedValueOnce(null);
       prismaMock.achievementUnlock.create.mockRejectedValueOnce(new Error('connection lost'));
 
       await expect(service.checkDiscoveryAndMastery('u1', 0)).rejects.toThrow('connection lost');

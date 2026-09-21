@@ -1,6 +1,7 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { AppConfigService } from '../config/config.service';
+import { stripJsonCodeFence } from '../common/ai-json';
 
 export interface AssessmentInput {
   targetWord: string;
@@ -94,7 +95,7 @@ Respond with ONLY a JSON object, no other text, in this exact shape:
 
     let parsed: { approved?: unknown; reasoning?: unknown; extractedText?: unknown };
     try {
-      parsed = JSON.parse(textBlock.text);
+      parsed = JSON.parse(stripJsonCodeFence(textBlock.text));
     } catch {
       throw new Error(
         `Evidence assessment returned unparseable output: ${textBlock.text.slice(0, 200)}`,

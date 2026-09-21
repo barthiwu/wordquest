@@ -11,6 +11,7 @@ import { ParagraphEvaluationService } from '../paragraph/paragraph-evaluation.se
 import { WordInTheWildService } from '../word-in-the-wild/word-in-the-wild.service';
 import { LearningProfileService } from '../learning-profile/learning-profile.service';
 import { AliService } from '../ali/ali.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { gameplayRules } from '../config/gameplay-rules';
 
 describe('QuestsService', () => {
@@ -96,7 +97,9 @@ describe('QuestsService', () => {
 
   const aliMock = {
     reactFireAndForget: jest.fn(),
+    react: jest.fn(),
   };
+  const analyticsMock = { track: jest.fn() };
 
   // Real English-vocabulary fixtures — generateOmissionChallenge is a
   // real pure function here (not mocked), so these need to be shapes it
@@ -138,6 +141,7 @@ describe('QuestsService', () => {
         { provide: WordInTheWildService, useValue: wordInTheWildMock },
         { provide: LearningProfileService, useValue: learningProfileMock },
         { provide: AliService, useValue: aliMock },
+        { provide: AnalyticsService, useValue: analyticsMock },
       ],
     }).compile();
     service = moduleRef.get(QuestsService);
@@ -1220,7 +1224,7 @@ describe('QuestsService', () => {
 
       await service.completeWord('u1', 'a1');
 
-      expect(aliMock.reactFireAndForget).toHaveBeenCalledWith('u1', {
+      expect(aliMock.react).toHaveBeenCalledWith('u1', {
         type: 'QUEST_COMPLETION',
         journeyStage: 2,
         context: { word: 'greeting', xpAwarded: 50, glyphAwarded: 10, currentStreak: 1 },
@@ -1267,6 +1271,7 @@ describe('QuestsService', () => {
         correctCount: 1,
         totalCount: 1,
         calibrationJustCompleted: false,
+        aliMessage: null,
       });
     });
 

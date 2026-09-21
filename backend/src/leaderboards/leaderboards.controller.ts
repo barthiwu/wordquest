@@ -25,4 +25,14 @@ export class LeaderboardsController {
   getClan(@CurrentUserId() userId: string): Promise<LeaderboardView> {
     return this.leaderboards.getClan(userId);
   }
+
+  @Get('country')
+  getCountry(@CurrentUserId() userId: string): Promise<LeaderboardView> {
+    return this.leaderboards.getCountry(userId);
+  }
+
+  @Get('continent')
+  getContinent(@CurrentUserId() userId: string): Promise<LeaderboardView> {
+    return this.leaderboards.getContinent(userId);
+  }
 }

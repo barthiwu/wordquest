@@ -1,6 +1,7 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { AppConfigService } from '../config/config.service';
+import { stripJsonCodeFence } from '../common/ai-json';
 
 export interface SentenceScores {
   grammar: number;
@@ -54,12 +55,24 @@ export class SentenceEvaluationService {
 
     const response = await client.messages.create({
       model: this.config.aiModel,
-      max_tokens: 700,
+      // Bumped preventively alongside the same fix for Master Challenge
+      // and Paragraph: this schema carries the same shape of risk (5
+      // scored dimensions, confidence, plus an optional betterVersion
+      // rewrite) at the same 700 budget that just proved too tight for
+      // Master Challenge's structurally similar response.
+      max_tokens: 1000,
       system: this.buildSystemPrompt(),
       messages: [
         { role: 'user', content: this.buildPrompt(targetWord, definition, partOfSpeech, sentence) },
       ],
     });
+
+    if (response.stop_reason === 'max_tokens') {
+      throw new Error(
+        'Sentence evaluation response was truncated by max_tokens before completing its JSON -- ' +
+          'raise max_tokens further if this recurs.',
+      );
+    }
 
     return this.parseResponse(response);
   }
@@ -115,7 +128,7 @@ Respond with ONLY a JSON object, no other text, in this exact shape:
       nextAction?: unknown;
     };
     try {
-      parsed = JSON.parse(textBlock.text);
+      parsed = JSON.parse(stripJsonCodeFence(textBlock.text));
     } catch {
       throw new Error(
         `Sentence evaluation returned unparseable output: ${textBlock.text.slice(0, 200)}`,

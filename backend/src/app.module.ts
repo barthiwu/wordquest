@@ -29,6 +29,9 @@ import { MasterChallengeModule } from './master-challenge/master-challenge.modul
 import { NotificationModule } from './notifications/notification.module';
 import { ShopModule } from './shop/shop.module';
 import { LearningProfileModule } from './learning-profile/learning-profile.module';
+import { PracticeModule } from './practice/practice.module';
+import { ModerationModule } from './moderation/moderation.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -73,6 +76,9 @@ import { LearningProfileModule } from './learning-profile/learning-profile.modul
     NotificationModule,
     ShopModule,
     LearningProfileModule,
+    PracticeModule,
+    ModerationModule,
+    AnalyticsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

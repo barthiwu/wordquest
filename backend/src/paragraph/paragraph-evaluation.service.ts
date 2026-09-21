@@ -1,6 +1,7 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { AppConfigService } from '../config/config.service';
+import { stripJsonCodeFence } from '../common/ai-json';
 
 export interface ParagraphScores {
   grammar: number;
@@ -61,7 +62,15 @@ export class ParagraphEvaluationService {
 
     const response = await client.messages.create({
       model: this.config.aiModel,
-      max_tokens: 800,
+      // Paragraph is the only evaluated stage whose JSON schema includes a
+      // full suggestedRevision (a rewritten 30-100 word paragraph) on top
+      // of two feedback fields -- meaningfully heavier output than
+      // sentence/master-challenge's schemas, which get by on 700. 800 was
+      // cutting it close enough that verbose model output would get
+      // truncated mid-JSON and fail to parse (see the stop_reason check
+      // below, which now makes that failure mode diagnosable instead of
+      // looking like generic malformed output).
+      max_tokens: 1300,
       system: this.buildSystemPrompt(),
       messages: [
         {
@@ -70,6 +79,13 @@ export class ParagraphEvaluationService {
         },
       ],
     });
+
+    if (response.stop_reason === 'max_tokens') {
+      throw new Error(
+        'Paragraph evaluation response was truncated by max_tokens before completing its JSON -- ' +
+          'raise max_tokens further if this recurs.',
+      );
+    }
 
     return this.parseResponse(response);
   }
@@ -128,7 +144,7 @@ Respond with ONLY a JSON object, no other text, in this exact shape:
       nextAction?: unknown;
     };
     try {
-      parsed = JSON.parse(textBlock.text);
+      parsed = JSON.parse(stripJsonCodeFence(textBlock.text));
     } catch {
       throw new Error(
         `Paragraph evaluation returned unparseable output: ${textBlock.text.slice(0, 200)}`,

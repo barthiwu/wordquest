@@ -1,6 +1,7 @@
 import { Controller, Get, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUserId } from '../auth/decorators/current-user.decorator';
 
 /**
  * Spec v2 §19: GET /api/v1/words/:id — a word looked up on its own,
@@ -16,6 +17,17 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
  * Registered before the :id route: NestJS matches routes in file order,
  * and a search after :id would never be reached — "search" would just
  * get captured as an :id value instead.
+ *
+ * V23 product feedback: this search must only surface words the
+ * requesting player has actually answered in a Quest — Word in the
+ * Wild evidence is supposed to prove real-world use of a word the
+ * player has met, not any word in the whole 500-word vocabulary they
+ * could type from the dictionary. Scoped to a LETTER_OMISSION
+ * ChallengeAttempt (the Guess-stage answer, and — per ChallengeType's
+ * own doc comment — the only challenge type with a real
+ * generator/evaluator today) existing for (userId, wordId). This is
+ * discovery only; word-in-the-wild.service.ts's createMission enforces
+ * the same rule server-side regardless of what this endpoint returns.
  */
 @Controller('words')
 @UseGuards(JwtAuthGuard)
@@ -23,13 +35,18 @@ export class WordsController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Get('search')
-  async search(@Query('q') query = '', @Query('limit') limit?: string) {
+  async search(
+    @CurrentUserId() userId: string,
+    @Query('q') query = '',
+    @Query('limit') limit?: string,
+  ) {
     const take = Math.min(Math.max(Number(limit) || 20, 1), 50);
 
     const words = await this.prisma.word.findMany({
       where: {
         isActive: true,
         ...(query.trim() ? { word: { contains: query.trim(), mode: 'insensitive' } } : {}),
+        challengeAttempts: { some: { userId, challengeType: 'LETTER_OMISSION' } },
       },
       take,
       orderBy: { word: 'asc' },

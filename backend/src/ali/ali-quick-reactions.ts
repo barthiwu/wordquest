@@ -13,6 +13,12 @@
  * history" the way a milestone reaction is) — just an immediate
  * personality touch on the single most common player action in the app.
  *
+ * V23: refreshed both pools to actually sound like ALI (a word-loving
+ * ink-sprite, not a generic "nice job" bot — see ali.service.ts's
+ * buildSystemPrompt doc comment for the character) now that these show
+ * up as an actual pop-up (AliBubble) after every guess instead of
+ * sitting as quiet inline text underneath the result.
+ *
  * Same tone guardrails as AliService's system prompt apply here by
  * construction, not by policy: every phrase in these two pools was
  * hand-written to encourage, never to shame, mock, or discourage — there
@@ -27,6 +33,11 @@ const CORRECT_REACTIONS: readonly string[] = [
   'Sharp — keep going.',
   'Correct! Nicely spotted.',
   "That's the one.",
+  'Ooh, I like that word too.',
+  'Got it in one!',
+  "That's going straight in my favourites.",
+  'Clean guess — well spotted.',
+  'Yes! Love watching that land.',
 ];
 
 const ENCOURAGING_REACTIONS: readonly string[] = [
@@ -36,6 +47,10 @@ const ENCOURAGING_REACTIONS: readonly string[] = [
   'Not this time — try again.',
   'Almost — have another go.',
   "That's alright, keep at it.",
+  "This one's a slippery word — try again.",
+  "Not it, but you're circling it.",
+  "Good try — one more look and it's yours.",
+  "Tricky one. Take another swing.",
 ];
 
 /**

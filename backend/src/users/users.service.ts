@@ -1,8 +1,9 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { LearningGoal } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { isValidTimezone } from '../common/timezone';
+import { ObjectStorageService, type UploadContentType } from '../storage/object-storage.service';
 
 const PASSWORD_SALT_ROUNDS = 12;
 
@@ -12,6 +13,8 @@ export interface CreateUserInput {
   displayName: string;
   countryCode?: string;
   clanId?: string;
+  /** Age gate (COPPA) — already validated as 13+ by AuthService.register before this is ever called. */
+  dateOfBirth: Date;
 }
 
 /**
@@ -21,7 +24,10 @@ export interface CreateUserInput {
  */
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly storage: ObjectStorageService,
+  ) {}
 
   findByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
@@ -46,6 +52,7 @@ export class UsersService {
         displayName: input.displayName,
         countryCode: input.countryCode,
         clanId: input.clanId,
+        dateOfBirth: input.dateOfBirth,
         // Every new player starts with a real progression row, not a
         // lazily-created one — avoids null-checks scattered across every
         // module that reads XP/streak/journey state.
@@ -61,6 +68,65 @@ export class UsersService {
 
   verifyPassword(plainPassword: string, passwordHash: string): Promise<boolean> {
     return bcrypt.compare(plainPassword, passwordHash);
+  }
+
+  /**
+   * Profile picture upload -- same two-step pattern as WordInTheWild's
+   * evidence photos: the mobile app PUTs bytes directly to object
+   * storage using a presigned URL, then tells us the key once that
+   * succeeds. Keyed under "avatars/<userId>/..." so confirmAvatar can
+   * verify a submitted key actually belongs to the caller before
+   * trusting it.
+   */
+  createAvatarUploadTarget(userId: string, contentType: UploadContentType) {
+    return this.storage.createUploadTarget(userId, contentType, 'avatars');
+  }
+
+  /**
+   * `key` must come from a prior createAvatarUploadTarget() call for
+   * THIS user, and the client must have already PUT the bytes there.
+   * Replacing an existing avatar deletes the old object so orphaned
+   * uploads don't pile up in the bucket.
+   */
+  async confirmAvatar(userId: string, key: string) {
+    if (!key.startsWith(`avatars/${userId}/`)) {
+      throw new ForbiddenException('That upload key does not belong to you');
+    }
+
+    const existing = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { avatarKey: true },
+    });
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: { avatarKey: key },
+    });
+
+    if (existing?.avatarKey && existing.avatarKey !== key && this.storage.isStorageConfigured()) {
+      await this.storage.delete(existing.avatarKey).catch(() => undefined);
+    }
+
+    return updated;
+  }
+
+  async removeAvatar(userId: string) {
+    const existing = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { avatarKey: true },
+    });
+
+    if (existing?.avatarKey && this.storage.isStorageConfigured()) {
+      await this.storage.delete(existing.avatarKey).catch(() => undefined);
+    }
+
+    return this.prisma.user.update({ where: { id: userId }, data: { avatarKey: null } });
+  }
+
+  /** Resolves a stored avatarKey to a short-lived signed URL for display — null if no avatar or storage isn't configured. */
+  async resolveAvatarUrl(avatarKey: string | null): Promise<string | null> {
+    if (!avatarKey || !this.storage.isStorageConfigured()) return null;
+    return this.storage.getDownloadUrl(avatarKey);
   }
 
   /**

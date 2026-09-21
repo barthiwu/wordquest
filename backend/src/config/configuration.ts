@@ -38,7 +38,7 @@ export default () => ({
 
   ai: {
     apiKey: process.env.AI_PROVIDER_API_KEY,
-    model: process.env.AI_PROVIDER_MODEL ?? 'claude-sonnet-5',
+    model: process.env.AI_PROVIDER_MODEL || 'claude-sonnet-5',
   },
   email: {
     // Provider left open — Resend's simple HTTP API is the default

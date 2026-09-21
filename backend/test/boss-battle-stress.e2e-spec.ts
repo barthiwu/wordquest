@@ -41,6 +41,7 @@ describe('Boss Battle concurrency stress (e2e)', () => {
       email: `${testTag}-${index}@wordquest.test`,
       password: 'Sup3rSecret',
       displayName: `Stress ${index}`,
+      dateOfBirth: new Date('2000-01-01'),
     });
     // minLevelToJoin is 2 — a brand-new account defaults to level 1.
     await prisma.userProgression.update({ where: { userId: user.id }, data: { level: 10 } });

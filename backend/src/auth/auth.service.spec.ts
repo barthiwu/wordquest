@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AppConfigService } from '../config/config.service';
 import { EmailService } from '../email/email.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -87,6 +88,7 @@ describe('AuthService', () => {
     sendVerificationEmail: jest.fn().mockResolvedValue(undefined),
     sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
   };
+  const analyticsMock = { track: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -102,6 +104,7 @@ describe('AuthService', () => {
         { provide: JwtService, useValue: jwtMock },
         { provide: AppConfigService, useValue: configMock },
         { provide: EmailService, useValue: emailMock },
+        { provide: AnalyticsService, useValue: analyticsMock },
       ],
     }).compile();
 
@@ -113,6 +116,7 @@ describe('AuthService', () => {
       email: 'ada@example.com',
       password: 'Sup3rSecret',
       displayName: 'Ada',
+      dateOfBirth: '2000-01-01',
     });
 
     expect(usersMock.create).toHaveBeenCalled();
@@ -121,11 +125,57 @@ describe('AuthService', () => {
     expect(prismaMock.refreshToken.create).toHaveBeenCalled();
   });
 
+  it('register() rejects a date of birth under the minimum age (COPPA)', async () => {
+    const dobUnderMinimum = new Date();
+    dobUnderMinimum.setUTCFullYear(dobUnderMinimum.getUTCFullYear() - 12);
+
+    await expect(
+      service.register({
+        email: 'young@example.com',
+        password: 'Sup3rSecret',
+        displayName: 'Too Young',
+        dateOfBirth: dobUnderMinimum.toISOString().slice(0, 10),
+      }),
+    ).rejects.toThrow('at least 13 years old');
+    expect(usersMock.create).not.toHaveBeenCalled();
+  });
+
+  it('register() rejects a date of birth in the future', async () => {
+    const dobInFuture = new Date();
+    dobInFuture.setUTCFullYear(dobInFuture.getUTCFullYear() + 1);
+
+    await expect(
+      service.register({
+        email: 'future@example.com',
+        password: 'Sup3rSecret',
+        displayName: 'Time Traveler',
+        dateOfBirth: dobInFuture.toISOString().slice(0, 10),
+      }),
+    ).rejects.toThrow('valid date in the past');
+    expect(usersMock.create).not.toHaveBeenCalled();
+  });
+
+  it('register() accepts a date of birth exactly at the minimum age', async () => {
+    const dobExactlyMinimum = new Date();
+    dobExactlyMinimum.setUTCFullYear(dobExactlyMinimum.getUTCFullYear() - 13);
+
+    const result = await service.register({
+      email: 'exactly13@example.com',
+      password: 'Sup3rSecret',
+      displayName: 'Exactly Thirteen',
+      dateOfBirth: dobExactlyMinimum.toISOString().slice(0, 10),
+    });
+
+    expect(usersMock.create).toHaveBeenCalled();
+    expect(result.user.email).toBe('ada@example.com'); // fakeUser stub, not the submitted email
+  });
+
   it('register() fires off a verification email without blocking on it (fire-and-forget)', async () => {
     await service.register({
       email: 'ada@example.com',
       password: 'Sup3rSecret',
       displayName: 'Ada',
+      dateOfBirth: '2000-01-01',
     });
 
     // sendVerificationEmail's own internals run async in the background;

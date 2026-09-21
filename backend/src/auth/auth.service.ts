@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Cron } from '@nestjs/schedule';
 import { Prisma, SecurityEventType } from '@prisma/client';
@@ -8,6 +8,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AppConfigService } from '../config/config.service';
 import { EmailService } from '../email/email.service';
 import { gameplayRules } from '../config/gameplay-rules';
+import { calculateAge, isValidPastDate } from '../common/age';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -59,19 +61,37 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: AppConfigService,
     private readonly email: EmailService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResult> {
+    const dateOfBirth = new Date(`${dto.dateOfBirth}T00:00:00Z`);
+    if (!isValidPastDate(dateOfBirth)) {
+      throw new BadRequestException('dateOfBirth must be a valid date in the past');
+    }
+
+    // Age gate (COPPA) — rejected before the account is ever created,
+    // not created-then-blocked, so an under-13 signup leaves no row
+    // behind to clean up or accidentally leak through a partial flow.
+    const { minimumAgeYears } = gameplayRules.auth;
+    if (calculateAge(dateOfBirth) < minimumAgeYears) {
+      throw new BadRequestException(
+        `You must be at least ${minimumAgeYears} years old to create a WordQuest account.`,
+      );
+    }
+
     const user = await this.users.create({
       email: dto.email,
       password: dto.password,
       displayName: dto.displayName,
       countryCode: dto.countryCode,
+      dateOfBirth,
     });
 
     // Fire-and-forget, same reasoning as ALI's reactFireAndForget — a
     // slow or failed email send must never block registration itself.
     this.sendVerificationEmail(user.id).catch(() => undefined);
+    this.analytics.track(user.id, 'account_created', { countryCode: user.countryCode });
 
     const tokens = await this.issueTokens(user.id);
     return { ...tokens, user: this.toPublicUser(user) };

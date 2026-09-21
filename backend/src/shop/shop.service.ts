@@ -8,6 +8,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProgressionService } from '../progression/progression.service';
 import { isUniqueConstraintError } from '../common/prisma-errors';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 export interface ShopItemView {
   id: string;
@@ -40,6 +41,7 @@ export class ShopService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly progression: ProgressionService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   /** Active catalog, annotated with whether the player already owns each item. */
@@ -116,6 +118,12 @@ export class ShopService {
 
         const purchase = await tx.shopPurchase.create({
           data: { userId, itemId: item.id, priceGlyphs: item.priceGlyphs },
+        });
+
+        this.analytics.track(userId, 'shop_purchase', {
+          itemId: item.id,
+          itemKey: item.key,
+          priceGlyphs: item.priceGlyphs,
         });
 
         return {

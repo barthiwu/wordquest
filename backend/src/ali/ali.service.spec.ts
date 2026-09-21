@@ -110,7 +110,7 @@ describe('AliService', () => {
           text: 'Level 12 — nice.',
           recommendation: 'Try a Boss Battle next.',
           tone: 'Witty, more direct, encouraging challenge',
-          promptVersion: 'v1',
+          promptVersion: 'v2',
         },
       });
     });
@@ -305,7 +305,7 @@ describe('AliService', () => {
           text: 'Welcome!',
           recommendation: null,
           tone: 'Warm, encouraging, lightly playful',
-          promptVersion: 'v1',
+          promptVersion: 'v2',
         },
       ]);
 

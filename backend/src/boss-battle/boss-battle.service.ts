@@ -22,6 +22,7 @@ import { IdempotencyService } from '../idempotency/idempotency.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
 import { JOURNEY_STAGES } from '../config/journey-stages';
 import { quickAliReaction } from '../ali/ali-quick-reactions';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 type Db = PrismaService | Prisma.TransactionClient;
 const GROUP_SIZE = 20;
@@ -126,6 +127,7 @@ export class BossBattleService {
     private readonly notifications: NotificationService,
     private readonly idempotency: IdempotencyService,
     private readonly questCards: QuestCardService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   /** Lightweight — for a pre-battle countdown display, no join/eligibility side effects. */
@@ -177,6 +179,7 @@ export class BossBattleService {
     }
 
     const { group, player } = await this.claimGroupSlot(battle.id, userId);
+    this.analytics.track(userId, 'boss_battle_joined', { battleId: battle.id, groupId: group.id });
     return this.buildChallengeView(player, group, battle.scheduledEndUtc);
   }
 

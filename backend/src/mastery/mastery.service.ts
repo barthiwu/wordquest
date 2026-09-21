@@ -40,6 +40,19 @@ export interface MasteryDetail extends SkillAreaScores {
   nextReviewDueAt: Date | null;
 }
 
+export interface MasteryListItem extends SkillAreaScores {
+  wordId: string;
+  word: string;
+  currentLevel: MasteryLevel;
+  masteryScore: number;
+  timesPresented: number;
+  timesCorrect: number;
+  timesIncorrect: number;
+  lastPresentedAt: Date | null;
+  masteredAt: Date | null;
+  nextReviewDueAt: Date | null;
+}
+
 /**
  * Owns the (user, word) Mastery relationship — Vocabulary Engine spec §4
  * (PlayerWordMastery) and §16 (NEW → RECOGNIZING → RECALLING → STRONG
@@ -256,6 +269,78 @@ export class MasteryService {
   }
 
   /**
+   * Practice-mode counterpart to evaluateWordCycleCompletion, for the
+   * Profile "My Words" review flow (Correction & Completion Spec
+   * follow-up: "just a way to improve mastery... no XP or rewards").
+   * Unlike evaluateWordCycleCompletion -- which always receives BOTH
+   * skill areas at once from a just-finished Daily Quest word cycle and
+   * overwrites both fields -- practice reviews one area at a time, so
+   * this updates ONLY the given area and leaves the other exactly where
+   * it was. Reuses the same MASTERED gate and onWordMastered path
+   * (masteredWordsCount, Journey/CEFR-eligibility re-check, achievements)
+   * so a word mastered via practice counts exactly like one mastered via
+   * a live quest -- the only thing genuinely different about practice is
+   * that nothing here ever calls ProgressionService.awardXp.
+   */
+  async recordSkillAreaPractice(
+    userId: string,
+    wordId: string,
+    area: 'sentence' | 'paragraph',
+    scores: Record<string, number>,
+    db: Db = this.prisma,
+  ): Promise<{ score: number; level: MasteryLevel; justMastered: boolean }> {
+    const score = averageScoreDimensions(scores);
+
+    const existing = await db.mastery.findUnique({ where: { userId_wordId: { userId, wordId } } });
+    const wasAlreadyMastered = existing?.currentLevel === 'MASTERED';
+    const currentLevel: MasteryLevel = existing?.currentLevel ?? 'NEW';
+
+    const guessScore = existing?.guessScore ?? 0;
+    const sentenceScore = area === 'sentence' ? score : (existing?.sentenceScore ?? 0);
+    const paragraphScore = area === 'paragraph' ? score : (existing?.paragraphScore ?? 0);
+
+    const newLevel = this.applyMasteryGate(currentLevel, { guessScore, sentenceScore, paragraphScore });
+
+    const now = new Date();
+    const areaUpdate =
+      area === 'sentence' ? { sentenceScore: score } : { paragraphScore: score };
+
+    await db.mastery.upsert({
+      where: { userId_wordId: { userId, wordId } },
+      create: {
+        userId,
+        wordId,
+        currentLevel: newLevel,
+        masteryScore: existing?.masteryScore ?? 0,
+        timesPresented: existing?.timesPresented ?? 0,
+        timesCorrect: existing?.timesCorrect ?? 0,
+        timesIncorrect: existing?.timesIncorrect ?? 0,
+        guessScore,
+        sentenceScore,
+        paragraphScore,
+        lastReviewedAt: now,
+        nextReviewDueAt: nextReviewDueAt(newLevel, now),
+        masteredAt: newLevel === 'MASTERED' ? now : null,
+      },
+      update: {
+        currentLevel: newLevel,
+        ...areaUpdate,
+        lastReviewedAt: now,
+        nextReviewDueAt: nextReviewDueAt(newLevel, now),
+        ...(newLevel === 'MASTERED' && !wasAlreadyMastered ? { masteredAt: now } : {}),
+      },
+    });
+
+    const justMastered = newLevel === 'MASTERED' && !wasAlreadyMastered;
+    if (justMastered) {
+      const masteredWordsCount = await this.onWordMastered(userId, wordId, db);
+      await this.achievements.checkDiscoveryAndMastery(userId, masteredWordsCount, db);
+    }
+
+    return { score, level: newLevel, justMastered };
+  }
+
+  /**
    * The omission engine needs the player's current level on THIS word
    * before it can generate a challenge (spec: "Backend reads word
    * difficulty + player's mastery" happens before "Omission Engine
@@ -268,6 +353,40 @@ export class MasteryService {
       select: { currentLevel: true },
     });
     return (existing?.currentLevel as MasteryLevel | undefined) ?? 'NEW';
+  }
+
+  /**
+   * Every word the player has ever been presented with, together with
+   * their current mastery on it — the "words I've guessed, and can I
+   * improve on them" view requested for the Profile tab. Only words
+   * with an actual Mastery row (i.e. presented at least once) show up
+   * here; the full 500-word vocabulary a player hasn't touched yet
+   * isn't "theirs" to review. Most-recently-presented first, so a
+   * player picking this up mid-session sees what they were just
+   * working on before older words.
+   */
+  async listForUser(userId: string): Promise<MasteryListItem[]> {
+    const rows = await this.prisma.mastery.findMany({
+      where: { userId },
+      orderBy: [{ lastPresentedAt: 'desc' }],
+      include: { word: { select: { word: true } } },
+    });
+
+    return rows.map((row) => ({
+      wordId: row.wordId,
+      word: row.word.word,
+      currentLevel: row.currentLevel as MasteryLevel,
+      masteryScore: row.masteryScore,
+      guessScore: row.guessScore,
+      sentenceScore: row.sentenceScore,
+      paragraphScore: row.paragraphScore,
+      timesPresented: row.timesPresented,
+      timesCorrect: row.timesCorrect,
+      timesIncorrect: row.timesIncorrect,
+      lastPresentedAt: row.lastPresentedAt,
+      masteredAt: row.masteredAt,
+      nextReviewDueAt: row.nextReviewDueAt,
+    }));
   }
 
   /**

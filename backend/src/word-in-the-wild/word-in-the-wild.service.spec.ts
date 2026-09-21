@@ -30,7 +30,7 @@ describe('WordInTheWildService', () => {
       update: jest.fn().mockResolvedValue({}),
       count: jest.fn().mockResolvedValue(0),
     },
-    challengeAttempt: { create: jest.fn() },
+    challengeAttempt: { create: jest.fn(), findFirst: jest.fn() },
     $transaction: jest.fn((callback: (tx: any) => unknown): unknown => callback(prismaMock)),
   };
 
@@ -82,8 +82,17 @@ describe('WordInTheWildService', () => {
       await expect(service.createMission('u1', 'missing')).rejects.toThrow(NotFoundException);
     });
 
+    it("throws BadRequestException when the player hasn't answered this word in a Quest yet", async () => {
+      prismaMock.word.findUnique.mockResolvedValueOnce(word);
+      prismaMock.challengeAttempt.findFirst.mockResolvedValueOnce(null);
+
+      await expect(service.createMission('u1', 'w1')).rejects.toThrow(BadRequestException);
+      expect(prismaMock.wordInTheWildMission.create).not.toHaveBeenCalled();
+    });
+
     it('returns an existing OPEN mission instead of creating a duplicate', async () => {
       prismaMock.word.findUnique.mockResolvedValueOnce(word);
+      prismaMock.challengeAttempt.findFirst.mockResolvedValueOnce({ id: 'ca1' });
       prismaMock.wordInTheWildMission.findFirst.mockResolvedValueOnce({
         id: 'm1',
         wordId: 'w1',
@@ -100,6 +109,7 @@ describe('WordInTheWildService', () => {
 
     it('creates a new mission when none is open', async () => {
       prismaMock.word.findUnique.mockResolvedValueOnce(word);
+      prismaMock.challengeAttempt.findFirst.mockResolvedValueOnce({ id: 'ca1' });
       prismaMock.wordInTheWildMission.findFirst.mockResolvedValueOnce(null);
       prismaMock.wordInTheWildMission.create.mockResolvedValueOnce({
         id: 'm2',

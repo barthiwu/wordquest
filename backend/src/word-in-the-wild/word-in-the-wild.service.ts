@@ -91,6 +91,25 @@ export class WordInTheWildService {
       throw new NotFoundException('Word not found');
     }
 
+    // V23 product feedback: Word in the Wild evidence is supposed to
+    // prove the player used a word they've actually met in a Quest —
+    // a mission for a word they've never been challenged on isn't
+    // evidence of real-world use, it's just evidence they can type.
+    // Authoritative for every caller (the standalone picker AND
+    // createOptionalWildMission) and every player/word, not just a UI
+    // filter — words.controller.ts's search endpoint applies the same
+    // rule for discovery, but this is what actually protects the data.
+    // Scoped to LETTER_OMISSION, the Guess-stage answer.
+    const hasAnswered = await this.prisma.challengeAttempt.findFirst({
+      where: { userId, wordId, challengeType: 'LETTER_OMISSION' },
+      select: { id: true },
+    });
+    if (!hasAnswered) {
+      throw new BadRequestException(
+        `You haven't answered "${word.word}" in a Quest yet — Word in the Wild evidence is only for words you've already met.`,
+      );
+    }
+
     const existing = await this.prisma.wordInTheWildMission.findFirst({
       where: { userId, wordId, status: 'OPEN' },
     });
@@ -302,6 +321,9 @@ export class WordInTheWildService {
           assessmentReasoning: result.reasoning,
           xpAwarded,
           challengeAttemptId,
+          // Photo review queue (moderation): only PHOTO evidence has
+          // content worth a trust & safety look; TEXT stays null (N/A).
+          moderationStatus: evidence.evidenceType === 'PHOTO' ? 'PENDING' : null,
         },
       });
 

@@ -10,6 +10,7 @@ describe('PassportController', () => {
     orderSelection: { findFirst: jest.fn() },
   };
   const questCardsMock = { listShowcase: jest.fn() };
+  const storageMock = { isStorageConfigured: jest.fn().mockReturnValue(false), getDownloadUrl: jest.fn() };
 
   const baseUser = {
     displayName: 'Ada',
@@ -34,7 +35,7 @@ describe('PassportController', () => {
     // JwtAuthGuard's own DI chain for no reason in a unit test of the
     // controller's own logic.
     questCardsMock.listShowcase.mockResolvedValue([]);
-    controller = new PassportController(prismaMock as any, questCardsMock as any);
+    controller = new PassportController(prismaMock as any, questCardsMock as any, storageMock as any);
   });
 
   it('maps real AchievementUnlock rows to catalog names, not an empty placeholder', async () => {

@@ -10,6 +10,7 @@ import { ParagraphModule } from '../paragraph/paragraph.module';
 import { WordInTheWildModule } from '../word-in-the-wild/word-in-the-wild.module';
 import { LearningProfileModule } from '../learning-profile/learning-profile.module';
 import { AliModule } from '../ali/ali.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AliModule } from '../ali/ali.module';
     WordInTheWildModule,
     LearningProfileModule,
     AliModule,
+    AnalyticsModule,
   ],
   controllers: [QuestsController],
   providers: [QuestsService],

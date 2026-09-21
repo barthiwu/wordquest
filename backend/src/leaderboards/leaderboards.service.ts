@@ -1,11 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { continentForCountryCode, countryCodesForContinent } from '../common/country-continent';
 
 export interface LeaderboardEntry {
   rank: number;
   userId: string;
   displayName: string;
   clanName: string | null;
+  countryCode: string | null;
   level: number;
   totalXp: number;
 }
@@ -19,7 +21,7 @@ export interface LeaderboardView {
 interface ProgressionRow {
   totalXp: number;
   level: number;
-  user: { id: string; displayName: string; clan: { name: string } | null };
+  user: { id: string; displayName: string; clan: { name: string } | null; countryCode: string | null };
 }
 
 const DEFAULT_LIMIT = 50;
@@ -53,7 +55,7 @@ export class LeaderboardsService {
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       take: clampedLimit,
       include: {
-        user: { select: { id: true, displayName: true, clan: { select: { name: true } } } },
+        user: { select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true } },
       },
     });
 
@@ -77,7 +79,7 @@ export class LeaderboardsService {
       where: { user: { clanId: viewer.clanId } },
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       include: {
-        user: { select: { id: true, displayName: true, clan: { select: { name: true } } } },
+        user: { select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true } },
       },
     });
 
@@ -88,6 +90,79 @@ export class LeaderboardsService {
       // their own clan's row set — but fail loudly rather than return
       // a LeaderboardView with a fabricated viewer entry if it ever is.
       throw new BadRequestException('Could not locate your entry on the clan leaderboard.');
+    }
+
+    return { entries, viewer: viewerEntry };
+  }
+
+  /**
+   * Ranks the viewer only against players who share their exact country
+   * (§30 tie-in with the flag/country picker added at onboarding —
+   * Correction & Completion Spec follow-up). A player with no
+   * countryCode set has nothing to be scoped to, same shape as `getClan`
+   * for "not in a clan".
+   */
+  async getCountry(userId: string): Promise<LeaderboardView> {
+    const viewer = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { countryCode: true },
+    });
+
+    if (!viewer.countryCode) {
+      throw new BadRequestException('Set your country to see the country leaderboard.');
+    }
+
+    const rows = await this.prisma.userProgression.findMany({
+      where: { user: { countryCode: viewer.countryCode } },
+      orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
+      include: {
+        user: {
+          select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true },
+        },
+      },
+    });
+
+    const entries = rows.map((row: ProgressionRow, index: number) => this.toEntry(row, index + 1));
+    const viewerEntry = entries.find((e: LeaderboardEntry) => e.userId === userId);
+    if (!viewerEntry) {
+      throw new BadRequestException('Could not locate your entry on the country leaderboard.');
+    }
+
+    return { entries, viewer: viewerEntry };
+  }
+
+  /**
+   * Ranks the viewer against every player whose country falls in the
+   * same continent, per the code -> continent table in
+   * common/country-continent.ts (kept manually in sync with the
+   * mobile app's country list). Same "nothing to scope to yet" shape
+   * as `getCountry` when the viewer has no countryCode set.
+   */
+  async getContinent(userId: string): Promise<LeaderboardView> {
+    const viewer = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { countryCode: true },
+    });
+
+    const continent = continentForCountryCode(viewer.countryCode);
+    if (!continent) {
+      throw new BadRequestException('Set your country to see the continent leaderboard.');
+    }
+
+    const rows = await this.prisma.userProgression.findMany({
+      where: { user: { countryCode: { in: countryCodesForContinent(continent) } } },
+      orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
+      include: {
+        user: {
+          select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true },
+        },
+      },
+    });
+
+    const entries = rows.map((row: ProgressionRow, index: number) => this.toEntry(row, index + 1));
+    const viewerEntry = entries.find((e: LeaderboardEntry) => e.userId === userId);
+    if (!viewerEntry) {
+      throw new BadRequestException('Could not locate your entry on the continent leaderboard.');
     }
 
     return { entries, viewer: viewerEntry };
@@ -105,7 +180,7 @@ export class LeaderboardsService {
     const progression = await this.prisma.userProgression.findUniqueOrThrow({
       where: { userId },
       include: {
-        user: { select: { id: true, displayName: true, clan: { select: { name: true } } } },
+        user: { select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true } },
       },
     });
 
@@ -135,6 +210,7 @@ export class LeaderboardsService {
       userId: row.user.id,
       displayName: row.user.displayName,
       clanName: row.user.clan?.name ?? null,
+      countryCode: row.user.countryCode,
       level: row.level,
       totalXp: row.totalXp,
     };

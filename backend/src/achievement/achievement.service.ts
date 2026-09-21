@@ -167,8 +167,29 @@ export class AchievementService {
     }
   }
 
-  /** True if this was a genuinely new unlock (false if already unlocked — achievements are awarded once, spec §6.1). */
+  /**
+   * True if this was a genuinely new unlock (false if already unlocked —
+   * achievements are awarded once, spec §6.1).
+   *
+   * Checks for an existing unlock BEFORE attempting the insert, rather
+   * than relying solely on catching the unique-constraint violation:
+   * db is very often an interactive transaction (tx) here, and Postgres
+   * poisons the whole transaction the instant any statement errors — a
+   * JS try/catch around the failed create() does not undo that without
+   * an explicit SAVEPOINT, so every later statement in the same
+   * transaction (e.g. the XP award right after this call returns) was
+   * failing with a generic "current transaction is aborted" error any
+   * time this ran for an already-unlocked achievement. The create()
+   * catch stays as a defense against a genuine concurrent-unlock race
+   * (two requests both passing the check at once), which is rare enough
+   * that poisoning that one transaction is an acceptable fallback.
+   */
   private async unlock(userId: string, achievementId: string, db: Db): Promise<boolean> {
+    const existing = await db.achievementUnlock.findUnique({
+      where: { userId_achievementId: { userId, achievementId } },
+    });
+    if (existing) return false;
+
     try {
       await db.achievementUnlock.create({ data: { userId, achievementId } });
     } catch (err) {

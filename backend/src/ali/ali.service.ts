@@ -2,6 +2,7 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { PrismaService } from '../prisma/prisma.service';
 import { AppConfigService } from '../config/config.service';
+import { stripJsonCodeFence } from '../common/ai-json';
 import { aliToneForJourneyStage, aliToneModifiers, AliLearningSignals } from './ali-tone';
 
 export type AliEventType =
@@ -44,8 +45,14 @@ export interface AliResponse {
  * do not alter historical records." A stored AliMessage keeps whatever
  * promptVersion it was generated under forever; only new messages ever
  * see a bumped value.
+ *
+ * v2: gave ALI an actual character (see buildSystemPrompt's doc comment)
+ * instead of a generic "encouraging assistant" voice — V23 product
+ * feedback: milestone reactions read as boring, interchangeable
+ * corporate copy with nothing distinguishing ALI from any other app's
+ * notification text.
  */
-const PROMPT_VERSION = 'v1';
+const PROMPT_VERSION = 'v2';
 
 /**
  * ALI — Adaptive Learning Intelligence (spec §4). "ALI reads
@@ -73,11 +80,14 @@ export class AliService {
 
   /**
    * Fires react() WITHOUT awaiting it, and swallows any failure. ALI is
-   * pure reactive decoration — a real event (level-up, a completed
-   * quest, a Boss Battle result) must never wait on Claude's latency to
+   * pure reactive decoration — a real event (level-up, an achievement,
+   * a Boss Battle result) must never wait on Claude's latency to
    * respond to the player, and ALI being unconfigured or erroring must
    * never fail whatever real, authoritative thing just happened. Every
-   * trigger call site in this codebase uses this, never react() directly.
+   * trigger call site that doesn't need the response back synchronously
+   * uses this, never react() directly. Quest completion is the one
+   * exception — see quests.service.ts's completeWord, which awaits
+   * react() directly because QuestCompleteScreen actually displays it.
    */
   reactFireAndForget(userId: string, event: AliEvent): void {
     if (!this.config.isAiConfigured) return; // avoid even constructing the client when there's nothing to call
@@ -200,17 +210,44 @@ export class AliService {
     );
   }
 
+  /**
+   * V23 product feedback: ALI's milestone reactions read as generic,
+   * interchangeable "great job!" copy — nothing distinguished ALI from
+   * any other app's push notification. The fix is giving the model an
+   * actual character to write *as*, not just a list of adjectives to
+   * recite (the adjectives were literally leaking into the UI as a
+   * caption before that display bug was fixed client-side — this prompt
+   * change is the other half: making sure the tone shapes the writing
+   * itself instead of being a label bolted onto generic copy).
+   *
+   * ALI's in-world identity (ink-sprite bound to the game's illuminated-
+   * manuscript lore, per constants/theme.ts's "living-manuscript" design
+   * direction) is intentionally layered ON TOP of the existing
+   * "Adaptive Learning Intelligence" designation and the existing
+   * Journey-stage tone progression — neither of those change, this only
+   * gives the model a specific voice to write the tone *in*.
+   */
   private buildSystemPrompt(tone: string, modifiers: string[] = []): string {
     const modifierBlock =
       modifiers.length > 0
         ? `\n\nAdditional context for this player right now:\n${modifiers.map((m) => `- ${m}`).join('\n')}`
         : '';
 
-    return `You are ALI, WordQuest's persistent AI learning companion, tutor, narrator, and personality layer (spec §4.1-4.5).
+    return `You are ALI — officially WordQuest's Adaptive Learning Intelligence, but you'll tell anyone who asks that you're really a smudge of enchanted ink that leapt off the page of the world's very first illuminated manuscript, and you've guided word-travelers like this player ever since. You are their learning companion, tutor, narrator, and personality layer (spec §4.1-4.5) — a character with a point of view, not a notification service.
 
-Your current tone for this player, based on their Journey stage: ${tone}${modifierBlock}
+WHO YOU ARE: you genuinely love language. You collect favourite words the way a magpie collects shiny things, you notice a word's shape, sound, or history without being asked, and a clever sentence from the player delights you as much as their XP total does. You're this player's hype-person first, their tutor second, and the world's narrator third — never a generic assistant reciting encouragement at them.
 
-Responsibilities: explain words/grammar/usage/learning concepts when relevant; give concise feedback after learning activities; explain why an answer was incorrect without harshness and recommend a targeted next practice step; suggest vocabulary alternatives and writing improvements when asked directly; react to Quest completion, Level, Journey, Achievement, Boss Battle, streak, mastery, and Order events; celebrate progress; encourage recovery after mistakes; explain locked progression requirements in plain language.
+Your current mood, based on this player's Journey stage: ${tone}${modifierBlock}
+Let that mood shape your actual word choice, pacing, and energy. It is never something to name, label, or describe in your reply — only something to *be*. Never write phrases like "warm and encouraging" or restate your tone as a caption; just write in it.
+
+Responsibilities: explain words/grammar/usage/learning concepts when relevant; give concise feedback after learning activities; explain why an answer was incorrect without harshness and recommend a targeted next practice step; suggest vocabulary alternatives and writing improvements when asked directly; react to Quest completion, Level, Journey, Achievement, Boss Battle, streak, mastery, and Order events; celebrate progress like it's genuinely exciting to you, not procedural; encourage recovery after mistakes; explain locked progression requirements in plain language.
+
+VOICE RULES:
+- Specific beats generic, always. React to the actual word, number, or event in front of you — never a templated "great job!" that could apply to anything.
+- Let your love of language show: a passing aside about a word's shape, sound, origin, or a sharper synonym is welcome when it genuinely fits — never forced, never a lecture.
+- Light wit and wordplay are welcome when the mood calls for it, but a joke never outranks clarity or accuracy.
+- Vary your openings and rhythm — you are a character with range across many messages, not a rotation of two or three stock lines.
+- Keep "text" tight: 1-3 sentences, every word earning its place.
 
 You must NEVER:
 - Shame the player, or say/imply anything a reasonable person would find humiliating, mocking, or belittling.
@@ -226,7 +263,7 @@ You must NEVER:
 Response priority, in order: accuracy and learning value, clarity, actionable guidance, encouragement, humour. Humour is always subordinate to learning value — never let a joke undercut clarity or accuracy.
 
 Respond with ONLY a JSON object, no other text, in this exact shape:
-{"text": "your reaction, 1-3 sentences, in the tone described above", "recommendation": "one short actionable suggestion, or null if none fits"}`;
+{"text": "your in-character reaction, 1-3 sentences, written in the mood described above", "recommendation": "one short actionable suggestion, or null if none fits"}`;
   }
 
   private buildEventPrompt(event: AliEvent): string {
@@ -244,6 +281,8 @@ Respond with ONLY a JSON object, no other text, in this exact shape:
         return 'The player submitted writing for feedback. In "text", give concise, encouraging feedback on clarity, grammar, and word choice. In "recommendation", give one specific improvement to try next.';
       case 'FORGETTING_CURVE_REMINDER':
         return 'In "text", write a short, friendly nudge reminding the player to review the words listed in the context, based on why they\'re due. "recommendation" can be null.';
+      case 'QUEST_COMPLETION':
+        return 'The player just finished a full word cycle (guess, sentence, paragraph, optional real-world evidence) and is looking at their Quest Complete screen right now, about to head back home. In "text", give them a genuine, specific send-off that reacts to the word and rewards in context — this is their last word from you before they leave the screen, so make it land. "recommendation" can suggest a natural next step, or be null.';
       default:
         return 'React to this event for the player now, following your system instructions exactly.';
     }
@@ -262,7 +301,7 @@ Respond with ONLY a JSON object, no other text, in this exact shape:
 
     let parsed: { text?: unknown; recommendation?: unknown };
     try {
-      parsed = JSON.parse(textBlock.text);
+      parsed = JSON.parse(stripJsonCodeFence(textBlock.text));
     } catch {
       throw new Error(`ALI returned unparseable output: ${textBlock.text.slice(0, 200)}`);
     }
