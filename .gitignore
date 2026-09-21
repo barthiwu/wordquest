@@ -43,3 +43,7 @@ Thumbs.db
 
 # test coverage
 coverage/
+
+# expo prebuild output (managed workflow — regenerate with `expo prebuild` / EAS Build, don't commit)
+mobile/ios/
+mobile/android/
