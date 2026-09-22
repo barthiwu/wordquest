@@ -36,7 +36,8 @@
             "deploymentTarget": "15.1"
           }
         }
-      ]
+      ],
+      "./plugins/withPodDeploymentTarget"
     ],
     "ios": {
       "supportsTablet": false,
