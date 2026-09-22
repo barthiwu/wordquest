@@ -21,6 +21,15 @@ const { withAppDelegate } = require('@expo/config-plugins');
  * Nothing about RN's own setup changes -- this only re-parents the
  * already-built root view controller once the scene becomes available.
  *
+ * It also forwards any URL/user-activity the OS hands to this method via
+ * connectionOptions -- this is how a COLD launch (app not already running)
+ * delivers a URL, such as the dev-client's exp+wordquest:// deep link that
+ * tells this app which Metro server to use. -scene:openURLContexts: (added
+ * by withSceneURLHandling) only fires for a URL that arrives while the app
+ * is already running; without this, every cold-started QR scan silently
+ * drops its URL and RCTBundleURLProvider falls back to its localhost
+ * default, which is invisible on a physical device.
+ *
  * Runs on every prebuild (clean or not), matching withPodDeploymentTarget.
  */
 module.exports = function withSceneDelegateWindow(config) {
@@ -48,6 +57,14 @@ module.exports = function withSceneDelegateWindow(config) {
 // by RN's own bootstrapping above) into a new window that IS properly
 // attached via -initWithWindowScene:. Nothing about RN's own setup changes
 // -- this only re-parents the already-built root view controller.
+//
+// A cold launch via a URL (e.g. the dev-client's exp+wordquest:// deep link
+// naming the Metro server to use) is delivered here, in
+// connectionOptions.URLContexts / .userActivities -- NOT via
+// -scene:openURLContexts:, which only fires once the app is already
+// running. Forward both through the same app-level handlers used there, so
+// a cold-started QR scan actually reaches RCTLinkingManager / the
+// dev-launcher instead of being silently dropped.
 - (void)scene:(UIScene *)scene
     willConnectToSession:(UISceneSession *)session
                  options:(UISceneConnectionOptions *)connectionOptions
@@ -61,6 +78,25 @@ module.exports = function withSceneDelegateWindow(config) {
   sceneWindow.rootViewController = rootViewController;
   self.window = sceneWindow;
   [self.window makeKeyAndVisible];
+
+  for (UIOpenURLContext *context in connectionOptions.URLContexts) {
+    NSMutableDictionary<UIApplicationOpenURLOptionsKey, id> *options = [NSMutableDictionary dictionary];
+    if (context.options.sourceApplication) {
+      options[UIApplicationOpenURLOptionsSourceApplicationKey] = context.options.sourceApplication;
+    }
+    if (context.options.annotation) {
+      options[UIApplicationOpenURLOptionsAnnotationKey] = context.options.annotation;
+    }
+    options[UIApplicationOpenURLOptionsOpenInPlaceKey] = @(context.options.openInPlace);
+    [self application:[UIApplication sharedApplication] openURL:context.URL options:options];
+  }
+
+  for (NSUserActivity *userActivity in connectionOptions.userActivities) {
+    [self application:[UIApplication sharedApplication]
+        continueUserActivity:userActivity
+           restorationHandler:^(NSArray<id<UIUserActivityRestoring>> *_Nullable restorableObjects) {
+           }];
+  }
 }
 
 `;
