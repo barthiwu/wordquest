@@ -38,7 +38,8 @@
         }
       ],
       "./plugins/withPodDeploymentTarget",
-      "./plugins/withSceneDelegateWindow"
+      "./plugins/withSceneDelegateWindow",
+      "./plugins/withSceneURLHandling"
     ],
     "ios": {
       "supportsTablet": false,
