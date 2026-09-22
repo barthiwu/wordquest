@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires -- Expo config plugins run as plain CommonJS under Node, outside the app's TS/babel pipeline */
 const { withDangerousMod } = require('@expo/config-plugins');
 const fs = require('fs');
 const path = require('path');
@@ -13,12 +14,14 @@ const path = require('path');
  * pods stayed on their old target even after we bumped the app itself to
  * 15.1, and Xcode flagged every one of them as a deployment-target mismatch.
  *
- * This appends a second `post_install` hook to the generated Podfile —
- * CocoaPods runs every post_install hook it's given, so it runs alongside
- * Expo's own `react_native_post_install` rather than replacing it — that
- * walks every pod target and raises its IPHONEOS_DEPLOYMENT_TARGET to match
- * ios.deploymentTarget whenever the pod's own value is lower, and leaves it
- * alone otherwise (never lowers a pod that genuinely needs something newer).
+ * CocoaPods only allows ONE `post_install` hook per Podfile (a second,
+ * separate `post_install do |installer| ... end` block fails Podfile
+ * validation outright: "Specifying multiple `post_install` hooks is
+ * unsupported"), so this can't just append a second hook — it has to splice
+ * into Expo's existing one, right after the `react_native_post_install(...)`
+ * call, and walk every pod target raising its IPHONEOS_DEPLOYMENT_TARGET to
+ * match whenever it's lower (never lowering a pod that genuinely needs
+ * something newer).
  *
  * Runs on every `expo prebuild` (clean or not), so this survives a full
  * native-project regen the same way the expo-build-properties deployment
@@ -35,22 +38,34 @@ module.exports = function withPodDeploymentTarget(config) {
         return config;
       }
 
+      // Anchored on the end of Expo's own react_native_post_install(...) call
+      // (inside the Podfile's single post_install hook), which every Expo
+      // SDK 51 template Podfile has — fails loudly instead of silently doing
+      // nothing if that call's shape ever changes.
+      const anchorPattern =
+        /(:ccache_enabled\s*=>\s*podfile_properties\['apple\.ccacheEnabled'\]\s*==\s*'true',\s*\n\s*\)\n)/;
+      const match = contents.match(anchorPattern);
+      if (!match) {
+        throw new Error(
+          "withPodDeploymentTarget: could not find the react_native_post_install(...) call in the Podfile to splice into — Expo's Podfile template may have changed.",
+        );
+      }
+
       const snippet = `
-${marker}
-post_install do |installer|
-  deployment_target = (podfile_properties['ios.deploymentTarget'] || '13.4').to_f
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |build_config|
-      current = build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
-      if current.nil? || current.to_f < deployment_target
-        build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = deployment_target.to_s
+    ${marker}
+    deployment_target = (podfile_properties['ios.deploymentTarget'] || '13.4').to_f
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |build_config|
+        current = build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+        if current.nil? || current.to_f < deployment_target
+          build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = deployment_target.to_s
+        end
       end
     end
-  end
-end
 `;
 
-      fs.writeFileSync(podfilePath, contents.trimEnd() + '\n' + snippet);
+      contents = contents.replace(anchorPattern, match[1] + snippet);
+      fs.writeFileSync(podfilePath, contents);
       return config;
     },
   ]);
