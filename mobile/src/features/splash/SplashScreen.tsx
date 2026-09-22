@@ -24,9 +24,18 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
  * loading indicator now (no separate spinner), so the screen holds
  * exactly as long as that animation takes to settle, plus a short beat
  * to let the completed wordmark register before handing off.
+ *
+ * hydrate() is expected to be fast and local (SecureStore reads only,
+ * no network), but nothing here previously guarded against it rejecting
+ * or simply never settling — either one left the app stuck on this
+ * screen forever with no way forward. SAFETY_TIMEOUT_MS below is a hard
+ * backstop: whatever happens with hydrate(), navigation fires no later
+ * than that, falling back to a logged-out state (Welcome), same as any
+ * other hydrate failure.
  */
 const HOLD_AFTER_ANIMATION_MS = 250;
 const MIN_SPLASH_MS = WORDMARK_ANIMATION_DURATION_MS + HOLD_AFTER_ANIMATION_MS;
+const SAFETY_TIMEOUT_MS = 8000;
 
 export function SplashScreen({ navigation }: Props) {
   const colors = useThemeColors();
@@ -35,10 +44,25 @@ export function SplashScreen({ navigation }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    const minDelay = new Promise((resolve) => setTimeout(resolve, MIN_SPLASH_MS));
 
-    Promise.all([hydrate(), minDelay]).then(() => {
+    const minDelay = new Promise<void>((resolve) => setTimeout(resolve, MIN_SPLASH_MS));
+
+    const hydrated = Promise.all([hydrate(), minDelay])
+      .then(() => true as const)
+      .catch((error: unknown) => {
+        console.warn('SplashScreen: hydrate() failed, continuing as logged out', error);
+        return true as const;
+      });
+
+    const safetyTimeout = new Promise<false>((resolve) => {
+      setTimeout(() => resolve(false), SAFETY_TIMEOUT_MS);
+    });
+
+    Promise.race([hydrated, safetyTimeout]).then((settledInTime) => {
       if (cancelled) return;
+      if (!settledInTime) {
+        console.warn('SplashScreen: hydrate() did not settle in time, continuing as logged out');
+      }
       const { accessToken } = useAuthStore.getState();
       if (accessToken) {
         syncPushToken(accessToken);
