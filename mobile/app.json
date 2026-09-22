@@ -48,7 +48,15 @@
           "NSAllowsLocalNetworking": true
         },
         "UIApplicationSceneManifest": {
-          "UIApplicationSupportsMultipleScenes": false
+          "UIApplicationSupportsMultipleScenes": false,
+          "UISceneConfigurations": {
+            "UIWindowSceneSessionRoleApplication": [
+              {
+                "UISceneConfigurationName": "Default Configuration",
+                "UISceneDelegateClassName": "AppDelegate"
+              }
+            ]
+          }
         }
       }
     },
