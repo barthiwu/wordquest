@@ -5,10 +5,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { getMyProgression, type Progression } from '@/services/progression';
+import { getMyJourney, type JourneyView } from '@/services/journey';
 import { useAuthStore } from '@/state/authStore';
 import { timeOfDayGreeting } from '@/utils/timeOfDay';
 import { VerificationBanner } from '@/components/VerificationBanner';
 import { GlyphCoin } from '@/components/GlyphIcon';
+import { JourneyMapExcerpt } from '@/components/JourneyMapExcerpt';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -22,11 +24,19 @@ type Props = CompositeScreenProps<
 
 /**
  * Screen 19 of the UI/UX Screen Bible, now the Home tab. Refetches
- * progression every time Home regains focus (e.g. returning from Quest
- * Complete) so the numbers shown are never stale — always the server's
- * snapshot, never a locally incremented guess. Journey/Compete/Profile
- * moved to their own tabs, so this screen is now purely the dashboard —
- * stats plus a quick way into today's quest, not a menu of links.
+ * progression (and, for the Journey map excerpt hero, the player's
+ * Journey view) every time Home regains focus so nothing shown is ever
+ * stale — always the server's snapshot, never a locally incremented
+ * guess.
+ *
+ * Sept 2026 homepage redesign: the plain greeting-and-stats dashboard
+ * gained a hero — JourneyMapExcerpt, a compact window onto the same
+ * per-stage gradient/motif card JourneyScreen shows in full, with ALI
+ * standing in the corner. It reuses Journey's own visual system rather
+ * than inventing a new one, so Home now reads as "a page in the same
+ * world," not a stats screen bolted in front of it. The generic "Home"
+ * title label was dropped in the process — the hero card carries that
+ * visual weight now, the personalized greeting is enough context above it.
  */
 export function HomeScreen({ navigation }: Props) {
   const colors = useThemeColors();
@@ -35,6 +45,7 @@ export function HomeScreen({ navigation }: Props) {
   const accessToken = useAuthStore((s) => s.accessToken);
   const displayName = useAuthStore((s) => s.user?.displayName);
   const [progression, setProgression] = useState<Progression | null>(null);
+  const [journey, setJourney] = useState<JourneyView | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -42,6 +53,12 @@ export function HomeScreen({ navigation }: Props) {
     getMyProgression(accessToken)
       .then(setProgression)
       .catch(() => setError('Could not reach the WordQuest backend.'));
+    // Journey has its own screen-level error handling; a failed fetch
+    // here just means the hero card doesn't render, not a page-level
+    // error — Home's real job is the stats above, not this excerpt.
+    getMyJourney(accessToken)
+      .then(setJourney)
+      .catch(() => {});
   }, [accessToken]);
 
   useEffect(load, [load]);
@@ -53,7 +70,13 @@ export function HomeScreen({ navigation }: Props) {
         {timeOfDayGreeting()}
         {displayName ? `, ${displayName}` : ''}
       </Text>
-      <Text style={styles.title}>Home</Text>
+
+      {journey && (
+        <JourneyMapExcerpt
+          currentStage={journey.currentStage}
+          onPress={() => navigation.navigate('Main', { screen: 'Journey' })}
+        />
+      )}
 
       <VerificationBanner onPress={() => navigation.navigate('Settings')} />
 
@@ -149,66 +172,65 @@ export function HomeScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  // Home has no native header (MainTabNavigator sets headerShown: false)
-  // and renders its own greeting/title as the first content, so it has
-  // to account for the status bar itself -- a flat spacing.xl top
-  // padding put "Good evening" half under the status bar on notched
-  // devices. paddingTop adds the real safe-area inset on top of the
-  // usual breathing room instead.
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.md,
-    gap: spacing.lg,
-  },
-  greeting: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  error: { color: colors.danger, fontSize: typography.scale.sm },
-  statsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  stat: {
-    flexBasis: '47%',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    gap: 2,
-  },
-  statValue: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  statLabel: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  glyphValueRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  questButton: {
-    marginTop: 'auto',
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  questButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-  linkRow: { flexDirection: 'row', gap: spacing.sm },
-  linkButton: {
-    flex: 1,
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
-  linkButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
+    // Home has no native header (MainTabNavigator sets headerShown: false)
+    // and renders its own greeting as the first content, so it has to
+    // account for the status bar itself -- a flat spacing.xl top padding
+    // put "Good evening" half under the status bar on notched devices.
+    // paddingTop adds the real safe-area inset on top of the usual
+    // breathing room instead.
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.md,
+      gap: spacing.lg,
+    },
+    greeting: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.lg,
+      fontWeight: typography.display.weight,
+    },
+    error: { color: colors.danger, fontSize: typography.scale.sm },
+    statsRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+    },
+    stat: {
+      flexBasis: '47%',
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      gap: 2,
+    },
+    statValue: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    statLabel: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    glyphValueRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+    questButton: {
+      marginTop: 'auto',
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    questButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+    linkRow: { flexDirection: 'row', gap: spacing.sm },
+    linkButton: {
+      flex: 1,
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+    },
+    linkButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
   });
 }
