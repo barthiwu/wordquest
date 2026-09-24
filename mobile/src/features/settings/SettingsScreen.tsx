@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,9 +9,11 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
-import { deleteAccount, logout, resendVerification, verifyEmail } from '@/services/auth';
+import { useSelectedLanguage } from '@/state/languageStore';
+import { logout, resendVerification, verifyEmail } from '@/services/auth';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -23,8 +24,10 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 /**
  * Settings — MVP-listed in BUILD_HANDOFF §6 but never built. Hosts the
  * account-lifecycle actions the rest of the app has nowhere else to
- * put: email verification, logout (which revokes the refresh token
- * server-side, not just clears local storage), and account deletion.
+ * put: email verification and logout (which revokes the refresh token
+ * server-side, not just clears local storage). Language preference
+ * lives here too; legal documents and account deletion moved to their
+ * own About screen (Sept 2026 request) rather than crowding this one.
  */
 export function SettingsScreen({ navigation }: Props) {
   const colors = useThemeColors();
@@ -33,8 +36,9 @@ export function SettingsScreen({ navigation }: Props) {
   const accessToken = useAuthStore((s) => s.accessToken);
   const refreshToken = useAuthStore((s) => s.refreshToken);
   const clearSession = useAuthStore((s) => s.clearSession);
+  const selectedLanguage = useSelectedLanguage();
   const [verifyToken, setVerifyToken] = useState('');
-  const [busy, setBusy] = useState<'resend' | 'verify' | 'logout' | 'delete' | null>(null);
+  const [busy, setBusy] = useState<'resend' | 'verify' | 'logout' | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const onLogout = async () => {
@@ -76,32 +80,6 @@ export function SettingsScreen({ navigation }: Props) {
     } finally {
       setBusy(null);
     }
-  };
-
-  const onDeleteAccount = () => {
-    Alert.alert(
-      'Delete account?',
-      'Your account will be deactivated. You can recover it later from the login screen.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            if (!accessToken) return;
-            setBusy('delete');
-            try {
-              await deleteAccount(accessToken);
-              await clearSession();
-              navigation.replace('Login');
-            } catch {
-              setMessage('Could not delete your account right now.');
-              setBusy(null);
-            }
-          },
-        },
-      ],
-    );
   };
 
   return (
@@ -168,32 +146,31 @@ export function SettingsScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Legal</Text>
+        <Text style={styles.sectionTitle}>Preferences</Text>
         <Pressable
-          style={styles.secondaryButton}
-          onPress={() => navigation.navigate('PrivacyPolicy')}
+          style={styles.row}
+          onPress={() => navigation.navigate('Language')}
           accessibilityRole="button"
-          accessibilityLabel="Privacy Policy"
+          accessibilityLabel={`Language: ${selectedLanguage.name}`}
         >
-          <Text style={styles.secondaryButtonText}>Privacy Policy</Text>
+          <Text style={styles.rowText}>Language</Text>
+          <View style={styles.rowValue}>
+            <Text style={styles.rowValueText}>{selectedLanguage.name}</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
+          </View>
         </Pressable>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Danger zone</Text>
+        <Text style={styles.sectionTitle}>More</Text>
         <Pressable
-          style={styles.dangerButton}
-          onPress={onDeleteAccount}
-          disabled={busy !== null}
+          style={styles.row}
+          onPress={() => navigation.navigate('About')}
           accessibilityRole="button"
-          accessibilityLabel="Delete account"
-          accessibilityHint="Deactivates your account; can be recovered later from the login screen"
+          accessibilityLabel="About"
         >
-          {busy === 'delete' ? (
-            <ActivityIndicator color={colors.danger} />
-          ) : (
-            <Text style={styles.dangerButtonText}>Delete account</Text>
-          )}
+          <Text style={styles.rowText}>About</Text>
+          <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
         </Pressable>
       </View>
     </ScrollView>
@@ -202,57 +179,61 @@ export function SettingsScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.lg },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  message: { color: colors.arcaneSoft, fontSize: typography.scale.sm },
-  section: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: spacing.sm,
-  },
-  sectionTitle: {
-    color: colors.ink,
-    fontSize: typography.scale.sm,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-  input: {
-    backgroundColor: colors.background,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    color: colors.ink,
-    fontSize: typography.scale.md,
-  },
-  secondaryButton: {
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: radius.md,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: colors.arcaneSoft,
-    fontSize: typography.scale.md,
-    fontWeight: '700',
-  },
-  buttonDisabled: { opacity: 0.4 },
-  dangerButton: {
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.danger,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
-  dangerButtonText: { color: colors.danger, fontSize: typography.scale.md, fontWeight: '700' },
-});
+    container: { flex: 1, backgroundColor: colors.background },
+    content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.lg },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    message: { color: colors.arcaneSoft, fontSize: typography.scale.sm },
+    section: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+      gap: spacing.sm,
+    },
+    sectionTitle: {
+      color: colors.ink,
+      fontSize: typography.scale.sm,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+    },
+    input: {
+      backgroundColor: colors.background,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+    },
+    secondaryButton: {
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.md,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+    },
+    secondaryButtonText: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.md,
+      fontWeight: '700',
+    },
+    buttonDisabled: { opacity: 0.4 },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    rowText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '600' },
+    rowValue: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+    rowValueText: { color: colors.inkMuted, fontSize: typography.scale.sm },
+  });
 }

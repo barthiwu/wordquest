@@ -35,6 +35,10 @@ import { WordMasteryScreen } from '@/features/passport/WordMasteryScreen';
 import { WordPracticeScreen } from '@/features/passport/WordPracticeScreen';
 import { LevelRoadmapScreen } from '@/features/passport/LevelRoadmapScreen';
 import { PrivacyPolicyScreen } from '@/features/legal/PrivacyPolicyScreen';
+import { TermsOfServiceScreen } from '@/features/legal/TermsOfServiceScreen';
+import { AgeRestrictionScreen } from '@/features/legal/AgeRestrictionScreen';
+import { LanguageScreen } from '@/features/settings/LanguageScreen';
+import { AboutScreen } from '@/features/settings/AboutScreen';
 import type { WordCompletionResult } from '@/services/quests';
 import type { Submission } from '@/services/word-in-the-wild';
 import { linking } from './linking';
@@ -87,6 +91,10 @@ export type RootStackParamList = {
   WordPractice: { wordId: string };
   LevelRoadmap: { currentLevel: number; totalXp: number };
   PrivacyPolicy: undefined;
+  TermsOfService: undefined;
+  AgeRestriction: undefined;
+  Language: undefined;
+  About: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -144,6 +152,10 @@ export function RootNavigator() {
         <Stack.Screen name="WordPractice" component={WordPracticeScreen} />
         <Stack.Screen name="LevelRoadmap" component={LevelRoadmapScreen} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+        <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
+        <Stack.Screen name="AgeRestriction" component={AgeRestrictionScreen} />
+        <Stack.Screen name="Language" component={LanguageScreen} />
+        <Stack.Screen name="About" component={AboutScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
