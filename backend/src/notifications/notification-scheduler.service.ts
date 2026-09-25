@@ -359,4 +359,98 @@ export class NotificationSchedulerService {
       this.logger.warn(`sendLeaderboardNotifications failed: ${err}`);
     }
   }
+
+  /**
+   * STREAK_AT_RISK (requested directly, Sept 2026): evening nudges at
+   * each of notificationScheduler.streakAtRiskLocalHours (18/21/23,
+   * player-local) for anyone who hasn't done anything quest-worthy yet
+   * today. "Yet today" is UserProgression.lastActiveOn compared by
+   * player-local calendar date -- the exact same check
+   * ProgressionService.recordDailyActivity uses to decide whether the
+   * streak extends, so this fires precisely when (and only when) that
+   * player's streak is genuinely still unclaimed for today, never a
+   * separately-derived approximation of it.
+   *
+   * Unlike the cooldown-gated triggers above, there's no multi-day
+   * anti-repeat here: these three checkpoints are one escalating same-
+   * day sequence (see streakAtRiskCopy), and each can only match once
+   * per day anyway since it's gated on the player's local hour landing
+   * on an exact checkpoint value while this job itself only runs
+   * hourly.
+   */
+  @Cron(gameplayRules.notificationScheduler.hourlyCronExpression)
+  async sendStreakAtRiskReminders(): Promise<void> {
+    try {
+      const { streakAtRiskLocalHours } = gameplayRules.notificationScheduler;
+      const checkpoints: readonly number[] = streakAtRiskLocalHours;
+      const now = new Date();
+
+      const users = await this.prisma.user.findMany({
+        where: { timezone: { not: null }, deletedAt: null },
+        select: { id: true, timezone: true },
+      });
+
+      for (const user of users) {
+        const localHour = playerLocalHour(user.timezone, now);
+        if (!checkpoints.includes(localHour)) continue;
+
+        const progression = await this.prisma.userProgression.findUnique({
+          where: { userId: user.id },
+          select: { currentStreak: true, lastActiveOn: true },
+        });
+        if (!progression) continue;
+
+        const today = playerLocalDate(user.timezone, now);
+        const lastActiveDay = progression.lastActiveOn
+          ? playerLocalDate(user.timezone, progression.lastActiveOn)
+          : null;
+        if (lastActiveDay === today) continue; // already played today -- streak's safe, nothing to nudge about
+
+        const { title, body } = this.streakAtRiskCopy(localHour, progression.currentStreak);
+        this.notifications.notifyFireAndForget(user.id, 'STREAK_AT_RISK', title, body, {
+          data: { localHour, currentStreak: progression.currentStreak },
+          deepLink: 'wordquest://quest',
+        });
+      }
+    } catch (err) {
+      this.logger.warn(`sendStreakAtRiskReminders failed: ${err}`);
+    }
+  }
+
+  /**
+   * Message copy for sendStreakAtRiskReminders, keyed by which of the
+   * three checkpoints this is -- gentle at 18:00, firmer at 21:00,
+   * urgent at 23:00 (player-local) -- and by whether the player actually
+   * has a streak at stake, so someone on day zero gets "come play" rather
+   * than a streak number that doesn't exist yet.
+   */
+  private streakAtRiskCopy(
+    localHour: number,
+    currentStreak: number,
+  ): { title: string; body: string } {
+    const hasStreak = currentStreak > 0;
+    if (localHour === 18) {
+      return hasStreak
+        ? {
+            title: 'Your streak is waiting',
+            body: `Keep your ${currentStreak}-day streak alive — today's quest is still open.`,
+          }
+        : { title: "Today's quest is still open", body: 'A couple of minutes is all it takes.' };
+    }
+    if (localHour === 21) {
+      return hasStreak
+        ? {
+            title: 'A few hours left',
+            body: `Don't lose your ${currentStreak}-day streak — play today's quest before midnight.`,
+          }
+        : { title: 'Still time today', body: "Today's quest only takes a couple of minutes." };
+    }
+    // 23:00 -- last checkpoint before the player's local midnight rolls the streak over
+    return hasStreak
+      ? {
+          title: 'Last call for your streak',
+          body: `Your ${currentStreak}-day streak resets at midnight if you don't play now.`,
+        }
+      : { title: 'Last call for today', body: "Today's quest closes at midnight." };
+  }
 }

@@ -122,6 +122,43 @@ describe('SentenceEvaluationService', () => {
       expect(result.scores).toEqual(validScores);
     });
 
+    it('instructs the model to write feedback in the given native language', async () => {
+      createMock.mockResolvedValueOnce(
+        textResponse({
+          scores: validScores,
+          confidence: 0.9,
+          whatWentWell: 'x',
+          whatNeedsImprovement: 'y',
+          betterVersion: null,
+          nextAction: 'z',
+        }),
+      );
+
+      await service.evaluate('resilient', 'x', 'adjective', 'She is resilient.', 'es');
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).toContain('Spanish');
+      expect(call.system).toContain('never translate the content being learned');
+    });
+
+    it('omits the language instruction when nativeLanguage is unset', async () => {
+      createMock.mockResolvedValueOnce(
+        textResponse({
+          scores: validScores,
+          confidence: 0.9,
+          whatWentWell: 'x',
+          whatNeedsImprovement: 'y',
+          betterVersion: null,
+          nextAction: 'z',
+        }),
+      );
+
+      await service.evaluate('resilient', 'x', 'adjective', 'She is resilient.');
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).not.toContain('native/comprehension language');
+    });
+
     it('computes xpAwarded as the sum of each dimension scaled to 250 max', async () => {
       // All scores 100 -> 5 * 250 = 1250 (the spec's max).
       createMock.mockResolvedValueOnce(

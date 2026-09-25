@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { UsersService } from './users.service';
 import { UpdateMeDto } from './dto/update-me.dto';
@@ -25,6 +25,7 @@ export class UsersController {
       id: user.id,
       email: user.email,
       displayName: user.displayName,
+      username: user.username,
       countryCode: user.countryCode,
       nativeLanguage: user.nativeLanguage,
       targetLanguage: user.targetLanguage,
@@ -64,11 +65,25 @@ export class UsersController {
     return { avatarUrl: null };
   }
 
+  /**
+   * Live "is this available?" check for the username field in Settings
+   * -- lets the UI validate before the player submits, instead of only
+   * finding out on save. `?username=` is query, not path, since this is
+   * a read against an arbitrary candidate string, not a resource.
+   */
+  @Get('username-availability')
+  async usernameAvailability(@CurrentUserId() userId: string, @Query('username') username?: string) {
+    if (!username) return { available: false };
+    return { available: await this.users.isUsernameAvailable(username, userId) };
+  }
+
   @Patch('me')
   async updateMe(@CurrentUserId() userId: string, @Body() dto: UpdateMeDto) {
     const updated = await this.users.updateProfile(userId, dto);
     return {
       id: updated.id,
+      displayName: updated.displayName,
+      username: updated.username,
       countryCode: updated.countryCode,
       nativeLanguage: updated.nativeLanguage,
       targetLanguage: updated.targetLanguage,

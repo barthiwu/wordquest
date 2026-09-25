@@ -18,7 +18,7 @@ export interface CsvImportSummary {
  * block importing the other 499 words).
  *
  * This is the one place both the automatic seed (prisma/seed.ts, for the
- * shipped 2000-word production CSV) and the manual operator import script
+ * shipped 10,000-word production CSV) and the manual operator import script
  * (prisma/import-words.ts, for any future CSV a content editor drops in)
  * actually write to the database — a fix, a new column, or a changed
  * upsert rule only has to happen here once.

@@ -2,6 +2,7 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { AppConfigService } from '../config/config.service';
 import { stripJsonCodeFence } from '../common/ai-json';
+import { nativeLanguageInstruction } from '../common/language-names';
 
 export interface MasterChallengeScores {
   wordUsage: number;
@@ -52,6 +53,8 @@ export class MasterChallengeEvaluationService {
   async evaluate(
     words: { word: string; definition: string }[],
     paragraph: string,
+    /** The player's native/comprehension language (User.nativeLanguage) -- see nativeLanguageInstruction. Null/undefined/'en' all mean "write feedback in English, nothing to bridge." */
+    nativeLanguage?: string | null,
   ): Promise<MasterChallengeEvaluation> {
     const client = this.getClient();
 
@@ -65,7 +68,7 @@ export class MasterChallengeEvaluationService {
       // added after that failure so it's diagnosable next time instead
       // of looking like generic malformed output).
       max_tokens: 1000,
-      system: this.buildSystemPrompt(),
+      system: this.buildSystemPrompt(nativeLanguage),
       messages: [{ role: 'user', content: this.buildPrompt(words, paragraph) }],
     });
 
@@ -79,7 +82,7 @@ export class MasterChallengeEvaluationService {
     return this.parseResponse(response);
   }
 
-  private buildSystemPrompt(): string {
+  private buildSystemPrompt(nativeLanguage?: string | null): string {
     return `You are WordQuest's Three-Word Master Challenge evaluator. A learner has written one paragraph that must use all three of today's target vocabulary words together, coherently. Score it on exactly five dimensions, each 0-100:
 
 - wordUsage: are all three target words present and used with their correct meanings?
@@ -93,7 +96,7 @@ Also report allWordsUsedCorrectly (true/false) — false if even one of the thre
 Feedback follows: what went well, what needs improvement, one concrete next action.
 
 Respond with ONLY a JSON object, no other text, in this exact shape:
-{"scores": {"wordUsage": 0-100, "coherence": 0-100, "grammar": 0-100, "vocabulary": 0-100, "context": 0-100}, "allWordsUsedCorrectly": true|false, "whatWentWell": "...", "whatNeedsImprovement": "...", "nextAction": "..."}`;
+{"scores": {"wordUsage": 0-100, "coherence": 0-100, "grammar": 0-100, "vocabulary": 0-100, "context": 0-100}, "allWordsUsedCorrectly": true|false, "whatWentWell": "...", "whatNeedsImprovement": "...", "nextAction": "..."}${nativeLanguageInstruction(nativeLanguage)}`;
   }
 
   private buildPrompt(words: { word: string; definition: string }[], paragraph: string): string {

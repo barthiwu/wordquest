@@ -19,7 +19,7 @@ npx prisma migrate dev
 # migration files — the only command CI/staging/production should run
 npx prisma migrate deploy
 
-# seed clans + the 2000-word vocabulary vault
+# seed clans + the 10,000-word vocabulary vault
 npx ts-node prisma/seed.ts
 ```
 

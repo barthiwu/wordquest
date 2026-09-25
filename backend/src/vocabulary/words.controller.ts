@@ -2,6 +2,7 @@ import { Controller, Get, NotFoundException, Param, Query, UseGuards } from '@ne
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user.decorator';
+import { WordsService } from './words.service';
 
 /**
  * Spec v2 §19: GET /api/v1/words/:id — a word looked up on its own,
@@ -32,7 +33,25 @@ import { CurrentUserId } from '../auth/decorators/current-user.decorator';
 @Controller('words')
 @UseGuards(JwtAuthGuard)
 export class WordsController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly words: WordsService,
+  ) {}
+
+  /**
+   * 10,000-Word Adaptive Distribution spec's "Exposure Analytics" —
+   * corpus-wide Global Word Distribution health, not any one player's
+   * data, so nothing here is sensitive to gate per-user. There's no
+   * admin-role system in this codebase yet (see WordsService's own doc
+   * comment), so this sits behind the same JwtAuthGuard as every other
+   * route here for now rather than blocking the feature on building one;
+   * an admin guard can be dropped in front of this specific route later
+   * without touching WordsService itself.
+   */
+  @Get('exposure-analytics')
+  async exposureAnalytics() {
+    return this.words.getExposureAnalytics();
+  }
 
   @Get('search')
   async search(

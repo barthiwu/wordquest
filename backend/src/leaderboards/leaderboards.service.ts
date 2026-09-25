@@ -5,7 +5,7 @@ import { continentForCountryCode, countryCodesForContinent } from '../common/cou
 export interface LeaderboardEntry {
   rank: number;
   userId: string;
-  displayName: string;
+  username: string;
   clanName: string | null;
   countryCode: string | null;
   level: number;
@@ -21,7 +21,7 @@ export interface LeaderboardView {
 interface ProgressionRow {
   totalXp: number;
   level: number;
-  user: { id: string; displayName: string; clan: { name: string } | null; countryCode: string | null };
+  user: { id: string; username: string; clan: { name: string } | null; countryCode: string | null };
 }
 
 const DEFAULT_LIMIT = 50;
@@ -55,7 +55,7 @@ export class LeaderboardsService {
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       take: clampedLimit,
       include: {
-        user: { select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true } },
+        user: { select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true } },
       },
     });
 
@@ -79,7 +79,7 @@ export class LeaderboardsService {
       where: { user: { clanId: viewer.clanId } },
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       include: {
-        user: { select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true } },
+        user: { select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true } },
       },
     });
 
@@ -117,7 +117,7 @@ export class LeaderboardsService {
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       include: {
         user: {
-          select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true },
+          select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true },
         },
       },
     });
@@ -154,7 +154,7 @@ export class LeaderboardsService {
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       include: {
         user: {
-          select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true },
+          select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true },
         },
       },
     });
@@ -180,7 +180,7 @@ export class LeaderboardsService {
     const progression = await this.prisma.userProgression.findUniqueOrThrow({
       where: { userId },
       include: {
-        user: { select: { id: true, displayName: true, clan: { select: { name: true } }, countryCode: true } },
+        user: { select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true } },
       },
     });
 
@@ -208,7 +208,7 @@ export class LeaderboardsService {
     return {
       rank,
       userId: row.user.id,
-      displayName: row.user.displayName,
+      username: row.user.username,
       clanName: row.user.clan?.name ?? null,
       countryCode: row.user.countryCode,
       level: row.level,

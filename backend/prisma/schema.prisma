@@ -33,7 +33,22 @@ model User {
   id           String    @id @default(uuid())
   email        String    @unique
   passwordHash String
+  // The account owner's real/full name -- collected at registration,
+  // editable in Settings, shown only to the account owner (email
+  // verification, "hi, X" greetings) and never to other players. See
+  // `username` below for the identity other players actually see.
   displayName  String
+  // The public, unique handle shown to other players everywhere a
+  // player's identity is displayed to someone other than themselves
+  // (leaderboards, Boss Battle, Quest Cards) -- so a real name is never
+  // searchable/exposed via multiplayer surfaces. Lowercase
+  // letters/digits/underscores only (3-20 chars, enforced in
+  // UsersService/UpdateMeDto) so uniqueness is a plain case-sensitive
+  // unique index rather than needing a separate lower(username) index.
+  // Every account has one: auto-generated from displayName at
+  // registration (UsersService.generateDefaultUsername), editable
+  // afterward in Settings with a live availability check.
+  username     String    @unique
   countryCode  String? // ISO 3166-1 alpha-2, e.g. "NG" — drives the Castle's animated flag (§18)
   // Age gate (COPPA, gameplayRules.auth.minimumAgeYears): collected once
   // at registration and never edited by the player afterward (no PATCH
@@ -318,6 +333,21 @@ model Word {
   audioUrl               String?
   isActive               Boolean        @default(true)
 
+  // Global Word Distribution (10,000-Word Adaptive Distribution & Repetition
+  // System, "Layer A"): tracks how often this word has been served to ANY
+  // player, independent of any one player's own history (that's Mastery,
+  // "Layer B", below) — the signal the scheduler uses to keep the whole
+  // corpus in rotation over the game's 1-3 year lifecycle instead of
+  // letting a handful of "good fit for a beginner" words dominate forever
+  // while others never surface. See vocabulary/word-ranking.ts's
+  // globalPriority term and WordsService.getExposureAnalytics. No stored
+  // "next eligible" timestamp on purpose (same reasoning as Mastery's own
+  // forgettingRisk further down: a fairness ratio computed live from
+  // globalExposureCount against the corpus-wide average stays correct
+  // every day without a background job re-stamping it).
+  globalExposureCount  Int       @default(0)
+  lastGlobalExposureAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -550,7 +580,14 @@ model QuestAttempt {
   challengeAttempts ChallengeAttempt[]
 
   @@index([userId, status])
-  @@index([userId, questId, localDate])
+  // One attempt per player per quest per local day (10,000-Word Adaptive
+  // Distribution spec §19, "daily quest locking"): startTimedQuest reads
+  // this via an atomic create-or-fetch so two concurrent requests (a
+  // double-tap, or the app reopened twice in quick succession) land on the
+  // SAME attempt with the SAME words instead of one request's word pick
+  // silently winning a race and the other's being discarded after already
+  // incrementing global exposure counts for words nobody actually saw.
+  @@unique([userId, questId, localDate])
   @@map("quest_attempts")
 }
 
@@ -967,7 +1004,7 @@ model QuestCard {
   sourceEventId             String // journey stage key, BossBattleGroup id, or AchievementUnlock id, depending on `source`
   title                     String
   category                  String? // the Achievement's category, when source = ACHIEVEMENT
-  playerDisplayNameSnapshot String // captured at creation — a later display-name change must not rewrite this card's history
+  playerUsernameSnapshot    String // the public username at creation time -- captured (not live-joined) so a later username change doesn't rewrite this card's history; see users.username's doc comment for why this is the username, not the real displayName
   artwork                   String? // asset key — resolved client-side to real art; null renders a category-default frame
   rarity                    QuestCardRarity @default(COMMON)
   journeyStageKey           String? // the Journey stage in effect when this card was earned, for display context
@@ -1088,6 +1125,11 @@ enum NotificationType {
   BOSS_BATTLE_REMINDER
   BOSS_BATTLE_RESULT
   LEADERBOARD_UPDATE
+  // Player hasn't done anything quest-worthy yet today (UserProgression.
+  // lastActiveOn isn't today, the same check recordDailyActivity uses to
+  // decide whether to extend the streak) and it's one of the player-local
+  // evening checkpoints -- see notificationScheduler.streakAtRiskLocalHours.
+  STREAK_AT_RISK
 }
 
 // A notification is always written here first (in-app history/inbox),

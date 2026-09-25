@@ -29,7 +29,9 @@ export interface AuthResult extends AuthTokens {
     id: string;
     email: string;
     displayName: string;
+    username: string;
     countryCode: string | null;
+    avatarUrl: string | null;
   };
 }
 
@@ -94,7 +96,7 @@ export class AuthService {
     this.analytics.track(user.id, 'account_created', { countryCode: user.countryCode });
 
     const tokens = await this.issueTokens(user.id);
-    return { ...tokens, user: this.toPublicUser(user) };
+    return { ...tokens, user: await this.toPublicUser(user) };
   }
 
   async login(dto: LoginDto, meta: RequestMeta = {}): Promise<AuthResult> {
@@ -133,7 +135,7 @@ export class AuthService {
 
     const tokens = await this.issueTokens(user.id);
     this.logSecurityEvent(user.id, 'LOGIN_SUCCESS', meta);
-    return { ...tokens, user: this.toPublicUser(user) };
+    return { ...tokens, user: await this.toPublicUser(user) };
   }
 
   /** Account lockout (Sprint 5 "Authentication hardening") — see User.failedLoginAttempts/lockedUntil and gameplayRules.auth. */
@@ -464,7 +466,7 @@ export class AuthService {
 
     const tokens = await this.issueTokens(user.id);
     this.logSecurityEvent(user.id, 'ACCOUNT_RECOVERED');
-    return { ...tokens, user: this.toPublicUser(user) };
+    return { ...tokens, user: await this.toPublicUser(user) };
   }
 
   /**
@@ -525,17 +527,31 @@ export class AuthService {
     return new Date(Date.now() + value * unitMs);
   }
 
-  private toPublicUser(user: {
+  /**
+   * Resolves avatarUrl here (not left for a later getMe() call) so
+   * register/login/recoverAccount's own response already carries the
+   * player's real avatar -- Barth, Sept 2026: Home's header showed only
+   * initials right after login because AuthUser never carried avatarUrl
+   * at all, and the app only re-fetches it via getMe() on a fresh cold
+   * start (authStore.hydrate), not after every login. A returning
+   * player with an avatar already set would see initials until their
+   * next full app relaunch without this.
+   */
+  private async toPublicUser(user: {
     id: string;
     email: string;
     displayName: string;
+    username: string;
     countryCode: string | null;
+    avatarKey: string | null;
   }) {
     return {
       id: user.id,
       email: user.email,
       displayName: user.displayName,
+      username: user.username,
       countryCode: user.countryCode,
+      avatarUrl: await this.users.resolveAvatarUrl(user.avatarKey),
     };
   }
 }

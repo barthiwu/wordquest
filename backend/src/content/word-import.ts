@@ -159,7 +159,7 @@ const VALID_CEFR = new Set(Object.keys(CEFR_TO_DIFFICULTY));
 
 /**
  * V20 Vocabulary Vault §1: "invalid categories". This is the full set in
- * use across prisma/vocabulary-production.csv (the merged 2000-word
+ * use across prisma/vocabulary-production.csv (the merged 10,000-word
  * production source, V21) plus "Nature" — used by the WordNet lexname
  * mapping the legacy-word metadata backfill relies on
  * (noun.animal/noun.plant/verb.weather) but not yet landed on any current

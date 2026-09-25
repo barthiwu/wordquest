@@ -13,6 +13,7 @@ describe('MasteryService', () => {
     mastery: {
       findUnique: jest.fn(),
       upsert: jest.fn().mockResolvedValue({}),
+      update: jest.fn().mockResolvedValue({}),
     },
     userProgression: {
       update: jest.fn().mockResolvedValue({ level: 1, journeyStage: 0, masteredWordsCount: 1 }),
@@ -133,13 +134,15 @@ describe('MasteryService', () => {
   });
 
   describe('recordAnswer — the single MASTERED gate', () => {
-    it('completes mastery on a correct guess when the other two areas were already at threshold and this answer pushes guessScore over it too', async () => {
-      // guessScore 70 -> EMA toward 100 on a correct answer -> 70 + (100-70)*0.3 = 79, clears 75.
+    it('completes mastery on the FIRST-EVER correct guess when the other two areas were already at threshold', async () => {
+      // Guess is a one-time pass now, not a guessScore threshold — the
+      // word has never been guessed correctly before (timesCorrect: 0),
+      // and this very answer (isCorrect: true) is what satisfies it.
       prismaMock.mastery.findUnique.mockResolvedValueOnce({
         currentLevel: 'STRONG',
         masteryScore: 60,
         currentCorrectStreak: 5,
-        guessScore: 70,
+        timesCorrect: 0,
         sentenceScore: 80,
         paragraphScore: 82,
       });
@@ -162,14 +165,14 @@ describe('MasteryService', () => {
       );
     });
 
-    it('does NOT complete mastery on a correct guess when guessScore alone is still below threshold, even with the other two areas maxed', async () => {
+    it('does NOT complete mastery on a correct guess when the other two areas are not both at threshold, even after the guess dimension is satisfied', async () => {
       prismaMock.mastery.findUnique.mockResolvedValueOnce({
         currentLevel: 'STRONG',
         masteryScore: 60,
         currentCorrectStreak: 5,
-        guessScore: 10, // one correct answer's EMA bump won't clear 75 from here
+        timesCorrect: 3, // guess dimension already satisfied from past correct guesses
         sentenceScore: 100,
-        paragraphScore: 100,
+        paragraphScore: 40, // still below threshold
       });
 
       const result = await service.recordAnswer('u1', 'w1', true);
@@ -183,6 +186,7 @@ describe('MasteryService', () => {
         currentLevel: 'MASTERED',
         masteryScore: 100,
         currentCorrectStreak: 8,
+        timesCorrect: 12,
         guessScore: 90,
         sentenceScore: 90,
         paragraphScore: 90,
@@ -194,21 +198,24 @@ describe('MasteryService', () => {
       expect(progressionMock.checkJourneyAdvancement).not.toHaveBeenCalled();
     });
 
-    it('decrements masteredWordsCount when a miss demotes a word out of MASTERED', async () => {
+    it('MASTERED is permanent — a guess miss on an already-mastered word never demotes it or touches masteredWordsCount', async () => {
       prismaMock.mastery.findUnique.mockResolvedValueOnce({
         currentLevel: 'MASTERED',
         masteryScore: 100,
         currentCorrectStreak: 6,
+        timesCorrect: 12,
         guessScore: 90,
         sentenceScore: 90,
         paragraphScore: 90,
       });
-      await service.recordAnswer('u1', 'w1', false);
-      expect(prismaMock.userProgression.update).toHaveBeenCalledWith({
-        where: { userId: 'u1' },
-        data: { masteredWordsCount: { decrement: 1 } },
-      });
-      // Journey only ever advances forward — a demotion never checks it.
+      const result = await service.recordAnswer('u1', 'w1', false);
+      expect(result.level).toBe('MASTERED');
+      expect(prismaMock.mastery.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          update: expect.objectContaining({ currentLevel: 'MASTERED' }),
+        }),
+      );
+      expect(prismaMock.userProgression.update).not.toHaveBeenCalled();
       expect(progressionMock.checkJourneyAdvancement).not.toHaveBeenCalled();
     });
   });
@@ -222,7 +229,7 @@ describe('MasteryService', () => {
     it('always persists the updated area scores, even when the cycle does not complete mastery', async () => {
       prismaMock.mastery.findUnique.mockResolvedValueOnce({
         currentLevel: 'RECOGNIZING',
-        guessScore: 0,
+        timesCorrect: 0,
       });
       const scoresWithOneLowDimension = { ...allHighScores.paragraph, flow: 40 };
 
@@ -245,13 +252,34 @@ describe('MasteryService', () => {
       );
     });
 
-    it('does NOT complete mastery from a perfect cycle alone — Guess is also required (the bug this spec fixes)', async () => {
-      // guessScore 0 (never guessed correctly) — a perfect Sentence/
-      // Paragraph cycle must not be sufficient by itself; the mastery
-      // gate requires all THREE areas.
+    it('never lowers a stored sentence/paragraph score — a weaker later cycle keeps the higher one on file', async () => {
       prismaMock.mastery.findUnique.mockResolvedValueOnce({
         currentLevel: 'RECOGNIZING',
-        guessScore: 0,
+        timesCorrect: 0,
+        sentenceScore: 90, // a strong score already on file
+        paragraphScore: 90,
+      });
+      const weakerCycle = {
+        sentence: { grammar: 40, vocabulary: 40, context: 40, naturalness: 40, clarity: 40 },
+        paragraph: { grammar: 40, vocabulary: 40, structure: 40, flow: 40, context: 40 },
+      };
+
+      await service.evaluateWordCycleCompletion('u1', 'w1', weakerCycle.sentence, weakerCycle.paragraph);
+
+      expect(prismaMock.mastery.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          update: expect.objectContaining({ sentenceScore: 90, paragraphScore: 90 }),
+        }),
+      );
+    });
+
+    it('does NOT complete mastery from a perfect cycle alone — Guess is also required (the bug this spec fixes)', async () => {
+      // timesCorrect 0 (never guessed correctly) — a perfect Sentence/
+      // Paragraph cycle must not be sufficient by itself; the mastery
+      // gate requires all THREE areas, and Guess is a one-time pass.
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'RECOGNIZING',
+        timesCorrect: 0,
       });
 
       const result = await service.evaluateWordCycleCompletion(
@@ -264,10 +292,10 @@ describe('MasteryService', () => {
       expect(result.masteredViaSkillCheck).toBe(false);
     });
 
-    it('completes mastery when the cycle is perfect AND guessScore was already at threshold', async () => {
+    it('completes mastery when the cycle is perfect AND the word had already been guessed correctly at least once', async () => {
       prismaMock.mastery.findUnique.mockResolvedValueOnce({
         currentLevel: 'STRONG',
-        guessScore: 80,
+        timesCorrect: 4,
       });
       prismaMock.userProgression.update.mockResolvedValueOnce({
         level: 3,
@@ -294,7 +322,7 @@ describe('MasteryService', () => {
     it('is a no-op (no new transition) when the word is already MASTERED, even with a perfect cycle', async () => {
       prismaMock.mastery.findUnique.mockResolvedValueOnce({
         currentLevel: 'MASTERED',
-        guessScore: 90,
+        timesCorrect: 9,
       });
 
       const result = await service.evaluateWordCycleCompletion(
@@ -311,7 +339,7 @@ describe('MasteryService', () => {
     it('increments masteredWordsCount and checks Journey/CEFR/achievements on a genuine promotion', async () => {
       prismaMock.mastery.findUnique.mockResolvedValueOnce({
         currentLevel: 'STRONG',
-        guessScore: 80,
+        timesCorrect: 4,
       });
       prismaMock.userProgression.update.mockResolvedValueOnce({
         level: 5,
@@ -339,6 +367,178 @@ describe('MasteryService', () => {
       );
       expect(progressionMock.checkCefrEligibility).toHaveBeenCalledWith('u1', prismaMock);
       expect(achievementsMock.checkDiscoveryAndMastery).toHaveBeenCalledWith('u1', 51, prismaMock);
+    });
+  });
+
+  describe('recordSkillAreaPractice', () => {
+    const highScores = { grammar: 90, vocabulary: 90, context: 90, naturalness: 90, clarity: 90 };
+    const lowScores = { grammar: 30, vocabulary: 30, context: 30, naturalness: 30, clarity: 30 };
+
+    it('stores a first-ever attempt as both the attempt score and the best score', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({ currentLevel: 'NEW' });
+
+      const result = await service.recordSkillAreaPractice('u1', 'w1', 'sentence', highScores);
+
+      expect(result.attemptScore).toBe(90);
+      expect(result.bestScore).toBe(90);
+      expect(prismaMock.mastery.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({ update: expect.objectContaining({ sentenceScore: 90 }) }),
+      );
+    });
+
+    it('keeps the higher score on file when a re-practice attempt scores lower — never overwrites downward', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'RECOGNIZING',
+        sentenceScore: 90, // a strong score already on file
+      });
+
+      const result = await service.recordSkillAreaPractice('u1', 'w1', 'sentence', lowScores);
+
+      expect(result.attemptScore).toBe(30); // honest feedback on what was just written
+      expect(result.bestScore).toBe(90); // but the stored score doesn't move backward
+      expect(prismaMock.mastery.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({ update: expect.objectContaining({ sentenceScore: 90 }) }),
+      );
+    });
+
+    it('raises the stored score when a re-practice attempt beats the existing one', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'RECOGNIZING',
+        paragraphScore: 30,
+      });
+
+      const result = await service.recordSkillAreaPractice('u1', 'w1', 'paragraph', highScores);
+
+      expect(result.attemptScore).toBe(90);
+      expect(result.bestScore).toBe(90);
+      expect(prismaMock.mastery.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({ update: expect.objectContaining({ paragraphScore: 90 }) }),
+      );
+    });
+
+    it('leaves the other area untouched when practicing just one', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'RECOGNIZING',
+        sentenceScore: 55,
+        paragraphScore: 70,
+      });
+
+      await service.recordSkillAreaPractice('u1', 'w1', 'sentence', highScores);
+
+      const call = prismaMock.mastery.upsert.mock.calls.at(-1)![0];
+      expect(call.update).not.toHaveProperty('paragraphScore');
+    });
+
+    it('completes mastery via practice once Guess (ever passed), sentence, and paragraph are all satisfied', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'STRONG',
+        timesCorrect: 5, // guess dimension already satisfied
+        sentenceScore: 80,
+        paragraphScore: 40, // this practice attempt is what clears it
+      });
+      prismaMock.userProgression.update.mockResolvedValueOnce({
+        level: 3,
+        journeyStage: 0,
+        masteredWordsCount: 20,
+      });
+
+      const result = await service.recordSkillAreaPractice('u1', 'w1', 'paragraph', highScores);
+
+      expect(result.level).toBe('MASTERED');
+      expect(result.justMastered).toBe(true);
+    });
+
+    it('does not complete mastery via practice when the word has never been guessed correctly', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'RECOGNIZING',
+        timesCorrect: 0,
+        sentenceScore: 90,
+        paragraphScore: 40,
+      });
+
+      const result = await service.recordSkillAreaPractice('u1', 'w1', 'paragraph', highScores);
+
+      expect(result.level).not.toBe('MASTERED');
+      expect(result.justMastered).toBe(false);
+    });
+  });
+
+  describe('recheckGate — the one-time backfill helper', () => {
+    it('promotes to MASTERED when stored data already satisfies the new gate', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'STRONG',
+        timesCorrect: 5,
+        sentenceScore: 80,
+        paragraphScore: 82,
+      });
+      prismaMock.userProgression.update.mockResolvedValueOnce({
+        level: 4,
+        journeyStage: 0,
+        masteredWordsCount: 11,
+      });
+
+      const result = await service.recheckGate('u1', 'w1');
+
+      expect(result.justMastered).toBe(true);
+      expect(prismaMock.mastery.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId_wordId: { userId: 'u1', wordId: 'w1' } },
+          data: expect.objectContaining({ currentLevel: 'MASTERED' }),
+        }),
+      );
+      expect(progressionMock.checkJourneyAdvancement).toHaveBeenCalledWith('u1', 4, 0, 11, prismaMock);
+    });
+
+    it('is a no-op when the word has never been guessed correctly', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'STRONG',
+        timesCorrect: 0,
+        sentenceScore: 90,
+        paragraphScore: 90,
+      });
+
+      const result = await service.recheckGate('u1', 'w1');
+
+      expect(result.justMastered).toBe(false);
+      expect(prismaMock.mastery.update).not.toHaveBeenCalled();
+    });
+
+    it('is a no-op when sentence or paragraph is still below threshold', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'STRONG',
+        timesCorrect: 3,
+        sentenceScore: 90,
+        paragraphScore: 40,
+      });
+
+      const result = await service.recheckGate('u1', 'w1');
+
+      expect(result.justMastered).toBe(false);
+      expect(prismaMock.mastery.update).not.toHaveBeenCalled();
+    });
+
+    it('is a no-op when the word is already MASTERED', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce({
+        currentLevel: 'MASTERED',
+        timesCorrect: 9,
+        sentenceScore: 90,
+        paragraphScore: 90,
+      });
+
+      const result = await service.recheckGate('u1', 'w1');
+
+      expect(result.justMastered).toBe(false);
+      expect(prismaMock.mastery.update).not.toHaveBeenCalled();
+      expect(prismaMock.userProgression.update).not.toHaveBeenCalled();
+    });
+
+    it('is a no-op when there is no Mastery row for the word at all', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce(null);
+
+      const result = await service.recheckGate('u1', 'w1');
+
+      expect(result.justMastered).toBe(false);
+      expect(prismaMock.mastery.update).not.toHaveBeenCalled();
     });
   });
 

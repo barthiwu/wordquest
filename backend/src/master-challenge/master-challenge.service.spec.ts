@@ -22,6 +22,9 @@ describe('MasterChallengeService', () => {
       updateMany: jest.fn().mockResolvedValue({ count: 1 }),
     },
     word: { findMany: jest.fn() },
+    // Default: no native-language preference set -- the dedicated
+    // localization test below overrides this per-call.
+    user: { findUnique: jest.fn().mockResolvedValue({ nativeLanguage: null }) },
     $transaction: jest.fn((callback: (tx: any) => unknown): unknown => callback(prismaMock)),
   };
 
@@ -207,6 +210,33 @@ describe('MasterChallengeService', () => {
       expect(evaluationMock.evaluate).toHaveBeenCalledWith(
         words,
         'A paragraph using all three words.',
+        null,
+      );
+    });
+
+    it("passes the player's native language through to the evaluator", async () => {
+      prismaMock.questAttempt.findMany
+        .mockResolvedValueOnce([{ questId: 'q1' }, { questId: 'q2' }, { questId: 'q3' }])
+        .mockResolvedValueOnce([{ wordIds: ['w1'] }, { wordIds: ['w2'] }, { wordIds: ['w3'] }]);
+      prismaMock.quest.count.mockResolvedValueOnce(3);
+      prismaMock.dailyMasterChallenge.findUnique.mockResolvedValueOnce({
+        id: 'mc1',
+        status: 'AVAILABLE',
+      });
+      prismaMock.dailyMasterChallenge.findUniqueOrThrow.mockResolvedValueOnce({
+        id: 'mc1',
+        status: 'AVAILABLE',
+      });
+      prismaMock.word.findMany.mockResolvedValueOnce(words);
+      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'hi' });
+      evaluationMock.evaluate.mockResolvedValueOnce(evaluation);
+
+      await service.submit('u1', '2026-08-14', 'A paragraph using all three words.');
+
+      expect(evaluationMock.evaluate).toHaveBeenCalledWith(
+        words,
+        'A paragraph using all three words.',
+        'hi',
       );
     });
 

@@ -19,3 +19,24 @@ export function calculateAge(dateOfBirth: Date, asOf: Date = new Date()): number
 export function isValidPastDate(dateOfBirth: Date, asOf: Date = new Date()): boolean {
   return !Number.isNaN(dateOfBirth.getTime()) && dateOfBirth.getTime() <= asOf.getTime();
 }
+
+/**
+ * The coarse age bucket a player's exact dateOfBirth falls into —
+ * derived, never separately collected (Barth, Sept 2026: registration
+ * keeps asking for exact DOB for the COPPA gate above; this is what
+ * feeds a friendlier STARTING difficulty at Initial Calibration —
+ * see gameplayRules.learningProfile.startingDifficultyByAgeRange and
+ * AuthService.register). UNDER_13 is unreachable through normal
+ * registration today (the COPPA gate above rejects it outright) —
+ * kept here only so this function is total over every possible DOB,
+ * never so a caller should expect to see it.
+ */
+export type AgeRange = 'UNDER_13' | 'TEENS_13_18' | 'YOUNG_ADULT_19_24' | 'ADULT_25_PLUS';
+
+export function getAgeRange(dateOfBirth: Date, asOf: Date = new Date()): AgeRange {
+  const age = calculateAge(dateOfBirth, asOf);
+  if (age < 13) return 'UNDER_13';
+  if (age <= 18) return 'TEENS_13_18';
+  if (age <= 24) return 'YOUNG_ADULT_19_24';
+  return 'ADULT_25_PLUS';
+}

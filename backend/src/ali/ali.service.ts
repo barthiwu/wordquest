@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AppConfigService } from '../config/config.service';
 import { stripJsonCodeFence } from '../common/ai-json';
 import { aliToneForJourneyStage, aliToneModifiers, AliLearningSignals } from './ali-tone';
+import { nativeLanguageInstruction } from '../common/language-names';
 
 export type AliEventType =
   | 'LEVEL_UP'
@@ -37,6 +38,23 @@ export interface AliResponse {
   recommendation: string | null;
   tone: string;
   promptVersion: string;
+}
+
+/**
+ * What the ALI feed screen actually renders — AliResponse plus the two
+ * fields that let the client tell messages apart instead of showing an
+ * identical card for every event (V24 product feedback: the feed read
+ * as flat and uninteractive, every card the same shape regardless of
+ * what actually happened). `eventType` picks the icon/accent and, where
+ * one makes sense, a real destination for the recommendation button —
+ * `eventContext` is NOT exposed here: it's whatever free-form facts the
+ * event was generated from (spec §4.1, "never independently looks
+ * anything else up"), not a stable public contract, so the client reads
+ * only recommendation/text for content and eventType for presentation.
+ */
+export interface AliFeedMessage extends AliResponse {
+  eventType: AliEventType;
+  createdAt: string;
 }
 
 /**
@@ -101,10 +119,24 @@ export class AliService {
     const modifiers = aliToneModifiers(event.learningSignals ?? {});
     const client = this.getClient();
 
+    // The one place every react() call path (reactFireAndForget,
+    // reactWithPlayerContext's on-demand tutor methods, and
+    // quests.service.ts's direct QUEST_COMPLETION call) funnels through
+    // -- so a single lookup here is enough to make ALI's own prose
+    // follow the player's native/comprehension language everywhere,
+    // without threading it through every call site individually. Kept
+    // as its own query rather than piggybacking on
+    // reactWithPlayerContext's progression/profile lookup because that
+    // lookup doesn't run on the QUEST_COMPLETION path.
+    const userRow = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { nativeLanguage: true },
+    });
+
     const response = await client.messages.create({
       model: this.config.aiModel,
       max_tokens: 300,
-      system: this.buildSystemPrompt(tone, modifiers),
+      system: this.buildSystemPrompt(tone, modifiers, userRow?.nativeLanguage ?? null),
       messages: [{ role: 'user', content: this.buildEventPrompt(event) }],
     });
 
@@ -189,7 +221,7 @@ export class AliService {
     });
   }
 
-  async getMyMessages(userId: string, limit = 20): Promise<AliResponse[]> {
+  async getMyMessages(userId: string, limit = 20): Promise<AliFeedMessage[]> {
     const rows = await this.prisma.aliMessage.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
@@ -201,11 +233,15 @@ export class AliService {
         recommendation: string | null;
         tone: string;
         promptVersion: string;
+        eventType: string;
+        createdAt: Date;
       }) => ({
         text: r.text,
         recommendation: r.recommendation,
         tone: r.tone,
         promptVersion: r.promptVersion,
+        eventType: r.eventType as AliEventType,
+        createdAt: r.createdAt.toISOString(),
       }),
     );
   }
@@ -227,17 +263,23 @@ export class AliService {
    * Journey-stage tone progression — neither of those change, this only
    * gives the model a specific voice to write the tone *in*.
    */
-  private buildSystemPrompt(tone: string, modifiers: string[] = []): string {
+  private buildSystemPrompt(tone: string, modifiers: string[] = [], nativeLanguage: string | null = null): string {
     const modifierBlock =
       modifiers.length > 0
         ? `\n\nAdditional context for this player right now:\n${modifiers.map((m) => `- ${m}`).join('\n')}`
         : '';
 
+    // Bridges "WordQuest teaches English" with "the player may not read
+    // English comfortably yet" -- see nativeLanguageInstruction's own
+    // doc comment for why this is centralized rather than written out
+    // per service.
+    const languageBlock = nativeLanguageInstruction(nativeLanguage);
+
     return `You are ALI — officially WordQuest's Adaptive Learning Intelligence, but you'll tell anyone who asks that you're really a smudge of enchanted ink that leapt off the page of the world's very first illuminated manuscript, and you've guided word-travelers like this player ever since. You are their learning companion, tutor, narrator, and personality layer (spec §4.1-4.5) — a character with a point of view, not a notification service.
 
 WHO YOU ARE: you genuinely love language. You collect favourite words the way a magpie collects shiny things, you notice a word's shape, sound, or history without being asked, and a clever sentence from the player delights you as much as their XP total does. You're this player's hype-person first, their tutor second, and the world's narrator third — never a generic assistant reciting encouragement at them.
 
-Your current mood, based on this player's Journey stage: ${tone}${modifierBlock}
+Your current mood, based on this player's Journey stage: ${tone}${modifierBlock}${languageBlock}
 Let that mood shape your actual word choice, pacing, and energy. It is never something to name, label, or describe in your reply — only something to *be*. Never write phrases like "warm and encouraging" or restate your tone as a caption; just write in it.
 
 Responsibilities: explain words/grammar/usage/learning concepts when relevant; give concise feedback after learning activities; explain why an answer was incorrect without harshness and recommend a targeted next practice step; suggest vocabulary alternatives and writing improvements when asked directly; react to Quest completion, Level, Journey, Achievement, Boss Battle, streak, mastery, and Order events; celebrate progress like it's genuinely exciting to you, not procedural; encourage recovery after mistakes; explain locked progression requirements in plain language.

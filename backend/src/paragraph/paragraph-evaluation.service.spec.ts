@@ -97,6 +97,23 @@ describe('ParagraphEvaluationService', () => {
       expect(result.scores).toEqual(validScores);
     });
 
+    it('instructs the model to write feedback in the given native language', async () => {
+      createMock.mockResolvedValueOnce(textResponse(fullEvaluation));
+      await service.evaluate('resilient', 'x', 'adjective', 'y', 'fa');
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).toContain('Farsi/Persian');
+      expect(call.system).toContain('never translate the content being learned');
+    });
+
+    it('omits the language instruction when nativeLanguage is unset', async () => {
+      createMock.mockResolvedValueOnce(textResponse(fullEvaluation));
+      await service.evaluate('resilient', 'x', 'adjective', 'y');
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).not.toContain('native/comprehension language');
+    });
+
     it('computes xpAwarded as the sum of each dimension scaled to 350 max', async () => {
       // All scores 100 -> 5 * 350 = 1750 (the spec's max).
       createMock.mockResolvedValueOnce(

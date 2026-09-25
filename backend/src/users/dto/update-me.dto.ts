@@ -1,4 +1,5 @@
-import { IsBoolean, IsEnum, IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString, IsUUID, Length, Matches } from 'class-validator';
+import { USERNAME_REGEX } from '../users.service';
 
 export enum LearningGoalDto {
   CASUAL = 'CASUAL',
@@ -14,6 +15,19 @@ export enum LearningGoalDto {
  * as they move through onboarding, rather than one endpoint per screen.
  */
 export class UpdateMeDto {
+  @IsOptional()
+  @IsString()
+  @Length(2, 40)
+  displayName?: string;
+
+  /** Lowercase letters, digits, underscores; 3-20 chars -- see USERNAME_REGEX's doc comment. */
+  @IsOptional()
+  @IsString()
+  @Matches(USERNAME_REGEX, {
+    message: 'username must be 3-20 characters: lowercase letters, numbers, and underscores only',
+  })
+  username?: string;
+
   @IsOptional()
   @IsString()
   @Length(2, 2)

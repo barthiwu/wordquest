@@ -26,8 +26,10 @@ describe('WordInTheWildService', () => {
     },
     wordInTheWildSubmission: {
       findUnique: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       create: jest.fn(),
       update: jest.fn().mockResolvedValue({}),
+      updateMany: jest.fn().mockResolvedValue({ count: 0 }),
       count: jest.fn().mockResolvedValue(0),
     },
     challengeAttempt: { create: jest.fn(), findFirst: jest.fn() },
@@ -601,6 +603,75 @@ describe('WordInTheWildService', () => {
       expect(prismaMock.wordInTheWildSubmission.update).toHaveBeenCalledWith({
         where: { id: 's1' },
         data: { evidenceText: null, photoKey: null, deletedAt: expect.any(Date) },
+      });
+    });
+  });
+
+  describe('cleanupExpiredPhotos', () => {
+    it('does nothing when there are no expired photo submissions', async () => {
+      prismaMock.wordInTheWildSubmission.findMany.mockResolvedValueOnce([]);
+      await service.cleanupExpiredPhotos();
+      expect(storageMock.delete).not.toHaveBeenCalled();
+      expect(prismaMock.wordInTheWildSubmission.updateMany).not.toHaveBeenCalled();
+    });
+
+    it('queries only PHOTO submissions older than photoRetentionHours with a set photoKey and no soft-delete', async () => {
+      prismaMock.wordInTheWildSubmission.findMany.mockResolvedValueOnce([]);
+      const before = Date.now();
+      await service.cleanupExpiredPhotos();
+      const args = prismaMock.wordInTheWildSubmission.findMany.mock.calls[0][0];
+      expect(args.where.evidenceType).toBe('PHOTO');
+      expect(args.where.photoKey).toEqual({ not: null });
+      expect(args.where.deletedAt).toBeNull();
+      const cutoffMs = args.where.createdAt.lt.getTime();
+      const expectedCutoffMs =
+        before - gameplayRules.wordInTheWild.photoRetentionHours * 60 * 60 * 1000;
+      // Allow a small margin for time elapsed between `before` and the call inside the service.
+      expect(Math.abs(cutoffMs - expectedCutoffMs)).toBeLessThan(5000);
+    });
+
+    it('deletes each expired photo from storage and clears photoKey on the matching rows', async () => {
+      prismaMock.wordInTheWildSubmission.findMany.mockResolvedValueOnce([
+        { id: 's1', photoKey: 'word-in-the-wild/u1/a.jpg' },
+        { id: 's2', photoKey: 'word-in-the-wild/u2/b.jpg' },
+      ]);
+
+      await service.cleanupExpiredPhotos();
+
+      expect(storageMock.delete).toHaveBeenCalledWith('word-in-the-wild/u1/a.jpg');
+      expect(storageMock.delete).toHaveBeenCalledWith('word-in-the-wild/u2/b.jpg');
+      expect(prismaMock.wordInTheWildSubmission.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ['s1', 's2'] } },
+        data: { photoKey: null },
+      });
+    });
+
+    it('still clears photoKey even when a storage delete fails for one object (never gets stuck retrying forever)', async () => {
+      prismaMock.wordInTheWildSubmission.findMany.mockResolvedValueOnce([
+        { id: 's1', photoKey: 'word-in-the-wild/u1/a.jpg' },
+      ]);
+      storageMock.delete.mockRejectedValueOnce(new Error('R2 unavailable'));
+
+      await service.cleanupExpiredPhotos();
+
+      expect(prismaMock.wordInTheWildSubmission.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ['s1'] } },
+        data: { photoKey: null },
+      });
+    });
+
+    it('skips storage calls entirely when storage is not configured, but still clears photoKey', async () => {
+      storageMock.isStorageConfigured.mockReturnValueOnce(false);
+      prismaMock.wordInTheWildSubmission.findMany.mockResolvedValueOnce([
+        { id: 's1', photoKey: 'word-in-the-wild/u1/a.jpg' },
+      ]);
+
+      await service.cleanupExpiredPhotos();
+
+      expect(storageMock.delete).not.toHaveBeenCalled();
+      expect(prismaMock.wordInTheWildSubmission.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ['s1'] } },
+        data: { photoKey: null },
       });
     });
   });

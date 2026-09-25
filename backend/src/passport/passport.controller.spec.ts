@@ -14,6 +14,7 @@ describe('PassportController', () => {
 
   const baseUser = {
     displayName: 'Ada',
+    username: 'ada_1a2b3c4d',
     countryCode: 'US',
     clan: null,
     progression: {

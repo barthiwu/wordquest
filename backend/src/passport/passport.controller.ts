@@ -63,6 +63,7 @@ export class PassportController {
 
     return {
       displayName: user.displayName,
+      username: user.username,
       avatarUrl,
       countryCode: user.countryCode,
       clan: user.clan ? { name: user.clan.name, bannerAsset: user.clan.bannerAsset } : null,

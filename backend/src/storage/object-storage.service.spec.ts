@@ -46,6 +46,17 @@ describe('ObjectStorageService', () => {
     });
   });
 
+  describe('S3 client construction', () => {
+    it("always requests path-style addressing -- R2's default endpoint does not resolve virtual-hosted-style (<bucket>.<endpoint>) requests", async () => {
+      const { S3Client } = jest.requireMock('@aws-sdk/client-s3');
+      (getSignedUrl as jest.Mock).mockResolvedValueOnce('url');
+
+      await service.createUploadTarget('u1', 'image/jpeg');
+
+      expect(S3Client).toHaveBeenCalledWith(expect.objectContaining({ forcePathStyle: true }));
+    });
+  });
+
   describe('createUploadTarget', () => {
     it('throws ServiceUnavailableException when storage is not configured, without calling the SDK', async () => {
       configured = false;

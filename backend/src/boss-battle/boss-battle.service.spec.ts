@@ -673,7 +673,7 @@ describe('BossBattleService', () => {
             scheduledEndUtc: utc(2026, 8, 16, 18),
           },
         },
-        user: { id: 'u1', displayName: 'Ada' },
+        user: { id: 'u1', username: 'Ada' },
       });
 
       const result = await service.getMyGroupLeaderboard('u1');
@@ -682,7 +682,7 @@ describe('BossBattleService', () => {
       expect(result.entries).toHaveLength(1);
       expect(result.entries[0]).toEqual({
         userId: 'u1',
-        displayName: 'Ada',
+        username: 'Ada',
         rank: null,
         battleXp: 30,
         correctAnswers: 2,
@@ -712,7 +712,7 @@ describe('BossBattleService', () => {
             scheduledEndUtc: utc(2026, 8, 16, 18),
           },
         },
-        user: { id: 'u1', displayName: 'Ada' },
+        user: { id: 'u1', username: 'Ada' },
       });
 
       const result = await service.getMyGroupLeaderboard('u1');
@@ -739,7 +739,7 @@ describe('BossBattleService', () => {
             scheduledEndUtc: utc(2026, 8, 16, 18),
           },
         },
-        user: { id: 'u1', displayName: 'Ada' },
+        user: { id: 'u1', username: 'Ada' },
       });
       prismaMock.bossBattlePlayer.findMany.mockResolvedValueOnce([
         {
@@ -750,7 +750,7 @@ describe('BossBattleService', () => {
           incorrectAnswers: 0,
           lastXpAt: null,
           finalRank: null,
-          user: { id: 'u1', displayName: 'Ada' },
+          user: { id: 'u1', username: 'Ada' },
         },
         {
           id: 'p2',
@@ -760,7 +760,7 @@ describe('BossBattleService', () => {
           incorrectAnswers: 0,
           lastXpAt: null,
           finalRank: null,
-          user: { id: 'u2', displayName: 'Bo' },
+          user: { id: 'u2', username: 'Bo' },
         },
       ]);
 
@@ -784,7 +784,7 @@ describe('BossBattleService', () => {
             scheduledEndUtc: utc(2026, 8, 16, 18),
           },
         },
-        user: { id: 'u1', displayName: 'Ada' },
+        user: { id: 'u1', username: 'Ada' },
       });
       prismaMock.bossBattlePlayer.findMany.mockResolvedValueOnce([
         {
@@ -795,7 +795,7 @@ describe('BossBattleService', () => {
           incorrectAnswers: 0,
           lastXpAt: null,
           finalRank: null,
-          user: { id: 'u1', displayName: 'Ada' },
+          user: { id: 'u1', username: 'Ada' },
         },
       ]);
 
@@ -816,7 +816,7 @@ describe('BossBattleService', () => {
             scheduledEndUtc: utc(2026, 8, 16, 18),
           },
         },
-        user: { id: 'late', displayName: 'Late' },
+        user: { id: 'late', username: 'Late' },
       });
       prismaMock.bossBattlePlayer.findMany.mockResolvedValueOnce([
         {
@@ -827,7 +827,7 @@ describe('BossBattleService', () => {
           incorrectAnswers: 0,
           lastXpAt: utc(2026, 8, 16, 17, 40),
           finalRank: null,
-          user: { id: 'late', displayName: 'Late' },
+          user: { id: 'late', username: 'Late' },
         },
         {
           id: 'p2',
@@ -837,7 +837,7 @@ describe('BossBattleService', () => {
           incorrectAnswers: 0,
           lastXpAt: utc(2026, 8, 16, 17, 20),
           finalRank: null,
-          user: { id: 'early', displayName: 'Early' },
+          user: { id: 'early', username: 'Early' },
         },
       ]);
 
@@ -882,7 +882,7 @@ describe('BossBattleService', () => {
             incorrectAnswers: 0,
             lastXpAt: null,
             finalRank: 1,
-            user: { id: 'u1', displayName: 'Ada' },
+            user: { id: 'u1', username: 'Ada' },
           },
         ]); // leaderboard query after finalizing
 
@@ -938,7 +938,7 @@ describe('BossBattleService', () => {
           incorrectAnswers: 0,
           lastXpAt: null,
           finalRank: null,
-          user: { id: 'u1', displayName: 'Ada' },
+          user: { id: 'u1', username: 'Ada' },
         },
       ]);
 
@@ -1016,7 +1016,7 @@ describe('BossBattleService', () => {
         incorrectAnswers: 0,
         lastXpAt: null,
         finalRank: null,
-        user: { id: 'u1', displayName: 'Ada' },
+        user: { id: 'u1', username: 'Ada' },
       };
       prismaMock.bossBattlePlayer.findMany
         .mockResolvedValueOnce([finalizedPlayer]) // finalize's internal query

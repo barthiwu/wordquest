@@ -1,4 +1,5 @@
 import { computeGuessXp, gameplayRules } from './gameplay-rules';
+import type { AgeRange } from '../common/age';
 
 describe('computeGuessXp', () => {
   const clean = { wrongAttempts: 0, hintsUsed: 0, synonymsUsed: 0, lettersRevealed: 0 };
@@ -182,5 +183,35 @@ describe('computeGuessXp', () => {
     };
     const results = new Set(Array.from({ length: 10 }, () => computeGuessXp(input)));
     expect(results.size).toBe(1);
+  });
+});
+
+describe('gameplayRules.learningProfile.startingDifficultyByAgeRange', () => {
+  const ALL_AGE_RANGES: AgeRange[] = [
+    'UNDER_13',
+    'TEENS_13_18',
+    'YOUNG_ADULT_19_24',
+    'ADULT_25_PLUS',
+  ];
+
+  it('is total over every AgeRange', () => {
+    for (const range of ALL_AGE_RANGES) {
+      expect(gameplayRules.learningProfile.startingDifficultyByAgeRange[range]).toBeDefined();
+    }
+  });
+
+  it('never starts anyone at ADVANCED purely from age — that must be earned via calibration', () => {
+    for (const range of ALL_AGE_RANGES) {
+      expect(gameplayRules.learningProfile.startingDifficultyByAgeRange[range]).not.toBe(
+        'ADVANCED',
+      );
+    }
+  });
+
+  it('starts younger players no higher than older players', () => {
+    const order = { BEGINNER: 0, INTERMEDIATE: 1, ADVANCED: 2 } as const;
+    const { startingDifficultyByAgeRange: byRange } = gameplayRules.learningProfile;
+    expect(order[byRange.TEENS_13_18]).toBeLessThanOrEqual(order[byRange.YOUNG_ADULT_19_24]);
+    expect(order[byRange.YOUNG_ADULT_19_24]).toBeLessThanOrEqual(order[byRange.ADULT_25_PLUS]);
   });
 });

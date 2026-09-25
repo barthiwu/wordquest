@@ -123,6 +123,13 @@ export class ObjectStorageService {
           accessKeyId: this.config.storageAccessKeyId,
           secretAccessKey: this.config.storageSecretAccessKey,
         },
+        // R2's default S3 API endpoint (<accountId>.r2.cloudflarestorage.com)
+        // doesn't resolve virtual-hosted-style requests (<bucket>.<endpoint>) --
+        // only path-style (<endpoint>/<bucket>/<key>), which is also exactly the
+        // shape Cloudflare's own dashboard shows as "S3 API" for a bucket.
+        // Without this the SDK's default virtual-hosted addressing produces a
+        // <bucket>.<accountId>.r2.cloudflarestorage.com host that never resolves.
+        forcePathStyle: true,
       });
     }
     return this.client;

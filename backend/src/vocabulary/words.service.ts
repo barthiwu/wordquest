@@ -1,11 +1,37 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { gameplayRules } from '../config/gameplay-rules';
+import { isReviewDue } from './review-schedule';
 import {
   rankCandidatesForSelection,
   type MasteryForRanking,
   type PlayerSelectionContext,
   type RankableWord,
 } from './word-ranking';
+
+type Db = PrismaService | Prisma.TransactionClient;
+
+/**
+ * Corpus-wide Global Word Distribution health (10,000-Word Adaptive
+ * Distribution spec §15/§21) — "which words are becoming overexposed, and
+ * which are being neglected," the half of the system that isn't specific
+ * to any one player. See WordsService.getExposureAnalytics.
+ */
+export interface ExposureAnalytics {
+  activeWordCount: number;
+  totalGlobalExposures: number;
+  /** totalGlobalExposures / activeWordCount -- what a perfectly even distribution would look like right now. */
+  expectedExposurePerWord: number;
+  /** gameplayRules.adaptiveSelection.targetGlobalExposuresPerWord -- the "one full distribution cycle" target from spec §4. */
+  targetExposuresPerWord: number;
+  wordsNeverExposed: number;
+  /** Below the corpus's own current average -- the pool globalPriority is actively boosting. */
+  wordsBelowExpected: number;
+  /** At or past the §4 target -- have completed at least one full distribution cycle. */
+  wordsAtOrAboveTarget: number;
+  maxExposureCount: number;
+}
 
 /**
  * Word selection for a Quest. Generating the actual letter-omission
@@ -25,6 +51,62 @@ import {
 @Injectable()
 export class WordsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * Global Word Distribution bookkeeping (10,000-Word Adaptive
+   * Distribution spec §18 step 11): called once a picked word set has
+   * actually been committed to a real attempt (never speculatively for a
+   * pick that might still lose a concurrency race -- see
+   * QuestsService.startTimedQuest) so `globalExposureCount` only ever
+   * counts words a player genuinely saw. Takes the same transaction
+   * client the attempt itself is created in, so the increment and the
+   * attempt are atomic together.
+   */
+  async recordGlobalExposure(wordIds: string[], db: Db = this.prisma): Promise<void> {
+    if (wordIds.length === 0) return;
+    await db.word.updateMany({
+      where: { id: { in: wordIds } },
+      data: { globalExposureCount: { increment: 1 }, lastGlobalExposureAt: new Date() },
+    });
+  }
+
+  /** See ExposureAnalytics's doc comment. Two round trips: the second needs the first's expected-exposure figure. */
+  async getExposureAnalytics(): Promise<ExposureAnalytics> {
+    const [agg, wordsNeverExposed] = await Promise.all([
+      this.prisma.word.aggregate({
+        where: { isActive: true },
+        _sum: { globalExposureCount: true },
+        _max: { globalExposureCount: true },
+        _count: true,
+      }),
+      this.prisma.word.count({ where: { isActive: true, globalExposureCount: 0 } }),
+    ]);
+
+    const activeWordCount = agg._count;
+    const totalGlobalExposures = agg._sum.globalExposureCount ?? 0;
+    const expectedExposurePerWord = activeWordCount > 0 ? totalGlobalExposures / activeWordCount : 0;
+    const targetExposuresPerWord = gameplayRules.adaptiveSelection.targetGlobalExposuresPerWord;
+
+    const [wordsBelowExpected, wordsAtOrAboveTarget] = await Promise.all([
+      this.prisma.word.count({
+        where: { isActive: true, globalExposureCount: { lt: expectedExposurePerWord } },
+      }),
+      this.prisma.word.count({
+        where: { isActive: true, globalExposureCount: { gte: targetExposuresPerWord } },
+      }),
+    ]);
+
+    return {
+      activeWordCount,
+      totalGlobalExposures,
+      expectedExposurePerWord,
+      targetExposuresPerWord,
+      wordsNeverExposed,
+      wordsBelowExpected,
+      wordsAtOrAboveTarget,
+      maxExposureCount: agg._max.globalExposureCount ?? 0,
+    };
+  }
 
   /**
    * Picks `count` words for a quest, ranked by the Adaptive Word
@@ -51,6 +133,7 @@ export class WordsService {
         currentLevel: true,
         lastReviewedAt: true,
         nextReviewDueAt: true,
+        lastPresentedAt: true,
         timesPresented: true,
         timesCorrect: true,
         timesIncorrect: true,
@@ -62,7 +145,38 @@ export class WordsService {
       .filter((m: { currentLevel: string }) => m.currentLevel === 'MASTERED')
       .map((m: { wordId: string }) => m.wordId);
 
-    let pool: RankableWord[] = await this.fetchActivePool([...masteredWordIds, ...excludeWordIds]);
+    // Minimum repeat protection (10,000-Word Adaptive Distribution spec
+    // §9): don't hand this player a word they were shown within the last
+    // `minRepeatDays`, UNLESS it's actually due for spaced review --
+    // that's the spec's one named exception, and it's also just correct:
+    // a word due for review should never be blocked by the very
+    // mechanism that's supposed to bring it back. Folded into the same
+    // exclusion list as masteredWordIds (below) so it gets the exact
+    // same "repetition beats a dead end" relaxation the existing
+    // fallback chain already does for mastered words, rather than a
+    // separate hard rule that could leave a quest short.
+    const now = new Date();
+    const minRepeatMs = gameplayRules.adaptiveSelection.minRepeatDays * 24 * 60 * 60 * 1000;
+    const recentlyShownWordIds = masteries
+      .filter(
+        (m: { lastPresentedAt: Date | null; nextReviewDueAt: Date | null }) =>
+          // `!= null` (not `!== null`) deliberately -- a mastery row from
+          // an older code path or a test fixture that simply never set
+          // this field is `undefined` at runtime, not `null`, and should
+          // be treated the same way: no recorded presentation, nothing
+          // to protect against repeating.
+          m.lastPresentedAt != null &&
+          now.getTime() - m.lastPresentedAt.getTime() < minRepeatMs &&
+          !isReviewDue(m.nextReviewDueAt, now),
+      )
+      .map((m: { wordId: string }) => m.wordId);
+
+    const defaultExcludedWordIds = [...masteredWordIds, ...recentlyShownWordIds];
+
+    let pool: RankableWord[] = await this.fetchActivePool([
+      ...defaultExcludedWordIds,
+      ...excludeWordIds,
+    ]);
 
     // Progressively relax the exclusions rather than ever returning an
     // empty quest — repetition beats a dead end, same reasoning as the
@@ -70,9 +184,10 @@ export class WordsService {
     // time: first try honoring in-flight exclusion, then fall back to
     // allowing an in-flight repeat if that's truly the only way to fill
     // the quest, then (unchanged from before) fall back to the full
-    // active pool once literally everything is mastered.
+    // active pool once literally everything is mastered or too-recently
+    // shown.
     if (pool.length === 0 && excludeWordIds.length > 0) {
-      pool = await this.fetchActivePool(masteredWordIds);
+      pool = await this.fetchActivePool(defaultExcludedWordIds);
     }
     if (pool.length === 0) {
       pool = await this.fetchActivePool([]);
@@ -103,6 +218,7 @@ export class WordsService {
         category: true,
         difficultyScore: true,
         baseDifficulty: true,
+        globalExposureCount: true,
       },
     });
   }
@@ -120,7 +236,7 @@ export class WordsService {
       word: { category: string | null };
     }>,
   ): Promise<PlayerSelectionContext> {
-    const [profile, progression] = await Promise.all([
+    const [profile, progression, exposureAgg] = await Promise.all([
       this.prisma.learningProfile.findUnique({
         where: { userId },
         select: { currentDifficulty: true },
@@ -129,7 +245,20 @@ export class WordsService {
         where: { userId },
         select: { estimatedCefrLevel: true },
       }),
+      // Global fairness (spec §15): the corpus-wide average this ranking
+      // pass compares every candidate's own globalExposureCount against.
+      // A cheap aggregate over the WHOLE active corpus, not just this
+      // pool's candidates -- a candidate that got excluded above (e.g.
+      // mastered, or shown too recently) still counts toward what "even
+      // distribution" means for everyone else.
+      this.prisma.word.aggregate({
+        where: { isActive: true },
+        _sum: { globalExposureCount: true },
+        _count: true,
+      }),
     ]);
+    const expectedGlobalExposure =
+      exposureAgg._count > 0 ? (exposureAgg._sum.globalExposureCount ?? 0) / exposureAgg._count : 0;
 
     const masteryByWordId = new Map<string, MasteryForRanking>();
     const masteredCountByCategory = new Map<string, number>();
@@ -175,6 +304,7 @@ export class WordsService {
     }
 
     return {
+      expectedGlobalExposure,
       currentDifficulty: profile?.currentDifficulty ?? 'BEGINNER',
       estimatedCefrLevel: progression?.estimatedCefrLevel ?? null,
       masteryByWordId,

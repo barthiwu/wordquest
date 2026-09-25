@@ -4,6 +4,7 @@ import { QuestsService } from './quests.service';
 import { SubmitAnswerDto } from './dto/submit-answer.dto';
 import { SubmitSentenceDto } from './dto/submit-sentence.dto';
 import { SubmitParagraphDto } from './dto/submit-paragraph.dto';
+import { CheckHistoryAnswerDto } from './dto/check-history-answer.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../auth/guards/email-verification.guard';
 import { CurrentUserId } from '../auth/decorators/current-user.decorator';
@@ -41,6 +42,15 @@ export class QuestsController {
     return this.quests.listQuests();
   }
 
+  // Read-only aggregation over today's QuestAttempt rows (see
+  // QuestsService.getTodaySummary) — backs Home's Daily Goals card with
+  // a real "N of 3 today" count instead of an invented target.
+  @Get('today')
+  async today(@CurrentUserId() userId: string) {
+    const { localDate } = await this.clock.now(userId);
+    return this.quests.getTodaySummary(userId, localDate);
+  }
+
   // No request body anymore (Player Timezone System, V1 Remaining Systems
   // Spec §15) — localDate/localHour used to be client-submitted; the
   // server now derives both from the player's own stored timezone, which
@@ -49,6 +59,28 @@ export class QuestsController {
   async start(@CurrentUserId() userId: string, @Param('questKey') questKey: string) {
     const { localDate, localHour } = await this.clock.now(userId);
     return this.quests.startTimedQuest(userId, questKey, localDate, localHour);
+  }
+
+  // Catch-up calendar: past days only (see QuestsService.getHistoryForDate/
+  // listHistoryDates) — registered before ':questKey/start' would matter
+  // if 'history' could ever collide with a real questKey, but quest keys
+  // are seed data ('morning-quest', etc.), so no collision risk here.
+  @Get('history/dates')
+  async historyDates(@CurrentUserId() userId: string) {
+    const { localDate } = await this.clock.now(userId);
+    return this.quests.listHistoryDates(userId, localDate);
+  }
+
+  @Get('history/:localDate')
+  async history(@CurrentUserId() userId: string, @Param('localDate') localDate: string) {
+    const { localDate: todayLocalDate } = await this.clock.now(userId);
+    return this.quests.getHistoryForDate(userId, localDate, todayLocalDate);
+  }
+
+  @Post('history/check')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  checkHistoryAnswer(@Body() dto: CheckHistoryAnswerDto) {
+    return this.quests.checkHistoryAnswer(dto.wordId, dto.answer);
   }
 
   @Post('attempts/:attemptId/answer')

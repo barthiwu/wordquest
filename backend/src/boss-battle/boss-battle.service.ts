@@ -55,7 +55,7 @@ export interface BattleAnswerResult {
 
 export interface LeaderboardEntry {
   userId: string;
-  displayName: string;
+  username: string;
   /** Null while the battle is still LIVE — no comparative rank is exposed until the group finalizes (Correction & Completion Spec §4). */
   rank: number | null;
   battleXp: number;
@@ -100,7 +100,7 @@ interface RankablePlayer {
 }
 
 interface RankablePlayerWithUser extends RankablePlayer {
-  user: { id: string; displayName: string };
+  user: { id: string; username: string };
 }
 
 /**
@@ -424,7 +424,7 @@ export class BossBattleService {
       orderBy: { joinedAt: 'desc' },
       include: {
         group: { include: { battle: true } },
-        user: { select: { id: true, displayName: true } },
+        user: { select: { id: true, username: true } },
       },
     });
     if (!player) throw new NotFoundException('You have not joined a Boss Battle');
@@ -449,7 +449,7 @@ export class BossBattleService {
         entries: [
           {
             userId: player.user.id,
-            displayName: player.user.displayName,
+            username: player.user.username,
             rank: null,
             battleXp: player.battleXp,
             correctAnswers: player.correctAnswers,
@@ -464,7 +464,7 @@ export class BossBattleService {
 
     const players: RankablePlayerWithUser[] = await this.prisma.bossBattlePlayer.findMany({
       where: { groupId: player.groupId },
-      include: { user: { select: { id: true, displayName: true } } },
+      include: { user: { select: { id: true, username: true } } },
     });
     const ranked = this.rankPlayers(players);
 
@@ -473,7 +473,7 @@ export class BossBattleService {
       status,
       entries: ranked.map((p, i) => ({
         userId: p.user.id,
-        displayName: p.user.displayName,
+        username: p.user.username,
         rank: p.finalRank ?? i + 1,
         battleXp: p.battleXp,
         correctAnswers: p.correctAnswers,

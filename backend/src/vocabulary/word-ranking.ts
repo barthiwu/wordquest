@@ -7,6 +7,8 @@ export interface RankableWord {
   category: string | null;
   difficultyScore: number | null;
   baseDifficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  /** How many times ANY player has ever been served this word — Layer A's global-distribution signal, independent of this one player's history. Absent/undefined treated as 0 (never exposed -- the highest-priority case). */
+  globalExposureCount?: number;
 }
 
 export interface MasteryForRanking {
@@ -30,6 +32,14 @@ export interface MasteryForRanking {
 }
 
 export interface PlayerSelectionContext {
+  /**
+   * total active-corpus global exposures / active-corpus word count (10,000-Word
+   * Adaptive Distribution spec §15) -- the "expected_exposure" a word
+   * would have if the whole corpus were served perfectly evenly. 0 for a
+   * brand-new corpus with no exposures recorded yet, in which case
+   * globalPriority treats every word as equally (and maximally) under-exposed.
+   */
+  expectedGlobalExposure: number;
   /** From LearningProfile.currentDifficulty, or a BEGINNER default for a brand-new player. */
   currentDifficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   /** UserProgression.estimatedCefrLevel — the rolling evidence-based estimate, may be null early on. */
@@ -130,6 +140,23 @@ export function scoreWordForSelection(
     const distance = Math.abs(word.difficultyScore - targetScore) / 100;
     score += Math.max(0, 1 - distance) * weights.difficultyScoreWeight;
   }
+
+  // Global fairness (10,000-Word Adaptive Distribution spec §15): a word
+  // sitting well below the corpus's average exposure ranks up, one well
+  // above it ranks down -- this is what keeps the full 10,000-word
+  // vocabulary cycling through the whole player base over the game's
+  // lifetime instead of the same "good generic fit" words dominating
+  // forever while the rest of the corpus barely ever gets served.
+  // Continuous, not a hard cutoff: at 0 exposure -> full weight; at
+  // exactly the expected exposure -> half weight; the further above
+  // expected, the closer to zero (never negative, so an overexposed word
+  // is merely unboosted, not actively punished beyond that).
+  const exposure = word.globalExposureCount ?? 0;
+  const globalPriority =
+    ctx.expectedGlobalExposure > 0
+      ? Math.max(0, 1 - exposure / (ctx.expectedGlobalExposure * 2))
+      : 1;
+  score += globalPriority * weights.globalPriorityWeight;
 
   if (mastery?.currentLevel === 'STRONG') {
     score -= weights.strongWordPenalty;

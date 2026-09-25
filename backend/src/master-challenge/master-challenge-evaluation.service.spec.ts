@@ -88,6 +88,23 @@ describe('MasterChallengeEvaluationService', () => {
       expect(result.scores).toEqual(validScores);
     });
 
+    it('instructs the model to write feedback in the given native language', async () => {
+      createMock.mockResolvedValueOnce(textResponse(fullEvaluation));
+      await service.evaluate(threeWords, 'y', 'sw');
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).toContain('Swahili');
+      expect(call.system).toContain('never translate the content being learned');
+    });
+
+    it('omits the language instruction when nativeLanguage is unset', async () => {
+      createMock.mockResolvedValueOnce(textResponse(fullEvaluation));
+      await service.evaluate(threeWords, 'y');
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).not.toContain('native/comprehension language');
+    });
+
     it('computes xpAwarded as the sum of each dimension scaled to 50 max', async () => {
       // All scores 100 -> 5 * 50 = 250 (the spec's max).
       createMock.mockResolvedValueOnce(

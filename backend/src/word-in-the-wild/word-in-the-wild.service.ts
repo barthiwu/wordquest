@@ -5,6 +5,7 @@ import {
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MasteryService } from '../mastery/mastery.service';
@@ -336,6 +337,47 @@ export class WordInTheWildService {
     });
 
     return this.toSubmissionView(submission);
+  }
+
+  /**
+   * Photo evidence retention (Barth, Sept 2026 -- see gameplayRules.
+   * wordInTheWild's doc comment): clears photoKey on any PHOTO submission
+   * older than photoRetentionHours, so the app stops trying to display a
+   * photo whose R2 object is gone (or about to be, per the bucket's own
+   * lifecycle rule on the same prefix). evidenceText/assessmentStatus/
+   * xpAwarded are left alone -- only the raw photo goes away, never the
+   * submission's history or its mastery/XP effect. Already-soft-deleted
+   * rows (deletedAt set) are skipped since ObjectStorageService.delete
+   * already ran for those. delete() is a no-op on an already-missing R2
+   * key (S3-compatible DELETE is idempotent), so this is safe to run
+   * even after the bucket's own lifecycle rule has already removed the
+   * object -- the DB side just catches up.
+   */
+  @Cron(gameplayRules.wordInTheWild.photoCleanupCronExpression)
+  async cleanupExpiredPhotos(): Promise<void> {
+    const cutoff = new Date(
+      Date.now() - gameplayRules.wordInTheWild.photoRetentionHours * 60 * 60 * 1000,
+    );
+    const expired = await this.prisma.wordInTheWildSubmission.findMany({
+      where: {
+        evidenceType: 'PHOTO',
+        photoKey: { not: null },
+        deletedAt: null,
+        createdAt: { lt: cutoff },
+      },
+      select: { id: true, photoKey: true },
+    });
+    if (expired.length === 0) return;
+
+    if (this.storage.isStorageConfigured()) {
+      await Promise.all(
+        expired.map((s) => this.storage.delete(s.photoKey as string).catch(() => undefined)),
+      );
+    }
+    await this.prisma.wordInTheWildSubmission.updateMany({
+      where: { id: { in: expired.map((s) => s.id) } },
+      data: { photoKey: null },
+    });
   }
 
   private toMissionView(mission: {

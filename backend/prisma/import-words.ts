@@ -1,7 +1,7 @@
 /**
  * Bulk word import from a CSV (spreadsheet export) — Content pipeline
  * (build order §47 item 12), for any word list beyond the production
- * 2000-word set shipped with the app (prisma/vocabulary-production.csv,
+ * 10,000-word set shipped with the app (prisma/vocabulary-production.csv,
  * imported automatically by `npx prisma db seed`, see prisma/seed.ts).
  * Usage:
  *

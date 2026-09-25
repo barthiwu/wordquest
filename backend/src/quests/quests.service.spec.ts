@@ -1,4 +1,5 @@
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { Test } from '@nestjs/testing';
 import { QuestsService } from './quests.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -40,9 +41,16 @@ describe('QuestsService', () => {
     word: {
       findUniqueOrThrow: jest.fn(),
       findUnique: jest.fn().mockResolvedValue({ word: 'greeting' }),
+      findMany: jest.fn(),
     },
     userProgression: {
       findUnique: jest.fn().mockResolvedValue({ journeyStage: 0 }),
+    },
+    // Default: no native-language preference set, same as any account
+    // that's never touched Settings > Language -- individual
+    // native-language-threading tests override this per-call.
+    user: {
+      findUnique: jest.fn().mockResolvedValue({ nativeLanguage: null }),
     },
     challengeAttempt: {
       create: jest.fn().mockResolvedValue({}),
@@ -59,6 +67,7 @@ describe('QuestsService', () => {
 
   const wordsMock = {
     pickWordsForQuest: jest.fn(),
+    recordGlobalExposure: jest.fn().mockResolvedValue(undefined),
   };
 
   const masteryMock = {
@@ -192,6 +201,45 @@ describe('QuestsService', () => {
       expect(view.wordCount).toBe(2);
       expect(view.definition).toBe(farewellWord.definition);
       expect(view.wordLength).toBe(8);
+      // Still at GUESSING (the mock attempt sets no wordStage, so the
+      // WordStage default parameter applies) -- understanding would give
+      // the answer away before it's actually guessed.
+      expect(view.understanding).toBeNull();
+    });
+
+    it('resuming an attempt already past Guess includes the full understanding content, not just definition/partOfSpeech', async () => {
+      // Regression test: buildChallengeView used to omit `understanding`
+      // entirely, so a resumed Sentence/Paragraph/Optional Wild screen
+      // had no way to show the actual word -- only the frontend's "the
+      // word" placeholder fallback, even though every field here is a
+      // plain Word column, not anything generated fresh at guess time.
+      prismaMock.quest.findUnique.mockResolvedValueOnce({
+        id: 'q1',
+        isActive: true,
+        wordCount: 5,
+        windowStartHour: 16,
+        windowEndHour: 23,
+      });
+      prismaMock.questAttempt.findFirst.mockResolvedValueOnce({
+        id: 'a1',
+        wordIds: ['w2'],
+        currentIndex: 0,
+        wordStage: 'PARAGRAPH',
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(farewellWord);
+
+      const view = await service.startTimedQuest('u1', 'evening-quest', '2026-08-14', 8);
+
+      expect(view.wordStage).toBe('PARAGRAPH');
+      expect(view.understanding).toEqual({
+        word: farewellWord.word,
+        definition: farewellWord.definition,
+        partOfSpeech: farewellWord.partOfSpeech,
+        pronunciation: undefined,
+        phoneticRepresentation: undefined,
+        synonyms: undefined,
+        exampleSentence: farewellWord.exampleSentence,
+      });
     });
 
     it("throws when the local hour is before the quest's windowStartHour and there is nothing to resume", async () => {
@@ -425,6 +473,164 @@ describe('QuestsService', () => {
         },
       });
     });
+
+    describe('Global Word Distribution + daily quest locking (10,000-Word Adaptive Distribution spec §18/§19)', () => {
+      it('records global exposure for a freshly created attempt\'s words', async () => {
+        prismaMock.quest.findUnique.mockResolvedValueOnce({
+          id: 'q1',
+          isActive: true,
+          wordCount: 3,
+          windowStartHour: null,
+          windowEndHour: null,
+        });
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce(null); // inProgress
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce(null); // completedToday
+        wordsMock.pickWordsForQuest.mockResolvedValueOnce(['w1', 'w2', 'w3']);
+        prismaMock.questAttempt.create.mockResolvedValueOnce({
+          id: 'a1',
+          wordIds: ['w1', 'w2', 'w3'],
+          currentIndex: 0,
+        });
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
+
+        await service.startTimedQuest('u1', 'morning-quest', '2026-08-14', 8);
+
+        expect(wordsMock.recordGlobalExposure).toHaveBeenCalledWith(['w1', 'w2', 'w3']);
+      });
+
+      it('on a concurrent double-create (P2002), resumes the winning attempt instead of erroring or double-picking words', async () => {
+        const questRow = {
+          id: 'q1',
+          isActive: true,
+          wordCount: 3,
+          windowStartHour: null,
+          windowEndHour: null,
+        };
+        // Consumed twice: once by this request's own pass, once more by
+        // the internal retry (startTimedQuest calling itself again) after
+        // losing the race below.
+        prismaMock.quest.findUnique.mockResolvedValueOnce(questRow);
+        prismaMock.quest.findUnique.mockResolvedValueOnce(questRow);
+        // This request's own first pass: no attempt yet, not completed.
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce(null); // inProgress
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce(null); // completedToday
+        wordsMock.pickWordsForQuest.mockResolvedValueOnce(['w1', 'w2', 'w3']);
+        // Another request won the race and created the row first.
+        const p2002 = Object.assign(new Error('Unique constraint failed'), { code: 'P2002' });
+        Object.setPrototypeOf(p2002, Prisma.PrismaClientKnownRequestError.prototype);
+        prismaMock.questAttempt.create.mockRejectedValueOnce(p2002);
+        // The retry (this method calling itself again): inProgress now
+        // finds the winner's row and resumes it through the normal path.
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce({
+          id: 'winner',
+          wordIds: ['x1', 'x2', 'x3'],
+          currentIndex: 0,
+          wordStage: 'GUESSING',
+        });
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
+
+        const view = await service.startTimedQuest('u1', 'morning-quest', '2026-08-14', 8);
+
+        expect(view.questAttemptId).toBe('winner');
+        expect(prismaMock.questAttempt.create).toHaveBeenCalledTimes(1);
+        // The losing pick (['w1','w2','w3']) must never inflate global
+        // exposure counts for words this player was never actually shown.
+        expect(wordsMock.recordGlobalExposure).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('catch-up calendar (listHistoryDates / getHistoryForDate / checkHistoryAnswer)', () => {
+    describe('listHistoryDates', () => {
+      it('returns distinct past dates, most recent first, excluding today', async () => {
+        prismaMock.questAttempt.findMany.mockResolvedValueOnce([
+          { localDate: '2026-09-20' },
+          { localDate: '2026-09-18' },
+        ]);
+
+        const result = await service.listHistoryDates('u1', '2026-09-24');
+
+        expect(prismaMock.questAttempt.findMany).toHaveBeenCalledWith(
+          expect.objectContaining({
+            where: { userId: 'u1', localDate: { lt: '2026-09-24' } },
+            distinct: ['localDate'],
+            orderBy: { localDate: 'desc' },
+          }),
+        );
+        expect(result).toEqual(['2026-09-20', '2026-09-18']);
+      });
+    });
+
+    describe('getHistoryForDate', () => {
+      it('rejects today or a future date', async () => {
+        await expect(service.getHistoryForDate('u1', '2026-09-24', '2026-09-24')).rejects.toThrow(
+          BadRequestException,
+        );
+        await expect(service.getHistoryForDate('u1', '2026-09-25', '2026-09-24')).rejects.toThrow(
+          BadRequestException,
+        );
+      });
+
+      it('throws NotFoundException when the player had no Quest activity that day', async () => {
+        prismaMock.questAttempt.findMany.mockResolvedValueOnce([]);
+
+        await expect(service.getHistoryForDate('u1', '2026-09-20', '2026-09-24')).rejects.toThrow(
+          NotFoundException,
+        );
+      });
+
+      it('deduplicates words across the day\'s quest windows and builds a fresh Guess challenge for each, at current mastery', async () => {
+        prismaMock.questAttempt.findMany.mockResolvedValueOnce([
+          { wordIds: ['w1', 'w2'] },
+          { wordIds: ['w2'] }, // same word reappearing in another window -- must not duplicate
+        ]);
+        prismaMock.word.findMany.mockResolvedValueOnce([greetingWord, farewellWord]);
+        masteryMock.getLevel.mockResolvedValueOnce('STRONG'); // w1
+        masteryMock.getLevel.mockResolvedValueOnce('NEW'); // w2
+
+        const result = await service.getHistoryForDate('u1', '2026-09-20', '2026-09-24');
+
+        expect(result.localDate).toBe('2026-09-20');
+        expect(result.words).toHaveLength(2);
+        expect(result.words.map((w) => w.wordId).sort()).toEqual(['w1', 'w2']);
+        expect(masteryMock.getLevel).toHaveBeenCalledWith('u1', 'w1');
+        expect(masteryMock.getLevel).toHaveBeenCalledWith('u1', 'w2');
+        // Nothing about this is a real presentation -- no attempt, no XP path touched.
+        expect(prismaMock.questAttempt.create).not.toHaveBeenCalled();
+        expect(progressionMock.awardXp).not.toHaveBeenCalled();
+      });
+
+      it('skips a word that no longer exists rather than failing the whole day', async () => {
+        prismaMock.questAttempt.findMany.mockResolvedValueOnce([{ wordIds: ['w1', 'gone'] }]);
+        prismaMock.word.findMany.mockResolvedValueOnce([greetingWord]); // 'gone' not returned
+
+        const result = await service.getHistoryForDate('u1', '2026-09-20', '2026-09-24');
+
+        expect(result.words).toHaveLength(1);
+        expect(result.words[0].wordId).toBe('w1');
+      });
+    });
+
+    describe('checkHistoryAnswer', () => {
+      it('reports a correct answer and never touches Mastery/XP/global exposure', async () => {
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
+
+        const result = await service.checkHistoryAnswer('w1', 'Greeting');
+
+        expect(result).toEqual({ correct: true, correctWord: 'greeting' });
+        expect(masteryMock.recordAnswer).not.toHaveBeenCalled();
+        expect(progressionMock.awardXp).not.toHaveBeenCalled();
+        expect(wordsMock.recordGlobalExposure).not.toHaveBeenCalled();
+      });
+
+      it('reports an incorrect answer', async () => {
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
+
+        const result = await service.checkHistoryAnswer('w1', 'nope');
+
+        expect(result).toEqual({ correct: false, correctWord: 'greeting' });
+      });
+    });
   });
 
   describe('listQuests', () => {
@@ -454,6 +660,83 @@ describe('QuestsService', () => {
           windowEndHour: 11,
         },
       ]);
+    });
+  });
+
+  describe('getTodaySummary', () => {
+    it('reports each active quest window as completed/in-progress/neither, from real QuestAttempt rows for the given localDate', async () => {
+      prismaMock.quest.findMany.mockResolvedValueOnce([
+        { id: 'q-morning', key: 'morning-quest', title: 'Morning Quest', windowStartHour: 0, windowEndHour: 11 },
+        { id: 'q-noon', key: 'noon-quest', title: 'Noon Quest', windowStartHour: 12, windowEndHour: 15 },
+        { id: 'q-evening', key: 'evening-quest', title: 'Evening Quest', windowStartHour: 16, windowEndHour: 23 },
+      ]);
+      prismaMock.questAttempt.findMany.mockResolvedValueOnce([
+        { questId: 'q-morning', status: 'COMPLETED', xpAwarded: 145, glyphAwarded: 3 },
+        { questId: 'q-noon', status: 'IN_PROGRESS', xpAwarded: 0, glyphAwarded: 0 },
+      ]);
+
+      const result = await service.getTodaySummary('user-1', '2026-09-24');
+
+      expect(prismaMock.questAttempt.findMany).toHaveBeenCalledWith({
+        where: {
+          userId: 'user-1',
+          localDate: '2026-09-24',
+          questId: { in: ['q-morning', 'q-noon', 'q-evening'] },
+          status: { in: ['COMPLETED', 'IN_PROGRESS'] },
+        },
+        select: { questId: true, status: true, xpAwarded: true, glyphAwarded: true },
+      });
+      expect(result).toEqual({
+        localDate: '2026-09-24',
+        completedCount: 1,
+        totalCount: 3,
+        quests: [
+          {
+            key: 'morning-quest',
+            title: 'Morning Quest',
+            windowStartHour: 0,
+            windowEndHour: 11,
+            completed: true,
+            inProgress: false,
+            xpAwarded: 145,
+            glyphAwarded: 3,
+          },
+          {
+            key: 'noon-quest',
+            title: 'Noon Quest',
+            windowStartHour: 12,
+            windowEndHour: 15,
+            completed: false,
+            inProgress: true,
+            xpAwarded: null,
+            glyphAwarded: null,
+          },
+          {
+            key: 'evening-quest',
+            title: 'Evening Quest',
+            windowStartHour: 16,
+            windowEndHour: 23,
+            completed: false,
+            inProgress: false,
+            xpAwarded: null,
+            glyphAwarded: null,
+          },
+        ],
+      });
+    });
+
+    it('never invents completion — no attempts today means completedCount 0', async () => {
+      prismaMock.quest.findMany.mockResolvedValueOnce([
+        { id: 'q-morning', key: 'morning-quest', title: 'Morning Quest', windowStartHour: 0, windowEndHour: 11 },
+      ]);
+      prismaMock.questAttempt.findMany.mockResolvedValueOnce([]);
+
+      const result = await service.getTodaySummary('user-1', '2026-09-24');
+
+      expect(result.completedCount).toBe(0);
+      expect(result.totalCount).toBe(1);
+      expect(result.quests[0].completed).toBe(false);
+      expect(result.quests[0].inProgress).toBe(false);
     });
   });
 
@@ -848,6 +1131,24 @@ describe('QuestsService', () => {
         greetingWord.definition,
         greetingWord.partOfSpeech,
         'She gave a warm greeting.',
+        null,
+      );
+    });
+
+    it("passes the player's native language through to the evaluator, so its feedback lands in a language they understand", async () => {
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...sentenceAttempt });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
+      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'es' });
+      sentenceEvaluationMock.evaluate.mockResolvedValueOnce(evaluation);
+
+      await service.submitSentence('u1', 'a1', 'She gave a warm greeting.');
+
+      expect(sentenceEvaluationMock.evaluate).toHaveBeenCalledWith(
+        greetingWord.word,
+        greetingWord.definition,
+        greetingWord.partOfSpeech,
+        'She gave a warm greeting.',
+        'es',
       );
     });
 
@@ -992,6 +1293,24 @@ describe('QuestsService', () => {
         greetingWord.definition,
         greetingWord.partOfSpeech,
         thirtyWordParagraph,
+        null,
+      );
+    });
+
+    it("passes the player's native language through to the evaluator, so its feedback lands in a language they understand", async () => {
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...paragraphAttempt });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
+      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'ar' });
+      paragraphEvaluationMock.evaluate.mockResolvedValueOnce(paragraphEvaluation);
+
+      await service.submitParagraph('u1', 'a1', thirtyWordParagraph);
+
+      expect(paragraphEvaluationMock.evaluate).toHaveBeenCalledWith(
+        greetingWord.word,
+        greetingWord.definition,
+        greetingWord.partOfSpeech,
+        thirtyWordParagraph,
+        'ar',
       );
     });
 

@@ -34,7 +34,10 @@ export interface PracticeGuessResult {
 
 export interface PracticeWritingResult {
   scores: Record<string, number>;
+  /** This submission's own composite score — feedback on exactly what was just written. */
   score: number;
+  /** What actually got stored (may be higher than `score` — see MasteryService.recordSkillAreaPractice doc comment). */
+  bestScore: number;
   masteryLevel: MasteryLevel;
   justMastered: boolean;
   whatWentWell: string;
@@ -129,7 +132,10 @@ export class PracticeService {
     wordId: string,
     sentence: string,
   ): Promise<PracticeWritingResult> {
-    const word = await this.prisma.word.findUnique({ where: { id: wordId } });
+    const [word, player] = await Promise.all([
+      this.prisma.word.findUnique({ where: { id: wordId } }),
+      this.prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
+    ]);
     if (!word || !word.isActive) throw new NotFoundException('Word not found');
 
     const evaluation = await this.sentenceEvaluation.evaluate(
@@ -137,9 +143,10 @@ export class PracticeService {
       word.definition,
       word.partOfSpeech,
       sentence,
+      player?.nativeLanguage,
     );
 
-    const { score, level, justMastered } = await this.mastery.recordSkillAreaPractice(
+    const { attemptScore, bestScore, level, justMastered } = await this.mastery.recordSkillAreaPractice(
       userId,
       wordId,
       'sentence',
@@ -148,7 +155,8 @@ export class PracticeService {
 
     return {
       scores: evaluation.scores as unknown as Record<string, number>,
-      score,
+      score: attemptScore,
+      bestScore,
       masteryLevel: level,
       justMastered,
       whatWentWell: evaluation.whatWentWell,
@@ -167,7 +175,10 @@ export class PracticeService {
       throw new BadRequestException(`Paragraph must be 30-100 words (got ${wordCount}).`);
     }
 
-    const word = await this.prisma.word.findUnique({ where: { id: wordId } });
+    const [word, player] = await Promise.all([
+      this.prisma.word.findUnique({ where: { id: wordId } }),
+      this.prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
+    ]);
     if (!word || !word.isActive) throw new NotFoundException('Word not found');
 
     const evaluation = await this.paragraphEvaluation.evaluate(
@@ -175,9 +186,10 @@ export class PracticeService {
       word.definition,
       word.partOfSpeech,
       paragraph,
+      player?.nativeLanguage,
     );
 
-    const { score, level, justMastered } = await this.mastery.recordSkillAreaPractice(
+    const { attemptScore, bestScore, level, justMastered } = await this.mastery.recordSkillAreaPractice(
       userId,
       wordId,
       'paragraph',
@@ -186,7 +198,8 @@ export class PracticeService {
 
     return {
       scores: evaluation.scores as unknown as Record<string, number>,
-      score,
+      score: attemptScore,
+      bestScore,
       masteryLevel: level,
       justMastered,
       whatWentWell: evaluation.whatWentWell,

@@ -56,6 +56,16 @@ export interface ChallengeView {
   /** The contextual clue shown alongside the blanked word (spec §13). exampleSentence is deliberately NOT sent here — it usually contains the word itself, which would give the answer away. */
   definition: string;
   partOfSpeech: string;
+  /**
+   * The full Understanding-stage content (word text, synonyms, example
+   * sentence, etc.) — populated whenever wordStage is past GUESSING, so
+   * a resumed attempt (app relaunch, or just leaving and reopening the
+   * quest) has the same word detail it would have gotten from a fresh
+   * correct guess, instead of the client falling back to a placeholder.
+   * Always null while still at GUESSING, since any of this would give
+   * the answer away before the player has actually guessed it.
+   */
+  understanding: UnderstandingContent | null;
 }
 
 export interface QuestCatalogEntry {
@@ -64,6 +74,46 @@ export interface QuestCatalogEntry {
   description: string;
   windowStartHour: number | null;
   windowEndHour: number | null;
+}
+
+/**
+ * Catch-up calendar (product request, Sept 2026): a past day's Guess
+ * words, replayed for review only. Deliberately NOT a ChallengeView --
+ * there's no attempt to resume, no stage beyond Guess, and no XP, so it
+ * doesn't need any of ChallengeView's attempt/stage bookkeeping.
+ */
+export interface CatchUpWordChallenge {
+  wordId: string;
+  displayPattern: string;
+  missingIndexes: number[];
+  wordLength: number;
+  definition: string;
+  partOfSpeech: string;
+}
+
+export interface CatchUpView {
+  localDate: string;
+  words: CatchUpWordChallenge[];
+}
+
+/** One quest window's real status for the player's current local day — see QuestsService.getTodaySummary. */
+export interface TodayQuestWindowSummary {
+  key: string;
+  title: string;
+  windowStartHour: number | null;
+  windowEndHour: number | null;
+  completed: boolean;
+  inProgress: boolean;
+  /** The real reward the player's completed attempt actually earned for this window — null until completed, never a guess or a same-day aggregate. */
+  xpAwarded: number | null;
+  glyphAwarded: number | null;
+}
+
+export interface TodayQuestSummary {
+  localDate: string;
+  completedCount: number;
+  totalCount: number;
+  quests: TodayQuestWindowSummary[];
 }
 
 export interface UnderstandingContent {
@@ -208,6 +258,62 @@ export class QuestsService {
   }
 
   /**
+   * Today's Daily Quest progress, for a home-screen summary — purely a
+   * read model over data startTimedQuest's own gating already computes
+   * (COMPLETED/IN_PROGRESS QuestAttempt rows for the player's current
+   * localDate). Adds no new rule, reward, or window: `completedCount`
+   * out of `totalCount` is exactly "how many of today's quest windows
+   * have a COMPLETED attempt", nothing inferred or targeted beyond what
+   * the Quest tab already enforces.
+   */
+  async getTodaySummary(userId: string, localDate: string): Promise<TodayQuestSummary> {
+    const quests = await this.prisma.quest.findMany({
+      where: { isActive: true },
+      orderBy: { windowStartHour: 'asc' },
+    });
+
+    const attempts = await this.prisma.questAttempt.findMany({
+      where: {
+        userId,
+        localDate,
+        questId: { in: quests.map((q: { id: string }) => q.id) },
+        status: { in: ['COMPLETED', 'IN_PROGRESS'] },
+      },
+      select: { questId: true, status: true, xpAwarded: true, glyphAwarded: true },
+    });
+    const attemptByQuestId = new Map(
+      attempts.map((a: { questId: string; status: string; xpAwarded: number; glyphAwarded: number }) => [
+        a.questId,
+        a,
+      ]),
+    );
+
+    const questSummaries: TodayQuestWindowSummary[] = quests.map(
+      (q: { id: string; key: string; title: string; windowStartHour: number | null; windowEndHour: number | null }) => {
+        const attempt = attemptByQuestId.get(q.id);
+        const completed = attempt?.status === 'COMPLETED';
+        return {
+          key: q.key,
+          title: q.title,
+          windowStartHour: q.windowStartHour,
+          windowEndHour: q.windowEndHour,
+          completed,
+          inProgress: attempt?.status === 'IN_PROGRESS',
+          xpAwarded: completed ? attempt!.xpAwarded : null,
+          glyphAwarded: completed ? attempt!.glyphAwarded : null,
+        };
+      },
+    );
+
+    return {
+      localDate,
+      completedCount: questSummaries.filter((q) => q.completed).length,
+      totalCount: questSummaries.length,
+      quests: questSummaries,
+    };
+  }
+
+  /**
    * Resumes an in-progress attempt for this quest, or starts a new one —
    * gated by the player's own local time (spec: quests unlock at a
    * player-local hour, never a ceiling, never re-locked once unlocked).
@@ -231,12 +337,14 @@ export class QuestsService {
       where: { userId, questId: quest.id, status: 'IN_PROGRESS' },
     });
     if (inProgress) {
-      // Understanding's explanation content is generated once at guess
-      // time and never persisted (see submitAnswer's result.understanding),
-      // so there's nothing to resume a player INTO for that stage — the
-      // closest honest option is to complete it on their behalf (it's a
-      // read-only informational step, not a scored input) and resume at
-      // Sentence instead, same place a normal "Continue" tap would land.
+      // Understanding is a read/acknowledge step, not a scored input, so
+      // there's no in-progress answer to preserve here the way Sentence/
+      // Paragraph have a draft — the closest honest option is to
+      // complete it on the player's behalf and resume at Sentence
+      // instead, same place a normal "Continue" tap would land.
+      // buildChallengeView below still returns the word's full
+      // `understanding` content either way (Sentence/Paragraph/Optional
+      // Wild need it just as much as Understanding would have).
       let resumeStage: WordStage = inProgress.wordStage;
       if (resumeStage === 'UNDERSTANDING') {
         await this.claimStageTransition(this.prisma, inProgress.id, 'UNDERSTANDING', {
@@ -277,21 +385,139 @@ export class QuestsService {
     });
     const excludeWordIds = otherInProgress.flatMap((a) => a.wordIds);
 
-    const attempt = await this.prisma.questAttempt.create({
-      data: {
-        userId,
-        questId: quest.id,
-        localDate,
-        wordIds: await this.words.pickWordsForQuest(
+    const wordIds = await this.words.pickWordsForQuest(
+      userId,
+      quest.wordCount || gameplayRules.quest.defaultWordCount,
+      excludeWordIds,
+    );
+
+    let attempt;
+    try {
+      attempt = await this.prisma.questAttempt.create({
+        data: {
           userId,
-          quest.wordCount || gameplayRules.quest.defaultWordCount,
-          excludeWordIds,
-        ),
-        guessStartedAt: new Date(), // the 2-minute Guess timer starts now, server-side — never trust a client-reported start time
-      },
-    });
+          questId: quest.id,
+          localDate,
+          wordIds,
+          guessStartedAt: new Date(), // the 2-minute Guess timer starts now, server-side — never trust a client-reported start time
+        },
+      });
+    } catch (err) {
+      // Daily quest locking (10,000-Word Adaptive Distribution spec §19):
+      // the @@unique([userId, questId, localDate]) constraint on
+      // QuestAttempt means a genuinely concurrent request for this same
+      // quest+day (a double-tap, or the app reopened twice in quick
+      // succession before the first request's attempt existed yet) fails
+      // here with P2002 instead of silently creating a second attempt
+      // with a DIFFERENT word set than the one already shown. The loser
+      // just re-enters this same method: the top-of-function `inProgress`
+      // check will now find the winner's row and resume it through the
+      // exact same (already-tested) resume path a normal reopen uses —
+      // this pick's own `wordIds` is simply discarded, which is why
+      // recordGlobalExposure below only ever runs for the request that
+      // actually won.
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        return this.startTimedQuest(userId, questKey, localDate, localHour);
+      }
+      throw err;
+    }
+
+    // Global Word Distribution bookkeeping (10,000-Word Adaptive
+    // Distribution spec §18 step 11) — only for a pick that just became a
+    // real, persisted attempt (see the P2002 branch above for why a
+    // losing race's pick must never reach here).
+    await this.words.recordGlobalExposure(wordIds);
 
     return this.buildChallengeView(attempt.id, userId, attempt.wordIds, attempt.currentIndex, 'GUESSING');
+  }
+
+  /**
+   * Every local calendar date the player has ANY Quest activity on, most
+   * recent first — powers the catch-up calendar (a marked day is
+   * playable; an unmarked one just has nothing to show). `todayLocalDate`
+   * excludes today itself and anything later — catch-up is for days that
+   * have actually ended, never the one still in progress.
+   */
+  async listHistoryDates(userId: string, todayLocalDate: string): Promise<string[]> {
+    const rows = await this.prisma.questAttempt.findMany({
+      where: { userId, localDate: { lt: todayLocalDate } },
+      select: { localDate: true },
+      distinct: ['localDate'],
+      orderBy: { localDate: 'desc' },
+    });
+    return rows.map((r: { localDate: string }) => r.localDate);
+  }
+
+  /**
+   * The catch-up replay for one past day: every word actually shown
+   * across ALL of that day's quest windows (morning/noon/evening),
+   * deduplicated, each given a fresh Guess challenge at the word's
+   * CURRENT mastery level — the same difficulty a live quest would show
+   * today, not whatever it was back then. Read-only: this never creates
+   * a QuestAttempt, and answering one (checkHistoryAnswer, below) never
+   * touches Mastery, XP, or Global Word Distribution's exposure counts —
+   * this is review, not a new presentation of the word.
+   */
+  async getHistoryForDate(
+    userId: string,
+    localDate: string,
+    todayLocalDate: string,
+  ): Promise<CatchUpView> {
+    if (localDate >= todayLocalDate) {
+      throw new BadRequestException('Catch-up is only available for a day that has already ended.');
+    }
+
+    const attempts = await this.prisma.questAttempt.findMany({
+      where: { userId, localDate },
+      select: { wordIds: true },
+    });
+    const wordIds = Array.from(
+      new Set(attempts.flatMap((a: { wordIds: string[] }) => a.wordIds)),
+    );
+    if (wordIds.length === 0) {
+      throw new NotFoundException(`No Quest activity found for ${localDate}.`);
+    }
+
+    const words = await this.prisma.word.findMany({ where: { id: { in: wordIds } } });
+    const wordById = new Map(words.map((w) => [w.id, w]));
+
+    const catchUpWords: CatchUpWordChallenge[] = [];
+    for (const wordId of wordIds) {
+      const word = wordById.get(wordId);
+      if (!word) continue; // deactivated/removed since — skip rather than fail the whole day
+      const masteryLevel = await this.mastery.getLevel(userId, wordId);
+      const challenge = generateOmissionChallenge({
+        word: word.word,
+        baseDifficulty: word.baseDifficulty,
+        masteryLevel,
+      });
+      catchUpWords.push({
+        wordId,
+        displayPattern: challenge.displayPattern,
+        missingIndexes: challenge.missingIndexes,
+        wordLength: word.length,
+        definition: word.definition,
+        partOfSpeech: word.partOfSpeech,
+      });
+    }
+
+    return { localDate, words: catchUpWords };
+  }
+
+  /**
+   * Checks one catch-up answer. Deliberately does nothing else — no XP,
+   * no Mastery update, no ChallengeAttempt row, no Global Word
+   * Distribution exposure increment. Product intent (Sept 2026): replay
+   * a past day's words "without it giving you any new XP beyond just
+   * answering what you missed."
+   */
+  async checkHistoryAnswer(
+    wordId: string,
+    rawAnswer: string,
+  ): Promise<{ correct: boolean; correctWord: string }> {
+    const word = await this.prisma.word.findUniqueOrThrow({ where: { id: wordId } });
+    const correct = rawAnswer.trim().toLowerCase() === word.normalizedWord;
+    return { correct, correctWord: word.word };
   }
 
   async submitAnswer(
@@ -471,15 +697,17 @@ export class QuestsService {
     sentence: string,
   ): Promise<SentenceResult> {
     const attempt = await this.loadInProgressAttempt(userId, questAttemptId, 'SENTENCE');
-    const word = await this.prisma.word.findUniqueOrThrow({
-      where: { id: attempt.wordIds[attempt.currentIndex] },
-    });
+    const [word, player] = await Promise.all([
+      this.prisma.word.findUniqueOrThrow({ where: { id: attempt.wordIds[attempt.currentIndex] } }),
+      this.prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
+    ]);
 
     const evaluation = await this.sentenceEvaluation.evaluate(
       word.word,
       word.definition,
       word.partOfSpeech,
       sentence,
+      player?.nativeLanguage,
     );
 
     await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -537,15 +765,17 @@ export class QuestsService {
       throw new BadRequestException(`Paragraph must be 30-100 words (got ${wordCount}).`);
     }
 
-    const word = await this.prisma.word.findUniqueOrThrow({
-      where: { id: attempt.wordIds[attempt.currentIndex] },
-    });
+    const [word, player] = await Promise.all([
+      this.prisma.word.findUniqueOrThrow({ where: { id: attempt.wordIds[attempt.currentIndex] } }),
+      this.prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
+    ]);
 
     const evaluation = await this.paragraphEvaluation.evaluate(
       word.word,
       word.definition,
       word.partOfSpeech,
       paragraph,
+      player?.nativeLanguage,
     );
 
     await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -990,6 +1220,18 @@ export class QuestsService {
       wordLength: word.length,
       definition: word.definition,
       partOfSpeech: word.partOfSpeech,
+      understanding:
+        wordStage === 'GUESSING'
+          ? null
+          : {
+              word: word.word,
+              definition: word.definition,
+              partOfSpeech: word.partOfSpeech,
+              pronunciation: word.pronunciation,
+              phoneticRepresentation: word.phoneticRepresentation,
+              synonyms: word.synonyms,
+              exampleSentence: word.exampleSentence,
+            },
     };
   }
 

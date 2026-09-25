@@ -15,6 +15,9 @@ describe('WordsService', () => {
     },
     word: {
       findMany: jest.fn(),
+      aggregate: jest.fn(),
+      count: jest.fn(),
+      updateMany: jest.fn(),
     },
     learningProfile: {
       findUnique: jest.fn().mockResolvedValue(null),
@@ -28,6 +31,11 @@ describe('WordsService', () => {
     jest.clearAllMocks();
     prismaMock.learningProfile.findUnique.mockResolvedValue(null);
     prismaMock.userProgression.findUnique.mockResolvedValue(null);
+    // Neutral default (no exposure data at all) so every pre-existing test
+    // that reaches the ranking step -- none of which are about Global Word
+    // Distribution -- gets the same "no corpus-wide signal yet" behavior
+    // as before this feature existed, without having to opt in per test.
+    prismaMock.word.aggregate.mockResolvedValue({ _sum: { globalExposureCount: 0 }, _count: 0 });
     const moduleRef = await Test.createTestingModule({
       providers: [WordsService, { provide: PrismaService, useValue: prismaMock }],
     }).compile();
@@ -297,6 +305,143 @@ describe('WordsService', () => {
         expect(prismaMock.word.findMany).toHaveBeenCalledTimes(2);
         expect(result).toEqual(['w1']);
       });
+    });
+  });
+
+
+  describe('minimum repeat protection (10,000-Word Adaptive Distribution spec §9)', () => {
+    it('excludes a word shown within minRepeatDays that is not due for review', async () => {
+      const now = Date.now();
+      prismaMock.mastery.findMany.mockResolvedValueOnce([
+        {
+          wordId: 'w1',
+          currentLevel: 'RECOGNIZING',
+          lastReviewedAt: new Date(now - 1000),
+          nextReviewDueAt: new Date(now + 999_999_999), // far in the future -- not due
+          lastPresentedAt: new Date(now - 1000), // shown one second ago
+          timesPresented: 1,
+          timesCorrect: 1,
+          timesIncorrect: 0,
+          word: { category: null },
+        },
+      ]);
+      prismaMock.word.findMany.mockResolvedValueOnce([candidate('w2')]);
+
+      const result = await service.pickWordsForQuest('u1', 1);
+
+      expect(prismaMock.word.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: { notIn: ['w1'] }, isActive: true } }),
+      );
+      expect(result).toEqual(['w2']);
+    });
+
+    it('does NOT exclude a word shown recently if it is actually due for review -- the spec\'s named exception', async () => {
+      const now = Date.now();
+      prismaMock.mastery.findMany.mockResolvedValueOnce([
+        {
+          wordId: 'w1',
+          currentLevel: 'RECOGNIZING',
+          lastReviewedAt: new Date(now - 1000),
+          nextReviewDueAt: new Date(now - 1), // already due
+          lastPresentedAt: new Date(now - 1000),
+          timesPresented: 1,
+          timesCorrect: 1,
+          timesIncorrect: 0,
+          word: { category: null },
+        },
+      ]);
+      prismaMock.word.findMany.mockResolvedValueOnce([candidate('w1'), candidate('w2')]);
+
+      const result = await service.pickWordsForQuest('u1', 2);
+
+      expect(prismaMock.word.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { isActive: true } }),
+      );
+      expect(result.sort()).toEqual(['w1', 'w2']);
+    });
+
+    it('does not exclude a word shown further back than minRepeatDays', async () => {
+      const now = Date.now();
+      const elevenDaysAgo = now - 11 * 24 * 60 * 60 * 1000;
+      prismaMock.mastery.findMany.mockResolvedValueOnce([
+        {
+          wordId: 'w1',
+          currentLevel: 'RECOGNIZING',
+          lastReviewedAt: new Date(elevenDaysAgo),
+          nextReviewDueAt: new Date(now + 999_999_999),
+          lastPresentedAt: new Date(elevenDaysAgo),
+          timesPresented: 1,
+          timesCorrect: 1,
+          timesIncorrect: 0,
+          word: { category: null },
+        },
+      ]);
+      prismaMock.word.findMany.mockResolvedValueOnce([candidate('w1'), candidate('w2')]);
+
+      const result = await service.pickWordsForQuest('u1', 2);
+
+      expect(prismaMock.word.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { isActive: true } }),
+      );
+      expect(result.sort()).toEqual(['w1', 'w2']);
+    });
+  });
+
+  describe('recordGlobalExposure', () => {
+    it('increments globalExposureCount and stamps lastGlobalExposureAt for every word delivered', async () => {
+      await service.recordGlobalExposure(['w1', 'w2']);
+
+      expect(prismaMock.word.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ['w1', 'w2'] } },
+        data: { globalExposureCount: { increment: 1 }, lastGlobalExposureAt: expect.any(Date) },
+      });
+    });
+
+    it('does nothing for an empty word list', async () => {
+      await service.recordGlobalExposure([]);
+
+      expect(prismaMock.word.updateMany).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getExposureAnalytics', () => {
+    it('computes the expected exposure and reports the corpus health breakdown', async () => {
+      prismaMock.word.aggregate.mockResolvedValueOnce({
+        _sum: { globalExposureCount: 18000 },
+        _max: { globalExposureCount: 12 },
+        _count: 10000,
+      });
+      prismaMock.word.count
+        .mockResolvedValueOnce(500) // wordsNeverExposed
+        .mockResolvedValueOnce(4000) // wordsBelowExpected
+        .mockResolvedValueOnce(3000); // wordsAtOrAboveTarget
+
+      const result = await service.getExposureAnalytics();
+
+      expect(result).toEqual({
+        activeWordCount: 10000,
+        totalGlobalExposures: 18000,
+        expectedExposurePerWord: 1.8,
+        targetExposuresPerWord: 3,
+        wordsNeverExposed: 500,
+        wordsBelowExpected: 4000,
+        wordsAtOrAboveTarget: 3000,
+        maxExposureCount: 12,
+      });
+    });
+
+    it('handles a totally empty corpus without dividing by zero', async () => {
+      prismaMock.word.aggregate.mockResolvedValueOnce({
+        _sum: { globalExposureCount: null },
+        _max: { globalExposureCount: null },
+        _count: 0,
+      });
+      prismaMock.word.count.mockResolvedValue(0);
+
+      const result = await service.getExposureAnalytics();
+
+      expect(result.expectedExposurePerWord).toBe(0);
+      expect(result.activeWordCount).toBe(0);
     });
   });
 });

@@ -411,4 +411,118 @@ describe('NotificationSchedulerService', () => {
       await expect(service.sendLeaderboardNotifications()).resolves.toBeUndefined();
     });
   });
+
+  describe('sendStreakAtRiskReminders', () => {
+    it('nudges a user at the 18:00 local checkpoint who has not played today', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 23, 18, 0, 0)); // UTC user's local 18:00
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+      prismaMock.userProgression.findUnique.mockResolvedValueOnce({
+        currentStreak: 4,
+        lastActiveOn: utc(2026, 8, 22, 9, 0, 0), // yesterday -- not today
+      });
+
+      await service.sendStreakAtRiskReminders();
+
+      expect(notificationsMock.notifyFireAndForget).toHaveBeenCalledWith(
+        'u1',
+        'STREAK_AT_RISK',
+        expect.any(String),
+        expect.stringContaining('4-day streak'),
+        { data: { localHour: 18, currentStreak: 4 }, deepLink: 'wordquest://quest' },
+      );
+    });
+
+    it('nudges at the 21:00 and 23:00 checkpoints too, with escalating copy', async () => {
+      for (const hour of [21, 23]) {
+        jest.useFakeTimers().setSystemTime(utc(2026, 8, 23, hour, 0, 0));
+        prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+        prismaMock.userProgression.findUnique.mockResolvedValueOnce({
+          currentStreak: 2,
+          lastActiveOn: null,
+        });
+
+        await service.sendStreakAtRiskReminders();
+
+        expect(notificationsMock.notifyFireAndForget).toHaveBeenCalledWith(
+          'u1',
+          'STREAK_AT_RISK',
+          expect.any(String),
+          expect.stringContaining('2-day streak'),
+          { data: { localHour: hour, currentStreak: 2 }, deepLink: 'wordquest://quest' },
+        );
+        notificationsMock.notifyFireAndForget.mockClear();
+      }
+    });
+
+    it('does not nudge outside the three checkpoint hours', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 23, 19, 0, 0)); // not 18/21/23
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+
+      await service.sendStreakAtRiskReminders();
+
+      expect(prismaMock.userProgression.findUnique).not.toHaveBeenCalled();
+      expect(notificationsMock.notifyFireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('does not nudge a player who already played today', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 23, 21, 0, 0));
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+      prismaMock.userProgression.findUnique.mockResolvedValueOnce({
+        currentStreak: 4,
+        lastActiveOn: utc(2026, 8, 23, 8, 0, 0), // earlier today
+      });
+
+      await service.sendStreakAtRiskReminders();
+
+      expect(notificationsMock.notifyFireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('uses "come play" copy rather than a streak number for a player on day zero', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 23, 18, 0, 0));
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+      prismaMock.userProgression.findUnique.mockResolvedValueOnce({
+        currentStreak: 0,
+        lastActiveOn: null,
+      });
+
+      await service.sendStreakAtRiskReminders();
+
+      expect(notificationsMock.notifyFireAndForget).toHaveBeenCalledWith(
+        'u1',
+        'STREAK_AT_RISK',
+        expect.any(String),
+        expect.not.stringContaining('day streak'),
+        { data: { localHour: 18, currentStreak: 0 }, deepLink: 'wordquest://quest' },
+      );
+    });
+
+    it('checks each player at THEIR OWN local checkpoint hour, not server time', async () => {
+      // Server UTC is 21:00; a user 3 hours behind UTC (offset -03:00) is
+      // at local 18:00 right now -- their first checkpoint.
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 23, 21, 0, 0));
+      prismaMock.user.findMany.mockResolvedValueOnce([
+        { id: 'u1', timezone: 'America/Sao_Paulo' },
+      ]);
+      prismaMock.userProgression.findUnique.mockResolvedValueOnce({
+        currentStreak: 1,
+        lastActiveOn: null,
+      });
+
+      await service.sendStreakAtRiskReminders();
+
+      expect(notificationsMock.notifyFireAndForget).toHaveBeenCalledWith(
+        'u1',
+        'STREAK_AT_RISK',
+        expect.any(String),
+        expect.any(String),
+        { data: { localHour: 18, currentStreak: 1 }, deepLink: 'wordquest://quest' },
+      );
+    });
+
+    it('swallows and logs errors rather than throwing', async () => {
+      prismaMock.user.findMany.mockRejectedValueOnce(new Error('db down'));
+
+      await expect(service.sendStreakAtRiskReminders()).resolves.toBeUndefined();
+    });
+  });
 });

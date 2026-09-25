@@ -26,6 +26,18 @@ export interface SkillAreaScores {
   paragraphScore: number;
 }
 
+/**
+ * What applyMasteryGate actually gates on — deliberately NOT the same
+ * shape as SkillAreaScores (which stays a display DTO with a numeric
+ * guessScore). The guess dimension of the gate is a one-time pass, not
+ * a threshold on a number: see applyMasteryGate's doc comment.
+ */
+interface MasteryGateInputs {
+  hasGuessedCorrectly: boolean;
+  sentenceScore: number;
+  paragraphScore: number;
+}
+
 export interface MasteryDetail extends SkillAreaScores {
   wordId: string;
   currentLevel: MasteryLevel;
@@ -64,15 +76,20 @@ export interface MasteryListItem extends SkillAreaScores {
  *    consecutive-correct GUESS streak on that word (unchanged from
  *    before) — a display/progress ladder, not a reward gate.
  *  - MASTERED is a single gate, checked by `applyMasteryGate` every time
- *    any of the three skill-area scores changes: guessScore, sentenceScore,
- *    paragraphScore must ALL be >= the threshold (75) at once (Correction
- *    & Completion Spec §2: Speaking/Pronunciation removed from the gate
- *    entirely in V1). A streak alone can never cross it — Boss Battle and
- *    Word in the Wild answers (binary correct/incorrect only) feed
- *    guessScore same as any other guess, but the other two areas only
- *    ever get evidence from a completed Daily Quest word cycle
- *    (Sentence/Paragraph stages), so in practice only that full cycle can
- *    complete mastery — exactly what the spec asks for.
+ *    any of the three skill areas changes. Guess is a one-time pass: the
+ *    first correct guess ever (`timesCorrect > 0`) satisfies it forever
+ *    — re-guessing a word already met is trivial (you've seen the
+ *    omission pattern before), so it isn't something a player can
+ *    action beyond that first success, and it must not gate mastery
+ *    behind a moving average they have no real way to move. Sentence
+ *    and paragraph must each be >= the threshold (75), but the score
+ *    STORED for each is a high-water mark — a later attempt that scores
+ *    lower never overwrites a better one already on file (Speaking/
+ *    Pronunciation stay removed from the gate entirely, Correction &
+ *    Completion Spec §2). Once all three are satisfied, MASTERED is
+ *    permanent for that word — nothing (a later guess miss, a weaker
+ *    rewrite) ever takes it away again; only the guess-streak ladder
+ *    above it continues to move on ordinary NEW..STRONG traffic.
  *
  * recordAnswer/evaluateWordCycleCompletion take an optional trailing `db`
  * for the same reason ProgressionService's methods do — pass the `tx`
@@ -113,20 +130,31 @@ export class MasteryService {
       100,
     );
     // NEW..STRONG only — levelForStreak never returns MASTERED anymore.
-    // A miss demotes by one rung, same as before, including down from a
-    // MASTERED reached via the skill-area gate (see class doc comment).
-    const streakLevel = isCorrect ? this.levelForStreak(newStreak) : this.demote(currentLevel);
+    // A miss demotes by one rung, same as before -- EXCEPT down from
+    // MASTERED, which is now permanent (see class doc comment): a word
+    // that's already cleared the gate keeps its level regardless of a
+    // later guess miss.
+    const streakLevel = isCorrect
+      ? this.levelForStreak(newStreak)
+      : currentLevel === 'MASTERED'
+        ? currentLevel
+        : this.demote(currentLevel);
     const newGuessScore = this.computeGuessScore(existing?.guessScore ?? 0, isCorrect);
+    // The guess dimension of the MASTERED gate: a one-time pass, not the
+    // rolling guessScore above (which stays purely informational/display
+    // now) — satisfied the moment the player has ever gotten this word's
+    // guess right, including right now.
+    const hasGuessedCorrectly = (existing?.timesCorrect ?? 0) > 0 || isCorrect;
 
     const now = new Date();
     // A correct guess is positive evidence, so re-check the MASTERED gate
-    // with the freshly-updated guessScore — the other four areas only
-    // ever get evidence from a Daily Quest word cycle, so this can only
-    // actually complete mastery for a word that's already cleared them.
-    // A miss never promotes (streakLevel already reflects the demotion).
+    // — the other two areas only ever get evidence from a Daily Quest
+    // word cycle (or Practice), so this can only actually complete
+    // mastery for a word that's already cleared them. A miss never
+    // promotes (streakLevel already reflects the demotion, if any).
     const newLevel = isCorrect
       ? this.applyMasteryGate(streakLevel, {
-          guessScore: newGuessScore,
+          hasGuessedCorrectly,
           sentenceScore: existing?.sentenceScore ?? 0,
           paragraphScore: existing?.paragraphScore ?? 0,
         })
@@ -166,25 +194,15 @@ export class MasteryService {
       },
     });
 
+    // MASTERED is permanent now (see class doc comment), so there is no
+    // "just demoted from MASTERED" case any more — a word only ever
+    // joins masteredWordsCount, never leaves it once it has.
     const justMastered = newLevel === 'MASTERED' && !wasAlreadyMastered;
-    const justDemotedFromMastered = wasAlreadyMastered && newLevel !== 'MASTERED';
 
     let masteredWordsCount: number;
 
     if (justMastered) {
       masteredWordsCount = await this.onWordMastered(userId, wordId, db);
-    } else if (justDemotedFromMastered) {
-      // Keeps masteredWordsCount an honest "currently mastered" count,
-      // not "ever mastered" — a word that's since been missed enough to
-      // fall out of MASTERED shouldn't still count toward it. No Journey
-      // check needed here — Journey only ever advances forward, and a
-      // decrement can never newly satisfy a threshold, only move away
-      // from one.
-      const updated = await db.userProgression.update({
-        where: { userId },
-        data: { masteredWordsCount: { decrement: 1 } },
-      });
-      masteredWordsCount = updated.masteredWordsCount;
     } else {
       const current = await db.userProgression.findUniqueOrThrow({
         where: { userId },
@@ -209,7 +227,11 @@ export class MasteryService {
    * Only ever promotes, never demotes — a so-so cycle isn't evidence the
    * player has gotten WORSE at a word they may already be doing fine on
    * via repeated guessing; it just leaves the level exactly where the
-   * guess-streak ladder already has it.
+   * guess-streak ladder already has it. The stored sentence/paragraph
+   * scores are each a high-water mark for the same reason — a weaker
+   * rewrite later doesn't erase a stronger one already on file, it just
+   * doesn't move the number. That's why this reads `existing` before
+   * computing them, even though it isn't gating anything by itself.
    */
   async evaluateWordCycleCompletion(
     userId: string,
@@ -218,15 +240,16 @@ export class MasteryService {
     paragraphScores: Record<string, number>,
     db: Db = this.prisma,
   ): Promise<{ masteredViaSkillCheck: boolean }> {
-    const sentenceScore = averageScoreDimensions(sentenceScores);
-    const paragraphScore = averageScoreDimensions(paragraphScores);
-
     const existing = await db.mastery.findUnique({ where: { userId_wordId: { userId, wordId } } });
     const wasAlreadyMastered = existing?.currentLevel === 'MASTERED';
     const currentLevel: MasteryLevel = existing?.currentLevel ?? 'NEW';
 
+    const sentenceScore = Math.max(existing?.sentenceScore ?? 0, averageScoreDimensions(sentenceScores));
+    const paragraphScore = Math.max(existing?.paragraphScore ?? 0, averageScoreDimensions(paragraphScores));
+    const hasGuessedCorrectly = (existing?.timesCorrect ?? 0) > 0;
+
     const newLevel = this.applyMasteryGate(currentLevel, {
-      guessScore: existing?.guessScore ?? 0,
+      hasGuessedCorrectly,
       sentenceScore,
       paragraphScore,
     });
@@ -281,6 +304,13 @@ export class MasteryService {
    * so a word mastered via practice counts exactly like one mastered via
    * a live quest -- the only thing genuinely different about practice is
    * that nothing here ever calls ProgressionService.awardXp.
+   *
+   * Returns both `attemptScore` (this submission's own composite, for
+   * feedback on exactly what the player just wrote) and `bestScore`
+   * (what actually got stored — the higher of this attempt and whatever
+   * was on file already). They differ only when a player re-practices a
+   * word and writes something weaker than their best on record; the
+   * stored score never moves backward.
    */
   async recordSkillAreaPractice(
     userId: string,
@@ -288,22 +318,27 @@ export class MasteryService {
     area: 'sentence' | 'paragraph',
     scores: Record<string, number>,
     db: Db = this.prisma,
-  ): Promise<{ score: number; level: MasteryLevel; justMastered: boolean }> {
-    const score = averageScoreDimensions(scores);
+  ): Promise<{ attemptScore: number; bestScore: number; level: MasteryLevel; justMastered: boolean }> {
+    const attemptScore = averageScoreDimensions(scores);
 
     const existing = await db.mastery.findUnique({ where: { userId_wordId: { userId, wordId } } });
     const wasAlreadyMastered = existing?.currentLevel === 'MASTERED';
     const currentLevel: MasteryLevel = existing?.currentLevel ?? 'NEW';
 
-    const guessScore = existing?.guessScore ?? 0;
-    const sentenceScore = area === 'sentence' ? score : (existing?.sentenceScore ?? 0);
-    const paragraphScore = area === 'paragraph' ? score : (existing?.paragraphScore ?? 0);
+    const hasGuessedCorrectly = (existing?.timesCorrect ?? 0) > 0;
+    const existingSentenceScore = existing?.sentenceScore ?? 0;
+    const existingParagraphScore = existing?.paragraphScore ?? 0;
+    const bestScore =
+      area === 'sentence'
+        ? Math.max(existingSentenceScore, attemptScore)
+        : Math.max(existingParagraphScore, attemptScore);
+    const sentenceScore = area === 'sentence' ? bestScore : existingSentenceScore;
+    const paragraphScore = area === 'paragraph' ? bestScore : existingParagraphScore;
 
-    const newLevel = this.applyMasteryGate(currentLevel, { guessScore, sentenceScore, paragraphScore });
+    const newLevel = this.applyMasteryGate(currentLevel, { hasGuessedCorrectly, sentenceScore, paragraphScore });
 
     const now = new Date();
-    const areaUpdate =
-      area === 'sentence' ? { sentenceScore: score } : { paragraphScore: score };
+    const areaUpdate = area === 'sentence' ? { sentenceScore } : { paragraphScore };
 
     await db.mastery.upsert({
       where: { userId_wordId: { userId, wordId } },
@@ -315,7 +350,7 @@ export class MasteryService {
         timesPresented: existing?.timesPresented ?? 0,
         timesCorrect: existing?.timesCorrect ?? 0,
         timesIncorrect: existing?.timesIncorrect ?? 0,
-        guessScore,
+        guessScore: existing?.guessScore ?? 0,
         sentenceScore,
         paragraphScore,
         lastReviewedAt: now,
@@ -337,7 +372,7 @@ export class MasteryService {
       await this.achievements.checkDiscoveryAndMastery(userId, masteredWordsCount, db);
     }
 
-    return { score, level: newLevel, justMastered };
+    return { attemptScore, bestScore, level: newLevel, justMastered };
   }
 
   /**
@@ -447,30 +482,36 @@ export class MasteryService {
   }
 
   /**
-   * The single MASTERED gate (Correction & Completion Spec §2): promotes
-   * to MASTERED only when every one of the three skill areas is at or
-   * above skillAreaMasteryThresholdPercent — otherwise returns
-   * `fallbackLevel` unchanged. Deliberately one-directional (only ever
-   * upgrades to MASTERED, never downgrades away from it) — demotion off
-   * MASTERED is handled separately, by a guess miss's ordinary
-   * one-rung demote().
+   * The single MASTERED gate (Correction & Completion Spec §2, amended):
+   * promotes to MASTERED only when the guess dimension has EVER been
+   * passed (`hasGuessedCorrectly` — a one-time pass, not a threshold)
+   * AND both sentenceScore and paragraphScore are at or above
+   * skillAreaMasteryThresholdPercent — otherwise returns `fallbackLevel`
+   * unchanged. Deliberately one-directional (only ever upgrades to
+   * MASTERED, never downgrades away from it): once a word clears this
+   * gate it stays MASTERED for good — see recordAnswer, which no longer
+   * demotes a MASTERED word on a later guess miss either.
    */
-  private applyMasteryGate(fallbackLevel: MasteryLevel, scores: SkillAreaScores): MasteryLevel {
+  private applyMasteryGate(fallbackLevel: MasteryLevel, inputs: MasteryGateInputs): MasteryLevel {
     const { skillAreaMasteryThresholdPercent } = gameplayRules.mastery;
-    const allAreasClear = [scores.guessScore, scores.sentenceScore, scores.paragraphScore].every(
-      (score) => score >= skillAreaMasteryThresholdPercent,
-    );
+    const allAreasClear =
+      inputs.hasGuessedCorrectly &&
+      inputs.sentenceScore >= skillAreaMasteryThresholdPercent &&
+      inputs.paragraphScore >= skillAreaMasteryThresholdPercent;
     return allAreasClear ? 'MASTERED' : fallbackLevel;
   }
 
   /**
-   * guessScore (one of the five MASTERED-gate areas) — a recency-weighted
-   * accuracy estimate for this word's Guess stage specifically. An EMA
-   * rather than a flat lifetime average so a player who struggled with a
-   * word long ago but has since gotten it right repeatedly isn't held
-   * back by history; response-speed/hint-dependency are tracked
-   * cross-word on LearningProfile instead of folded in here, so this
-   * stays a clean, single-signal per-word score.
+   * guessScore — a recency-weighted accuracy estimate for this word's
+   * Guess stage, kept purely for display/analytics now (Skill Radar,
+   * Passport, Practice's read-only Guess line). It no longer gates
+   * MASTERED (see applyMasteryGate) — guess mastery is a one-time pass,
+   * since re-guessing a word already met is trivial rather than a real
+   * test. An EMA rather than a flat lifetime average so a player who
+   * struggled with a word long ago but has since gotten it right
+   * repeatedly isn't held back by history; response-speed/hint-dependency
+   * are tracked cross-word on LearningProfile instead of folded in here,
+   * so this stays a clean, single-signal per-word score.
    */
   private computeGuessScore(currentGuessScore: number, isCorrect: boolean): number {
     const target = isCorrect ? 100 : 0;
@@ -478,6 +519,44 @@ export class MasteryService {
     return Math.round(
       this.clamp(currentGuessScore + (target - currentGuessScore) * smoothing, 0, 100),
     );
+  }
+
+  /**
+   * Re-derives MASTERED purely from what's already stored on the row —
+   * no new evidence comes in here, unlike recordAnswer/
+   * evaluateWordCycleCompletion/recordSkillAreaPractice. Exists for the
+   * one-time backfill after the Sept 2026 gate change (Correction &
+   * Completion Spec amendment: guess went from a guessScore threshold to
+   * a one-time pass; sentence/paragraph went from overwrite to a
+   * high-water mark) — a word sitting on data that already satisfies the
+   * NEW gate, but was evaluated under the OLD one, would otherwise sit
+   * un-promoted until its next live interaction. See
+   * scripts/backfill-mastery-gate.ts, the only caller. Promotion-only,
+   * same as applyMasteryGate itself — can never demote anything, and is
+   * a no-op on a word that's already MASTERED or doesn't yet qualify.
+   */
+  async recheckGate(userId: string, wordId: string, db: Db = this.prisma): Promise<{ justMastered: boolean }> {
+    const existing = await db.mastery.findUnique({ where: { userId_wordId: { userId, wordId } } });
+    if (!existing || existing.currentLevel === 'MASTERED') return { justMastered: false };
+
+    const hasGuessedCorrectly = existing.timesCorrect > 0;
+    const newLevel = this.applyMasteryGate(existing.currentLevel as MasteryLevel, {
+      hasGuessedCorrectly,
+      sentenceScore: existing.sentenceScore,
+      paragraphScore: existing.paragraphScore,
+    });
+    if (newLevel !== 'MASTERED') return { justMastered: false };
+
+    const now = new Date();
+    await db.mastery.update({
+      where: { userId_wordId: { userId, wordId } },
+      data: { currentLevel: 'MASTERED', masteredAt: now },
+    });
+
+    const masteredWordsCount = await this.onWordMastered(userId, wordId, db);
+    await this.achievements.checkDiscoveryAndMastery(userId, masteredWordsCount, db);
+
+    return { justMastered: true };
   }
 
   /**

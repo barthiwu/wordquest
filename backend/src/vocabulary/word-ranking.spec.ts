@@ -30,6 +30,7 @@ function mastery(overrides: Partial<MasteryForRanking> = {}): MasteryForRanking 
 }
 
 const baseCtx = {
+  expectedGlobalExposure: 0,
   currentDifficulty: 'BEGINNER' as const,
   estimatedCefrLevel: null,
   masteryByWordId: new Map(),
@@ -295,5 +296,66 @@ describe('rankCandidatesForSelection', () => {
 
     const ranked = rankCandidatesForSelection([notDue, due], ctx, now);
     expect(ranked[0].id).toBe('due');
+  });
+});
+
+
+describe('global fairness (10,000-Word Adaptive Distribution spec §15)', () => {
+  it('scores a never-globally-exposed word higher than an over-exposed one, all else equal', () => {
+    const now = new Date();
+    const neverExposed = word({ id: 'a', globalExposureCount: 0 });
+    const overExposed = word({ id: 'b', globalExposureCount: 50 });
+    const ctx = { ...baseCtx, expectedGlobalExposure: 3 };
+
+    expect(scoreWordForSelection(neverExposed, ctx, now)).toBeGreaterThan(
+      scoreWordForSelection(overExposed, ctx, now),
+    );
+  });
+
+  it('treats every word as equally (and maximally) under-exposed when the corpus has no exposure data yet', () => {
+    const now = new Date();
+    const a = word({ id: 'a', globalExposureCount: 0 });
+    const b = word({ id: 'b', globalExposureCount: 0 });
+    const ctx = { ...baseCtx, expectedGlobalExposure: 0 };
+
+    expect(scoreWordForSelection(a, ctx, now)).toBe(scoreWordForSelection(b, ctx, now));
+  });
+
+  it('treats an undefined globalExposureCount the same as zero (never exposed) -- the word() factory below leaves it unset by default', () => {
+    const now = new Date();
+    const noFieldAtAll = word({ id: 'a' });
+    const explicitZero = word({ id: 'b', globalExposureCount: 0 });
+    const ctx = { ...baseCtx, expectedGlobalExposure: 3 };
+
+    expect(scoreWordForSelection(noFieldAtAll, ctx, now)).toBe(
+      scoreWordForSelection(explicitZero, ctx, now),
+    );
+  });
+
+  it('never lets global fairness overrule a word actually due for review', () => {
+    // The spec is explicit that layers work together, not compete: an
+    // over-exposed word that's genuinely due for THIS player should still
+    // usually win over a globally-neglected word this player has never
+    // seen, because reviewDueWeight (3) plus forgettingRiskWeight (up to
+    // 2) together outweigh globalPriorityWeight (2) alone.
+    const now = new Date('2026-06-10T00:00:00Z');
+    const dueButOverExposed = word({ id: 'a', globalExposureCount: 50 });
+    const neverSeenByAnyone = word({ id: 'b', globalExposureCount: 0 });
+    const ctx = {
+      ...baseCtx,
+      expectedGlobalExposure: 3,
+      masteryByWordId: new Map([
+        [
+          'a',
+          mastery({
+            lastReviewedAt: new Date('2026-06-01'),
+            nextReviewDueAt: new Date('2026-06-05'),
+          }),
+        ],
+      ]),
+    };
+
+    const ranked = rankCandidatesForSelection([neverSeenByAnyone, dueButOverExposed], ctx, now);
+    expect(ranked[0].id).toBe('a');
   });
 });

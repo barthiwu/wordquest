@@ -2,6 +2,7 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { AppConfigService } from '../config/config.service';
 import { stripJsonCodeFence } from '../common/ai-json';
+import { nativeLanguageInstruction } from '../common/language-names';
 
 export interface SentenceScores {
   grammar: number;
@@ -50,18 +51,20 @@ export class SentenceEvaluationService {
     definition: string,
     partOfSpeech: string,
     sentence: string,
+    /** The player's native/comprehension language (User.nativeLanguage) -- see nativeLanguageInstruction. Null/undefined/'en' all mean "write feedback in English, nothing to bridge." */
+    nativeLanguage?: string | null,
   ): Promise<SentenceEvaluation> {
     const client = this.getClient();
 
     const response = await client.messages.create({
       model: this.config.aiModel,
-      // Bumped preventively alongside the same fix for Master Challenge
-      // and Paragraph: this schema carries the same shape of risk (5
-      // scored dimensions, confidence, plus an optional betterVersion
-      // rewrite) at the same 700 budget that just proved too tight for
-      // Master Challenge's structurally similar response.
-      max_tokens: 1000,
-      system: this.buildSystemPrompt(),
+      // 1000 was still too tight in practice -- a real request truncated
+      // mid-JSON at that budget (see the stop_reason check below). Paragraph's
+      // schema is heavier (a full suggestedRevision paragraph, not just one
+      // rewritten sentence) and needed 1300, so 1500 here leaves real headroom
+      // rather than inching up by another few hundred and risking a repeat.
+      max_tokens: 1500,
+      system: this.buildSystemPrompt(nativeLanguage),
       messages: [
         { role: 'user', content: this.buildPrompt(targetWord, definition, partOfSpeech, sentence) },
       ],
@@ -77,7 +80,7 @@ export class SentenceEvaluationService {
     return this.parseResponse(response);
   }
 
-  private buildSystemPrompt(): string {
+  private buildSystemPrompt(nativeLanguage?: string | null): string {
     return `You are WordQuest's Sentence stage evaluator. A learner has written one sentence using a target vocabulary word. Score it on exactly five independent dimensions, each 0-100:
 
 - grammar: is the sentence grammatically correct?
@@ -93,7 +96,7 @@ Feedback follows this structure: what went well, what needs improvement, an opti
 Also report your own confidence (0-1) in this evaluation — lower it for genuinely ambiguous or borderline cases, not out of general caution.
 
 Respond with ONLY a JSON object, no other text, in this exact shape:
-{"scores": {"grammar": 0-100, "vocabulary": 0-100, "context": 0-100, "naturalness": 0-100, "clarity": 0-100}, "confidence": 0-1, "whatWentWell": "...", "whatNeedsImprovement": "...", "betterVersion": "..." or null, "nextAction": "..."}`;
+{"scores": {"grammar": 0-100, "vocabulary": 0-100, "context": 0-100, "naturalness": 0-100, "clarity": 0-100}, "confidence": 0-1, "whatWentWell": "...", "whatNeedsImprovement": "...", "betterVersion": "..." or null, "nextAction": "..."}${nativeLanguageInstruction(nativeLanguage)}`;
   }
 
   private buildPrompt(

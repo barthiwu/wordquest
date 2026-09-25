@@ -23,6 +23,10 @@ const CATEGORY_BY_TYPE: Record<NotificationType, PreferenceCategory> = {
   BOSS_BATTLE_REMINDER: 'competitionEnabled',
   BOSS_BATTLE_RESULT: 'competitionEnabled',
   LEADERBOARD_UPDATE: 'competitionEnabled',
+  // A "go play today's quest" nudge, same as the quest-window reminders
+  // above -- not a spaced-repetition/learning nudge (learningRemindersEnabled)
+  // or a congratulatory progress push (progressEnabled).
+  STREAK_AT_RISK: 'dailyQuestsEnabled',
 };
 
 const DEFAULT_PREFERENCE = {

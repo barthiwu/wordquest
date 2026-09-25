@@ -26,7 +26,7 @@ export interface QuestCardView {
   sourceEventId: string;
   title: string;
   category: string | null;
-  playerDisplayNameSnapshot: string;
+  playerUsernameSnapshot: string;
   artwork: string | null;
   rarity: QuestCardRarity;
   journeyStageKey: string | null;
@@ -68,7 +68,7 @@ export class QuestCardService {
   ): Promise<void> {
     const user = await db.user.findUniqueOrThrow({
       where: { id: userId },
-      select: { displayName: true },
+      select: { username: true },
     });
     try {
       await db.questCard.create({
@@ -78,9 +78,11 @@ export class QuestCardService {
           sourceEventId,
           title,
           category,
-          // Snapshotted now, not live-joined later — a display-name
-          // change after this card is earned must not rewrite its history.
-          playerDisplayNameSnapshot: user.displayName,
+          // Snapshotted now, not live-joined later — a username change
+          // after this card is earned must not rewrite its history. The
+          // public username, not the real displayName: other players see
+          // this card (Boss Battle results, showcases).
+          playerUsernameSnapshot: user.username,
           ...(opts.artwork ? { artwork: opts.artwork } : {}),
           ...(opts.rarity ? { rarity: opts.rarity } : {}),
           ...(opts.journeyStageKey ? { journeyStageKey: opts.journeyStageKey } : {}),

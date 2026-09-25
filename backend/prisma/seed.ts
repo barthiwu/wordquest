@@ -42,21 +42,41 @@ const CLANS = [
  * (prisma/lib/csv-word-import.ts).
  *
  * As of the V21 Vocabulary Vault Final Production Pass,
- * prisma/vocabulary-production.csv is the one authoritative word list:
- * 2000 words, IDs 1-2000 with no gaps or duplicates, in the Vocabulary
- * Vault V2 header shape (ID, Word, Definition, Part of Speech, Example
- * Sentence, Synonym 1, Synonym 2, CEFR Level, Difficulty Score,
- * Category, Frequency Level, Word Family, Usage Note). It supersedes
- * the five files this used to be split across (words-template.csv,
- * words-51-500.csv, and vocabulary-vault-v2-batch1/2/3.csv — all
- * deleted; see prisma/README.md for the merge history).
+ * prisma/vocabulary-production.csv is the one authoritative word list.
+ * It shipped as 2000 words (IDs 1-2000, no gaps or duplicates) and was
+ * expanded to 10,000 (IDs 1-10000, still no gaps or duplicates — the
+ * added 8001-10000 range is WordNet-sourced, upserted by word so
+ * re-running the seed never creates a duplicate row for the original
+ * 2000), in the Vocabulary Vault V2 header shape (ID, Word, Definition,
+ * Part of Speech, Example Sentence, Synonym 1, Synonym 2, CEFR Level,
+ * Difficulty Score, Category, Frequency Level, Word Family, Usage
+ * Note, Related Words). It supersedes the five files this used to be
+ * split across (words-template.csv, words-51-500.csv, and
+ * vocabulary-vault-v2-batch1/2/3.csv — all deleted; see
+ * prisma/README.md for the merge history).
  *
- * Every one of the 2000 words carries cefrLevel, category,
- * difficultyScore, frequencyLevel, and at least one synonym (Synonym 1
- * is now a hard-required column — see src/content/word-import.ts) — a
- * fresh `npx prisma db seed` against an empty database gets the same
+ * Every word carries cefrLevel, category, difficultyScore,
+ * frequencyLevel, and at least one synonym (Synonym 1 is now a
+ * hard-required column — see src/content/word-import.ts) — a fresh
+ * `npx prisma db seed` against an empty database gets the same
  * fully-enriched vocabulary the live DB already has, instead of
  * regressing Adaptive AI word selection with NULL metadata.
+ *
+ * Related Words column (added 2026-09-24): populates Word.relatedWords,
+ * which QuestsService.requestHint() reads from -- before this the
+ * column didn't exist in any shipped CSV, so every word's relatedWords
+ * came back empty and "Hint" was silently non-functional for the whole
+ * 10,000-word list. Generated programmatically from WordNet (hypernyms,
+ * coordinate/sibling terms, meronyms, entailments, and
+ * derivational/pertainym relations depending on part of speech),
+ * filtered to exclude the word's own synonyms/word-family forms and
+ * WordNet-recorded antonyms, and preferring candidates that are
+ * themselves already in this vocabulary list. ~96% coverage; the
+ * remainder is mostly closed-class words (discourse adverbs like
+ * "anymore"/"besides", participial adjectives like "accepting") that
+ * don't have a meaningful "related word" in the first place -- Hint
+ * stays gracefully unavailable for those, same as before. Automated,
+ * not hand-edited -- a manual editorial pass would still improve on it.
  */
 const WORD_CSV_FILES = ['vocabulary-production.csv'];
 

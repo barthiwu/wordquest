@@ -2,6 +2,7 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { AppConfigService } from '../config/config.service';
 import { stripJsonCodeFence } from '../common/ai-json';
+import { nativeLanguageInstruction } from '../common/language-names';
 
 export interface ParagraphScores {
   grammar: number;
@@ -57,6 +58,8 @@ export class ParagraphEvaluationService {
     definition: string,
     partOfSpeech: string,
     paragraph: string,
+    /** The player's native/comprehension language (User.nativeLanguage) -- see nativeLanguageInstruction. Null/undefined/'en' all mean "write feedback in English, nothing to bridge." */
+    nativeLanguage?: string | null,
   ): Promise<ParagraphEvaluation> {
     const client = this.getClient();
 
@@ -65,13 +68,16 @@ export class ParagraphEvaluationService {
       // Paragraph is the only evaluated stage whose JSON schema includes a
       // full suggestedRevision (a rewritten 30-100 word paragraph) on top
       // of two feedback fields -- meaningfully heavier output than
-      // sentence/master-challenge's schemas, which get by on 700. 800 was
-      // cutting it close enough that verbose model output would get
-      // truncated mid-JSON and fail to parse (see the stop_reason check
-      // below, which now makes that failure mode diagnosable instead of
-      // looking like generic malformed output).
-      max_tokens: 1300,
-      system: this.buildSystemPrompt(),
+      // sentence/master-challenge's schemas. 800, then 1300, both still
+      // truncated mid-JSON in real use (see the stop_reason check below,
+      // which makes that failure mode diagnosable instead of looking like
+      // generic malformed output) -- and Sentence's own lighter schema
+      // already needed 1500 to stop truncating, so 1300 here was never
+      // going to hold. 2000 leaves real headroom above a heavier schema
+      // than either of those, rather than inching up by another few
+      // hundred and risking a third repeat.
+      max_tokens: 2000,
+      system: this.buildSystemPrompt(nativeLanguage),
       messages: [
         {
           role: 'user',
@@ -90,7 +96,7 @@ export class ParagraphEvaluationService {
     return this.parseResponse(response);
   }
 
-  private buildSystemPrompt(): string {
+  private buildSystemPrompt(nativeLanguage?: string | null): string {
     return `You are WordQuest's Paragraph stage evaluator. A learner has written a 30-100 word paragraph using a target vocabulary word. Score it on exactly five independent dimensions, each 0-100:
 
 - grammar: is the paragraph grammatically correct throughout?
@@ -108,7 +114,7 @@ Feedback follows this structure: what went well, what needs improvement, an opti
 Also report your own confidence (0-1) in this evaluation.
 
 Respond with ONLY a JSON object, no other text, in this exact shape:
-{"scores": {"grammar": 0-100, "vocabulary": 0-100, "structure": 0-100, "flow": 0-100, "context": 0-100}, "confidence": 0-1, "estimatedProficiency": "A1"|"A2"|"B1"|"B2"|"C1"|"C2", "whatWentWell": "...", "whatNeedsImprovement": "...", "suggestedRevision": "..." or null, "nextAction": "..."}`;
+{"scores": {"grammar": 0-100, "vocabulary": 0-100, "structure": 0-100, "flow": 0-100, "context": 0-100}, "confidence": 0-1, "estimatedProficiency": "A1"|"A2"|"B1"|"B2"|"C1"|"C2", "whatWentWell": "...", "whatNeedsImprovement": "...", "suggestedRevision": "..." or null, "nextAction": "..."}${nativeLanguageInstruction(nativeLanguage)}`;
   }
 
   private buildPrompt(

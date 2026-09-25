@@ -21,6 +21,7 @@ describe('AuthService', () => {
     emailVerifiedAt: null,
     failedLoginAttempts: 0,
     lockedUntil: null,
+    avatarKey: 'avatars/user-1/pic.jpg',
   };
 
   const usersMock = {
@@ -28,6 +29,9 @@ describe('AuthService', () => {
     findByEmail: jest.fn().mockResolvedValue(fakeUser),
     verifyPassword: jest.fn().mockResolvedValue(true),
     hashPassword: jest.fn().mockResolvedValue('new-hashed-password'),
+    // toPublicUser resolves avatarUrl through this -- null matches
+    // fakeUser having no avatarKey, same as any real avatar-less player.
+    resolveAvatarUrl: jest.fn().mockResolvedValue(null),
   };
 
   const prismaMock = {
@@ -203,6 +207,28 @@ describe('AuthService', () => {
     const result = await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' });
     expect(result.accessToken).toBe('signed.jwt.token');
     expect(result.refreshToken).toBe('signed.jwt.token');
+  });
+
+  it("login() resolves the returning player's existing avatar into the response (Sept 2026 -- Home's header showed only initials right after login because avatarUrl was missing here entirely)", async () => {
+    usersMock.resolveAvatarUrl.mockResolvedValueOnce('https://signed-avatar-url.example.com');
+
+    const result = await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' });
+
+    expect(usersMock.resolveAvatarUrl).toHaveBeenCalledWith(fakeUser.avatarKey);
+    expect(result.user.avatarUrl).toBe('https://signed-avatar-url.example.com');
+  });
+
+  it('register() returns a null avatarUrl for a brand-new player (nothing to resolve yet)', async () => {
+    usersMock.resolveAvatarUrl.mockResolvedValueOnce(null);
+
+    const result = await service.register({
+      email: 'brandnew@example.com',
+      password: 'Sup3rSecret',
+      displayName: 'Brand New',
+      dateOfBirth: '2000-01-01',
+    });
+
+    expect(result.user.avatarUrl).toBeNull();
   });
 
   it('login() still succeeds even when the fire-and-forget security-event log write fails (failure recovery)', async () => {

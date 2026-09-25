@@ -30,6 +30,9 @@ describe('AliService', () => {
     learningProfile: {
       findUnique: jest.fn(),
     },
+    user: {
+      findUnique: jest.fn(),
+    },
   };
 
   const configMock = {
@@ -43,6 +46,10 @@ describe('AliService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     configured = true;
+    // Most tests don't care about localization -- default to "no
+    // preference set" so they read the same as before this existed;
+    // the language-specific tests below override this per-call.
+    prismaMock.user.findUnique.mockResolvedValue({ nativeLanguage: null });
     const moduleRef = await Test.createTestingModule({
       providers: [
         AliService,
@@ -213,6 +220,71 @@ describe('AliService', () => {
     });
   });
 
+  describe('native-language localization', () => {
+    it('instructs the model to write in the player\'s native language when set and non-English', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'es' });
+      createMock.mockResolvedValueOnce(textResponse({ text: 'Buen trabajo!', recommendation: null }));
+
+      await service.react('u1', { type: 'LEVEL_UP', journeyStage: 0, context: { newLevel: 2 } });
+
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+        where: { id: 'u1' },
+        select: { nativeLanguage: true },
+      });
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).toContain('Spanish');
+      expect(call.system).toContain('code: "es"');
+      expect(call.system).toContain('never translate the content being learned');
+    });
+
+    it('omits the language instruction entirely when nativeLanguage is null', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: null });
+      createMock.mockResolvedValueOnce(textResponse({ text: 'Nice!', recommendation: null }));
+
+      await service.react('u1', { type: 'LEVEL_UP', journeyStage: 0, context: {} });
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).not.toContain('native/comprehension language');
+    });
+
+    it('omits the language instruction when nativeLanguage is English -- nothing to switch', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'en' });
+      createMock.mockResolvedValueOnce(textResponse({ text: 'Nice!', recommendation: null }));
+
+      await service.react('u1', { type: 'LEVEL_UP', journeyStage: 0, context: {} });
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).not.toContain('native/comprehension language');
+    });
+
+    it('falls back to the raw code for a language not in the known map', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'xx' });
+      createMock.mockResolvedValueOnce(textResponse({ text: 'Nice!', recommendation: null }));
+
+      await service.react('u1', { type: 'LEVEL_UP', journeyStage: 0, context: {} });
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).toContain('code: "xx"');
+    });
+
+    it('applies to on-demand Learning Assistant calls too (explainMistake), not just react()', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'fr' });
+      prismaMock.userProgression.findUnique.mockResolvedValueOnce({ journeyStage: 0, currentStreak: 0 });
+      prismaMock.learningProfile.findUnique.mockResolvedValueOnce({ weaknessAreas: [], currentDifficulty: 'BEGINNER' });
+      createMock.mockResolvedValueOnce(textResponse({ text: 'Presque!', recommendation: 'Try again.' }));
+
+      await service.explainMistake('u1', {
+        word: 'resilient',
+        playerAnswer: 'resiliant',
+        correctAnswer: 'resilient',
+        stage: 'GUESS',
+      });
+
+      const call = createMock.mock.calls[0][0];
+      expect(call.system).toContain('French');
+    });
+  });
+
   describe('on-demand Learning Assistant / AI Tutor capabilities', () => {
     beforeEach(() => {
       prismaMock.userProgression.findUnique.mockResolvedValue({
@@ -300,18 +372,24 @@ describe('AliService', () => {
 
   describe('getMyMessages', () => {
     it("returns the player's own messages, most recent first", async () => {
+      const createdAt = new Date('2026-09-20T12:00:00Z');
       prismaMock.aliMessage.findMany.mockResolvedValueOnce([
         {
           text: 'Welcome!',
           recommendation: null,
           tone: 'Warm, encouraging, lightly playful',
           promptVersion: 'v2',
+          eventType: 'STREAK_MILESTONE',
+          createdAt,
         },
       ]);
 
       const result = await service.getMyMessages('u1');
 
       expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(
+        expect.objectContaining({ eventType: 'STREAK_MILESTONE', createdAt: createdAt.toISOString() }),
+      );
       expect(prismaMock.aliMessage.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: { userId: 'u1' }, orderBy: { createdAt: 'desc' } }),
       );

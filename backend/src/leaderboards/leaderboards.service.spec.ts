@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 function progressionRow(overrides: {
   userId: string;
-  displayName: string;
+  username: string;
   totalXp: number;
   level?: number;
   clanName?: string | null;
@@ -16,7 +16,7 @@ function progressionRow(overrides: {
     level: overrides.level ?? 1,
     user: {
       id: overrides.userId,
-      displayName: overrides.displayName,
+      username: overrides.username,
       clan: overrides.clanName ? { name: overrides.clanName } : null,
     },
   };
@@ -47,25 +47,25 @@ describe('LeaderboardsService', () => {
   describe('getGlobal', () => {
     it('assigns ranks in descending totalXp order, starting at 1', async () => {
       prismaMock.userProgression.findMany.mockResolvedValueOnce([
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 900 }),
-        progressionRow({ userId: 'u2', displayName: 'Bo', totalXp: 500 }),
-        progressionRow({ userId: 'u3', displayName: 'Cy', totalXp: 100 }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900 }),
+        progressionRow({ userId: 'u2', username: 'Bo', totalXp: 500 }),
+        progressionRow({ userId: 'u3', username: 'Cy', totalXp: 100 }),
       ]);
       prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 900 }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900 }),
       );
       prismaMock.userProgression.count.mockResolvedValueOnce(0);
 
       const result = await service.getGlobal('u1');
 
       expect(result.entries.map((e) => e.rank)).toEqual([1, 2, 3]);
-      expect(result.entries[0]).toMatchObject({ userId: 'u1', displayName: 'Ada', totalXp: 900 });
+      expect(result.entries[0]).toMatchObject({ userId: 'u1', username: 'Ada', totalXp: 900 });
     });
 
     it('orders the Prisma query by totalXp desc with a stable secondary key', async () => {
       prismaMock.userProgression.findMany.mockResolvedValueOnce([]);
       prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 0 }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 0 }),
       );
       prismaMock.userProgression.count.mockResolvedValueOnce(0);
 
@@ -79,7 +79,7 @@ describe('LeaderboardsService', () => {
     it("computes the viewer's rank as 1 + the count of players with strictly more XP", async () => {
       prismaMock.userProgression.findMany.mockResolvedValueOnce([]);
       prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
-        progressionRow({ userId: 'u9', displayName: 'Viewer', totalXp: 250 }),
+        progressionRow({ userId: 'u9', username: 'Viewer', totalXp: 250 }),
       );
       prismaMock.userProgression.count.mockResolvedValueOnce(41);
 
@@ -93,10 +93,10 @@ describe('LeaderboardsService', () => {
 
     it('ranks the sole leader as #1 with nobody ahead', async () => {
       prismaMock.userProgression.findMany.mockResolvedValueOnce([
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 900 }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900 }),
       ]);
       prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 900 }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900 }),
       );
       prismaMock.userProgression.count.mockResolvedValueOnce(0);
 
@@ -108,7 +108,7 @@ describe('LeaderboardsService', () => {
     it('defaults to 50 and clamps an out-of-range limit down to 100', async () => {
       prismaMock.userProgression.findMany.mockResolvedValueOnce([]);
       prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 0 }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 0 }),
       );
       prismaMock.userProgression.count.mockResolvedValueOnce(0);
 
@@ -120,7 +120,7 @@ describe('LeaderboardsService', () => {
 
       prismaMock.userProgression.findMany.mockResolvedValueOnce([]);
       prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 0 }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 0 }),
       );
       prismaMock.userProgression.count.mockResolvedValueOnce(0);
 
@@ -134,7 +134,7 @@ describe('LeaderboardsService', () => {
     it('falls back to the default limit for a non-positive or non-finite value', async () => {
       prismaMock.userProgression.findMany.mockResolvedValueOnce([]);
       prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 0 }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 0 }),
       );
       prismaMock.userProgression.count.mockResolvedValueOnce(0);
 
@@ -147,11 +147,11 @@ describe('LeaderboardsService', () => {
 
     it('surfaces the clan name on an entry, and null when the player has no clan', async () => {
       prismaMock.userProgression.findMany.mockResolvedValueOnce([
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 900, clanName: 'Ember Vale' }),
-        progressionRow({ userId: 'u2', displayName: 'Bo', totalXp: 500, clanName: null }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900, clanName: 'Ember Vale' }),
+        progressionRow({ userId: 'u2', username: 'Bo', totalXp: 500, clanName: null }),
       ]);
       prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 900, clanName: 'Ember Vale' }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900, clanName: 'Ember Vale' }),
       );
       prismaMock.userProgression.count.mockResolvedValueOnce(0);
 
@@ -173,8 +173,8 @@ describe('LeaderboardsService', () => {
     it("scopes the query to the viewer's clan and ranks only clan-mates", async () => {
       prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ clanId: 'clan-1' });
       prismaMock.userProgression.findMany.mockResolvedValueOnce([
-        progressionRow({ userId: 'u1', displayName: 'Ada', totalXp: 900, clanName: 'Ember Vale' }),
-        progressionRow({ userId: 'u2', displayName: 'Bo', totalXp: 300, clanName: 'Ember Vale' }),
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900, clanName: 'Ember Vale' }),
+        progressionRow({ userId: 'u2', username: 'Bo', totalXp: 300, clanName: 'Ember Vale' }),
       ]);
 
       const result = await service.getClan('u2');

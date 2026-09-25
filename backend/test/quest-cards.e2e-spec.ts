@@ -59,7 +59,7 @@ describe('Quest Cards (e2e)', () => {
             sourceEventId: achievementId,
             title: `Card ${i}`,
             category: 'DISCOVERY',
-            playerDisplayNameSnapshot: 'Quest Cards E2E',
+            playerUsernameSnapshot: 'Quest Cards E2E',
           },
         }),
       ),
@@ -73,7 +73,7 @@ describe('Quest Cards (e2e)', () => {
         sourceEventId: 'first_step',
         title: "Other's Card",
         category: 'DISCOVERY',
-        playerDisplayNameSnapshot: 'Other Player',
+        playerUsernameSnapshot: 'Other Player',
       },
     });
     otherCardId = otherCard.id;

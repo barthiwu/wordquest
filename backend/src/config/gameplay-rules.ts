@@ -8,6 +8,8 @@
  * `version` exists so a future scoring change can be attributed on
  * historical XpTransaction/ChallengeAttempt rows if it ever matters.
  */
+import type { AgeRange } from '../common/age';
+
 export const GAMEPLAY_RULES_VERSION = 1;
 
 export const gameplayRules = {
@@ -46,6 +48,21 @@ export const gameplayRules = {
     dailySubmissionCap: 6,
     xpPerApproval: 100,
     glyphsPerApproval: 15,
+    // Photo evidence storage (Barth, Sept 2026): unlike an avatar, which
+    // is meant to persist indefinitely, a Word in the Wild photo is only
+    // ever needed for Claude's one-time assessment -- once that's done
+    // (or even if it never runs), there's no reason to keep the raw
+    // image around. photoKey is cleared photoRetentionHours after
+    // submission (WordInTheWildService.cleanupExpiredPhotos, same @Cron
+    // pattern as AuthService.cleanupExpiredTokens); assessmentStatus/
+    // assessmentReasoning/xpAwarded and the transcribed evidenceText all
+    // stay untouched, so the submission's history and mastery/XP effect
+    // are unaffected -- only the photo bytes go away. Mirrored at the R2
+    // level too (see storage/README or the bucket's lifecycle rule on
+    // the "word-in-the-wild/" prefix) as a second, storage-side
+    // guarantee that doesn't depend on this cron job ever running.
+    photoRetentionHours: 24,
+    photoCleanupCronExpression: '0 * * * *', // hourly — cheap query, and keeps the "24h" promise reasonably tight
   },
   mastery: {
     // Consecutive-correct-streak thresholds that promote a word up the
@@ -53,19 +70,24 @@ export const gameplayRules = {
     // Vocabulary Engine spec §16). A miss demotes by exactly one rung and
     // resets the streak — never straight back to NEW — per spec §15's
     // instruction not to swing difficulty too aggressively off a single
-    // wrong answer.
+    // wrong answer. That demotion never reaches below MASTERED, though:
+    // once a word clears the MASTERED gate it's permanent (see
+    // MasteryService.applyMasteryGate and recordAnswer).
     //
     // IMPORTANT (V1 Remaining Systems Spec §4 — "the Mastery Engine
-    // becomes the single source of truth"): streakForMastered is NOT a
-    // path to the MASTERED level anymore. A streak alone — Boss Battle,
-    // Word in the Wild, or ordinary Guess-stage answers — can only ever
-    // promote a word up to STRONG. MASTERED requires every one of the
-    // three skill areas below (guess/sentence/paragraph — Speaking/
-    // Pronunciation were removed from V1 entirely, Correction &
-    // Completion Spec §1-2) independently at or above
-    // skillAreaMasteryThresholdPercent — see
-    // MasteryService.evaluateWordCycleCompletion, the single place that
-    // decides MASTERED.
+    // becomes the single source of truth", amended per the player-request
+    // that follows): streakForMastered is NOT a path to the MASTERED
+    // level. A streak alone — Boss Battle, Word in the Wild, or ordinary
+    // Guess-stage answers — can only ever promote a word up to STRONG.
+    // MASTERED requires: (1) Guess — a ONE-TIME pass, not a threshold on
+    // guessScore; the first correct guess ever satisfies it for good,
+    // since re-guessing a word already met is trivial rather than a real
+    // test, and (2)+(3) sentenceScore and paragraphScore, independently,
+    // each at or above skillAreaMasteryThresholdPercent — and each
+    // stored as a high-water mark, never overwritten by a weaker later
+    // attempt. See MasteryService.applyMasteryGate, the single place
+    // that decides MASTERED, called from recordAnswer,
+    // evaluateWordCycleCompletion, and recordSkillAreaPractice alike.
     streakForRecognizing: 1,
     streakForRecalling: 2,
     streakForStrong: 4,
@@ -75,9 +97,9 @@ export const gameplayRules = {
     scoreDeltaCorrect: 15,
     scoreDeltaIncorrect: -10,
     // V1 Remaining Systems Spec §4: "mastery must ONLY occur when EVERY
-    // required skill area reaches 75% or higher." Applied independently
-    // to each of guessScore/sentenceScore/paragraphScore on Mastery —
-    // not a weighted average, not "most of them," every single one.
+    // required skill area reaches 75% or higher." Applies to
+    // sentenceScore and paragraphScore only now — Guess is a one-time
+    // pass rather than a threshold (see the comment above).
     skillAreaMasteryThresholdPercent: 75,
   },
   quest: {
@@ -257,6 +279,21 @@ export const gameplayRules = {
   learningProfile: {
     skillAreaWeaknessPercent: 60,
     hintDependencyWeaknessRate: 0.5,
+    // A friendlier STARTING point for currentDifficulty, seeded at
+    // registration from the player's age range (common/age.ts's
+    // getAgeRange) — not a replacement for Initial Calibration above,
+    // which still runs over the first 3 Daily Quest words and can move
+    // a player up or down from here. Deliberately conservative: nobody
+    // starts at ADVANCED purely from age, that must be earned.
+    // UNDER_13 is unreachable through normal registration (the COPPA
+    // gate in AuthService.register rejects it outright) — listed only
+    // so this map is total over every AgeRange.
+    startingDifficultyByAgeRange: {
+      UNDER_13: 'BEGINNER',
+      TEENS_13_18: 'BEGINNER',
+      YOUNG_ADULT_19_24: 'INTERMEDIATE',
+      ADULT_25_PLUS: 'INTERMEDIATE',
+    } as Record<AgeRange, 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'>,
   },
   adaptiveSelection: {
     reviewDueWeight: 3, // words at/past nextReviewDueAt rank highest — spaced repetition is the primary driver
@@ -293,6 +330,41 @@ export const gameplayRules = {
       RECALLING: 4,
       STRONG: 9,
       MASTERED: 21,
+    },
+    // 10,000-Word Adaptive Distribution spec §15 "global fairness rule":
+    // how strongly a word's own share of the corpus's total global
+    // exposure (see Word.globalExposureCount) pulls it up or down in the
+    // ranking, independent of anything about the requesting player. Kept
+    // in the same additive scoring model as every weight above it rather
+    // than switching to the spec's literal multiplicative formula — this
+    // is the smaller, lower-risk change that still makes an
+    // under-exposed word rank higher and an over-exposed one rank lower,
+    // on top of (never instead of) the existing player-specific signals.
+    globalPriorityWeight: 2,
+    // §4: how many global exposures a word is expected to have received
+    // once the corpus has been through one full distribution cycle —
+    // used only to give WordsService.getExposureAnalytics a human
+    // "how far along is the corpus" readout, not a hard cutoff.
+    targetGlobalExposuresPerWord: 3,
+    // §9 "minimum repeat protection": don't hand a player the same word
+    // again within this many days of when they last SAW it (Mastery.
+    // lastPresentedAt), even if the ranking would otherwise favor it --
+    // UNLESS it's actually due for spaced review (nextReviewDueAt),
+    // which is the one explicit exception the spec carves out.
+    minRepeatDays: 2,
+    // §7: the target mix of a daily word allocation. Recorded here as
+    // the configurable, documented target the spec asks for; not yet
+    // enforced as a hard per-bucket quota in WordsService.pickWordsForQuest
+    // -- the existing score-based ranking already pulls hard toward
+    // due/new words (reviewDueWeight) and away from over-seen ones
+    // (strongWordPenalty) without needing the pool partitioned into three
+    // separately-sampled buckets. Left here as the extension point: a
+    // future pass can stratify sampling by these percentages directly if
+    // the emergent mix ever needs a harder guarantee.
+    dailyWordComposition: {
+      newPercent: 50,
+      dueReviewPercent: 30,
+      reinforcementPercent: 20,
     },
   },
   /**
@@ -350,6 +422,18 @@ export const gameplayRules = {
     leaderboardCheckCooldownDays: 1,
     leaderboardTopRankThreshold: 10,
     leaderboardRankImprovementThreshold: 5,
+    // STREAK_AT_RISK: evening nudges for a player who hasn't done
+    // anything quest-worthy yet today (UserProgression.lastActiveOn
+    // isn't today -- the exact same check ProgressionService.
+    // recordDailyActivity uses to decide whether to extend the streak),
+    // checked against the player's own local hour at each of these three
+    // checkpoints. No cooldown-days gate the way the other triggers have
+    // one: these three are deliberately an escalating same-day sequence,
+    // not a "don't repeat within N days" nudge -- each checkpoint only
+    // ever fires once per day anyway, since it's gated on the player's
+    // local hour matching exactly and the scheduler itself only runs
+    // hourly.
+    streakAtRiskLocalHours: [18, 21, 23],
   },
 } as const;
 

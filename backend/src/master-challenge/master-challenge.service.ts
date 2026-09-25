@@ -95,12 +95,15 @@ export class MasterChallengeService {
       select: { wordIds: true },
     });
     const wordIds = completedAttempts.flatMap((a: { wordIds: string[] }) => a.wordIds);
-    const words = await this.prisma.word.findMany({
-      where: { id: { in: wordIds } },
-      select: { word: true, definition: true },
-    });
+    const [words, player] = await Promise.all([
+      this.prisma.word.findMany({
+        where: { id: { in: wordIds } },
+        select: { word: true, definition: true },
+      }),
+      this.prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
+    ]);
 
-    const evaluation = await this.evaluation.evaluate(words, paragraph);
+    const evaluation = await this.evaluation.evaluate(words, paragraph, player?.nativeLanguage);
 
     await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Claim first — the `record.status === 'COMPLETED'` check above ran

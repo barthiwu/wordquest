@@ -28,7 +28,7 @@ describe('QuestCardService', () => {
   });
 
   it('snapshots the current display name at creation time', async () => {
-    prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ displayName: 'Ada' });
+    prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ username: 'ada' });
 
     await service.createCard(
       'u1',
@@ -46,13 +46,13 @@ describe('QuestCardService', () => {
         sourceEventId: 'hamlet',
         title: 'Reached Hamlet',
         category: undefined,
-        playerDisplayNameSnapshot: 'Ada',
+        playerUsernameSnapshot: 'ada',
       },
     });
   });
 
   it('passes the category through for achievement-sourced cards', async () => {
-    prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ displayName: 'Bo' });
+    prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ username: 'bo' });
 
     await service.createCard(
       'u1',
@@ -69,7 +69,7 @@ describe('QuestCardService', () => {
   });
 
   it('includes rarity/artwork/journeyStageKey only when explicitly provided', async () => {
-    prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ displayName: 'Cy' });
+    prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ username: 'cy' });
 
     await service.createCard(
       'u1',
@@ -88,7 +88,7 @@ describe('QuestCardService', () => {
         sourceEventId: 'hamlet',
         title: 'Reached Hamlet',
         category: undefined,
-        playerDisplayNameSnapshot: 'Cy',
+        playerUsernameSnapshot: 'cy',
         rarity: 'RARE',
         journeyStageKey: 'hamlet',
       },
@@ -97,7 +97,7 @@ describe('QuestCardService', () => {
 
   describe('duplicate protection (Correction & Completion Spec §6)', () => {
     it('silently no-ops when the (userId, source, sourceEventId) unique constraint rejects a repeat create', async () => {
-      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ displayName: 'Ada' });
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ username: 'ada' });
       prismaMock.questCard.create.mockRejectedValueOnce({ code: 'P2002' });
 
       await expect(
@@ -113,7 +113,7 @@ describe('QuestCardService', () => {
     });
 
     it('re-throws any other error from the create call', async () => {
-      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ displayName: 'Ada' });
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ username: 'ada' });
       const dbError = new Error('connection lost');
       prismaMock.questCard.create.mockRejectedValueOnce(dbError);
 
