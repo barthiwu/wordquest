@@ -31,6 +31,11 @@ RUN npm ci
 
 FROM deps AS build
 WORKDIR /app
+# Alpine ships no OpenSSL runtime by default; Prisma's query engine
+# needs it present at generate-time to detect and fetch the correct
+# musl/OpenSSL engine binary variant (libssl.so.1.1 "No such file or
+# directory" otherwise).
+RUN apk add --no-cache openssl
 COPY prisma ./prisma
 RUN npx prisma generate
 COPY tsconfig.json tsconfig.build.json* nest-cli.json ./
@@ -45,6 +50,10 @@ RUN addgroup -S wordquest && adduser -S wordquest -G wordquest
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
+# Same OpenSSL requirement as the build stage above — this is the
+# image that actually runs, so the engine binary loaded here is the
+# one that matters at boot.
+RUN apk add --no-cache openssl
 COPY prisma ./prisma
 # Prisma's generated client is version/schema-specific — regenerate
 # against the production install rather than copying node_modules
