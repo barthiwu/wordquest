@@ -14,31 +14,15 @@ Store–sized app icon at `store-assets/android/play-store-icon-512.png`.
 Everything below needs your own accounts and one-time setup, same shape as
 the Railway section in `docs/DEPLOYMENT.md`.
 
-## Decision needed: bundle identifiers don't match
+## Bundle identifier: resolved, `com.wordquest.app` on both platforms
 
-`mobile/app.json` currently has:
-
-- iOS `bundleIdentifier`: `com.bartholomewiwuoha.wordquest`
-- Android `package`: `com.wordquest.app`
-
-These are independent per-platform and EAS doesn't require them to match,
-but once either one is submitted to a store it is effectively permanent —
-both Apple and Google treat the identifier as the app's permanent identity,
-with no supported way to change it later without losing reviews/install
-base or being treated as a brand-new app. Worth deciding before the first
-real submission rather than after:
-
-- **Option A** — `com.wordquest.app` on both (short, no personal name
-  baked in)
-- **Option B** — `com.bartholomewiwuoha.wordquest` on both (matches the
-  pattern Apple's own docs suggest, though nothing requires it)
-- **Option C** — leave as-is; mismatched identifiers are allowed, just
-  inconsistent
-
-If you want to change the Android side, edit `android.package` in
-`mobile/app.json` — it's free to change until you upload the first build
-to Play Console. I've left it alone since this is a naming/branding call,
-not a technical one.
+Decided 2026-09-25: `com.wordquest.app` everywhere — iOS `bundleIdentifier`
+and Android `package` in `mobile/app.json` both match now, along with the
+already-generated native iOS project (`mobile/ios/WordQuest/Info.plist` and
+`WordQuest.xcodeproj/project.pbxproj`'s `PRODUCT_BUNDLE_IDENTIFIER`, both
+updated to match rather than left to drift until a `prebuild --clean`).
+This is effectively permanent once submitted to either store, so this is
+now the identity both TestFlight and Play Console builds should use.
 
 ## What's already in place
 
