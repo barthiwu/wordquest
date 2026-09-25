@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing } from '@/constants/theme';
 import { useThemeColors, useThemeStore } from '@/state/themeStore';
 
@@ -21,6 +22,7 @@ const TAB_BAR_CLEARANCE = 72;
  * theme is live, even before every screen has been converted.
  */
 export function ThemeToggleButton() {
+  const { t } = useTranslation('common');
   const insets = useSafeAreaInsets();
   const mode = useThemeStore((s) => s.mode);
   const toggle = useThemeStore((s) => s.toggle);
@@ -39,7 +41,9 @@ export function ThemeToggleButton() {
     <Pressable
       onPress={toggle}
       accessibilityRole="button"
-      accessibilityLabel={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      accessibilityLabel={
+        mode === 'dark' ? t('themeToggleButton.switchToLight') : t('themeToggleButton.switchToDark')
+      }
       hitSlop={8}
       style={[
         styles.button,

@@ -9,7 +9,7 @@ import { ForgotPasswordScreen } from '@/features/auth/ForgotPasswordScreen';
 import { RecoverAccountScreen } from '@/features/auth/RecoverAccountScreen';
 import { VerifyEmailScreen } from '@/features/auth/VerifyEmailScreen';
 import { ResetPasswordScreen } from '@/features/auth/ResetPasswordScreen';
-import { OnboardingIdentityScreen } from '@/features/onboarding/OnboardingIdentityScreen';
+import { BiodataScreen } from '@/features/onboarding/BiodataScreen';
 import { OnboardingGoalScreen } from '@/features/onboarding/OnboardingGoalScreen';
 import { ClanSelectionScreen } from '@/features/clans/ClanSelectionScreen';
 import { MainTabNavigator, type MainTabParamList } from './MainTabNavigator';
@@ -65,7 +65,7 @@ export type RootStackParamList = {
   // navigation — the screens themselves handle a missing token.
   VerifyEmail: { token?: string } | undefined;
   ResetPassword: { token?: string } | undefined;
-  OnboardingIdentity: undefined;
+  Biodata: undefined;
   OnboardingGoal: undefined;
   ClanSelection: undefined;
   Main: NavigatorScreenParams<MainTabParamList> | undefined;
@@ -126,7 +126,7 @@ export function RootNavigator() {
         <Stack.Screen name="RecoverAccount" component={RecoverAccountScreen} />
         <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        <Stack.Screen name="OnboardingIdentity" component={OnboardingIdentityScreen} />
+        <Stack.Screen name="Biodata" component={BiodataScreen} />
         <Stack.Screen name="OnboardingGoal" component={OnboardingGoalScreen} />
         <Stack.Screen name="ClanSelection" component={ClanSelectionScreen} />
         <Stack.Screen name="Main" component={MainTabNavigator} />

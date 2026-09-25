@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { deleteAccount } from '@/services/auth';
@@ -29,65 +30,80 @@ const APP_VERSION = '0.1.0';
  * Settings' own "Danger zone" the way it used to. The account-deletion
  * logic itself is unchanged from the old SettingsScreen implementation,
  * just relocated.
+ *
+ * i18n note: only this screen's own chrome (title, section headers,
+ * row labels, the delete-account dialog) is translated here. The
+ * legal document BODIES themselves (Privacy Policy, Terms of Service,
+ * Age Restriction) are explicitly out of scope for this pass — see
+ * src/i18n/index.ts's doc comment.
  */
 export function AboutScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('settings');
   const accessToken = useAuthStore((s) => s.accessToken);
   const clearSession = useAuthStore((s) => s.clearSession);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const onDeleteAccount = () => {
-    Alert.alert(
-      'Delete account?',
-      'Your account will be deactivated. You can recover it later from the login screen.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            if (!accessToken) return;
-            setBusy(true);
-            try {
-              await deleteAccount(accessToken);
-              await clearSession();
-              navigation.replace('Login');
-            } catch {
-              setMessage('Could not delete your account right now.');
-              setBusy(false);
-            }
-          },
+    Alert.alert(t('about.deleteConfirmTitle'), t('about.deleteConfirmMessage'), [
+      { text: t('about.deleteConfirmCancel'), style: 'cancel' },
+      {
+        text: t('about.deleteConfirmDelete'),
+        style: 'destructive',
+        onPress: async () => {
+          if (!accessToken) return;
+          setBusy(true);
+          try {
+            await deleteAccount(accessToken);
+            await clearSession();
+            navigation.replace('Login');
+          } catch {
+            setMessage(t('about.errorDelete'));
+            setBusy(false);
+          }
         },
-      ],
-    );
+      },
+    ]);
   };
 
-  const legalRows: Array<{ label: string; onPress: () => void }> = [
-    { label: 'Privacy Policy', onPress: () => navigation.navigate('PrivacyPolicy') },
-    { label: 'Terms of Service', onPress: () => navigation.navigate('TermsOfService') },
-    { label: 'Age Restriction', onPress: () => navigation.navigate('AgeRestriction') },
+  const legalRows: Array<{ id: string; label: string; onPress: () => void }> = [
+    {
+      id: 'privacy',
+      label: t('about.privacyPolicy'),
+      onPress: () => navigation.navigate('PrivacyPolicy'),
+    },
+    {
+      id: 'terms',
+      label: t('about.termsOfService'),
+      onPress: () => navigation.navigate('TermsOfService'),
+    },
+    {
+      id: 'age',
+      label: t('about.ageRestriction'),
+      onPress: () => navigation.navigate('AgeRestriction'),
+    },
   ];
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <BackButton onPress={() => navigation.goBack()} />
-      <Text style={styles.title}>About</Text>
+      <Text style={styles.title}>{t('about.title')}</Text>
 
       <View style={styles.appInfo}>
-        <Text style={styles.appName}>WordQuest</Text>
-        <Text style={styles.appVersion}>Version {APP_VERSION}</Text>
+        <Text style={styles.appName}>{t('about.appName')}</Text>
+        <Text style={styles.appVersion}>{t('about.version', { version: APP_VERSION })}</Text>
       </View>
 
       {message && <Text style={styles.message}>{message}</Text>}
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Legal</Text>
+        <Text style={styles.sectionTitle}>{t('about.legalSection')}</Text>
         {legalRows.map((row) => (
           <Pressable
-            key={row.label}
+            key={row.id}
             style={styles.row}
             onPress={row.onPress}
             accessibilityRole="button"
@@ -100,19 +116,19 @@ export function AboutScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Danger zone</Text>
+        <Text style={styles.sectionTitle}>{t('about.dangerZoneSection')}</Text>
         <Pressable
           style={styles.dangerButton}
           onPress={onDeleteAccount}
           disabled={busy}
           accessibilityRole="button"
-          accessibilityLabel="Delete account"
-          accessibilityHint="Deactivates your account; can be recovered later from the login screen"
+          accessibilityLabel={t('about.deleteAccount')}
+          accessibilityHint={t('about.deleteAccountHint')}
         >
           {busy ? (
             <ActivityIndicator color={colors.danger} />
           ) : (
-            <Text style={styles.dangerButtonText}>Delete account</Text>
+            <Text style={styles.dangerButtonText}>{t('about.deleteAccount')}</Text>
           )}
         </Pressable>
       </View>

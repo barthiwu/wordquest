@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { listQuests, type QuestCatalogEntry } from '@/services/quests';
@@ -29,6 +30,7 @@ type Props = CompositeScreenProps<
  * the tab bar disappears during actual play.
  */
 export function QuestScreen({ navigation }: Props) {
+  const { t } = useTranslation('quests');
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -40,8 +42,8 @@ export function QuestScreen({ navigation }: Props) {
     if (!accessToken) return;
     listQuests(accessToken)
       .then(setQuests)
-      .catch(() => setError('Could not load your quests.'));
-  }, [accessToken]);
+      .catch(() => setError(t('loadError')));
+  }, [accessToken, t]);
 
   useFocusEffect(load);
 
@@ -60,7 +62,7 @@ export function QuestScreen({ navigation }: Props) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Quests</Text>
+      <Text style={styles.title}>{t('title')}</Text>
 
       {!quests && !error && (
         <View style={styles.centered}>
@@ -71,14 +73,13 @@ export function QuestScreen({ navigation }: Props) {
 
       {quests && quests.length === 0 && (
         <View style={styles.empty}>
-          <Text style={styles.emptyText}>
-            No quests are configured right now — check back soon.
-          </Text>
+          <Text style={styles.emptyText}>{t('emptyState')}</Text>
         </View>
       )}
 
       {quests?.map((quest) => {
         const locked = quest.windowStartHour !== null && localHour < quest.windowStartHour;
+        const unlockTime = `${String(quest.windowStartHour).padStart(2, '0')}:00`;
         return (
           <View key={quest.key} style={[styles.card, locked && styles.cardLocked]}>
             <Text style={styles.cardTitle}>{quest.title}</Text>
@@ -98,14 +99,12 @@ export function QuestScreen({ navigation }: Props) {
               accessibilityRole="button"
               accessibilityLabel={
                 locked
-                  ? `${quest.title}, unlocks at ${String(quest.windowStartHour).padStart(2, '0')}:00`
-                  : `Start ${quest.title}`
+                  ? t('unlocksAtAccessibilityLabel', { title: quest.title, time: unlockTime })
+                  : t('startAccessibilityLabel', { title: quest.title })
               }
             >
               <Text style={styles.buttonText}>
-                {locked
-                  ? `Unlocks at ${String(quest.windowStartHour).padStart(2, '0')}:00`
-                  : 'Start'}
+                {locked ? t('unlocksAt', { time: unlockTime }) : t('start')}
               </Text>
             </Pressable>
           </View>
@@ -113,7 +112,7 @@ export function QuestScreen({ navigation }: Props) {
       })}
 
       <Text style={styles.deviceTime}>
-        Your local time: {timeOfDayPeriod(now)} ({formatLocalClock(now)})
+        {t('localTime', { period: timeOfDayPeriod(now), clock: formatLocalClock(now) })}
       </Text>
     </ScrollView>
   );
@@ -121,55 +120,55 @@ export function QuestScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.xl,
-    gap: spacing.md,
-  },
-  centered: { alignItems: 'center', paddingVertical: spacing.xl },
-  empty: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-  },
-  emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  error: { color: colors.danger, fontSize: typography.scale.md },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: spacing.sm,
-  },
-  cardLocked: { opacity: 0.6 },
-  cardTitle: { color: colors.arcaneSoft, fontSize: typography.scale.lg, fontWeight: '700' },
-  cardBody: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  window: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.xs,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-  button: {
-    marginTop: spacing.xs,
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  buttonLocked: { backgroundColor: colors.surfaceRaised },
-  buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-  deviceTime: { color: colors.inkMuted, fontSize: typography.scale.xs, textAlign: 'center' },
-});
+    container: {
+      flexGrow: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.xl,
+      gap: spacing.md,
+    },
+    centered: { alignItems: 'center', paddingVertical: spacing.xl },
+    empty: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+    },
+    emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    error: { color: colors.danger, fontSize: typography.scale.md },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+      gap: spacing.sm,
+    },
+    cardLocked: { opacity: 0.6 },
+    cardTitle: { color: colors.arcaneSoft, fontSize: typography.scale.lg, fontWeight: '700' },
+    cardBody: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    window: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+    },
+    button: {
+      marginTop: spacing.xs,
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    buttonLocked: { backgroundColor: colors.surfaceRaised },
+    buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+    deviceTime: { color: colors.inkMuted, fontSize: typography.scale.xs, textAlign: 'center' },
+  });
 }

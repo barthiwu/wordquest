@@ -63,14 +63,14 @@ export function JourneyStarBar({ stages }: Props) {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm },
-  stageWrap: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-  connector: { flex: 1, height: 2 },
-  starWrap: { padding: 2 },
-  starWrapCurrent: {
-    borderRadius: 999,
-    borderWidth: 2,
-    borderColor: colors.arcaneSoft,
-  },
-});
+    row: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm },
+    stageWrap: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+    connector: { flex: 1, height: 2 },
+    starWrap: { padding: 2 },
+    starWrapCurrent: {
+      borderRadius: 999,
+      borderWidth: 2,
+      borderColor: colors.arcaneSoft,
+    },
+  });
 }

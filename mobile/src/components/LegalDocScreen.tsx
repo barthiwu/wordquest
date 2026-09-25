@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { BackButton } from '@/components/BackButton';
@@ -26,17 +27,26 @@ interface Props {
  * three separately-styled screens. Content stays data-only (see
  * constants/privacyPolicy.ts, termsOfService.ts, ageRestriction.ts);
  * this component only knows how to lay it out.
+ *
+ * i18n note: `title` is passed in already translated by each calling
+ * screen (see PrivacyPolicyScreen/TermsOfServiceScreen/
+ * AgeRestrictionScreen) rather than hardcoded here, since this wrapper
+ * doesn't know which document it's rendering. This component's own
+ * chrome — the "Last updated:" label — is translated directly. The
+ * document body itself (intro/sections) stays out of scope and is
+ * rendered exactly as passed in.
  */
 export function LegalDocScreen({ title, lastUpdated, intro, sections, onBack }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('legal');
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <BackButton onPress={onBack} />
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.lastUpdated}>Last updated: {lastUpdated}</Text>
+      <Text style={styles.lastUpdated}>{t('lastUpdated', { date: lastUpdated })}</Text>
       <Text style={styles.paragraph}>{intro}</Text>
 
       {sections.map((section) => (

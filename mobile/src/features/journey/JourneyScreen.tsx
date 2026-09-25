@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { getMyJourney, type JourneyView } from '@/services/journey';
@@ -47,6 +48,7 @@ export function JourneyScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('journey');
   const accessToken = useAuthStore((s) => s.accessToken);
   const countryCode = useAuthStore((s) => s.user?.countryCode);
   const [journey, setJourney] = useState<JourneyView | null>(null);
@@ -65,8 +67,8 @@ export function JourneyScreen({ navigation }: Props) {
         previousStageRef.current = view.currentStage.stage;
         setJourney(view);
       })
-      .catch(() => setError('Could not load your Journey.'));
-  }, [accessToken]);
+      .catch(() => setError(t('loadError')));
+  }, [accessToken, t]);
 
   useFocusEffect(load);
 
@@ -105,7 +107,7 @@ export function JourneyScreen({ navigation }: Props) {
         />
       )}
 
-      <Text style={styles.title}>Your Journey</Text>
+      <Text style={styles.title}>{t('title')}</Text>
 
       {/* Shadow lives on this outer wrapper — the inner LinearGradient
           clips to its rounded corners (overflow: hidden, for the motif
@@ -152,10 +154,12 @@ export function JourneyScreen({ navigation }: Props) {
 
       {journey.nextStage && (
         <View style={styles.nextCard}>
-          <Text style={styles.nextLabel}>Next: {journey.nextStage.name}</Text>
+          <Text style={styles.nextLabel}>{t('nextLabel', { name: journey.nextStage.name })}</Text>
           <Text style={styles.nextRequirement}>
-            Reach Level {journey.nextStage.minLevel} and master{' '}
-            {journey.nextStage.requiredMasteredWords} words to unlock
+            {t('nextRequirement', {
+              level: journey.nextStage.minLevel,
+              count: journey.nextStage.requiredMasteredWords,
+            })}
           </Text>
         </View>
       )}
@@ -171,8 +175,8 @@ export function JourneyScreen({ navigation }: Props) {
           <Pressable
             onPress={() => navigation.navigate('Order')}
             accessibilityRole="button"
-            accessibilityLabel="The Order"
-            accessibilityHint="Opens Order selection"
+            accessibilityLabel={t('theOrder')}
+            accessibilityHint={t('theOrderHint')}
           >
             <LinearGradient
               colors={journeyVisualFor('kingdom').gradient}
@@ -185,9 +189,9 @@ export function JourneyScreen({ navigation }: Props) {
                 <Text
                   style={[styles.orderBannerTitle, { color: journeyVisualFor('kingdom').color }]}
                 >
-                  The Order
+                  {t('theOrder')}
                 </Text>
-                <Text style={styles.orderBannerSubtitle}>Kingdom&apos;s banner of allegiance</Text>
+                <Text style={styles.orderBannerSubtitle}>{t('orderBannerSubtitle')}</Text>
               </View>
               <Ionicons
                 name="chevron-forward"
@@ -225,7 +229,10 @@ export function JourneyScreen({ navigation }: Props) {
                 <Text style={styles.stageRequirement}>
                   {stage.unlocked
                     ? stage.majorUnlock
-                    : `Level ${stage.minLevel} · ${stage.requiredMasteredWords} mastered words`}
+                    : t('stageLockedRequirement', {
+                        level: stage.minLevel,
+                        count: stage.requiredMasteredWords,
+                      })}
                 </Text>
               </View>
             </View>
@@ -237,18 +244,18 @@ export function JourneyScreen({ navigation }: Props) {
         style={styles.skillRadarButton}
         onPress={() => navigation.navigate('SkillRadar')}
         accessibilityRole="button"
-        accessibilityLabel="View Skill Radar"
+        accessibilityLabel={t('viewSkillRadar')}
       >
-        <Text style={styles.skillRadarButtonText}>View Skill Radar</Text>
+        <Text style={styles.skillRadarButtonText}>{t('viewSkillRadar')}</Text>
       </Pressable>
 
       <Pressable
         style={styles.witwButton}
         onPress={() => navigation.navigate('WordInTheWild')}
         accessibilityRole="button"
-        accessibilityLabel="Find a Word in the Wild"
+        accessibilityLabel={t('findWordInWild')}
       >
-        <Text style={styles.witwButtonText}>Find a Word in the Wild</Text>
+        <Text style={styles.witwButtonText}>{t('findWordInWild')}</Text>
       </Pressable>
     </ScrollView>
   );
@@ -256,118 +263,118 @@ export function JourneyScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, gap: spacing.lg, paddingTop: topInset + spacing.xxl },
-  centered: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  error: { color: colors.danger, fontSize: typography.scale.md },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  currentCard: {
-    borderRadius: radius.lg,
-    borderWidth: 2,
-    padding: spacing.lg,
-    gap: spacing.sm,
-    overflow: 'hidden',
-  },
-  currentCardShadowWrap: {
-    shadowColor: '#E9D5FF',
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 0 },
-  },
-  celestialRow: { flexDirection: 'row', gap: spacing.sm, alignSelf: 'flex-end' },
-  currentHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  badge: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  currentStageName: {
-    fontSize: typography.scale.lg,
-    fontWeight: typography.display.weight,
-  },
-  currentTitle: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  majorUnlock: { color: colors.inkMuted, fontSize: typography.scale.xs },
-  nextCard: {
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.arcane,
-    padding: spacing.md,
-    gap: 2,
-  },
-  nextLabel: { color: colors.arcaneSoft, fontSize: typography.scale.md, fontWeight: '700' },
-  nextRequirement: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  orderBannerShadowWrap: {
-    shadowColor: '#818CF8',
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 0 },
-  },
-  orderBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    borderRadius: radius.md,
-    borderWidth: 2,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-  },
-  orderBannerTitle: { fontSize: typography.scale.md, fontWeight: typography.display.weight },
-  orderBannerSubtitle: { color: colors.inkMuted, fontSize: typography.scale.xs, marginTop: 2 },
-  stageList: { gap: spacing.sm },
-  stageRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-  },
-  stageRowLocked: { opacity: 0.5 },
-  stageBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stageName: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-  stageNameLocked: { color: colors.inkMuted },
-  stageRequirement: { color: colors.inkMuted, fontSize: typography.scale.xs },
-  skillRadarButton: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  skillRadarButtonText: {
-    color: colors.arcaneSoft,
-    fontSize: typography.scale.md,
-    fontWeight: '700',
-  },
-  witwButton: {
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  witwButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-});
+    container: { flex: 1, backgroundColor: colors.background },
+    content: { padding: spacing.xl, gap: spacing.lg, paddingTop: topInset + spacing.xxl },
+    centered: {
+      flex: 1,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    error: { color: colors.danger, fontSize: typography.scale.md },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    currentCard: {
+      borderRadius: radius.lg,
+      borderWidth: 2,
+      padding: spacing.lg,
+      gap: spacing.sm,
+      overflow: 'hidden',
+    },
+    currentCardShadowWrap: {
+      shadowColor: '#E9D5FF',
+      shadowOpacity: 0.5,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 0 },
+    },
+    celestialRow: { flexDirection: 'row', gap: spacing.sm, alignSelf: 'flex-end' },
+    currentHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+    badge: {
+      width: 52,
+      height: 52,
+      borderRadius: 26,
+      borderWidth: 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    currentStageName: {
+      fontSize: typography.scale.lg,
+      fontWeight: typography.display.weight,
+    },
+    currentTitle: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    majorUnlock: { color: colors.inkMuted, fontSize: typography.scale.xs },
+    nextCard: {
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.arcane,
+      padding: spacing.md,
+      gap: 2,
+    },
+    nextLabel: { color: colors.arcaneSoft, fontSize: typography.scale.md, fontWeight: '700' },
+    nextRequirement: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    orderBannerShadowWrap: {
+      shadowColor: '#818CF8',
+      shadowOpacity: 0.35,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 0 },
+    },
+    orderBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      borderRadius: radius.md,
+      borderWidth: 2,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+    },
+    orderBannerTitle: { fontSize: typography.scale.md, fontWeight: typography.display.weight },
+    orderBannerSubtitle: { color: colors.inkMuted, fontSize: typography.scale.xs, marginTop: 2 },
+    stageList: { gap: spacing.sm },
+    stageRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+    },
+    stageRowLocked: { opacity: 0.5 },
+    stageBadge: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      borderWidth: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    stageName: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+    stageNameLocked: { color: colors.inkMuted },
+    stageRequirement: { color: colors.inkMuted, fontSize: typography.scale.xs },
+    skillRadarButton: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    skillRadarButtonText: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.md,
+      fontWeight: '700',
+    },
+    witwButton: {
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    witwButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+  });
 }

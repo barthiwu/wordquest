@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { register } from '@/services/auth';
@@ -30,6 +31,7 @@ export function RegistrationScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('auth');
   const setSession = useAuthStore((s) => s.setSession);
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -49,17 +51,17 @@ export function RegistrationScreen({ navigation }: Props) {
     const day = Number(dobDay);
     const year = Number(dobYear);
     if (!isValidCalendarDate(year, month, day)) {
-      return "That date of birth doesn't look right.";
+      return t('registration.dobErrorInvalidDate');
     }
     const dob = new Date(Date.UTC(year, month - 1, day));
     if (dob.getTime() > Date.now()) {
-      return 'Date of birth must be in the past.';
+      return t('registration.dobErrorFuture');
     }
     if (calculateAge(year, month, day) < MINIMUM_AGE_YEARS) {
-      return `You must be at least ${MINIMUM_AGE_YEARS} years old to create a WordQuest account.`;
+      return t('registration.dobErrorTooYoung', { minAge: MINIMUM_AGE_YEARS });
     }
     return null;
-  }, [dobFieldsFilled, dobMonth, dobDay, dobYear]);
+  }, [dobFieldsFilled, dobMonth, dobDay, dobYear, t]);
   const dobValid = dobFieldsFilled && dobError === null;
 
   const canSubmit =
@@ -78,9 +80,9 @@ export function RegistrationScreen({ navigation }: Props) {
       });
       await setSession(result);
       syncPushToken(result.accessToken);
-      navigation.replace('OnboardingIdentity');
+      navigation.replace('Biodata');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
+      setError(err instanceof ApiError ? err.message : t('registration.errorGeneric'));
     } finally {
       setSubmitting(false);
     }
@@ -92,76 +94,76 @@ export function RegistrationScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
-        <Text style={styles.title}>Create your account</Text>
-        <Text style={styles.subtitle}>Every Legend starts as a new player.</Text>
+        <Text style={styles.title}>{t('registration.title')}</Text>
+        <Text style={styles.subtitle}>{t('registration.subtitle')}</Text>
       </View>
 
       <View style={styles.form}>
         <TextInput
           style={styles.input}
-          placeholder="Display name"
+          placeholder={t('registration.displayNamePlaceholder')}
           placeholderTextColor={colors.inkMuted}
           value={displayName}
           onChangeText={setDisplayName}
           autoCapitalize="words"
-          accessibilityLabel="Display name"
+          accessibilityLabel={t('registration.displayNamePlaceholder')}
         />
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder={t('registration.emailPlaceholder')}
           placeholderTextColor={colors.inkMuted}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
-          accessibilityLabel="Email"
+          accessibilityLabel={t('registration.emailPlaceholder')}
         />
         <TextInput
           style={styles.input}
-          placeholder="Password (8+ characters)"
+          placeholder={t('registration.passwordPlaceholder')}
           placeholderTextColor={colors.inkMuted}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          accessibilityLabel="Password"
+          accessibilityLabel={t('registration.passwordPlaceholder')}
         />
 
         <View style={styles.dobBlock}>
-          <Text style={styles.dobLabel}>Date of birth</Text>
+          <Text style={styles.dobLabel}>{t('registration.dobLabel')}</Text>
           <View style={styles.dobRow}>
             <TextInput
               style={[styles.input, styles.dobInputSmall]}
-              placeholder="MM"
+              placeholder={t('registration.dobMonthPlaceholder')}
               placeholderTextColor={colors.inkMuted}
               value={dobMonth}
-              onChangeText={(t) => setDobMonth(t.replace(/[^0-9]/g, '').slice(0, 2))}
+              onChangeText={(v) => setDobMonth(v.replace(/[^0-9]/g, '').slice(0, 2))}
               keyboardType="number-pad"
               maxLength={2}
-              accessibilityLabel="Birth month"
+              accessibilityLabel={t('registration.dobMonthLabel')}
             />
             <TextInput
               style={[styles.input, styles.dobInputSmall]}
-              placeholder="DD"
+              placeholder={t('registration.dobDayPlaceholder')}
               placeholderTextColor={colors.inkMuted}
               value={dobDay}
-              onChangeText={(t) => setDobDay(t.replace(/[^0-9]/g, '').slice(0, 2))}
+              onChangeText={(v) => setDobDay(v.replace(/[^0-9]/g, '').slice(0, 2))}
               keyboardType="number-pad"
               maxLength={2}
-              accessibilityLabel="Birth day"
+              accessibilityLabel={t('registration.dobDayLabel')}
             />
             <TextInput
               style={[styles.input, styles.dobInputLarge]}
-              placeholder="YYYY"
+              placeholder={t('registration.dobYearPlaceholder')}
               placeholderTextColor={colors.inkMuted}
               value={dobYear}
-              onChangeText={(t) => setDobYear(t.replace(/[^0-9]/g, '').slice(0, 4))}
+              onChangeText={(v) => setDobYear(v.replace(/[^0-9]/g, '').slice(0, 4))}
               keyboardType="number-pad"
               maxLength={4}
-              accessibilityLabel="Birth year"
+              accessibilityLabel={t('registration.dobYearLabel')}
             />
           </View>
           <Text style={styles.dobHint}>
-            You must be {MINIMUM_AGE_YEARS}+ to create a WordQuest account.
+            {t('registration.dobHint', { minAge: MINIMUM_AGE_YEARS })}
           </Text>
           {dobError && <Text style={styles.error}>{dobError}</Text>}
         </View>
@@ -173,19 +175,19 @@ export function RegistrationScreen({ navigation }: Props) {
           onPress={onSubmit}
           disabled={!canSubmit || submitting}
           accessibilityRole="button"
-          accessibilityLabel="Create account"
+          accessibilityLabel={t('registration.submit')}
         >
           {submitting ? (
             <ActivityIndicator color={colors.ink} />
           ) : (
-            <Text style={styles.buttonText}>Create account</Text>
+            <Text style={styles.buttonText}>{t('registration.submit')}</Text>
           )}
         </Pressable>
 
         <Text style={styles.legalNote}>
-          By creating an account, you agree to our{' '}
+          {t('registration.legalNotePrefix')}
           <Text style={styles.legalLink} onPress={() => navigation.navigate('PrivacyPolicy')}>
-            Privacy Policy
+            {t('registration.legalLink')}
           </Text>
           .
         </Text>
@@ -196,71 +198,71 @@ export function RegistrationScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.xxl * 1.5,
-    gap: spacing.xl,
-  },
-  header: { gap: spacing.xs },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  subtitle: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.md,
-  },
-  form: { gap: spacing.md },
-  input: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    color: colors.ink,
-    fontSize: typography.scale.md,
-  },
-  error: {
-    color: colors.danger,
-    fontSize: typography.scale.sm,
-  },
-  dobBlock: { gap: spacing.xs },
-  dobLabel: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.sm,
-  },
-  dobRow: { flexDirection: 'row', gap: spacing.sm },
-  dobInputSmall: { flex: 1, textAlign: 'center' },
-  dobInputLarge: { flex: 1.6, textAlign: 'center' },
-  dobHint: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.xs,
-  },
-  legalNote: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.xs,
-    textAlign: 'center',
-  },
-  legalLink: {
-    color: colors.arcaneSoft,
-    fontWeight: '700',
-  },
-  button: {
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  buttonDisabled: { opacity: 0.5 },
-  buttonText: {
-    color: colors.ink,
-    fontSize: typography.scale.md,
-    fontWeight: '700',
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.xxl * 1.5,
+      gap: spacing.xl,
+    },
+    header: { gap: spacing.xs },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    subtitle: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.md,
+    },
+    form: { gap: spacing.md },
+    input: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+    },
+    error: {
+      color: colors.danger,
+      fontSize: typography.scale.sm,
+    },
+    dobBlock: { gap: spacing.xs },
+    dobLabel: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.sm,
+    },
+    dobRow: { flexDirection: 'row', gap: spacing.sm },
+    dobInputSmall: { flex: 1, textAlign: 'center' },
+    dobInputLarge: { flex: 1.6, textAlign: 'center' },
+    dobHint: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+    },
+    legalNote: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+      textAlign: 'center',
+    },
+    legalLink: {
+      color: colors.arcaneSoft,
+      fontWeight: '700',
+    },
+    button: {
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    buttonDisabled: { opacity: 0.5 },
+    buttonText: {
+      color: colors.ink,
+      fontSize: typography.scale.md,
+      fontWeight: '700',
+    },
+  });
 }

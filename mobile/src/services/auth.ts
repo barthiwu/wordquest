@@ -3,8 +3,20 @@ import { apiRequest } from './apiClient';
 export interface AuthUser {
   id: string;
   email: string;
+  /** The account owner's real name -- shown only to the account owner, never other players. See `username`. */
   displayName: string;
+  /** The public handle shown to other players (leaderboards, Boss Battle, Quest Cards). */
+  username: string;
   countryCode: string | null;
+  /**
+   * Resolved (short-lived, presigned) on the backend -- see AuthService.
+   * toPublicUser. Present on register/login/recoverAccount responses so
+   * Home's header (and anywhere else `user` is read) doesn't need a
+   * separate fetch to show it; PassportScreen also pushes a fresh value
+   * here via updateUser() right after an upload/delete so it doesn't go
+   * stale until the next login.
+   */
+  avatarUrl: string | null;
 }
 
 export interface AuthResult {

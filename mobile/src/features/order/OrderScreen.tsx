@@ -2,6 +2,7 @@ import { useCallback, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
@@ -31,6 +32,7 @@ export function OrderScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('order');
   const accessToken = useAuthStore((s) => s.accessToken);
   const [catalog, setCatalog] = useState<OrderCatalogEntry[] | null>(null);
   const [current, setCurrent] = useState<MyOrder | null>(null);
@@ -44,8 +46,8 @@ export function OrderScreen({ navigation }: Props) {
         setCatalog(c);
         setCurrent(m);
       })
-      .catch(() => setError('Could not load the Order.'));
-  }, [accessToken]);
+      .catch(() => setError(t('errorLoad')));
+  }, [accessToken, t]);
 
   useFocusEffect(load);
 
@@ -61,7 +63,7 @@ export function OrderScreen({ navigation }: Props) {
       const result = await selectOrder(accessToken, order);
       setCurrent(result);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not select this Order.');
+      setError(err instanceof ApiError ? err.message : t('errorSelect'));
     } finally {
       setSelecting(null);
     }
@@ -87,15 +89,17 @@ export function OrderScreen({ navigation }: Props) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <BackButton onPress={() => navigation.goBack()} />
-      <Text style={styles.title}>The Order</Text>
+      <Text style={styles.title}>{t('title')}</Text>
       <Text style={styles.subtitle}>
         {current.current
-          ? `You walk with ${catalog.find((o) => o.key === current.current)?.name ?? current.current}.`
-          : 'Choose an Order to declare your identity.'}
+          ? t('subtitleCurrent', {
+              name: catalog.find((o) => o.key === current.current)?.name ?? current.current,
+            })
+          : t('subtitleChoose')}
       </Text>
       {changeLocked && current.changeEligibleAt && (
         <Text style={styles.cooldown}>
-          Next change available {new Date(current.changeEligibleAt).toLocaleDateString()}.
+          {t('cooldown', { date: new Date(current.changeEligibleAt).toLocaleDateString() })}
         </Text>
       )}
       {error && <Text style={styles.error}>{error}</Text>}
@@ -109,10 +113,14 @@ export function OrderScreen({ navigation }: Props) {
             onPress={() => onSelect(entry.key)}
             disabled={selecting !== null || (changeLocked && !isCurrent)}
             accessibilityRole="button"
-            accessibilityLabel={isCurrent ? `${entry.name} (current)` : `Select ${entry.name}`}
+            accessibilityLabel={
+              isCurrent
+                ? t('cardCurrentLabel', { name: entry.name })
+                : t('cardSelectLabel', { name: entry.name })
+            }
           >
             <Text style={styles.cardName}>
-              {entry.name} {isCurrent ? '(current)' : ''}
+              {entry.name} {isCurrent ? t('currentSuffix') : ''}
             </Text>
             <Text style={styles.cardSymbol}>{entry.symbol}</Text>
             <Text style={styles.cardMotto}>“{entry.motto}”</Text>
@@ -127,38 +135,38 @@ export function OrderScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
-  centered: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  error: { color: colors.danger, fontSize: typography.scale.sm },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
-  cooldown: { color: colors.warning, fontSize: typography.scale.sm },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: 2,
-  },
-  cardSelected: { borderColor: colors.arcane, backgroundColor: colors.surfaceRaised },
-  cardName: { color: colors.ink, fontSize: typography.scale.lg, fontWeight: '700' },
-  cardSymbol: {
-    color: colors.arcaneSoft,
-    fontSize: typography.scale.xs,
-    textTransform: 'uppercase',
-  },
-  cardMotto: { color: colors.ink, fontSize: typography.scale.sm, fontStyle: 'italic' },
-  cardPhilosophy: { color: colors.inkMuted, fontSize: typography.scale.sm },
-});
+    container: { flex: 1, backgroundColor: colors.background },
+    content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
+    centered: {
+      flex: 1,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    error: { color: colors.danger, fontSize: typography.scale.sm },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
+    cooldown: { color: colors.warning, fontSize: typography.scale.sm },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+      gap: 2,
+    },
+    cardSelected: { borderColor: colors.arcane, backgroundColor: colors.surfaceRaised },
+    cardName: { color: colors.ink, fontSize: typography.scale.lg, fontWeight: '700' },
+    cardSymbol: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.xs,
+      textTransform: 'uppercase',
+    },
+    cardMotto: { color: colors.ink, fontSize: typography.scale.sm, fontStyle: 'italic' },
+    cardPhilosophy: { color: colors.inkMuted, fontSize: typography.scale.sm },
+  });
 }

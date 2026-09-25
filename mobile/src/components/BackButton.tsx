@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 
@@ -10,25 +11,26 @@ import { useThemeColors } from '@/state/themeStore';
  * than replacing, which therefore needs a way back.
  */
 export function BackButton({ onPress }: { onPress: () => void }) {
+  const { t } = useTranslation('common');
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel="Back"
-      accessibilityHint="Returns to the previous screen"
+      accessibilityLabel={t('back')}
+      accessibilityHint={t('backHint')}
       style={styles.button}
       hitSlop={8}
     >
-      <Text style={styles.text}>‹ Back</Text>
+      <Text style={styles.text}>‹ {t('back')}</Text>
     </Pressable>
   );
 }
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-  button: { alignSelf: 'flex-start', paddingVertical: spacing.xs },
-  text: { color: colors.arcaneSoft, fontSize: typography.scale.md, fontWeight: '700' },
-});
+    button: { alignSelf: 'flex-start', paddingVertical: spacing.xs },
+    text: { color: colors.arcaneSoft, fontSize: typography.scale.md, fontWeight: '700' },
+  });
 }

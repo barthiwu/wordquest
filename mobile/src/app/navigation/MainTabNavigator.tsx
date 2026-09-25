@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/state/themeStore';
 import { HomeScreen } from '@/features/home/HomeScreen';
 import { QuestScreen } from '@/features/quests/QuestScreen';
@@ -37,6 +38,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
  * most directly about.
  */
 export function MainTabNavigator() {
+  const { t } = useTranslation('common');
   const colors = useThemeColors();
   return (
     <Tab.Navigator
@@ -53,11 +55,23 @@ export function MainTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Quest" component={QuestScreen} />
-      <Tab.Screen name="Journey" component={JourneyScreen} />
-      <Tab.Screen name="Compete" component={LeaderboardScreen} />
-      <Tab.Screen name="Profile" component={PassportScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: t('tabs.home') }} />
+      <Tab.Screen name="Quest" component={QuestScreen} options={{ tabBarLabel: t('tabs.quest') }} />
+      <Tab.Screen
+        name="Journey"
+        component={JourneyScreen}
+        options={{ tabBarLabel: t('tabs.journey') }}
+      />
+      <Tab.Screen
+        name="Compete"
+        component={LeaderboardScreen}
+        options={{ tabBarLabel: t('tabs.compete') }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={PassportScreen}
+        options={{ tabBarLabel: t('tabs.profile') }}
+      />
     </Tab.Navigator>
   );
 }

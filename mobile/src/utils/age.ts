@@ -17,7 +17,12 @@ export function isValidCalendarDate(year: number, month: number, day: number): b
   );
 }
 
-export function calculateAge(year: number, month: number, day: number, asOf: Date = new Date()): number {
+export function calculateAge(
+  year: number,
+  month: number,
+  day: number,
+  asOf: Date = new Date(),
+): number {
   let age = asOf.getUTCFullYear() - year;
   const monthDiff = asOf.getUTCMonth() - (month - 1);
   const dayDiff = asOf.getUTCDate() - day;

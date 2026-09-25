@@ -3,12 +3,7 @@ import { apiRequest } from './apiClient';
 export type MasteryLevel = 'NEW' | 'RECOGNIZING' | 'RECALLING' | 'STRONG' | 'MASTERED';
 
 export type WordStage =
-  | 'GUESSING'
-  | 'UNDERSTANDING'
-  | 'SENTENCE'
-  | 'PARAGRAPH'
-  | 'OPTIONAL_WILD'
-  | 'WORD_COMPLETE';
+  'GUESSING' | 'UNDERSTANDING' | 'SENTENCE' | 'PARAGRAPH' | 'OPTIONAL_WILD' | 'WORD_COMPLETE';
 
 export interface ChallengeView {
   questAttemptId: string;
@@ -24,6 +19,8 @@ export interface ChallengeView {
   /** The clue shown alongside the blanked word. */
   definition: string;
   partOfSpeech: string;
+  /** Populated once wordStage is past GUESSING (Understanding/Sentence/Paragraph/Optional Wild all need the real word) — null only at GUESSING, where it would give the answer away. */
+  understanding: UnderstandingContent | null;
 }
 
 export interface QuestCatalogEntry {
@@ -134,6 +131,31 @@ export interface OptionalWildMission {
 
 export function listQuests(accessToken: string): Promise<QuestCatalogEntry[]> {
   return apiRequest<QuestCatalogEntry[]>('/quests', { accessToken });
+}
+
+/** One quest window's real status for the player's current local day — see backend QuestsService.getTodaySummary. */
+export interface TodayQuestWindowSummary {
+  key: string;
+  title: string;
+  windowStartHour: number | null;
+  windowEndHour: number | null;
+  completed: boolean;
+  inProgress: boolean;
+  /** The real reward that quest's completed attempt actually earned — null until completed. */
+  xpAwarded: number | null;
+  glyphAwarded: number | null;
+}
+
+export interface TodayQuestSummary {
+  localDate: string;
+  completedCount: number;
+  totalCount: number;
+  quests: TodayQuestWindowSummary[];
+}
+
+/** Today's real Daily Quest progress (completed/in-progress per window) — backs Home's Daily Goals card. */
+export function getTodayQuestSummary(accessToken: string): Promise<TodayQuestSummary> {
+  return apiRequest<TodayQuestSummary>('/quests/today', { accessToken });
 }
 
 /**
@@ -267,6 +289,54 @@ export function completeWord(
 ): Promise<WordCompletionResult> {
   return apiRequest<WordCompletionResult>(`/quests/attempts/${questAttemptId}/complete-word`, {
     method: 'POST',
+    accessToken,
+  });
+}
+
+// ── Catch-up calendar ───────────────────────────────────────────────
+// Replaying a past day's Guess words for review — never a new
+// presentation, so there's no XP/mastery/attempt bookkeeping here at
+// all, unlike everything above.
+
+/** One catch-up word for a past day — a fresh Guess challenge, not tied to any attempt. */
+export interface CatchUpWordChallenge {
+  wordId: string;
+  displayPattern: string;
+  missingIndexes: number[];
+  wordLength: number;
+  definition: string;
+  partOfSpeech: string;
+}
+
+export interface CatchUpView {
+  localDate: string;
+  words: CatchUpWordChallenge[];
+}
+
+export interface CatchUpAnswerResult {
+  correct: boolean;
+  correctWord: string;
+}
+
+/** Every past local date ("YYYY-MM-DD") the player has real Quest activity on, most recent first — today is never included. */
+export function getHistoryDates(accessToken: string): Promise<string[]> {
+  return apiRequest<string[]>('/quests/history/dates', { accessToken });
+}
+
+/** Every word shown across all of that day's quest windows, deduplicated, each with a fresh Guess challenge at the word's current mastery level. */
+export function getHistoryForDate(accessToken: string, localDate: string): Promise<CatchUpView> {
+  return apiRequest<CatchUpView>(`/quests/history/${localDate}`, { accessToken });
+}
+
+/** Checks one catch-up answer. No XP, no mastery update, no global exposure change -- purely "did you get it right this time." */
+export function checkHistoryAnswer(
+  accessToken: string,
+  wordId: string,
+  answer: string,
+): Promise<CatchUpAnswerResult> {
+  return apiRequest<CatchUpAnswerResult>('/quests/history/check', {
+    method: 'POST',
+    body: { wordId, answer },
     accessToken,
   });
 }

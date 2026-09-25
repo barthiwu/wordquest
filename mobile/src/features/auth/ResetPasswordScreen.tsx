@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { resetPassword } from '@/services/auth';
@@ -32,6 +33,7 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('auth');
   const [token, setToken] = useState(route.params?.token ?? '');
   const [newPassword, setNewPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -48,7 +50,7 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
       await resetPassword(token.trim(), newPassword);
       setDone(true);
     } catch {
-      setError('That code is invalid or has expired. Request a new one.');
+      setError(t('resetPassword.errorInvalidCode'));
     } finally {
       setSubmitting(false);
     }
@@ -57,14 +59,14 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
   if (done) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Your password has been reset.</Text>
+        <Text style={styles.title}>{t('resetPassword.doneTitle')}</Text>
         <Pressable
           style={styles.button}
           onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Login' }] })}
           accessibilityRole="button"
-          accessibilityLabel="Back to log in"
+          accessibilityLabel={t('resetPassword.backToLogin')}
         >
-          <Text style={styles.buttonText}>Back to log in</Text>
+          <Text style={styles.buttonText}>{t('resetPassword.backToLogin')}</Text>
         </Pressable>
       </View>
     );
@@ -76,30 +78,28 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
-        <Text style={styles.title}>Choose a new password</Text>
-        <Text style={styles.subtitle}>
-          Confirm the code from your email if it isn&apos;t already filled in.
-        </Text>
+        <Text style={styles.title}>{t('resetPassword.title')}</Text>
+        <Text style={styles.subtitle}>{t('resetPassword.subtitle')}</Text>
       </View>
 
       <View style={styles.form}>
         <TextInput
           style={styles.input}
-          placeholder="Reset code"
+          placeholder={t('resetPassword.tokenPlaceholder')}
           placeholderTextColor={colors.inkMuted}
           value={token}
           onChangeText={setToken}
           autoCapitalize="none"
-          accessibilityLabel="Reset code"
+          accessibilityLabel={t('resetPassword.tokenPlaceholder')}
         />
         <TextInput
           style={styles.input}
-          placeholder="New password"
+          placeholder={t('resetPassword.newPasswordPlaceholder')}
           placeholderTextColor={colors.inkMuted}
           value={newPassword}
           onChangeText={setNewPassword}
           secureTextEntry
-          accessibilityLabel="New password"
+          accessibilityLabel={t('resetPassword.newPasswordPlaceholder')}
         />
         {error && <Text style={styles.error}>{error}</Text>}
         <Pressable
@@ -107,12 +107,12 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
           onPress={onSubmit}
           disabled={!canSubmit || submitting}
           accessibilityRole="button"
-          accessibilityLabel="Reset password"
+          accessibilityLabel={t('resetPassword.submit')}
         >
           {submitting ? (
             <ActivityIndicator color={colors.ink} />
           ) : (
-            <Text style={styles.buttonText}>Reset password</Text>
+            <Text style={styles.buttonText}>{t('resetPassword.submit')}</Text>
           )}
         </Pressable>
       </View>
@@ -122,40 +122,40 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.xxl * 1.5,
-    gap: spacing.xl,
-  },
-  header: { gap: spacing.xs },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
-  form: { gap: spacing.md },
-  input: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    color: colors.ink,
-    fontSize: typography.scale.md,
-  },
-  error: { color: colors.danger, fontSize: typography.scale.sm },
-  button: {
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-});
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.xxl * 1.5,
+      gap: spacing.xl,
+    },
+    header: { gap: spacing.xs },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
+    form: { gap: spacing.md },
+    input: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+    },
+    error: { color: colors.danger, fontSize: typography.scale.sm },
+    button: {
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    buttonDisabled: { opacity: 0.5 },
+    buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+  });
 }

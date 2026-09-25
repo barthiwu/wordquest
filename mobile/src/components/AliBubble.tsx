@@ -1,5 +1,6 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { AliMark } from './AliMark';
@@ -33,6 +34,7 @@ interface AliBubbleProps {
 export function AliBubble({ message, onDismiss, autoDismissMs = 2800 }: AliBubbleProps) {
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { t } = useTranslation('common');
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-16)).current;
 
@@ -58,8 +60,12 @@ export function AliBubble({ message, onDismiss, autoDismissMs = 2800 }: AliBubbl
         style={styles.bubble}
         onPress={onDismiss}
         accessibilityRole="button"
-        accessibilityLabel={`ALI: ${message}`}
-        accessibilityHint="Dismiss"
+        // "ALI" itself is never translated (proper noun); `message` is
+        // ALI's own dynamic reaction text, out of scope like her other
+        // dialogue content -- only the surrounding label pattern and the
+        // dismiss hint are this component's own translatable chrome.
+        accessibilityLabel={t('aliBubble.accessibilityLabel', { message })}
+        accessibilityHint={t('aliBubble.dismissHint')}
       >
         <Animated.View style={styles.avatar}>
           <AliMark size={14} />
@@ -72,39 +78,39 @@ export function AliBubble({ message, onDismiss, autoDismissMs = 2800 }: AliBubbl
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-  wrapper: {
-    position: 'absolute',
-    top: spacing.md,
-    left: spacing.lg,
-    right: spacing.lg,
-    zIndex: 20,
-    alignItems: 'center',
-  },
-  bubble: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.arcaneSoft,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    maxWidth: '100%',
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
-  },
-  avatar: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: colors.arcaneSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '600', flexShrink: 1 },
-});
+    wrapper: {
+      position: 'absolute',
+      top: spacing.md,
+      left: spacing.lg,
+      right: spacing.lg,
+      zIndex: 20,
+      alignItems: 'center',
+    },
+    bubble: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.arcaneSoft,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      maxWidth: '100%',
+      shadowColor: '#000',
+      shadowOpacity: 0.3,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 8,
+    },
+    avatar: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      backgroundColor: colors.arcaneSoft,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    text: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '600', flexShrink: 1 },
+  });
 }

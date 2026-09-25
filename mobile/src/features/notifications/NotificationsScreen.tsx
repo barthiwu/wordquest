@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
@@ -28,11 +29,11 @@ import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Notifications'>;
 
-const PREFERENCE_TOGGLES: { key: keyof NotificationPreferences; label: string }[] = [
-  { key: 'dailyQuestsEnabled', label: 'Daily Quest reminders' },
-  { key: 'learningRemindersEnabled', label: 'Review & practice reminders' },
-  { key: 'progressEnabled', label: 'Level, Journey & Achievement updates' },
-  { key: 'competitionEnabled', label: 'Boss Battle & leaderboard updates' },
+const PREFERENCE_TOGGLES: { key: keyof NotificationPreferences; labelKey: string }[] = [
+  { key: 'dailyQuestsEnabled', labelKey: 'dailyQuestsToggle' },
+  { key: 'learningRemindersEnabled', labelKey: 'learningRemindersToggle' },
+  { key: 'progressEnabled', labelKey: 'progressToggle' },
+  { key: 'competitionEnabled', labelKey: 'competitionToggle' },
 ];
 
 /**
@@ -44,6 +45,7 @@ export function NotificationsScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('notifications');
   const accessToken = useAuthStore((s) => s.accessToken);
   const [notifications, setNotifications] = useState<AppNotification[] | null>(null);
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
@@ -56,8 +58,8 @@ export function NotificationsScreen({ navigation }: Props) {
         setNotifications(n);
         setPreferences(p);
       })
-      .catch(() => setError('Could not load your notifications.'));
-  }, [accessToken]);
+      .catch(() => setError(t('errorLoad')));
+  }, [accessToken, t]);
 
   useFocusEffect(load);
 
@@ -137,7 +139,7 @@ export function NotificationsScreen({ navigation }: Props) {
   };
 
   const formatHour = (hour: number) => {
-    const period = hour < 12 ? 'AM' : 'PM';
+    const period = hour < 12 ? t('amPeriod') : t('pmPeriod');
     const display = hour % 12 === 0 ? 12 : hour % 12;
     return `${display}:00 ${period}`;
   };
@@ -165,23 +167,21 @@ export function NotificationsScreen({ navigation }: Props) {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <BackButton onPress={() => navigation.goBack()} />
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Notifications</Text>
+        <Text style={styles.title}>{t('title')}</Text>
         {unreadCount > 0 && (
           <Pressable
             onPress={onMarkAllRead}
             accessibilityRole="button"
-            accessibilityLabel="Mark all read"
+            accessibilityLabel={t('markAllRead')}
           >
-            <Text style={styles.markAllText}>Mark all read</Text>
+            <Text style={styles.markAllText}>{t('markAllRead')}</Text>
           </Pressable>
         )}
       </View>
 
       {notifications.length === 0 && (
         <View style={styles.empty}>
-          <Text style={styles.emptyText}>
-            Nothing here yet — you’ll see quest reminders and progress updates as they happen.
-          </Text>
+          <Text style={styles.emptyText}>{t('emptyText')}</Text>
         </View>
       )}
 
@@ -192,7 +192,7 @@ export function NotificationsScreen({ navigation }: Props) {
           onPress={() => onMarkRead(n.id)}
           accessibilityRole="button"
           accessibilityLabel={n.title}
-          accessibilityHint={n.readAt ? undefined : 'marks as read'}
+          accessibilityHint={n.readAt ? undefined : t('markAsReadHint')}
         >
           <Text style={styles.cardTitle}>{n.title}</Text>
           <Text style={styles.cardBody}>{n.body}</Text>
@@ -200,49 +200,54 @@ export function NotificationsScreen({ navigation }: Props) {
       ))}
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Preferences</Text>
-        {PREFERENCE_TOGGLES.map(({ key, label }) => (
-          <View key={key} style={styles.toggleRow}>
-            <Text style={styles.toggleLabel}>{label}</Text>
-            <Switch
-              value={preferences[key] as boolean}
-              onValueChange={(value) => onTogglePreference(key, value)}
-              trackColor={{ false: colors.border, true: colors.arcaneSoft }}
-              thumbColor={colors.ink}
-              accessibilityLabel={label}
-            />
-          </View>
-        ))}
+        <Text style={styles.sectionTitle}>{t('preferencesTitle')}</Text>
+        {PREFERENCE_TOGGLES.map(({ key, labelKey }) => {
+          const label = t(labelKey);
+          return (
+            <View key={key} style={styles.toggleRow}>
+              <Text style={styles.toggleLabel}>{label}</Text>
+              <Switch
+                value={preferences[key] as boolean}
+                onValueChange={(value) => onTogglePreference(key, value)}
+                trackColor={{ false: colors.border, true: colors.arcaneSoft }}
+                thumbColor={colors.ink}
+                accessibilityLabel={label}
+              />
+            </View>
+          );
+        })}
       </View>
 
       <View style={styles.section}>
         <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Quiet hours</Text>
+          <Text style={styles.toggleLabel}>{t('quietHoursToggle')}</Text>
           <Switch
             value={quietHoursEnabled}
             onValueChange={onToggleQuietHours}
             trackColor={{ false: colors.border, true: colors.arcaneSoft }}
             thumbColor={colors.ink}
-            accessibilityLabel="Quiet hours"
+            accessibilityLabel={t('quietHoursToggle')}
           />
         </View>
         {quietHoursEnabled &&
           preferences.quietHoursStartHour != null &&
           preferences.quietHoursEndHour != null && (
             <>
-              <Text style={styles.quietHoursHint}>
-                No push notifications between these hours, in your own timezone.
-              </Text>
+              <Text style={styles.quietHoursHint}>{t('quietHoursHint')}</Text>
               <View style={styles.hourStepperRow}>
                 <HourStepper
-                  label="From"
+                  label={t('quietHoursFrom')}
+                  earlierLabel={t('quietHoursAdjustEarlier', { label: t('quietHoursFrom') })}
+                  laterLabel={t('quietHoursAdjustLater', { label: t('quietHoursFrom') })}
                   hour={preferences.quietHoursStartHour}
                   onChange={(delta) => onAdjustQuietHour('quietHoursStartHour', delta)}
                   formatHour={formatHour}
                   styles={styles}
                 />
                 <HourStepper
-                  label="Until"
+                  label={t('quietHoursUntil')}
+                  earlierLabel={t('quietHoursAdjustEarlier', { label: t('quietHoursUntil') })}
+                  laterLabel={t('quietHoursAdjustLater', { label: t('quietHoursUntil') })}
                   hour={preferences.quietHoursEndHour}
                   onChange={(delta) => onAdjustQuietHour('quietHoursEndHour', delta)}
                   formatHour={formatHour}
@@ -258,12 +263,16 @@ export function NotificationsScreen({ navigation }: Props) {
 
 function HourStepper({
   label,
+  earlierLabel,
+  laterLabel,
   hour,
   onChange,
   formatHour,
   styles,
 }: {
   label: string;
+  earlierLabel: string;
+  laterLabel: string;
   hour: number;
   onChange: (delta: number) => void;
   formatHour: (hour: number) => string;
@@ -277,7 +286,7 @@ function HourStepper({
           style={styles.hourStepperButton}
           onPress={() => onChange(-1)}
           accessibilityRole="button"
-          accessibilityLabel={`${label}: earlier`}
+          accessibilityLabel={earlierLabel}
         >
           <Text style={styles.hourStepperButtonText}>−</Text>
         </Pressable>
@@ -286,7 +295,7 @@ function HourStepper({
           style={styles.hourStepperButton}
           onPress={() => onChange(1)}
           accessibilityRole="button"
-          accessibilityLabel={`${label}: later`}
+          accessibilityLabel={laterLabel}
         >
           <Text style={styles.hourStepperButtonText}>+</Text>
         </Pressable>
@@ -297,92 +306,92 @@ function HourStepper({
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
-  centered: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  error: { color: colors.danger, fontSize: typography.scale.md },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  markAllText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
-  empty: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-  },
-  emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    gap: 2,
-  },
-  cardUnread: { borderColor: colors.arcaneSoft },
-  cardTitle: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
-  cardBody: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  section: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  sectionTitle: {
-    color: colors.ink,
-    fontSize: typography.scale.sm,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  toggleLabel: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.sm,
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  quietHoursHint: { color: colors.inkMuted, fontSize: typography.scale.xs },
-  hourStepperRow: { flexDirection: 'row', gap: spacing.md },
-  hourStepper: { flex: 1, gap: 4, alignItems: 'center' },
-  hourStepperLabel: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.xs,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-  hourStepperControls: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  hourStepperButton: {
-    width: 28,
-    height: 28,
-    borderRadius: radius.sm,
-    backgroundColor: colors.surfaceRaised,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  hourStepperButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-  hourStepperValue: {
-    color: colors.ink,
-    fontSize: typography.scale.sm,
-    fontWeight: '700',
-    minWidth: 72,
-    textAlign: 'center',
-  },
-});
+    container: { flex: 1, backgroundColor: colors.background },
+    content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
+    centered: {
+      flex: 1,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    error: { color: colors.danger, fontSize: typography.scale.md },
+    headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    markAllText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
+    empty: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+    },
+    emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      gap: 2,
+    },
+    cardUnread: { borderColor: colors.arcaneSoft },
+    cardTitle: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
+    cardBody: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    section: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+      gap: spacing.sm,
+      marginTop: spacing.sm,
+    },
+    sectionTitle: {
+      color: colors.ink,
+      fontSize: typography.scale.sm,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+    },
+    toggleRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    toggleLabel: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.sm,
+      flex: 1,
+      marginRight: spacing.sm,
+    },
+    quietHoursHint: { color: colors.inkMuted, fontSize: typography.scale.xs },
+    hourStepperRow: { flexDirection: 'row', gap: spacing.md },
+    hourStepper: { flex: 1, gap: 4, alignItems: 'center' },
+    hourStepperLabel: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+    },
+    hourStepperControls: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+    hourStepperButton: {
+      width: 28,
+      height: 28,
+      borderRadius: radius.sm,
+      backgroundColor: colors.surfaceRaised,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    hourStepperButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+    hourStepperValue: {
+      color: colors.ink,
+      fontSize: typography.scale.sm,
+      fontWeight: '700',
+      minWidth: 72,
+      textAlign: 'center',
+    },
+  });
 }

@@ -8,7 +8,7 @@ export interface QuestCard {
   sourceEventId: string;
   title: string;
   category: string | null;
-  playerDisplayNameSnapshot: string;
+  playerUsernameSnapshot: string;
   artwork: string | null;
   rarity: QuestCardRarity;
   journeyStageKey: string | null;

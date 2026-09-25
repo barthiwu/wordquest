@@ -59,7 +59,8 @@
               }
             ]
           }
-        }
+        },
+        "NSLocalNetworkUsageDescription": "WordQuest uses your local network to connect to the Metro development server while testing a development build."
       }
     },
     "android": {

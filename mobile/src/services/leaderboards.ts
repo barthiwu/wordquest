@@ -3,7 +3,7 @@ import { apiRequest } from './apiClient';
 export interface LeaderboardEntry {
   rank: number;
   userId: string;
-  displayName: string;
+  username: string;
   clanName: string | null;
   countryCode: string | null;
   level: number;

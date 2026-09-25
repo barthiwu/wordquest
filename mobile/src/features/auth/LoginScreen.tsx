@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { login } from '@/services/auth';
@@ -25,6 +26,7 @@ export function LoginScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('auth');
   const setSession = useAuthStore((s) => s.setSession);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,8 +47,8 @@ export function LoginScreen({ navigation }: Props) {
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 401
-          ? 'Incorrect email or password.'
-          : 'Something went wrong. Please try again.',
+          ? t('login.errorIncorrect')
+          : t('login.errorGeneric'),
       );
     } finally {
       setSubmitting(false);
@@ -59,29 +61,29 @@ export function LoginScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome back</Text>
-        <Text style={styles.subtitle}>Your Journey is right where you left it.</Text>
+        <Text style={styles.title}>{t('login.title')}</Text>
+        <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
       </View>
 
       <View style={styles.form}>
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder={t('login.emailPlaceholder')}
           placeholderTextColor={colors.inkMuted}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
-          accessibilityLabel="Email"
+          accessibilityLabel={t('login.emailPlaceholder')}
         />
         <TextInput
           style={styles.input}
-          placeholder="Password"
+          placeholder={t('login.passwordPlaceholder')}
           placeholderTextColor={colors.inkMuted}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          accessibilityLabel="Password"
+          accessibilityLabel={t('login.passwordPlaceholder')}
         />
 
         {error && <Text style={styles.error}>{error}</Text>}
@@ -91,29 +93,29 @@ export function LoginScreen({ navigation }: Props) {
           onPress={onSubmit}
           disabled={!canSubmit || submitting}
           accessibilityRole="button"
-          accessibilityLabel="Log in"
+          accessibilityLabel={t('login.submit')}
         >
           {submitting ? (
             <ActivityIndicator color={colors.ink} />
           ) : (
-            <Text style={styles.buttonText}>Log in</Text>
+            <Text style={styles.buttonText}>{t('login.submit')}</Text>
           )}
         </Pressable>
 
         <Pressable
           onPress={() => navigation.navigate('ForgotPassword')}
           accessibilityRole="button"
-          accessibilityLabel="Forgot password?"
-          accessibilityHint="Opens the password reset flow"
+          accessibilityLabel={t('login.forgotPassword')}
+          accessibilityHint={t('login.forgotPasswordHint')}
         >
-          <Text style={styles.link}>Forgot password?</Text>
+          <Text style={styles.link}>{t('login.forgotPassword')}</Text>
         </Pressable>
         <Pressable
           onPress={() => navigation.navigate('RecoverAccount')}
           accessibilityRole="button"
-          accessibilityLabel="Recover a deleted account"
+          accessibilityLabel={t('login.recoverAccount')}
         >
-          <Text style={styles.link}>Recover a deleted account</Text>
+          <Text style={styles.link}>{t('login.recoverAccount')}</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -122,53 +124,53 @@ export function LoginScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.xxl * 1.5,
-    gap: spacing.xl,
-  },
-  header: { gap: spacing.xs },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  subtitle: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.md,
-  },
-  form: { gap: spacing.md },
-  input: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    color: colors.ink,
-    fontSize: typography.scale.md,
-  },
-  error: { color: colors.danger, fontSize: typography.scale.sm },
-  link: {
-    color: colors.arcaneSoft,
-    fontSize: typography.scale.sm,
-    textAlign: 'center',
-    marginTop: spacing.xs,
-  },
-  button: {
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  buttonDisabled: { opacity: 0.5 },
-  buttonText: {
-    color: colors.ink,
-    fontSize: typography.scale.md,
-    fontWeight: '700',
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.xxl * 1.5,
+      gap: spacing.xl,
+    },
+    header: { gap: spacing.xs },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    subtitle: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.md,
+    },
+    form: { gap: spacing.md },
+    input: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+    },
+    error: { color: colors.danger, fontSize: typography.scale.sm },
+    link: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.sm,
+      textAlign: 'center',
+      marginTop: spacing.xs,
+    },
+    button: {
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    buttonDisabled: { opacity: 0.5 },
+    buttonText: {
+      color: colors.ink,
+      fontSize: typography.scale.md,
+      fontWeight: '700',
+    },
+  });
 }

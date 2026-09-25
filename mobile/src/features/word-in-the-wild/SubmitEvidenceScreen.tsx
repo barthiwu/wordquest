@@ -12,6 +12,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
@@ -53,6 +54,7 @@ const MODE_ICONS: Record<
  * to miss when every mission reset back to the Text tab.
  */
 export function SubmitEvidenceScreen({ route, navigation }: Props) {
+  const { t } = useTranslation('submitEvidence');
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -79,7 +81,7 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
         : await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       setError(
-        `WordQuest needs ${source === 'camera' ? 'camera' : 'photo library'} access to do this.`,
+        source === 'camera' ? t('cameraPermissionNeeded') : t('photoLibraryPermissionNeeded'),
       );
       return;
     }
@@ -105,7 +107,7 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
       const submission = await submitTextEvidence(accessToken, missionId, text.trim());
       navigation.replace('EvidenceResult', submission);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not submit your evidence.');
+      setError(err instanceof ApiError ? err.message : t('submitError'));
       setStage('idle');
     }
   };
@@ -122,7 +124,7 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
       const submission = await submitPhotoEvidence(accessToken, missionId, target.key);
       navigation.replace('EvidenceResult', submission);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not submit your evidence.');
+      setError(err instanceof ApiError ? err.message : t('submitError'));
       setStage('idle');
     }
   };
@@ -132,12 +134,12 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <BackButton onPress={() => navigation.goBack()} />
-      <Text style={styles.title}>Find “{word}”</Text>
+      <Text style={styles.title}>{t('title', { word })}</Text>
       <Text style={styles.definition}>{definition}</Text>
 
       <View style={styles.modeTabs}>
         <ModeTab
-          label="Text"
+          label={t('tabText')}
           icon={mode === 'TEXT' ? MODE_ICONS.TEXT.active : MODE_ICONS.TEXT.inactive}
           active={mode === 'TEXT'}
           onPress={() => setMode('TEXT')}
@@ -146,7 +148,7 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
           colors={colors}
         />
         <ModeTab
-          label="Photo"
+          label={t('tabPhoto')}
           icon={mode === 'PHOTO' ? MODE_ICONS.PHOTO.active : MODE_ICONS.PHOTO.inactive}
           active={mode === 'PHOTO'}
           onPress={() => setMode('PHOTO')}
@@ -158,31 +160,29 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
 
       {mode === 'TEXT' && (
         <View style={styles.section}>
-          <Text style={styles.hint}>
-            Describe where you saw or heard the word, or paste the sentence itself.
-          </Text>
+          <Text style={styles.hint}>{t('textHint')}</Text>
           <TextInput
             style={styles.textArea}
             multiline
             numberOfLines={4}
-            placeholder={`e.g. "I read '${word}' on a poster at the train station."`}
+            placeholder={t('textPlaceholder', { word })}
             placeholderTextColor={colors.inkMuted}
             value={text}
             onChangeText={setText}
             editable={!busy}
-            accessibilityLabel="Describe where you saw or heard the word"
+            accessibilityLabel={t('textInputAccessibilityLabel')}
           />
           <Pressable
             style={[styles.submitButton, (!text.trim() || busy) && styles.submitButtonDisabled]}
             onPress={onSubmitText}
             disabled={!text.trim() || busy}
             accessibilityRole="button"
-            accessibilityLabel="Submit"
+            accessibilityLabel={t('submitAccessibilityLabel')}
           >
             {busy ? (
               <ActivityIndicator color={colors.ink} />
             ) : (
-              <Text style={styles.submitButtonText}>Submit</Text>
+              <Text style={styles.submitButtonText}>{t('submitButtonText')}</Text>
             )}
           </Pressable>
         </View>
@@ -190,9 +190,7 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
 
       {mode === 'PHOTO' && (
         <View style={styles.section}>
-          <Text style={styles.hint}>
-            Take or choose a photo showing the word used somewhere real.
-          </Text>
+          <Text style={styles.hint}>{t('photoHint')}</Text>
 
           {photo && <Image source={{ uri: photo.uri }} style={styles.preview} />}
 
@@ -202,20 +200,20 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
               onPress={() => pickPhoto('camera')}
               disabled={busy}
               accessibilityRole="button"
-              accessibilityLabel="Take Photo"
+              accessibilityLabel={t('takePhotoAccessibilityLabel')}
             >
               <Ionicons name="camera-outline" size={18} color={colors.arcaneSoft} />
-              <Text style={styles.photoButtonText}>Take Photo</Text>
+              <Text style={styles.photoButtonText}>{t('takePhotoText')}</Text>
             </Pressable>
             <Pressable
               style={styles.photoButton}
               onPress={() => pickPhoto('library')}
               disabled={busy}
               accessibilityRole="button"
-              accessibilityLabel="Choose Photo"
+              accessibilityLabel={t('choosePhotoAccessibilityLabel')}
             >
               <Ionicons name="images-outline" size={18} color={colors.arcaneSoft} />
-              <Text style={styles.photoButtonText}>Choose Photo</Text>
+              <Text style={styles.photoButtonText}>{t('choosePhotoText')}</Text>
             </Pressable>
           </View>
 
@@ -224,17 +222,17 @@ export function SubmitEvidenceScreen({ route, navigation }: Props) {
             onPress={onSubmitPhoto}
             disabled={!photo || busy}
             accessibilityRole="button"
-            accessibilityLabel="Submit"
+            accessibilityLabel={t('submitAccessibilityLabel')}
           >
             {busy ? (
               <View style={styles.busyRow}>
                 <ActivityIndicator color={colors.ink} />
                 <Text style={styles.submitButtonText}>
-                  {stage === 'uploading' ? 'Uploading...' : 'Assessing...'}
+                  {stage === 'uploading' ? t('uploadingText') : t('assessingText')}
                 </Text>
               </View>
             ) : (
-              <Text style={styles.submitButtonText}>Submit</Text>
+              <Text style={styles.submitButtonText}>{t('submitButtonText')}</Text>
             )}
           </Pressable>
         </View>
@@ -278,73 +276,78 @@ function ModeTab({
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.xl,
-    gap: spacing.md,
-  },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  definition: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  modeTabs: { flexDirection: 'row', gap: spacing.sm },
-  modeTab: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  modeTabActive: { backgroundColor: colors.arcane, borderColor: colors.arcane },
-  modeTabText: { color: colors.inkMuted, fontSize: typography.scale.sm, fontWeight: '700' },
-  modeTabTextActive: { color: colors.ink },
-  section: { gap: spacing.sm },
-  hint: { color: colors.inkMuted, fontSize: typography.scale.xs },
-  textArea: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    color: colors.ink,
-    fontSize: typography.scale.md,
-    minHeight: 100,
-    textAlignVertical: 'top',
-  },
-  preview: { width: '100%', height: 220, borderRadius: radius.md, backgroundColor: colors.surface },
-  photoButtonsRow: { flexDirection: 'row', gap: spacing.sm },
-  photoButton: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  photoButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
-  submitButton: {
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  submitButtonDisabled: { opacity: 0.4 },
-  submitButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-  busyRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  error: { color: colors.danger, fontSize: typography.scale.sm },
-});
+    container: {
+      flexGrow: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.xl,
+      gap: spacing.md,
+    },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    definition: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    modeTabs: { flexDirection: 'row', gap: spacing.sm },
+    modeTab: {
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    modeTabActive: { backgroundColor: colors.arcane, borderColor: colors.arcane },
+    modeTabText: { color: colors.inkMuted, fontSize: typography.scale.sm, fontWeight: '700' },
+    modeTabTextActive: { color: colors.ink },
+    section: { gap: spacing.sm },
+    hint: { color: colors.inkMuted, fontSize: typography.scale.xs },
+    textArea: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+      minHeight: 100,
+      textAlignVertical: 'top',
+    },
+    preview: {
+      width: '100%',
+      height: 220,
+      borderRadius: radius.md,
+      backgroundColor: colors.surface,
+    },
+    photoButtonsRow: { flexDirection: 'row', gap: spacing.sm },
+    photoButton: {
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    photoButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
+    submitButton: {
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    submitButtonDisabled: { opacity: 0.4 },
+    submitButtonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+    busyRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+    error: { color: colors.danger, fontSize: typography.scale.sm },
+  });
 }

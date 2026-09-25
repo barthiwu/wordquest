@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { journeyVisualFor } from '@/constants/journeyVisuals';
@@ -22,6 +23,7 @@ interface Props {
  * renders the moment once told to.
  */
 export function JourneyCelebration({ stageName, primaryTitle, stageKey, onDismiss }: Props) {
+  const { t } = useTranslation('common');
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const scale = useRef(new Animated.Value(0.7)).current;
@@ -42,16 +44,16 @@ export function JourneyCelebration({ stageName, primaryTitle, stageKey, onDismis
           <View style={[styles.iconRing, { borderColor: visual.color }]}>
             <Ionicons name={visual.icon} size={40} color={visual.color} />
           </View>
-          <Text style={styles.eyebrow}>Journey advanced</Text>
+          <Text style={styles.eyebrow}>{t('journeyCelebration.eyebrow')}</Text>
           <Text style={[styles.stageName, { color: visual.color }]}>{stageName}</Text>
           <Text style={styles.title}>{primaryTitle}</Text>
           <Pressable
             style={styles.button}
             onPress={onDismiss}
             accessibilityRole="button"
-            accessibilityLabel="Continue"
+            accessibilityLabel={t('continue')}
           >
-            <Text style={styles.buttonText}>Continue</Text>
+            <Text style={styles.buttonText}>{t('continue')}</Text>
           </Pressable>
         </Animated.View>
       </View>
@@ -61,51 +63,51 @@ export function JourneyCelebration({ stageName, primaryTitle, stageKey, onDismis
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.65)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.xl,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.xl,
-    alignItems: 'center',
-    gap: spacing.xs,
-    width: '100%',
-    maxWidth: 340,
-  },
-  iconRing: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-  },
-  eyebrow: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.xs,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  stageName: {
-    fontSize: typography.scale.xxl,
-    fontWeight: typography.display.weight,
-  },
-  title: { color: colors.ink, fontSize: typography.scale.md, marginBottom: spacing.md },
-  button: {
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xl,
-  },
-  buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-});
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.65)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xl,
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.xl,
+      alignItems: 'center',
+      gap: spacing.xs,
+      width: '100%',
+      maxWidth: 340,
+    },
+    iconRing: {
+      width: 76,
+      height: 76,
+      borderRadius: 38,
+      borderWidth: 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.sm,
+    },
+    eyebrow: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    stageName: {
+      fontSize: typography.scale.xxl,
+      fontWeight: typography.display.weight,
+    },
+    title: { color: colors.ink, fontSize: typography.scale.md, marginBottom: spacing.md },
+    button: {
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.xl,
+    },
+    buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+  });
 }

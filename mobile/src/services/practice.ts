@@ -30,7 +30,10 @@ export interface PracticeGuessResult {
 
 export interface PracticeWritingResult {
   scores: Record<string, number>;
+  /** This submission's own composite score — what this specific attempt scored. */
   score: number;
+  /** What's actually stored for this area — the higher of this attempt and any prior best; never moves backward. */
+  bestScore: number;
   masteryLevel: MasteryLevel;
   justMastered: boolean;
   whatWentWell: string;

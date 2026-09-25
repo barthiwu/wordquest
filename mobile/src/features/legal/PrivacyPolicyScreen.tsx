@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { LegalDocScreen } from '@/components/LegalDocScreen';
 import {
   PRIVACY_POLICY_INTRO,
@@ -16,11 +17,16 @@ type Props = NativeStackScreenProps<RootStackParamList, 'PrivacyPolicy'>;
  * docs/PRIVACY_POLICY.md at the repo root. Layout itself lives in the
  * shared LegalDocScreen, alongside TermsOfServiceScreen and
  * AgeRestrictionScreen.
+ *
+ * i18n note: only the screen title is translated here — the document
+ * body itself (intro/sections, from constants/privacyPolicy.ts) is
+ * out of scope; see src/i18n/index.ts's doc comment.
  */
 export function PrivacyPolicyScreen({ navigation }: Props) {
+  const { t } = useTranslation('legal');
   return (
     <LegalDocScreen
-      title="Privacy Policy"
+      title={t('privacyPolicy.title')}
       lastUpdated={PRIVACY_POLICY_LAST_UPDATED}
       intro={PRIVACY_POLICY_INTRO}
       sections={PRIVACY_POLICY_SECTIONS}

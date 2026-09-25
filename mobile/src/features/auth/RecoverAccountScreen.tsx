@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { recoverAccount } from '@/services/auth';
@@ -30,6 +31,7 @@ export function RecoverAccountScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('auth');
   const setSession = useAuthStore((s) => s.setSession);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,8 +51,8 @@ export function RecoverAccountScreen({ navigation }: Props) {
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 401
-          ? 'Incorrect email or password, or this account is not deleted.'
-          : 'Something went wrong. Please try again.',
+          ? t('recoverAccount.errorIncorrect')
+          : t('recoverAccount.errorGeneric'),
       );
     } finally {
       setSubmitting(false);
@@ -63,31 +65,29 @@ export function RecoverAccountScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
-        <Text style={styles.title}>Recover your account</Text>
-        <Text style={styles.subtitle}>
-          Log in with your old credentials to restore a deleted account.
-        </Text>
+        <Text style={styles.title}>{t('recoverAccount.title')}</Text>
+        <Text style={styles.subtitle}>{t('recoverAccount.subtitle')}</Text>
       </View>
 
       <View style={styles.form}>
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder={t('recoverAccount.emailPlaceholder')}
           placeholderTextColor={colors.inkMuted}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
-          accessibilityLabel="Email"
+          accessibilityLabel={t('recoverAccount.emailPlaceholder')}
         />
         <TextInput
           style={styles.input}
-          placeholder="Password"
+          placeholder={t('recoverAccount.passwordPlaceholder')}
           placeholderTextColor={colors.inkMuted}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          accessibilityLabel="Password"
+          accessibilityLabel={t('recoverAccount.passwordPlaceholder')}
         />
 
         {error && <Text style={styles.error}>{error}</Text>}
@@ -97,13 +97,13 @@ export function RecoverAccountScreen({ navigation }: Props) {
           onPress={onSubmit}
           disabled={!canSubmit || submitting}
           accessibilityRole="button"
-          accessibilityLabel="Recover account"
-          accessibilityHint="Restores a deleted account to active"
+          accessibilityLabel={t('recoverAccount.submit')}
+          accessibilityHint={t('recoverAccount.submitHint')}
         >
           {submitting ? (
             <ActivityIndicator color={colors.ink} />
           ) : (
-            <Text style={styles.buttonText}>Recover account</Text>
+            <Text style={styles.buttonText}>{t('recoverAccount.submit')}</Text>
           )}
         </Pressable>
       </View>
@@ -113,40 +113,40 @@ export function RecoverAccountScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.xxl * 1.5,
-    gap: spacing.xl,
-  },
-  header: { gap: spacing.xs },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
-  form: { gap: spacing.md },
-  input: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    color: colors.ink,
-    fontSize: typography.scale.md,
-  },
-  error: { color: colors.danger, fontSize: typography.scale.sm },
-  button: {
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-});
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.xxl * 1.5,
+      gap: spacing.xl,
+    },
+    header: { gap: spacing.xs },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
+    form: { gap: spacing.md },
+    input: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+    },
+    error: { color: colors.danger, fontSize: typography.scale.sm },
+    button: {
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    buttonDisabled: { opacity: 0.5 },
+    buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+  });
 }

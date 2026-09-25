@@ -120,6 +120,6 @@ export function RadarChart({ data, size = 260 }: Props) {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-  wrapper: { alignItems: 'center', justifyContent: 'center' },
-});
+    wrapper: { alignItems: 'center', justifyContent: 'center' },
+  });
 }

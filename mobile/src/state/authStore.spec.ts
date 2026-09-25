@@ -11,7 +11,14 @@ jest.mock('expo-secure-store', () => ({
 const authResult: AuthResult = {
   accessToken: 'access-123',
   refreshToken: 'refresh-456',
-  user: { id: 'u1', email: 'barth@example.com', displayName: 'Barth', countryCode: 'NG' },
+  user: {
+    id: 'u1',
+    email: 'barth@example.com',
+    displayName: 'Barth',
+    username: 'barth',
+    countryCode: 'NG',
+    avatarUrl: null,
+  },
 };
 
 describe('useAuthStore', () => {
@@ -57,7 +64,10 @@ describe('useAuthStore', () => {
     it('persists both tokens to SecureStore under the expected keys', async () => {
       await useAuthStore.getState().setSession(authResult);
 
-      expect(SecureStore.setItemAsync).toHaveBeenCalledWith('wordquest.accessToken.v2', 'access-123');
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
+        'wordquest.accessToken.v2',
+        'access-123',
+      );
       expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
         'wordquest.refreshToken.v2',
         'refresh-456',

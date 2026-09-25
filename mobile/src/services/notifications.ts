@@ -13,7 +13,8 @@ export type NotificationType =
   | 'CEFR_UNLOCK'
   | 'BOSS_BATTLE_REMINDER'
   | 'BOSS_BATTLE_RESULT'
-  | 'LEADERBOARD_UPDATE';
+  | 'LEADERBOARD_UPDATE'
+  | 'STREAK_AT_RISK';
 
 export interface AppNotification {
   id: string;

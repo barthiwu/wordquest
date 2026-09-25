@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { searchWords, type WordSearchResult } from '@/services/words';
@@ -29,6 +30,7 @@ const SEARCH_DEBOUNCE_MS = 300;
  * is created for the chosen word.
  */
 export function WordInTheWildScreen({ navigation }: Props) {
+  const { t } = useTranslation('wordInTheWild');
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -47,10 +49,10 @@ export function WordInTheWildScreen({ navigation }: Props) {
       setError(null);
       searchWords(accessToken, text)
         .then(setResults)
-        .catch(() => setError('Could not search words.'))
+        .catch(() => setError(t('searchError')))
         .finally(() => setLoading(false));
     },
-    [accessToken],
+    [accessToken, t],
   );
 
   const onChangeQuery = (text: string) => {
@@ -71,7 +73,7 @@ export function WordInTheWildScreen({ navigation }: Props) {
         definition: mission.definition,
       });
     } catch {
-      setError('Could not start a mission for that word.');
+      setError(t('missionError'));
     } finally {
       setStartingWordId(null);
     }
@@ -80,21 +82,18 @@ export function WordInTheWildScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <BackButton onPress={() => navigation.goBack()} />
-      <Text style={styles.title}>Word in the Wild</Text>
-      <Text style={styles.subtitle}>
-        Pick a word you’ve already answered in a Quest — that’s what Word in the Wild
-        evidence is for.
-      </Text>
+      <Text style={styles.title}>{t('title')}</Text>
+      <Text style={styles.subtitle}>{t('subtitle')}</Text>
 
       <TextInput
         style={styles.searchInput}
-        placeholder="Search words..."
+        placeholder={t('searchPlaceholder')}
         placeholderTextColor={colors.inkMuted}
         value={query}
         onChangeText={onChangeQuery}
         autoCapitalize="none"
         autoCorrect={false}
-        accessibilityLabel="Search words"
+        accessibilityLabel={t('searchAccessibilityLabel')}
       />
 
       {loading && <ActivityIndicator color={colors.arcaneSoft} style={styles.spinner} />}
@@ -103,9 +102,7 @@ export function WordInTheWildScreen({ navigation }: Props) {
       {!loading && !error && results.length === 0 && (
         <View style={styles.empty}>
           <Text style={styles.emptyText}>
-            {query.trim().length === 0
-              ? 'Start typing a word you’ve already answered in a Quest.'
-              : `No answered words match “${query.trim()}” — Word in the Wild is only for words you’ve met in a Quest.`}
+            {query.trim().length === 0 ? t('emptyPrompt') : t('noMatches', { query: query.trim() })}
           </Text>
         </View>
       )}
@@ -120,7 +117,7 @@ export function WordInTheWildScreen({ navigation }: Props) {
             onPress={() => onPickWord(item)}
             disabled={startingWordId !== null}
             accessibilityRole="button"
-            accessibilityLabel={`Start mission for ${item.word}`}
+            accessibilityLabel={t('startMissionAccessibilityLabel', { word: item.word })}
           >
             <View style={{ flex: 1 }}>
               <Text style={styles.resultWord}>{item.word}</Text>
@@ -138,52 +135,52 @@ export function WordInTheWildScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.xl,
-    gap: spacing.md,
-  },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  subtitle: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  searchInput: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    color: colors.ink,
-    fontSize: typography.scale.md,
-  },
-  spinner: { marginTop: spacing.sm },
-  error: { color: colors.danger, fontSize: typography.scale.sm },
-  empty: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-  },
-  emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  list: { gap: spacing.sm },
-  resultRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    gap: spacing.sm,
-  },
-  resultWord: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-  resultDefinition: { color: colors.inkMuted, fontSize: typography.scale.xs },
-});
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.xl,
+      gap: spacing.md,
+    },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    subtitle: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    searchInput: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+    },
+    spinner: { marginTop: spacing.sm },
+    error: { color: colors.danger, fontSize: typography.scale.sm },
+    empty: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+    },
+    emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    list: { gap: spacing.sm },
+    resultRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      gap: spacing.sm,
+    },
+    resultWord: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+    resultDefinition: { color: colors.inkMuted, fontSize: typography.scale.xs },
+  });
 }

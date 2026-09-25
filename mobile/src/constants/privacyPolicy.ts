@@ -24,8 +24,7 @@ export const PRIVACY_POLICY_INTRO =
 export const PRIVACY_POLICY_SECTIONS: PrivacyPolicySection[] = [
   {
     heading: 'Who can use WordQuest',
-    body:
-      "You must be at least 13 years old to create a WordQuest account. This is enforced at signup — we ask for your date of birth and reject registration if you're under 13, to comply with the U.S. Children's Online Privacy Protection Act (COPPA). WordQuest does not knowingly collect information from anyone under 13. If we learn that an account belongs to someone under 13, we will delete that account and its data. If you believe a child under 13 has created a WordQuest account, email us and we'll investigate and remove it.",
+    body: "You must be at least 13 years old to create a WordQuest account. This is enforced at signup — we ask for your date of birth and reject registration if you're under 13, to comply with the U.S. Children's Online Privacy Protection Act (COPPA). WordQuest does not knowingly collect information from anyone under 13. If we learn that an account belongs to someone under 13, we will delete that account and its data. If you believe a child under 13 has created a WordQuest account, email us and we'll investigate and remove it.",
   },
   {
     heading: 'Account information you provide directly',
@@ -79,13 +78,13 @@ export const PRIVACY_POLICY_SECTIONS: PrivacyPolicySection[] = [
   },
   {
     heading: 'Data retention',
-    body: "We keep your account data for as long as your account is active. Deleting your account (Settings) deactivates it immediately; email us if you want your data permanently and completely erased rather than soft-deleted.",
+    body: 'We keep your account data for as long as your account is active. Deleting your account (Settings) deactivates it immediately; email us if you want your data permanently and completely erased rather than soft-deleted.',
   },
   {
     heading: 'Your choices and rights',
     body: [
       'Access or export your data — email us',
-      "Correct your data — most fields are editable in Settings; email us for the rest",
+      'Correct your data — most fields are editable in Settings; email us for the rest',
       'Delete your account — Settings > Delete Account, or email us for full erasure',
       'Delete a Word in the Wild submission — from within the app',
       "California residents (CCPA) — right to know, delete, and opt out of 'sale' (WordQuest doesn't sell personal information)",

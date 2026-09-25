@@ -21,6 +21,19 @@ const { withAppDelegate } = require('@expo/config-plugins');
  * Nothing about RN's own setup changes -- this only re-parents the
  * already-built root view controller once the scene becomes available.
  *
+ * IMPORTANT: `self` inside -scene:willConnectToSession:options: is NOT the
+ * same object as the UIApplicationDelegate singleton that
+ * -application:didFinishLaunchingWithOptions: ran on. UIKit always
+ * allocates a separate instance for scene-delegate duties, even when
+ * UISceneDelegateClassName names this very class -- so self.window in this
+ * method is a distinct, always-nil ivar, on every launch, no exceptions.
+ * The already-built window/rootViewController has to be read off
+ * [UIApplication sharedApplication].delegate instead, and the new
+ * scene-attached window written back onto that singleton's own `window`
+ * property too, since plain UIApplicationDelegate callbacks (openURL,
+ * remote notifications, etc.) keep running on the singleton and reference
+ * *its* self.window.
+ *
  * It also forwards any URL/user-activity the OS hands to this method via
  * connectionOptions -- this is how a COLD launch (app not already running)
  * delivers a URL, such as the dev-client's exp+wordquest:// deep link that
@@ -69,14 +82,28 @@ module.exports = function withSceneDelegateWindow(config) {
     willConnectToSession:(UISceneSession *)session
                  options:(UISceneConnectionOptions *)connectionOptions
 {
-  if (![scene isKindOfClass:[UIWindowScene class]] || !self.window) {
+  // self here is a SEPARATE instance from the UIApplicationDelegate
+  // singleton that -application:didFinishLaunchingWithOptions: ran on --
+  // UIKit always allocates a fresh object for scene-delegate duties, even
+  // though UISceneDelegateClassName names this same class. self.window is
+  // therefore a distinct, never-populated ivar and is ALWAYS nil here, on
+  // every launch. Pull the real, already-built window/rootViewController
+  // off the actual app-delegate singleton instead.
+  id<UIApplicationDelegate> appDelegate = [UIApplication sharedApplication].delegate;
+  UIWindow *builtWindow = appDelegate.window;
+  if (![scene isKindOfClass:[UIWindowScene class]] || !builtWindow) {
     return;
   }
   UIWindowScene *windowScene = (UIWindowScene *)scene;
-  UIViewController *rootViewController = self.window.rootViewController;
+  UIViewController *rootViewController = builtWindow.rootViewController;
   UIWindow *sceneWindow = [[UIWindow alloc] initWithWindowScene:windowScene];
   sceneWindow.rootViewController = rootViewController;
   self.window = sceneWindow;
+  // Keep the app-delegate singleton's own window in sync too: plain
+  // UIApplicationDelegate methods (application:openURL:options:, remote
+  // notification callbacks, etc.) run on THAT instance and read *its*
+  // self.window, not this scene delegate's.
+  appDelegate.window = sceneWindow;
   [self.window makeKeyAndVisible];
 
   for (UIOpenURLContext *context in connectionOptions.URLContexts) {

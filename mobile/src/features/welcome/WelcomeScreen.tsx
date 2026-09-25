@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -17,11 +18,12 @@ export function WelcomeScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('welcome');
   return (
     <View style={styles.container}>
       <View style={styles.copy}>
-        <Text style={styles.title}>Your quest begins here.</Text>
-        <Text style={styles.subtitle}>Master words. Build your Kingdom. Become a Legend.</Text>
+        <Text style={styles.title}>{t('title')}</Text>
+        <Text style={styles.subtitle}>{t('subtitle')}</Text>
       </View>
 
       <View style={styles.actions}>
@@ -29,17 +31,17 @@ export function WelcomeScreen({ navigation }: Props) {
           style={[styles.button, styles.buttonPrimary]}
           onPress={() => navigation.navigate('Registration')}
           accessibilityRole="button"
-          accessibilityLabel="Begin your Quest"
+          accessibilityLabel={t('beginQuest')}
         >
-          <Text style={styles.buttonPrimaryText}>Begin your Quest</Text>
+          <Text style={styles.buttonPrimaryText}>{t('beginQuest')}</Text>
         </Pressable>
         <Pressable
           style={styles.button}
           onPress={() => navigation.navigate('Login')}
           accessibilityRole="button"
-          accessibilityLabel="I already have an account"
+          accessibilityLabel={t('haveAccount')}
         >
-          <Text style={styles.buttonText}>I already have an account</Text>
+          <Text style={styles.buttonText}>{t('haveAccount')}</Text>
         </Pressable>
       </View>
     </View>
@@ -48,45 +50,45 @@ export function WelcomeScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.xl,
-    paddingTop: topInset + spacing.xxl * 2,
-    paddingBottom: spacing.xxl,
-  },
-  copy: {
-    gap: spacing.sm,
-  },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  subtitle: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.md,
-  },
-  actions: {
-    gap: spacing.sm,
-  },
-  button: {
-    paddingVertical: spacing.md,
-    borderRadius: radius.md,
-    alignItems: 'center',
-  },
-  buttonPrimary: {
-    backgroundColor: colors.arcane,
-  },
-  buttonPrimaryText: {
-    color: colors.ink,
-    fontSize: typography.scale.md,
-    fontWeight: '700',
-  },
-  buttonText: {
-    color: colors.inkMuted,
-    fontSize: typography.scale.md,
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.xl,
+      paddingTop: topInset + spacing.xxl * 2,
+      paddingBottom: spacing.xxl,
+    },
+    copy: {
+      gap: spacing.sm,
+    },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    subtitle: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.md,
+    },
+    actions: {
+      gap: spacing.sm,
+    },
+    button: {
+      paddingVertical: spacing.md,
+      borderRadius: radius.md,
+      alignItems: 'center',
+    },
+    buttonPrimary: {
+      backgroundColor: colors.arcane,
+    },
+    buttonPrimaryText: {
+      color: colors.ink,
+      fontSize: typography.scale.md,
+      fontWeight: '700',
+    },
+    buttonText: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.md,
+    },
+  });
 }

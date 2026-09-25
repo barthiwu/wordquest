@@ -29,7 +29,15 @@ export function GlyphIcon({ size = 24, color }: GlyphIconProps) {
         strokeWidth={8}
         strokeLinecap="round"
       />
-      <Line x1={50} y1={26} x2={50} y2={76} stroke={resolvedColor} strokeWidth={8} strokeLinecap="round" />
+      <Line
+        x1={50}
+        y1={26}
+        x2={50}
+        y2={76}
+        stroke={resolvedColor}
+        strokeWidth={8}
+        strokeLinecap="round"
+      />
     </Svg>
   );
 }
@@ -77,7 +85,15 @@ export function GlyphCoin({ size = 28 }: GlyphCoinProps) {
       {/* Rim, for depth */}
       <Circle cx={50} cy={50} r={44} fill="none" stroke="#C98A1D" strokeWidth={4} />
       {/* Bevel: a subtle inset ring between the rim and the symbol */}
-      <Circle cx={50} cy={50} r={38} fill="none" stroke="#8B5E0F" strokeWidth={2} strokeOpacity={0.45} />
+      <Circle
+        cx={50}
+        cy={50}
+        r={38}
+        fill="none"
+        stroke="#8B5E0F"
+        strokeWidth={2}
+        strokeOpacity={0.45}
+      />
       {/* Engraved symbol: the original Insight Glyph mark (see the
           plain GlyphIcon export above, unchanged since the project's
           first design pass) -- a complete outer ring, an inner ring
@@ -91,7 +107,15 @@ export function GlyphCoin({ size = 28 }: GlyphCoinProps) {
           exact SVG elliptical-arc math and swept the long way around
           (large-arc-flag=1, sweep-flag=0) so it passes through the
           bottom rather than cutting across the gap. */}
-      <Circle cx={50} cy={50} r={33.3} fill="none" stroke="#181233" strokeOpacity={0.82} strokeWidth={5} />
+      <Circle
+        cx={50}
+        cy={50}
+        r={33.3}
+        fill="none"
+        stroke="#181233"
+        strokeOpacity={0.82}
+        strokeWidth={5}
+      />
       <Path
         d="M35.86,35.86 A20,20 0 1,0 64.14,35.86"
         fill="none"

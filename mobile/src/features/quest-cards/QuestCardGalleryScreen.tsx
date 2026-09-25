@@ -2,6 +2,7 @@ import { useCallback, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
@@ -39,6 +40,7 @@ function getRarityColors(colors: ThemeColors): Record<QuestCard['rarity'], strin
  * change their mind before committing.
  */
 export function QuestCardGalleryScreen({ navigation }: Props) {
+  const { t } = useTranslation('questCards');
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -62,8 +64,8 @@ export function QuestCardGalleryScreen({ navigation }: Props) {
             .map((c) => c.id),
         );
       })
-      .catch(() => setError('Could not load your Quest Cards.'));
-  }, [accessToken]);
+      .catch(() => setError(t('loadError')));
+  }, [accessToken, t]);
 
   useFocusEffect(load);
 
@@ -96,7 +98,7 @@ export function QuestCardGalleryScreen({ navigation }: Props) {
       await setMyShowcase(accessToken, selected);
       load();
     } catch {
-      setSaveError('Could not save your showcase. Try again.');
+      setSaveError(t('saveError'));
     } finally {
       setSaving(false);
     }
@@ -122,16 +124,18 @@ export function QuestCardGalleryScreen({ navigation }: Props) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <BackButton onPress={() => navigation.goBack()} />
-      <Text style={styles.title}>Quest Cards</Text>
+      <Text style={styles.title}>{t('title')}</Text>
       <Text style={styles.subtitle}>
-        {cards.length} earned · {selected.length}/{MAX_SHOWCASE_CARDS} showcased on your profile
+        {t('subtitle', {
+          earned: cards.length,
+          selected: selected.length,
+          max: MAX_SHOWCASE_CARDS,
+        })}
       </Text>
 
       {cards.length === 0 && (
         <View style={styles.empty}>
-          <Text style={styles.emptyText}>
-            No Quest Cards yet — your first one arrives with your next Journey milestone.
-          </Text>
+          <Text style={styles.emptyText}>{t('emptyText')}</Text>
         </View>
       )}
 
@@ -157,13 +161,15 @@ export function QuestCardGalleryScreen({ navigation }: Props) {
                 onPress={() => toggleShowcase(card.id)}
                 accessibilityRole="button"
                 accessibilityLabel={
-                  isSelected ? `Remove ${card.title} from showcase` : `Showcase ${card.title}`
+                  isSelected
+                    ? t('removeFromShowcase', { title: card.title })
+                    : t('addToShowcase', { title: card.title })
                 }
               >
                 <Text
                   style={[styles.showcaseToggleText, isSelected && styles.showcaseToggleActive]}
                 >
-                  {isSelected ? '★ Showcased' : '☆ Showcase'}
+                  {isSelected ? t('showcasedLabel') : t('showcaseLabel')}
                 </Text>
               </Pressable>
             </View>
@@ -179,9 +185,11 @@ export function QuestCardGalleryScreen({ navigation }: Props) {
             onPress={onSaveShowcase}
             disabled={!dirty || saving}
             accessibilityRole="button"
-            accessibilityLabel="Save showcase"
+            accessibilityLabel={t('saveShowcaseAccessibilityLabel')}
           >
-            <Text style={styles.saveButtonText}>{saving ? 'Saving…' : 'Save showcase'}</Text>
+            <Text style={styles.saveButtonText}>
+              {saving ? t('savingText') : t('saveShowcaseText')}
+            </Text>
           </Pressable>
         </View>
       )}
@@ -191,56 +199,60 @@ export function QuestCardGalleryScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
-  centered: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  error: { color: colors.danger, fontSize: typography.scale.md },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  subtitle: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  empty: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-  },
-  emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  card: {
-    flexBasis: '47%',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 2,
-    padding: spacing.md,
-    gap: spacing.xs,
-    minHeight: 96,
-  },
-  rarity: {
-    fontSize: typography.scale.xs,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-  cardTitle: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
-  showcaseToggle: { marginTop: spacing.xs, alignSelf: 'flex-start' },
-  showcaseToggleText: { color: colors.inkMuted, fontSize: typography.scale.xs, fontWeight: '700' },
-  showcaseToggleActive: { color: colors.glyph },
-  saveBar: { gap: spacing.sm, alignItems: 'flex-start' },
-  saveButton: {
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-  },
-  saveButtonDisabled: { opacity: 0.5 },
-  saveButtonText: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
-});
+    container: { flex: 1, backgroundColor: colors.background },
+    content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
+    centered: {
+      flex: 1,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    error: { color: colors.danger, fontSize: typography.scale.md },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    subtitle: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    empty: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+    },
+    emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+    card: {
+      flexBasis: '47%',
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 2,
+      padding: spacing.md,
+      gap: spacing.xs,
+      minHeight: 96,
+    },
+    rarity: {
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+    },
+    cardTitle: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
+    showcaseToggle: { marginTop: spacing.xs, alignSelf: 'flex-start' },
+    showcaseToggleText: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
+    },
+    showcaseToggleActive: { color: colors.glyph },
+    saveBar: { gap: spacing.sm, alignItems: 'flex-start' },
+    saveButton: {
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.lg,
+    },
+    saveButtonDisabled: { opacity: 0.5 },
+    saveButtonText: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
+  });
 }

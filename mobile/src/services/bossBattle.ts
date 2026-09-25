@@ -34,7 +34,7 @@ export interface BattleAnswerResult {
 
 export interface LeaderboardEntry {
   userId: string;
-  displayName: string;
+  username: string;
   /** Null while the battle is still LIVE — no comparative rank is shown until the group finalizes. */
   rank: number | null;
   battleXp: number;

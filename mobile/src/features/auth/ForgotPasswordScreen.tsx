@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { requestPasswordReset, resetPassword } from '@/services/auth';
@@ -31,6 +32,7 @@ export function ForgotPasswordScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('auth');
   const [step, setStep] = useState<Step>('request');
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');
@@ -61,7 +63,7 @@ export function ForgotPasswordScreen({ navigation }: Props) {
       await resetPassword(token.trim(), newPassword);
       setStep('done');
     } catch {
-      setError('That code is invalid or has expired. Request a new one.');
+      setError(t('forgotPassword.errorInvalidCode'));
     } finally {
       setSubmitting(false);
     }
@@ -73,11 +75,11 @@ export function ForgotPasswordScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
-        <Text style={styles.title}>Reset your password</Text>
+        <Text style={styles.title}>{t('forgotPassword.title')}</Text>
         <Text style={styles.subtitle}>
-          {step === 'request' && "We'll email you a code if that address has an account."}
-          {step === 'reset' && 'Enter the code from your email and choose a new password.'}
-          {step === 'done' && 'Your password has been reset.'}
+          {step === 'request' && t('forgotPassword.subtitleRequest')}
+          {step === 'reset' && t('forgotPassword.subtitleReset')}
+          {step === 'done' && t('forgotPassword.subtitleDone')}
         </Text>
       </View>
 
@@ -85,25 +87,25 @@ export function ForgotPasswordScreen({ navigation }: Props) {
         <View style={styles.form}>
           <TextInput
             style={styles.input}
-            placeholder="Email"
+            placeholder={t('forgotPassword.emailPlaceholder')}
             placeholderTextColor={colors.inkMuted}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
-            accessibilityLabel="Email"
+            accessibilityLabel={t('forgotPassword.emailPlaceholder')}
           />
           <Pressable
             style={[styles.button, !email.includes('@') && styles.buttonDisabled]}
             onPress={onRequest}
             disabled={!email.includes('@') || submitting}
             accessibilityRole="button"
-            accessibilityLabel="Send code"
+            accessibilityLabel={t('forgotPassword.sendCode')}
           >
             {submitting ? (
               <ActivityIndicator color={colors.ink} />
             ) : (
-              <Text style={styles.buttonText}>Send code</Text>
+              <Text style={styles.buttonText}>{t('forgotPassword.sendCode')}</Text>
             )}
           </Pressable>
         </View>
@@ -113,21 +115,21 @@ export function ForgotPasswordScreen({ navigation }: Props) {
         <View style={styles.form}>
           <TextInput
             style={styles.input}
-            placeholder="Reset code"
+            placeholder={t('forgotPassword.tokenPlaceholder')}
             placeholderTextColor={colors.inkMuted}
             value={token}
             onChangeText={setToken}
             autoCapitalize="none"
-            accessibilityLabel="Reset code"
+            accessibilityLabel={t('forgotPassword.tokenPlaceholder')}
           />
           <TextInput
             style={styles.input}
-            placeholder="New password"
+            placeholder={t('forgotPassword.newPasswordPlaceholder')}
             placeholderTextColor={colors.inkMuted}
             value={newPassword}
             onChangeText={setNewPassword}
             secureTextEntry
-            accessibilityLabel="New password"
+            accessibilityLabel={t('forgotPassword.newPasswordPlaceholder')}
           />
           {error && <Text style={styles.error}>{error}</Text>}
           <Pressable
@@ -138,12 +140,12 @@ export function ForgotPasswordScreen({ navigation }: Props) {
             onPress={onReset}
             disabled={!token.trim() || newPassword.length < 8 || submitting}
             accessibilityRole="button"
-            accessibilityLabel="Reset password"
+            accessibilityLabel={t('forgotPassword.resetPassword')}
           >
             {submitting ? (
               <ActivityIndicator color={colors.ink} />
             ) : (
-              <Text style={styles.buttonText}>Reset password</Text>
+              <Text style={styles.buttonText}>{t('forgotPassword.resetPassword')}</Text>
             )}
           </Pressable>
         </View>
@@ -154,9 +156,9 @@ export function ForgotPasswordScreen({ navigation }: Props) {
           style={styles.button}
           onPress={() => navigation.replace('Login')}
           accessibilityRole="button"
-          accessibilityLabel="Back to log in"
+          accessibilityLabel={t('forgotPassword.backToLogin')}
         >
-          <Text style={styles.buttonText}>Back to log in</Text>
+          <Text style={styles.buttonText}>{t('forgotPassword.backToLogin')}</Text>
         </Pressable>
       )}
     </KeyboardAvoidingView>
@@ -165,40 +167,40 @@ export function ForgotPasswordScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.xxl * 1.5,
-    gap: spacing.xl,
-  },
-  header: { gap: spacing.xs },
-  title: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-  },
-  subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
-  form: { gap: spacing.md },
-  input: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    color: colors.ink,
-    fontSize: typography.scale.md,
-  },
-  error: { color: colors.danger, fontSize: typography.scale.sm },
-  button: {
-    backgroundColor: colors.arcane,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
-});
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.xxl * 1.5,
+      gap: spacing.xl,
+    },
+    header: { gap: spacing.xs },
+    title: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+    },
+    subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
+    form: { gap: spacing.md },
+    input: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+    },
+    error: { color: colors.danger, fontSize: typography.scale.sm },
+    button: {
+      backgroundColor: colors.arcane,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+    },
+    buttonDisabled: { opacity: 0.5 },
+    buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+  });
 }

@@ -2,6 +2,7 @@ import { useCallback, useState, useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { getQuestCard, type QuestCard } from '@/services/questCards';
@@ -24,6 +25,7 @@ function getRarityColors(colors: ThemeColors): Record<QuestCard['rarity'], strin
 
 /** One Quest Card's full detail — the same view used for sharing (owner-only; a card is "permanent identity," not a public link). */
 export function QuestCardDetailScreen({ route, navigation }: Props) {
+  const { t } = useTranslation('questCards');
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -36,8 +38,8 @@ export function QuestCardDetailScreen({ route, navigation }: Props) {
     if (!accessToken) return;
     getQuestCard(accessToken, route.params.id)
       .then(setCard)
-      .catch(() => setError('Could not load this Quest Card.'));
-  }, [accessToken, route.params.id]);
+      .catch(() => setError(t('detail.loadError')));
+  }, [accessToken, route.params.id, t]);
 
   useFocusEffect(load);
 
@@ -65,8 +67,10 @@ export function QuestCardDetailScreen({ route, navigation }: Props) {
         <Text style={[styles.rarity, { color: RARITY_COLORS[card.rarity] }]}>{card.rarity}</Text>
         <Text style={styles.cardTitle}>{card.title}</Text>
         {card.category && <Text style={styles.category}>{card.category}</Text>}
-        <Text style={styles.name}>{card.playerDisplayNameSnapshot}</Text>
-        <Text style={styles.earnedAt}>Earned {new Date(card.earnedAt).toLocaleDateString()}</Text>
+        <Text style={styles.name}>{card.playerUsernameSnapshot}</Text>
+        <Text style={styles.earnedAt}>
+          {t('detail.earnedAt', { date: new Date(card.earnedAt).toLocaleDateString() })}
+        </Text>
       </FadeInUp>
     </View>
   );
@@ -74,45 +78,45 @@ export function QuestCardDetailScreen({ route, navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: topInset + spacing.xxl,
-    gap: spacing.lg,
-  },
-  centered: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  error: { color: colors.danger, fontSize: typography.scale.md },
-  card: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 2,
-    padding: spacing.xl,
-    gap: spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rarity: { fontSize: typography.scale.sm, fontWeight: '700', textTransform: 'uppercase' },
-  cardTitle: {
-    color: colors.ink,
-    fontSize: typography.scale.xl,
-    fontWeight: typography.display.weight,
-    textAlign: 'center',
-  },
-  category: { color: colors.inkMuted, fontSize: typography.scale.sm },
-  name: {
-    color: colors.arcaneSoft,
-    fontSize: typography.scale.md,
-    fontWeight: '700',
-    marginTop: spacing.md,
-  },
-  earnedAt: { color: colors.inkMuted, fontSize: typography.scale.xs },
-});
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: topInset + spacing.xxl,
+      gap: spacing.lg,
+    },
+    centered: {
+      flex: 1,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    error: { color: colors.danger, fontSize: typography.scale.md },
+    card: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 2,
+      padding: spacing.xl,
+      gap: spacing.sm,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    rarity: { fontSize: typography.scale.sm, fontWeight: '700', textTransform: 'uppercase' },
+    cardTitle: {
+      color: colors.ink,
+      fontSize: typography.scale.xl,
+      fontWeight: typography.display.weight,
+      textAlign: 'center',
+    },
+    category: { color: colors.inkMuted, fontSize: typography.scale.sm },
+    name: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.md,
+      fontWeight: '700',
+      marginTop: spacing.md,
+    },
+    earnedAt: { color: colors.inkMuted, fontSize: typography.scale.xs },
+  });
 }

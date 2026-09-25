@@ -10,8 +10,12 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
+import { ScoreRing } from '@/components/ScoreRing';
 import {
   getPracticeOverview,
   submitPracticeParagraph,
@@ -30,13 +34,36 @@ type Props = NativeStackScreenProps<RootStackParamList, 'WordPractice'>;
 
 type Mode = 'sentence' | 'paragraph';
 
-const LEVEL_LABEL: Record<MasteryLevel, string> = {
-  NEW: 'New',
-  RECOGNIZING: 'Recognizing',
-  RECALLING: 'Recalling',
-  STRONG: 'Strong',
-  MASTERED: 'Mastered',
-};
+function scoreBandColor(score: number, colors: ThemeColors): string {
+  if (score >= 90) return colors.success;
+  if (score >= 75) return colors.arcaneSoft;
+  return colors.warning;
+}
+
+function capitalize(key: string): string {
+  return key.charAt(0).toUpperCase() + key.slice(1);
+}
+
+// result.scores is a Record<string, number> -- an open-ended shape from
+// the practice-scoring API, so we can't guarantee every possible key up
+// front. scoreCategoryLabel looks the key up in the shared
+// common:scoreCategories.* map (the dimension names already known to be
+// in use across the app -- grammar, vocabulary, coherence, etc., kept in
+// sync with MasterChallengeScreen's own fixed set); any key not in that
+// map falls back to a capitalized rendering of the raw key via i18next's
+// defaultValue, so an unrecognized dimension degrades to readable
+// English instead of breaking.
+function scoreCategoryLabel(key: string, t: TFunction): string {
+  return t(`common:scoreCategories.${key}`, { defaultValue: capitalize(key) });
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.substring(0, 2), 16);
+  const g = parseInt(clean.substring(2, 4), 16);
+  const b = parseInt(clean.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 /**
  * Profile > My Words > tap a word — practice Sentence/Paragraph again
@@ -54,19 +81,32 @@ const LEVEL_LABEL: Record<MasteryLevel, string> = {
  * easy rather than a real test ("no longer much fun" was the exact
  * feedback this came from). Guess score still shown read-only below,
  * since it's still real mastery data -- it just only moves from a
- * live Quest.
+ * live Quest. It also no longer gates MASTERED past the first correct
+ * guess ever made (see backend MasteryService.applyMasteryGate) -- once
+ * a player has gotten a word's guess right once, that dimension is
+ * satisfied for good, so getting to MASTERED here only ever depends on
+ * Sentence and Paragraph, each stored as this word's best score yet
+ * (a weaker re-practice attempt never lowers what's on file).
  */
 export function WordPracticeScreen({ route, navigation }: Props) {
   const { wordId } = route.params;
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('wordPractice');
   const accessToken = useAuthStore((s) => s.accessToken);
+
+  const LEVEL_LABEL: Record<MasteryLevel, string> = {
+    NEW: t('levelNew'),
+    RECOGNIZING: t('levelRecognizing'),
+    RECALLING: t('levelRecalling'),
+    STRONG: t('levelStrong'),
+    MASTERED: t('levelMastered'),
+  };
 
   const [overview, setOverview] = useState<PracticeWordOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>('sentence');
-
 
   const [sentenceText, setSentenceText] = useState('');
   const [sentenceBusy, setSentenceBusy] = useState(false);
@@ -80,8 +120,8 @@ export function WordPracticeScreen({ route, navigation }: Props) {
     if (!accessToken) return;
     getPracticeOverview(accessToken, wordId)
       .then(setOverview)
-      .catch(() => setError('Could not load this word.'));
-  }, [accessToken, wordId]);
+      .catch(() => setError(t('loadError')));
+  }, [accessToken, wordId, t]);
 
   useFocusEffect(loadOverview);
 
@@ -100,15 +140,20 @@ export function WordPracticeScreen({ route, navigation }: Props) {
       const result = await submitPracticeSentence(accessToken, wordId, sentenceText.trim());
       setSentenceResult(result);
       applyLevelUpdate(result.masteryLevel);
-      setOverview((prev) => (prev ? { ...prev, sentenceScore: result.score } : prev));
+      // bestScore, not score -- the card should reflect what's actually
+      // stored (the higher of this attempt and any prior best), while
+      // the result screen's own ring below still shows this attempt's
+      // honest score.
+      setOverview((prev) => (prev ? { ...prev, sentenceScore: result.bestScore } : prev));
     } catch {
-      setError('Could not submit your sentence. Please try again.');
+      setError(t('sentenceSubmitError'));
     } finally {
       setSentenceBusy(false);
     }
   };
 
-  const paragraphWordCount = paragraphText.trim().length === 0 ? 0 : paragraphText.trim().split(/\s+/).length;
+  const paragraphWordCount =
+    paragraphText.trim().length === 0 ? 0 : paragraphText.trim().split(/\s+/).length;
   const paragraphValid = paragraphWordCount >= 30 && paragraphWordCount <= 100;
 
   const onSubmitParagraph = async () => {
@@ -118,9 +163,10 @@ export function WordPracticeScreen({ route, navigation }: Props) {
       const result = await submitPracticeParagraph(accessToken, wordId, paragraphText.trim());
       setParagraphResult(result);
       applyLevelUpdate(result.masteryLevel);
-      setOverview((prev) => (prev ? { ...prev, paragraphScore: result.score } : prev));
+      // bestScore, not score -- same reasoning as onSubmitSentence above.
+      setOverview((prev) => (prev ? { ...prev, paragraphScore: result.bestScore } : prev));
     } catch {
-      setError('Could not submit your paragraph. Please try again.');
+      setError(t('paragraphSubmitError'));
     } finally {
       setParagraphBusy(false);
     }
@@ -148,25 +194,25 @@ export function WordPracticeScreen({ route, navigation }: Props) {
       <BackButton onPress={() => navigation.goBack()} />
 
       <View style={styles.header}>
+        {/* overview.word is the actual vocabulary word being practiced --
+            gameplay content from the practice API, left untranslated. */}
         <Text style={styles.word}>{overview.word}</Text>
         <View style={styles.levelBadge}>
           <Text style={styles.levelBadgeText}>{LEVEL_LABEL[overview.currentLevel]}</Text>
         </View>
       </View>
-      <Text style={styles.practiceNote}>Practice mode — no XP or rewards, just mastery.</Text>
-      <Text style={styles.guessNote}>
-        Guess — {overview.guessScore}% (only moves from a live Quest, not practiced here)
-      </Text>
+      <Text style={styles.practiceNote}>{t('practiceNote')}</Text>
+      <Text style={styles.guessNote}>{t('guessNote', { score: overview.guessScore })}</Text>
 
       <View style={styles.tabs}>
         <ModeTab
-          label="Sentence"
+          label={t('sentenceTab')}
           active={mode === 'sentence'}
           onPress={() => selectMode('sentence')}
           styles={styles}
         />
         <ModeTab
-          label="Paragraph"
+          label={t('paragraphTab')}
           active={mode === 'paragraph'}
           onPress={() => selectMode('paragraph')}
           styles={styles}
@@ -175,7 +221,12 @@ export function WordPracticeScreen({ route, navigation }: Props) {
 
       {mode === 'sentence' && (
         <View style={styles.card}>
-          <Text style={styles.cardLabel}>Sentence — {overview.sentenceScore}%</Text>
+          <Text style={styles.cardLabel}>
+            {t('sentenceCardLabel', { score: overview.sentenceScore })}
+          </Text>
+          {/* overview.definition / overview.exampleSentence are gameplay
+              content (the word's definition and a CEFR-level example
+              sentence) pulled from the practice API -- left untranslated. */}
           <Text style={styles.reference}>{overview.definition}</Text>
           <Text style={styles.referenceMuted}>{overview.exampleSentence}</Text>
 
@@ -186,9 +237,9 @@ export function WordPracticeScreen({ route, navigation }: Props) {
                 value={sentenceText}
                 onChangeText={setSentenceText}
                 multiline
-                placeholder={`Write one sentence using "${overview.word}"...`}
+                placeholder={t('sentencePlaceholder', { word: overview.word })}
                 placeholderTextColor={colors.inkMuted}
-                accessibilityLabel="Your sentence"
+                accessibilityLabel={t('sentenceInputAccessibilityLabel')}
               />
               <Pressable
                 style={[
@@ -198,44 +249,37 @@ export function WordPracticeScreen({ route, navigation }: Props) {
                 onPress={onSubmitSentence}
                 disabled={!sentenceText.trim() || sentenceBusy}
                 accessibilityRole="button"
-                accessibilityLabel="Submit"
+                accessibilityLabel={t('submit')}
               >
                 {sentenceBusy ? (
                   <ActivityIndicator color={colors.ink} />
                 ) : (
-                  <Text style={styles.buttonText}>Submit</Text>
+                  <Text style={styles.buttonText}>{t('submit')}</Text>
                 )}
               </Pressable>
             </>
           )}
 
           {sentenceResult && (
-            <FadeInUp style={styles.resultBlock}>
-              <ScoreList scores={sentenceResult.scores} styles={styles} />
-              <Text style={styles.reference}>{sentenceResult.whatWentWell}</Text>
-              <Text style={styles.referenceMuted}>{sentenceResult.whatNeedsImprovement}</Text>
-              {sentenceResult.justMastered && (
-                <Text style={styles.masteredBanner}>Mastered — every skill area cleared.</Text>
-              )}
-              <Pressable
-                style={styles.button}
-                onPress={() => {
-                  setSentenceResult(null);
-                  setSentenceText('');
-                }}
-                accessibilityRole="button"
-                accessibilityLabel="Practice again"
-              >
-                <Text style={styles.buttonText}>Practice again</Text>
-              </Pressable>
-            </FadeInUp>
+            <PracticeResult
+              result={sentenceResult}
+              onPracticeAgain={() => {
+                setSentenceResult(null);
+                setSentenceText('');
+              }}
+              colors={colors}
+              styles={styles}
+              t={t}
+            />
           )}
         </View>
       )}
 
       {mode === 'paragraph' && (
         <View style={styles.card}>
-          <Text style={styles.cardLabel}>Paragraph — {overview.paragraphScore}%</Text>
+          <Text style={styles.cardLabel}>
+            {t('paragraphCardLabel', { score: overview.paragraphScore })}
+          </Text>
           <Text style={styles.reference}>{overview.definition}</Text>
           <Text style={styles.referenceMuted}>{overview.exampleSentence}</Text>
 
@@ -246,47 +290,40 @@ export function WordPracticeScreen({ route, navigation }: Props) {
                 value={paragraphText}
                 onChangeText={setParagraphText}
                 multiline
-                placeholder={`Write a 30-100 word paragraph using "${overview.word}"...`}
+                placeholder={t('paragraphPlaceholder', { word: overview.word })}
                 placeholderTextColor={colors.inkMuted}
-                accessibilityLabel="Your paragraph"
+                accessibilityLabel={t('paragraphInputAccessibilityLabel')}
               />
-              <Text style={styles.referenceMuted}>{paragraphWordCount} / 30-100 words</Text>
+              <Text style={styles.referenceMuted}>
+                {t('paragraphWordCount', { count: paragraphWordCount })}
+              </Text>
               <Pressable
                 style={[styles.button, (!paragraphValid || paragraphBusy) && styles.buttonDisabled]}
                 onPress={onSubmitParagraph}
                 disabled={!paragraphValid || paragraphBusy}
                 accessibilityRole="button"
-                accessibilityLabel="Submit"
+                accessibilityLabel={t('submit')}
               >
                 {paragraphBusy ? (
                   <ActivityIndicator color={colors.ink} />
                 ) : (
-                  <Text style={styles.buttonText}>Submit</Text>
+                  <Text style={styles.buttonText}>{t('submit')}</Text>
                 )}
               </Pressable>
             </>
           )}
 
           {paragraphResult && (
-            <FadeInUp style={styles.resultBlock}>
-              <ScoreList scores={paragraphResult.scores} styles={styles} />
-              <Text style={styles.reference}>{paragraphResult.whatWentWell}</Text>
-              <Text style={styles.referenceMuted}>{paragraphResult.whatNeedsImprovement}</Text>
-              {paragraphResult.justMastered && (
-                <Text style={styles.masteredBanner}>Mastered — every skill area cleared.</Text>
-              )}
-              <Pressable
-                style={styles.button}
-                onPress={() => {
-                  setParagraphResult(null);
-                  setParagraphText('');
-                }}
-                accessibilityRole="button"
-                accessibilityLabel="Practice again"
-              >
-                <Text style={styles.buttonText}>Practice again</Text>
-              </Pressable>
-            </FadeInUp>
+            <PracticeResult
+              result={paragraphResult}
+              onPracticeAgain={() => {
+                setParagraphResult(null);
+                setParagraphText('');
+              }}
+              colors={colors}
+              styles={styles}
+              t={t}
+            />
           )}
         </View>
       )}
@@ -317,22 +354,85 @@ function ModeTab({
   );
 }
 
-function ScoreList({
-  scores,
+function PracticeResult({
+  result,
+  onPracticeAgain,
+  colors,
   styles,
+  t,
 }: {
-  scores: Record<string, number>;
+  result: PracticeWritingResult;
+  onPracticeAgain: () => void;
+  colors: ThemeColors;
   styles: ReturnType<typeof createStyles>;
+  t: TFunction;
 }) {
   return (
-    <View style={styles.scoreCard}>
-      {Object.entries(scores).map(([key, value]) => (
-        <View key={key} style={styles.scoreRow}>
-          <Text style={styles.scoreLabel}>{key}</Text>
-          <Text style={styles.scoreValue}>{value}</Text>
+    <FadeInUp style={styles.resultBlock}>
+      <FadeInUp style={styles.heroRingWrap}>
+        <ScoreRing
+          score={result.score}
+          size={168}
+          strokeWidth={14}
+          color={colors.arcane}
+          label={t('compositeScoreLabel')}
+        />
+      </FadeInUp>
+
+      <FadeInUp style={styles.subScoreRow} delay={120}>
+        {Object.entries(result.scores).map(([key, value]) => (
+          <View key={key} style={styles.subScoreItem}>
+            <ScoreRing
+              score={value}
+              size={56}
+              strokeWidth={6}
+              color={scoreBandColor(value, colors)}
+              valueFontSize={14}
+            />
+            <Text style={styles.subScoreLabel}>{scoreCategoryLabel(key, t)}</Text>
+          </View>
+        ))}
+      </FadeInUp>
+
+      <FadeInUp style={[styles.feedbackCard, styles.feedbackCardWorked]} delay={220}>
+        <View style={styles.feedbackCardHeader}>
+          <Ionicons name="checkmark-circle" size={16} color={colors.success} />
+          <Text style={[styles.feedbackCardLabel, { color: colors.success }]}>
+            {t('whatWorkedLabel')}
+          </Text>
         </View>
-      ))}
-    </View>
+        {/* result.whatWentWell is AI-generated feedback on this specific
+            submission, not a hardcoded literal -- left untranslated. */}
+        <Text style={styles.feedbackCardText}>{result.whatWentWell}</Text>
+      </FadeInUp>
+
+      <FadeInUp style={[styles.feedbackCard, styles.feedbackCardPolish]} delay={300}>
+        <View style={styles.feedbackCardHeader}>
+          <Ionicons name="locate-outline" size={15} color={colors.warning} />
+          <Text style={[styles.feedbackCardLabel, { color: colors.warning }]}>
+            {t('polishThisLabel')}
+          </Text>
+        </View>
+        {/* result.whatNeedsImprovement -- same as whatWentWell above. */}
+        <Text style={styles.feedbackCardText}>{result.whatNeedsImprovement}</Text>
+      </FadeInUp>
+
+      {result.justMastered && (
+        <FadeInUp style={styles.masteredPill} delay={380}>
+          <Ionicons name="ribbon" size={14} color={colors.glyph} />
+          <Text style={styles.masteredPillText}>{t('masteredPill')}</Text>
+        </FadeInUp>
+      )}
+
+      <Pressable
+        style={styles.button}
+        onPress={onPracticeAgain}
+        accessibilityRole="button"
+        accessibilityLabel={t('practiceAgain')}
+      >
+        <Text style={styles.buttonText}>{t('practiceAgain')}</Text>
+      </Pressable>
+    </FadeInUp>
   );
 }
 
@@ -443,17 +543,42 @@ function createStyles(colors: ThemeColors, topInset: number) {
     resultText: { fontSize: typography.scale.md, fontWeight: '700' },
     revealText: { color: colors.inkMuted, fontSize: typography.scale.sm },
     revealWord: { color: colors.ink, fontWeight: '700' },
-    masteredBanner: { color: colors.glyph, fontSize: typography.scale.sm, fontWeight: '700' },
-    scoreCard: {
-      backgroundColor: colors.surfaceRaised,
-      borderRadius: radius.md,
+    heroRingWrap: { alignSelf: 'center', marginVertical: spacing.sm },
+    subScoreRow: { flexDirection: 'row', justifyContent: 'space-between' },
+    subScoreItem: { alignItems: 'center', gap: spacing.xs },
+    subScoreLabel: { color: colors.inkMuted, fontSize: 10, fontWeight: '600' },
+    feedbackCard: {
+      borderRadius: radius.lg,
       borderWidth: 1,
-      borderColor: colors.border,
       padding: spacing.md,
       gap: spacing.xs,
     },
-    scoreRow: { flexDirection: 'row', justifyContent: 'space-between' },
-    scoreLabel: { color: colors.inkMuted, fontSize: typography.scale.sm, textTransform: 'capitalize' },
-    scoreValue: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
+    feedbackCardWorked: {
+      backgroundColor: hexToRgba(colors.success, 0.1),
+      borderColor: hexToRgba(colors.success, 0.35),
+    },
+    feedbackCardPolish: {
+      backgroundColor: hexToRgba(colors.warning, 0.1),
+      borderColor: hexToRgba(colors.warning, 0.35),
+    },
+    feedbackCardHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+    feedbackCardLabel: {
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    feedbackCardText: { color: colors.ink, fontSize: typography.scale.sm, lineHeight: 20 },
+    masteredPill: {
+      flexDirection: 'row',
+      alignSelf: 'center',
+      alignItems: 'center',
+      gap: spacing.xs,
+      backgroundColor: hexToRgba(colors.glyph, 0.14),
+      borderRadius: radius.pill,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+    },
+    masteredPillText: { color: colors.glyph, fontSize: typography.scale.xs, fontWeight: '700' },
   });
 }

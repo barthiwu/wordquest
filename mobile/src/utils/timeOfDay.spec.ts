@@ -1,4 +1,10 @@
-import { formatLocalClock, localDateString, timeOfDayGreeting, timeOfDayPeriod } from './timeOfDay';
+import {
+  formatLocalClock,
+  localDateString,
+  localIsoWeekKey,
+  timeOfDayGreeting,
+  timeOfDayPeriod,
+} from './timeOfDay';
 
 function atHour(hour: number, minute = 0): Date {
   const d = new Date(2026, 0, 1, hour, minute, 0);
@@ -73,5 +79,25 @@ describe('localDateString', () => {
     // west of UTC.
     const d = new Date(2026, 7, 14, 23, 30);
     expect(localDateString(d)).toBe('2026-08-14');
+  });
+});
+
+describe('localIsoWeekKey', () => {
+  it('formats as YYYY-Www from local date components', () => {
+    // Wednesday, Sept 23, 2026 falls in ISO week 39.
+    const d = new Date(2026, 8, 23, 10, 0);
+    expect(localIsoWeekKey(d)).toBe('2026-W39');
+  });
+
+  it('stays the same key across the week, Monday through Sunday', () => {
+    const monday = new Date(2026, 8, 21, 0, 1);
+    const sunday = new Date(2026, 8, 27, 23, 59);
+    expect(localIsoWeekKey(monday)).toBe(localIsoWeekKey(sunday));
+  });
+
+  it('rolls to a new week key the following Monday', () => {
+    const sunday = new Date(2026, 8, 27, 23, 59);
+    const nextMonday = new Date(2026, 8, 28, 0, 1);
+    expect(localIsoWeekKey(nextMonday)).not.toBe(localIsoWeekKey(sunday));
   });
 });

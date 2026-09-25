@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { fileReport, type ReportTargetType } from '@/services/reports';
@@ -14,6 +15,18 @@ const REASONS = [
   'Spam',
   'Other',
 ] as const;
+
+// Display-only translation keys for REASONS — the values submitted to
+// fileReport() stay the original English strings (REASONS itself is
+// unchanged) since that's the payload the moderation queue expects;
+// only what's shown on screen is translated.
+const REASON_KEYS: Record<(typeof REASONS)[number], string> = {
+  'Inappropriate name': 'reportButton.reasons.inappropriateName',
+  'Harassment or bullying': 'reportButton.reasons.harassmentOrBullying',
+  'Inappropriate photo': 'reportButton.reasons.inappropriatePhoto',
+  Spam: 'reportButton.reasons.spam',
+  Other: 'reportButton.reasons.other',
+};
 
 interface Props {
   targetType: ReportTargetType;
@@ -30,6 +43,7 @@ interface Props {
  * to triage against the target itself.
  */
 export function ReportButton({ targetType, targetId, label }: Props) {
+  const { t } = useTranslation('common');
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const accessToken = useAuthStore((s) => s.accessToken);
@@ -42,9 +56,12 @@ export function ReportButton({ targetType, targetId, label }: Props) {
     try {
       await fileReport(accessToken, { targetType, targetId, reason });
       setOpen(false);
-      Alert.alert('Report sent', "Thanks — we'll take a look.");
+      Alert.alert(t('reportButton.sentTitle'), t('reportButton.sentMessage'));
     } catch (err) {
-      Alert.alert('Could not send report', err instanceof ApiError ? err.message : 'Please try again.');
+      Alert.alert(
+        t('reportButton.errorTitle'),
+        err instanceof ApiError ? err.message : t('reportButton.errorFallback'),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -56,7 +73,7 @@ export function ReportButton({ targetType, targetId, label }: Props) {
         onPress={() => setOpen(true)}
         hitSlop={10}
         accessibilityRole="button"
-        accessibilityLabel={`Report ${label}`}
+        accessibilityLabel={t('reportButton.reportLabel', { label })}
         style={styles.button}
       >
         <Ionicons name="flag-outline" size={16} color={colors.inkMuted} />
@@ -65,8 +82,8 @@ export function ReportButton({ targetType, targetId, label }: Props) {
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
           <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
-            <Text style={styles.title}>Report {label}?</Text>
-            <Text style={styles.subtitle}>Pick the reason that fits best.</Text>
+            <Text style={styles.title}>{t('reportButton.title', { label })}</Text>
+            <Text style={styles.subtitle}>{t('reportButton.subtitle')}</Text>
             {REASONS.map((reason) => (
               <Pressable
                 key={reason}
@@ -74,13 +91,13 @@ export function ReportButton({ targetType, targetId, label }: Props) {
                 disabled={submitting}
                 onPress={() => submit(reason)}
                 accessibilityRole="button"
-                accessibilityLabel={reason}
+                accessibilityLabel={t(REASON_KEYS[reason])}
               >
-                <Text style={styles.reasonText}>{reason}</Text>
+                <Text style={styles.reasonText}>{t(REASON_KEYS[reason])}</Text>
               </Pressable>
             ))}
             <Pressable style={styles.cancelRow} onPress={() => setOpen(false)}>
-              <Text style={styles.cancelText}>Cancel</Text>
+              <Text style={styles.cancelText}>{t('cancel')}</Text>
             </Pressable>
           </Pressable>
         </Pressable>

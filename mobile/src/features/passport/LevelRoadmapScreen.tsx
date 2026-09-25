@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { LEVEL_ROADMAP, type LevelRoadmapEntry } from '@/constants/levels';
@@ -23,13 +24,14 @@ export function LevelRoadmapScreen({ route, navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('levelRoadmap');
 
   return (
     <View style={styles.container}>
       <BackButton onPress={() => navigation.goBack()} />
-      <Text style={styles.title}>Levels</Text>
+      <Text style={styles.title}>{t('title')}</Text>
       <Text style={styles.subtitle}>
-        Level {currentLevel} · {totalXp.toLocaleString()} XP
+        {t('subtitle', { level: currentLevel, xp: totalXp.toLocaleString() })}
       </Text>
 
       <FlatList
@@ -39,7 +41,13 @@ export function LevelRoadmapScreen({ route, navigation }: Props) {
         initialScrollIndex={Math.max(0, currentLevel - 3)}
         getItemLayout={(_, index) => ({ length: ROW_HEIGHT, offset: ROW_HEIGHT * index, index })}
         renderItem={({ item }) => (
-          <RoadmapRow item={item} currentLevel={currentLevel} totalXp={totalXp} styles={styles} colors={colors} />
+          <RoadmapRow
+            item={item}
+            currentLevel={currentLevel}
+            totalXp={totalXp}
+            styles={styles}
+            t={t}
+          />
         )}
       />
     </View>
@@ -53,13 +61,13 @@ function RoadmapRow({
   currentLevel,
   totalXp,
   styles,
-  colors,
+  t,
 }: {
   item: LevelRoadmapEntry;
   currentLevel: number;
   totalXp: number;
   styles: ReturnType<typeof createStyles>;
-  colors: ThemeColors;
+  t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
   const isCurrent = item.level === currentLevel;
   const isReached = item.level <= currentLevel;
@@ -69,17 +77,22 @@ function RoadmapRow({
   return (
     <View style={[styles.row, isCurrent && styles.rowCurrent, { height: ROW_HEIGHT }]}>
       <View style={styles.rowLeft}>
-        <Text style={[styles.rowLevel, !isReached && styles.rowLevelLocked]}>Lv {item.level}</Text>
+        <Text style={[styles.rowLevel, !isReached && styles.rowLevelLocked]}>
+          {t('rowLevel', { level: item.level })}
+        </Text>
         <View>
           <Text style={[styles.rowXp, !isReached && styles.rowTextLocked]}>
-            {item.xpRequired.toLocaleString()} XP
+            {t('xpValue', { xp: item.xpRequired.toLocaleString() })}
           </Text>
           {isCurrent && nextThreshold != null ? (
             <Text style={styles.rowMeta}>
-              {Math.max(0, nextThreshold - totalXp).toLocaleString()} XP to Level {item.level + 1}
+              {t('xpToNextLevel', {
+                xp: Math.max(0, nextThreshold - totalXp).toLocaleString(),
+                level: item.level + 1,
+              })}
             </Text>
           ) : xpToGo != null ? (
-            <Text style={styles.rowMeta}>{xpToGo.toLocaleString()} XP to go</Text>
+            <Text style={styles.rowMeta}>{t('xpToGo', { xp: xpToGo.toLocaleString() })}</Text>
           ) : null}
         </View>
       </View>
@@ -94,9 +107,9 @@ function RoadmapRow({
           </View>
         )}
         {isCurrent ? (
-          <Text style={styles.currentBadge}>Current</Text>
+          <Text style={styles.currentBadge}>{t('currentBadge')}</Text>
         ) : !isReached ? (
-          <Text style={styles.lockedBadge}>Locked</Text>
+          <Text style={styles.lockedBadge}>{t('lockedBadge')}</Text>
         ) : (
           <Text style={styles.reachedBadge}>✓</Text>
         )}

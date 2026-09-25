@@ -6,7 +6,10 @@ export type MasteryLevel = 'NEW' | 'RECOGNIZING' | 'RECALLING' | 'STRONG' | 'MAS
 export interface Me {
   id: string;
   email: string;
+  /** The account owner's real name -- shown only to the account owner, never other players. See `username`. */
   displayName: string;
+  /** The public handle shown to other players (leaderboards, Boss Battle, Quest Cards). Lowercase letters, digits, underscores; 3-20 chars. */
+  username: string;
   countryCode: string | null;
   nativeLanguage: string | null;
   targetLanguage: string | null;
@@ -20,6 +23,8 @@ export interface Me {
 }
 
 export interface UpdateMeInput {
+  displayName?: string;
+  username?: string;
   countryCode?: string;
   nativeLanguage?: string;
   targetLanguage?: string;
@@ -87,7 +92,10 @@ export async function uploadAvatarBytes(
 }
 
 /** `key` must come from a prior createAvatarUploadTarget() call, and the client must have already PUT the bytes there. */
-export function confirmAvatar(accessToken: string, key: string): Promise<{ avatarUrl: string | null }> {
+export function confirmAvatar(
+  accessToken: string,
+  key: string,
+): Promise<{ avatarUrl: string | null }> {
   return apiRequest<{ avatarUrl: string | null }>('/users/me/avatar', {
     method: 'POST',
     body: { key },
@@ -106,8 +114,33 @@ export function getMe(accessToken: string): Promise<Me> {
   return apiRequest<Me>('/users/me', { accessToken });
 }
 
-export function updateMe(accessToken: string, input: UpdateMeInput) {
-  return apiRequest('/users/me', { method: 'PATCH', body: input, accessToken });
+/** The subset of Me that PATCH /users/me actually returns -- notably not email/createdAt/emailVerifiedAt/avatarUrl. */
+export interface UpdateMeResult {
+  id: string;
+  displayName: string;
+  username: string;
+  countryCode: string | null;
+  nativeLanguage: string | null;
+  targetLanguage: string | null;
+  timezone: string | null;
+  learningGoal: LearningGoal | null;
+  onboardingCompletedAt: string | null;
+  clanId: string | null;
+}
+
+export function updateMe(accessToken: string, input: UpdateMeInput): Promise<UpdateMeResult> {
+  return apiRequest<UpdateMeResult>('/users/me', { method: 'PATCH', body: input, accessToken });
+}
+
+/** Live "is this available?" check for the username field in Settings -- lets the UI validate before the player saves. */
+export function checkUsernameAvailability(
+  accessToken: string,
+  username: string,
+): Promise<{ available: boolean }> {
+  return apiRequest<{ available: boolean }>(
+    `/users/username-availability?username=${encodeURIComponent(username)}`,
+    { accessToken },
+  );
 }
 
 /** Spec v2 §19 — the player's own relationship with one specific word (presented/correct/incorrect counts, current level, streak). */

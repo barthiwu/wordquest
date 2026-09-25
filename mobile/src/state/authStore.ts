@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import type { AuthResult, AuthUser } from '@/services/auth';
+import { getMe } from '@/services/users';
 
 const ACCESS_TOKEN_KEY = 'wordquest.accessToken.v2';
 const REFRESH_TOKEN_KEY = 'wordquest.refreshToken.v2';
@@ -13,6 +14,8 @@ interface AuthState {
   hydrate: () => Promise<void>;
   setSession: (result: AuthResult) => Promise<void>;
   clearSession: () => Promise<void>;
+  /** Merges a partial profile update (e.g. from Settings' Profile section) into the in-memory user, so a saved displayName/username shows up immediately without a re-login. */
+  updateUser: (patch: Partial<AuthUser>) => void;
 }
 
 /**
@@ -34,6 +37,24 @@ export const useAuthStore = create<AuthState>((set) => ({
       SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
     ]);
     set({ accessToken, refreshToken, isHydrated: true });
+
+    // Tokens alone don't carry the profile -- only setSession (a fresh
+    // login/register/refresh response) does. A relaunch that skips those
+    // (restoring a session from SecureStore instead) would otherwise leave
+    // `user` null forever even though the tokens are perfectly valid,
+    // which is why displayName/avatar show as blank/placeholder until the
+    // next explicit login. Fetch it once here so a restored session looks
+    // the same as a fresh one. Failure (offline, or a dead refresh token --
+    // apiRequest already clears the session itself in that case) just
+    // leaves `user` null, same as before this existed.
+    if (accessToken) {
+      try {
+        const user = await getMe(accessToken);
+        set({ user });
+      } catch {
+        // handled above
+      }
+    }
   },
 
   setSession: async (result: AuthResult) => {
@@ -50,5 +71,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
     ]);
     set({ user: null, accessToken: null, refreshToken: null });
+  },
+
+  updateUser: (patch: Partial<AuthUser>) => {
+    set((state) => (state.user ? { user: { ...state.user, ...patch } } : state));
   },
 }));

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { COUNTRIES, type Country } from '@/constants/countries';
@@ -21,10 +22,12 @@ interface Props {
  * request -- selection still resolves to the same ISO alpha-2 `code` the
  * rest of the app (updateMe, Passport, Journey) already expects.
  */
-export function CountryPickerField({ value, onChange, label = 'Country' }: Props) {
+export function CountryPickerField({ value, onChange, label }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const { t } = useTranslation('common');
+  const resolvedLabel = label ?? t('fields.country');
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
 
@@ -48,7 +51,9 @@ export function CountryPickerField({ value, onChange, label = 'Country' }: Props
         style={styles.field}
         onPress={() => setOpen(true)}
         accessibilityRole="button"
-        accessibilityLabel={selected ? `${label}: ${selected.name}` : `Select ${label.toLowerCase()}`}
+        accessibilityLabel={
+          selected ? `${resolvedLabel}: ${selected.name}` : `${t('pickers.country.placeholder')}`
+        }
       >
         {selected ? (
           <View style={styles.fieldSelected}>
@@ -56,7 +61,7 @@ export function CountryPickerField({ value, onChange, label = 'Country' }: Props
             <Text style={styles.fieldText}>{selected.name}</Text>
           </View>
         ) : (
-          <Text style={styles.placeholder}>Select your country</Text>
+          <Text style={styles.placeholder}>{t('pickers.country.placeholder')}</Text>
         )}
         <Ionicons name="chevron-down" size={18} color={colors.inkMuted} />
       </Pressable>
@@ -64,11 +69,11 @@ export function CountryPickerField({ value, onChange, label = 'Country' }: Props
       <Modal visible={open} animationType="slide" onRequestClose={() => setOpen(false)}>
         <View style={styles.modal}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Select your country</Text>
+            <Text style={styles.modalTitle}>{t('pickers.country.modalTitle')}</Text>
             <Pressable
               onPress={() => setOpen(false)}
               accessibilityRole="button"
-              accessibilityLabel="Close"
+              accessibilityLabel={t('close')}
               hitSlop={8}
             >
               <Ionicons name="close" size={24} color={colors.ink} />
@@ -77,12 +82,12 @@ export function CountryPickerField({ value, onChange, label = 'Country' }: Props
 
           <TextInput
             style={styles.search}
-            placeholder="Search countries"
+            placeholder={t('pickers.country.searchPlaceholder')}
             placeholderTextColor={colors.inkMuted}
             value={query}
             onChangeText={setQuery}
             autoCapitalize="words"
-            accessibilityLabel="Search countries"
+            accessibilityLabel={t('pickers.country.searchLabel')}
           />
 
           <FlatList
@@ -104,7 +109,7 @@ export function CountryPickerField({ value, onChange, label = 'Country' }: Props
               </Pressable>
             )}
             ListEmptyComponent={
-              <Text style={styles.emptyText}>No countries match &ldquo;{query}&rdquo;.</Text>
+              <Text style={styles.emptyText}>{t('pickers.country.noMatches', { query })}</Text>
             }
             contentContainerStyle={styles.list}
           />

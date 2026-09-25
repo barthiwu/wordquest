@@ -26,10 +26,8 @@ describe('leaderboards service', () => {
 
   it('returns whatever the API client resolves with', async () => {
     const view = {
-      entries: [
-        { rank: 1, userId: 'u1', displayName: 'Ada', clanName: null, level: 3, totalXp: 900 },
-      ],
-      viewer: { rank: 1, userId: 'u1', displayName: 'Ada', clanName: null, level: 3, totalXp: 900 },
+      entries: [{ rank: 1, userId: 'u1', username: 'ada', clanName: null, level: 3, totalXp: 900 }],
+      viewer: { rank: 1, userId: 'u1', username: 'ada', clanName: null, level: 3, totalXp: 900 },
     };
     (apiRequest as jest.Mock).mockResolvedValueOnce(view);
 

@@ -4,12 +4,7 @@
 // the code via countryCodeToFlagEmoji() in ./countryFlag -- this file
 // never stores emoji directly so it stays a plain data table.
 export type Continent =
-  | 'Africa'
-  | 'Asia'
-  | 'Europe'
-  | 'North America'
-  | 'South America'
-  | 'Oceania';
+  'Africa' | 'Asia' | 'Europe' | 'North America' | 'South America' | 'Oceania';
 
 export interface Country {
   code: string;
@@ -217,9 +212,7 @@ export const COUNTRIES: Country[] = [
   { code: 'ZW', name: 'Zimbabwe', continent: 'Africa' },
 ];
 
-const BY_CODE: Record<string, Country> = Object.fromEntries(
-  COUNTRIES.map((c) => [c.code, c]),
-);
+const BY_CODE: Record<string, Country> = Object.fromEntries(COUNTRIES.map((c) => [c.code, c]));
 
 export function countryForCode(countryCode: string | null | undefined): Country | null {
   if (!countryCode) return null;
@@ -233,4 +226,3 @@ export function countryNameForCode(countryCode: string | null | undefined): stri
 export function continentForCode(countryCode: string | null | undefined): Continent | null {
   return countryForCode(countryCode)?.continent ?? null;
 }
-

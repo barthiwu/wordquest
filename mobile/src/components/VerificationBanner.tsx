@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { getMe } from '@/services/users';
@@ -24,6 +25,7 @@ interface Props {
  * remind me," it means "not right now."
  */
 export function VerificationBanner({ onPress }: Props) {
+  const { t } = useTranslation('common');
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const accessToken = useAuthStore((s) => s.accessToken);
@@ -48,17 +50,17 @@ export function VerificationBanner({ onPress }: Props) {
         style={styles.body}
         onPress={onPress}
         accessibilityRole="button"
-        accessibilityLabel="Verify your email to keep your progress safe"
-        accessibilityHint="Opens email verification settings"
+        accessibilityLabel={t('verificationBanner.message')}
+        accessibilityHint={t('verificationBanner.hint')}
       >
         <Ionicons name="mail-unread-outline" size={18} color={colors.warning} />
-        <Text style={styles.text}>Verify your email to keep your progress safe</Text>
+        <Text style={styles.text}>{t('verificationBanner.message')}</Text>
       </Pressable>
       <Pressable
         style={styles.dismiss}
         onPress={() => setDismissed(true)}
         accessibilityRole="button"
-        accessibilityLabel="Dismiss email verification reminder"
+        accessibilityLabel={t('verificationBanner.dismiss')}
       >
         <Ionicons name="close" size={16} color={colors.inkMuted} />
       </Pressable>
@@ -68,19 +70,19 @@ export function VerificationBanner({ onPress }: Props) {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-  banner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.warning,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    gap: spacing.sm,
-  },
-  body: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  text: { flex: 1, color: colors.ink, fontSize: typography.scale.sm, fontWeight: '600' },
-  dismiss: { padding: spacing.xs },
-});
+    banner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.warning,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      gap: spacing.sm,
+    },
+    body: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+    text: { flex: 1, color: colors.ink, fontSize: typography.scale.sm, fontWeight: '600' },
+    dismiss: { padding: spacing.xs },
+  });
 }

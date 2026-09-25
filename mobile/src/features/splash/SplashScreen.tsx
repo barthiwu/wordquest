@@ -32,6 +32,11 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
  * backstop: whatever happens with hydrate(), navigation fires no later
  * than that, falling back to a logged-out state (Welcome), same as any
  * other hydrate failure.
+ *
+ * i18n note: this screen has no user-facing text of its own — just the
+ * AnimatedWordmark logo graphic — so there is nothing to wrap in t()
+ * here. console.warn calls below are developer-facing only. Left
+ * without a useTranslation() call since it would have nothing to do.
  */
 const HOLD_AFTER_ANIMATION_MS = 250;
 const MIN_SPLASH_MS = WORDMARK_ANIMATION_DURATION_MS + HOLD_AFTER_ANIMATION_MS;

@@ -34,6 +34,7 @@ export interface PassportOrder {
 
 export interface PassportView {
   displayName: string;
+  username: string;
   avatarUrl: string | null;
   countryCode: string | null;
   clan: { name: string; bannerAsset: string } | null;
