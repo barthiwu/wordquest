@@ -18,7 +18,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-WITH-STAGING-BACKEND-URL/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://wordquest-production-83cf.up.railway.app/api/v1"
       }
     },
     "production": {
@@ -27,7 +27,7 @@
       },
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-WITH-PRODUCTION-BACKEND-URL/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://wordquest-production-83cf.up.railway.app/api/v1"
       }
     }
   },
