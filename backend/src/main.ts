@@ -58,9 +58,15 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(config.port);
+  // Bind explicitly to 0.0.0.0 — Node's default (no host argument) can
+  // resolve to an IPv6-only or loopback-only socket depending on the
+  // container's network stack, which keeps the process alive and
+  // reachable from inside the container (console commands, cron jobs)
+  // while Railway's edge proxy gets nothing back from the outside —
+  // exactly the "Application failed to respond" symptom this fixes.
+  await app.listen(config.port, '0.0.0.0');
   // eslint-disable-next-line no-console
-  console.log(`WordQuest API listening on :${config.port}/api/v1`);
+  console.log(`WordQuest API listening on 0.0.0.0:${config.port}/api/v1`);
 }
 
 bootstrap();
