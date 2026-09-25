@@ -68,13 +68,20 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#12102A"
       },
-      "package": "com.wordquest.app"
+      "package": "com.wordquest.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiUrl": "http://localhost:3002/api/v1"
-    }
+      "apiUrl": "http://localhost:3002/api/v1",
+      "eas": {
+        "projectId": "0ef38d51-a343-43ae-83ef-fe83e173374d"
+      }
+    },
+    "owner": "barthiwus-team"
   }
 }
