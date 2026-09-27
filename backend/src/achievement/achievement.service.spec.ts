@@ -303,6 +303,7 @@ describe('AchievementService', () => {
         'achievement',
         'first_step',
         prismaMock,
+        undefined,
       );
       expect(progressionMock.awardGlyphs).toHaveBeenCalledWith(
         'u1',

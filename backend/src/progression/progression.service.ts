@@ -8,7 +8,7 @@ import {
   questCardRarityForStage,
   JOURNEY_STAGES,
 } from '../config/journey-stages';
-import { AliService } from '../ali/ali.service';
+import { AliService, type AliEvent } from '../ali/ali.service';
 import { NotificationService } from '../notifications/notification.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
 import { playerLocalDate } from '../common/timezone';
@@ -48,6 +48,15 @@ export class ProgressionService {
     source: string,
     reference?: string,
     db: Db = this.prisma,
+    /**
+     * When passed, LEVEL_UP (and, transitively, JOURNEY_COMPLETION)
+     * descriptors are pushed onto this array instead of fired via
+     * reactFireAndForget -- see quests.service.ts's completeWord for
+     * why Daily Quest wants these awaited and surfaced live instead of
+     * silently landing in ALI's message feed. Every other caller omits
+     * this and keeps today's fire-and-forget behavior unchanged.
+     */
+    aliEvents?: AliEvent[],
   ) {
     if (amount <= 0) return;
 
@@ -97,11 +106,16 @@ export class ProgressionService {
       );
     }
 
-    this.ali.reactFireAndForget(userId, {
+    const levelUpEvent: AliEvent = {
       type: 'LEVEL_UP',
       journeyStage: progression.journeyStage,
       context: { newLevel, glyphsAwarded: levelGlyphReward },
-    });
+    };
+    if (aliEvents) {
+      aliEvents.push(levelUpEvent);
+    } else {
+      this.ali.reactFireAndForget(userId, levelUpEvent);
+    }
     this.notifications.notifyFireAndForget(
       userId,
       'LEVEL_UP',
@@ -118,6 +132,7 @@ export class ProgressionService {
       progression.journeyStage,
       progression.masteredWordsCount,
       db,
+      aliEvents,
     );
   }
 
@@ -212,6 +227,8 @@ export class ProgressionService {
     currentJourneyStage: number,
     masteredWordsCount: number,
     db: Db = this.prisma,
+    /** See awardXp's doc comment on this same optional trailing param. */
+    aliEvents?: AliEvent[],
   ): Promise<void> {
     const newStage = journeyStageForProgress(level, masteredWordsCount);
     if (newStage <= currentJourneyStage) return;
@@ -234,13 +251,19 @@ export class ProgressionService {
       'progression',
       String(newStage),
       db,
+      aliEvents,
     );
 
-    this.ali.reactFireAndForget(userId, {
+    const journeyEvent: AliEvent = {
       type: 'JOURNEY_COMPLETION',
       journeyStage: newStage,
       context: { stageName: JOURNEY_STAGES[newStage]?.name, stagesCrossed },
-    });
+    };
+    if (aliEvents) {
+      aliEvents.push(journeyEvent);
+    } else {
+      this.ali.reactFireAndForget(userId, journeyEvent);
+    }
     this.notifications.notifyFireAndForget(
       userId,
       'JOURNEY_UNLOCK',
@@ -529,6 +552,8 @@ export class ProgressionService {
   async recordDailyActivity(
     userId: string,
     db: Db = this.prisma,
+    /** See awardXp's doc comment on this same optional trailing param. */
+    aliEvents?: AliEvent[],
   ): Promise<{ currentStreak: number }> {
     const progression = await db.userProgression.findUniqueOrThrow({ where: { userId } });
     const user = db.user
@@ -569,11 +594,16 @@ export class ProgressionService {
     // thresholds) — a reaction every single day would be noise, not a
     // narrator responding to something noteworthy.
     if (STREAK_MILESTONE_DAYS.includes(newStreak)) {
-      this.ali.reactFireAndForget(userId, {
+      const streakEvent: AliEvent = {
         type: 'STREAK_MILESTONE',
         journeyStage: progression.journeyStage,
         context: { streakDays: newStreak },
-      });
+      };
+      if (aliEvents) {
+        aliEvents.push(streakEvent);
+      } else {
+        this.ali.reactFireAndForget(userId, streakEvent);
+      }
     }
 
     await this.checkCefrEligibility(userId, db);

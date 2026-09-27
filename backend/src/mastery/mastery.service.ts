@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProgressionService } from '../progression/progression.service';
 import { AchievementService } from '../achievement/achievement.service';
-import { AliService } from '../ali/ali.service';
+import { AliService, type AliEvent } from '../ali/ali.service';
 import { gameplayRules } from '../config/gameplay-rules';
 import { nextReviewDueAt } from '../vocabulary/review-schedule';
 import { averageScoreDimensions } from '../common/score-average';
@@ -244,6 +244,8 @@ export class MasteryService {
     sentenceScores: Record<string, number>,
     paragraphScores: Record<string, number>,
     db: Db = this.prisma,
+    /** See ProgressionService.awardXp's doc comment on this same optional trailing param. */
+    aliEvents?: AliEvent[],
   ): Promise<{ masteredViaSkillCheck: boolean }> {
     const existing = await db.mastery.findUnique({ where: { userId_wordId: { userId, wordId } } });
     const wasAlreadyMastered = existing?.currentLevel === 'MASTERED';
@@ -300,8 +302,9 @@ export class MasteryService {
         wordId,
         db,
         (existing?.timesIncorrect ?? 0) === 0,
+        aliEvents,
       );
-      await this.achievements.checkDiscoveryAndMastery(userId, masteredWordsCount, db);
+      await this.achievements.checkDiscoveryAndMastery(userId, masteredWordsCount, db, aliEvents);
     }
 
     return { masteredViaSkillCheck };
@@ -609,6 +612,7 @@ export class MasteryService {
     wordId: string,
     db: Db,
     firstAttempt: boolean,
+    aliEvents?: AliEvent[],
   ): Promise<number> {
     const updated = await db.userProgression.update({
       where: { userId },
@@ -623,6 +627,7 @@ export class MasteryService {
       updated.journeyStage,
       updated.masteredWordsCount,
       db,
+      aliEvents,
     );
     // checkJourneyAdvancement only re-checks CEFR when the Journey stage
     // itself just advanced — masteredWordsCount can cross the CEFR
@@ -631,7 +636,7 @@ export class MasteryService {
     await this.progression.checkCefrEligibility(userId, db);
 
     const word = await db.word.findUnique({ where: { id: wordId }, select: { word: true } });
-    this.ali.reactFireAndForget(userId, {
+    const masteryEvent: AliEvent = {
       type: 'MASTERY_EVENT',
       journeyStage: updated.journeyStage,
       // firstAttempt distinguishes the bible's 'first-attempt mastery'
@@ -643,7 +648,12 @@ export class MasteryService {
         totalMastered: updated.masteredWordsCount,
         firstAttempt,
       },
-    });
+    };
+    if (aliEvents) {
+      aliEvents.push(masteryEvent);
+    } else {
+      this.ali.reactFireAndForget(userId, masteryEvent);
+    }
 
     return updated.masteredWordsCount;
   }

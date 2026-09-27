@@ -162,6 +162,7 @@ describe('MasteryService', () => {
         0,
         50,
         prismaMock,
+        undefined,
       );
     });
 
@@ -264,7 +265,12 @@ describe('MasteryService', () => {
         paragraph: { grammar: 40, vocabulary: 40, structure: 40, flow: 40, context: 40 },
       };
 
-      await service.evaluateWordCycleCompletion('u1', 'w1', weakerCycle.sentence, weakerCycle.paragraph);
+      await service.evaluateWordCycleCompletion(
+        'u1',
+        'w1',
+        weakerCycle.sentence,
+        weakerCycle.paragraph,
+      );
 
       expect(prismaMock.mastery.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -364,9 +370,15 @@ describe('MasteryService', () => {
         1,
         51,
         prismaMock,
+        undefined,
       );
       expect(progressionMock.checkCefrEligibility).toHaveBeenCalledWith('u1', prismaMock);
-      expect(achievementsMock.checkDiscoveryAndMastery).toHaveBeenCalledWith('u1', 51, prismaMock);
+      expect(achievementsMock.checkDiscoveryAndMastery).toHaveBeenCalledWith(
+        'u1',
+        51,
+        prismaMock,
+        undefined,
+      );
     });
   });
 
@@ -486,7 +498,14 @@ describe('MasteryService', () => {
           data: expect.objectContaining({ currentLevel: 'MASTERED' }),
         }),
       );
-      expect(progressionMock.checkJourneyAdvancement).toHaveBeenCalledWith('u1', 4, 0, 11, prismaMock);
+      expect(progressionMock.checkJourneyAdvancement).toHaveBeenCalledWith(
+        'u1',
+        4,
+        0,
+        11,
+        prismaMock,
+        undefined,
+      );
     });
 
     it('is a no-op when the word has never been guessed correctly', async () => {

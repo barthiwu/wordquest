@@ -234,33 +234,66 @@ export class AliService {
       orderBy: { createdAt: 'desc' },
       take: limit,
     });
-    return rows.map(
-      (r: {
-        text: string;
-        recommendation: string | null;
-        tone: string;
-        promptVersion: string;
-        eventType: string;
-        createdAt: Date;
-        expression: string;
-        pose: string;
-        intensity: number;
-        priority: number;
-        durationMs: number;
-      }) => ({
-        text: r.text,
-        recommendation: r.recommendation,
-        tone: r.tone,
-        promptVersion: r.promptVersion,
-        eventType: r.eventType as AliEventType,
-        createdAt: r.createdAt.toISOString(),
-        expression: r.expression as AliExpressionCue['expression'],
-        pose: r.pose as AliExpressionCue['pose'],
-        intensity: r.intensity as AliExpressionCue['intensity'],
-        priority: r.priority as AliExpressionCue['priority'],
-        durationMs: r.durationMs,
-      }),
-    );
+    return rows.map((r) => this.toFeedMessage(r));
+  }
+
+  /**
+   * Reactions generated at/after `since`, restricted to `eventTypes` --
+   * the read side of the "logged for later" pattern (2026-09, task #99
+   * follow-up): a game session that only fire-and-forgets its
+   * LEVEL_UP/JOURNEY_COMPLETION/MASTERY_EVENT/ACHIEVEMENT_UNLOCK
+   * reactions (arcade, Boss Battle, Master Challenge -- see each
+   * service's own call sites) can't show them live without adding
+   * Anthropic latency to the hot path, but its results screen -- opened
+   * a moment after the session actually ends, by which point the
+   * fire-and-forget calls have almost always already persisted -- can
+   * say "while you were playing..." by reading them back here instead
+   * of the player only ever finding them in their ALI message feed.
+   * Ascending order (oldest first) since this reads as a small recap,
+   * not a feed. STREAK_MILESTONE is deliberately not a normal caller of
+   * this: callers that want a *live*, anchored-to-the-streak-container
+   * reaction resolve it synchronously via the aliEvents collector
+   * pattern instead (see ProgressionService.recordDailyActivity) and
+   * never need to read it back here.
+   */
+  async listReactionsSince(
+    userId: string,
+    since: Date,
+    eventTypes: AliEventType[],
+  ): Promise<AliFeedMessage[]> {
+    const rows = await this.prisma.aliMessage.findMany({
+      where: { userId, createdAt: { gte: since }, eventType: { in: eventTypes } },
+      orderBy: { createdAt: 'asc' },
+    });
+    return rows.map((r) => this.toFeedMessage(r));
+  }
+
+  private toFeedMessage(row: {
+    text: string;
+    recommendation: string | null;
+    tone: string;
+    promptVersion: string;
+    eventType: string;
+    createdAt: Date;
+    expression: string;
+    pose: string;
+    intensity: number;
+    priority: number;
+    durationMs: number;
+  }): AliFeedMessage {
+    return {
+      text: row.text,
+      recommendation: row.recommendation,
+      tone: row.tone,
+      promptVersion: row.promptVersion,
+      eventType: row.eventType as AliEventType,
+      createdAt: row.createdAt.toISOString(),
+      expression: row.expression as AliExpressionCue['expression'],
+      pose: row.pose as AliExpressionCue['pose'],
+      intensity: row.intensity as AliExpressionCue['intensity'],
+      priority: row.priority as AliExpressionCue['priority'],
+      durationMs: row.durationMs,
+    };
   }
 
   /**

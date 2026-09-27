@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProgressionService } from '../progression/progression.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
-import { AliService } from '../ali/ali.service';
+import { AliService, type AliEvent } from '../ali/ali.service';
 import { NotificationService } from '../notifications/notification.service';
 import { isUniqueConstraintError } from '../common/prisma-errors';
 import { usedAnyGuessAssistance } from '../config/gameplay-rules';
@@ -81,6 +81,8 @@ export class AchievementService {
     userId: string,
     masteredWordsCount: number,
     db: Db = this.prisma,
+    /** See ProgressionService.awardXp's doc comment on this same optional trailing param. */
+    aliEvents?: AliEvent[],
   ): Promise<void> {
     const [challengeCount, battleAnswerCount] = await Promise.all([
       db.challengeAttempt.count({ where: { userId } }),
@@ -89,10 +91,10 @@ export class AchievementService {
     const totalGuesses = challengeCount + battleAnswerCount;
 
     for (const [id, threshold] of DISCOVERY_THRESHOLDS) {
-      if (totalGuesses >= threshold) await this.unlock(userId, id, db);
+      if (totalGuesses >= threshold) await this.unlock(userId, id, db, aliEvents);
     }
     for (const [id, threshold] of MASTERY_THRESHOLDS) {
-      if (masteredWordsCount >= threshold) await this.unlock(userId, id, db);
+      if (masteredWordsCount >= threshold) await this.unlock(userId, id, db, aliEvents);
     }
   }
 
@@ -100,9 +102,10 @@ export class AchievementService {
     userId: string,
     currentStreak: number,
     db: Db = this.prisma,
+    aliEvents?: AliEvent[],
   ): Promise<void> {
     for (const [id, threshold] of CONSISTENCY_THRESHOLDS) {
-      if (currentStreak >= threshold) await this.unlock(userId, id, db);
+      if (currentStreak >= threshold) await this.unlock(userId, id, db, aliEvents);
     }
   }
 
@@ -123,7 +126,11 @@ export class AchievementService {
    * independent; the first non-independent completion in that window
    * ends the streak, same as any other streak in this codebase.
    */
-  async checkIndependentLearning(userId: string, db: Db = this.prisma): Promise<void> {
+  async checkIndependentLearning(
+    userId: string,
+    db: Db = this.prisma,
+    aliEvents?: AliEvent[],
+  ): Promise<void> {
     const highestThreshold = Math.max(...INDEPENDENT_LEARNING_THRESHOLDS.map(([, n]) => n));
     const recentAttempts = await db.questAttempt.findMany({
       where: { userId, status: 'COMPLETED' },
@@ -139,7 +146,7 @@ export class AchievementService {
     }
 
     for (const [id, threshold] of INDEPENDENT_LEARNING_THRESHOLDS) {
-      if (independentStreak >= threshold) await this.unlock(userId, id, db);
+      if (independentStreak >= threshold) await this.unlock(userId, id, db, aliEvents);
     }
   }
 
@@ -184,7 +191,12 @@ export class AchievementService {
    * (two requests both passing the check at once), which is rare enough
    * that poisoning that one transaction is an acceptable fallback.
    */
-  private async unlock(userId: string, achievementId: string, db: Db): Promise<boolean> {
+  private async unlock(
+    userId: string,
+    achievementId: string,
+    db: Db,
+    aliEvents?: AliEvent[],
+  ): Promise<boolean> {
     const existing = await db.achievementUnlock.findUnique({
       where: { userId_achievementId: { userId, achievementId } },
     });
@@ -206,6 +218,7 @@ export class AchievementService {
       'achievement',
       achievementId,
       db,
+      aliEvents,
     );
     await this.progression.awardGlyphs(
       userId,
@@ -220,11 +233,16 @@ export class AchievementService {
       where: { userId },
       select: { journeyStage: true },
     });
-    this.ali.reactFireAndForget(userId, {
+    const achievementEvent: AliEvent = {
       type: 'ACHIEVEMENT_UNLOCK',
       journeyStage: progression?.journeyStage ?? 0,
       context: { achievementName: entry.name, category: entry.category },
-    });
+    };
+    if (aliEvents) {
+      aliEvents.push(achievementEvent);
+    } else {
+      this.ali.reactFireAndForget(userId, achievementEvent);
+    }
     this.notifications.notifyFireAndForget(
       userId,
       'ACHIEVEMENT_UNLOCK',
