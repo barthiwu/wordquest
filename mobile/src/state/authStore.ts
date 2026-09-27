@@ -1,9 +1,6 @@
 import { create } from 'zustand';
-import * as SecureStore from 'expo-secure-store';
 import type { AuthResult, AuthUser } from '@/services/auth';
-
-const ACCESS_TOKEN_KEY = 'wordquest.accessToken.v2';
-const REFRESH_TOKEN_KEY = 'wordquest.refreshToken.v2';
+import { useTokenStore } from './tokenStore';
 
 interface AuthState {
   user: AuthUser | null;
@@ -18,71 +15,67 @@ interface AuthState {
 }
 
 /**
- * Tokens live in SecureStore (Keychain/Keystore-backed), not AsyncStorage —
- * they're credentials, not preferences. The store only mirrors them in
- * memory for the current session. User's chosen clan, XP, etc. are NOT
- * cached here — those come from the backend on demand (BUILD_HANDOFF §40:
- * frontend owns presentation/local prefs, backend owns progression truth).
+ * The player-facing session: who's logged in (`user`) and whether we've
+ * finished reading tokens back from disk (`isHydrated`). The tokens
+ * themselves live in tokenStore.ts, not here -- see that file's header
+ * comment for why (breaking a require cycle with services/apiClient.ts).
+ * This store mirrors tokenStore's accessToken/refreshToken into its own
+ * state below so every existing `useAuthStore((s) => s.accessToken)` call
+ * site across the app keeps working unchanged, including when apiClient.ts
+ * rotates the access token on a silent 401 refresh -- a change made
+ * directly against tokenStore, not through this store.
+ *
+ * User's chosen clan, XP, etc. are NOT cached here -- those come from the
+ * backend on demand (BUILD_HANDOFF §40: frontend owns presentation/local
+ * prefs, backend owns progression truth).
  */
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  accessToken: null,
-  refreshToken: null,
-  isHydrated: false,
+export const useAuthStore = create<AuthState>((set) => {
+  useTokenStore.subscribe((tokenState) => {
+    set({ accessToken: tokenState.accessToken, refreshToken: tokenState.refreshToken });
+  });
 
-  hydrate: async () => {
-    const [accessToken, refreshToken] = await Promise.all([
-      SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
-      SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
-    ]);
-    set({ accessToken, refreshToken, isHydrated: true });
+  return {
+    user: null,
+    accessToken: null,
+    refreshToken: null,
+    isHydrated: false,
 
-    // Tokens alone don't carry the profile -- only setSession (a fresh
-    // login/register/refresh response) does. A relaunch that skips those
-    // (restoring a session from SecureStore instead) would otherwise leave
-    // `user` null forever even though the tokens are perfectly valid,
-    // which is why displayName/avatar show as blank/placeholder until the
-    // next explicit login. Fetch it once here so a restored session looks
-    // the same as a fresh one. Failure (offline, or a dead refresh token --
-    // apiRequest already clears the session itself in that case) just
-    // leaves `user` null, same as before this existed.
-    if (accessToken) {
-      try {
-        // Lazy/dynamic import, not a top-level one: services/users.ts pulls
-        // in services/apiClient.ts, which itself imports useAuthStore (to
-        // read tokens / clear the session on a failed refresh) -- a static
-        // import here would close that into a require cycle
-        // (authStore -> users -> apiClient -> authStore), which Metro warns
-        // about at bundle time. Deferring the require until hydrate() is
-        // actually called keeps the runtime behavior identical (this is
-        // still awaited before use) while breaking the cycle in the static
-        // module graph.
-        const { getMe } = await import('@/services/users');
-        const user = await getMe(accessToken);
-        set({ user });
-      } catch {
-        // handled above
+    hydrate: async () => {
+      const { accessToken } = await useTokenStore.getState().loadTokens();
+      set({ isHydrated: true });
+
+      // Tokens alone don't carry the profile -- only setSession (a fresh
+      // login/register/refresh response) does. A relaunch that skips those
+      // (restoring a session from SecureStore instead) would otherwise leave
+      // `user` null forever even though the tokens are perfectly valid,
+      // which is why displayName/avatar show as blank/placeholder until the
+      // next explicit login. Fetch it once here so a restored session looks
+      // the same as a fresh one. Failure (offline, or a dead refresh token --
+      // apiRequest already clears the session itself in that case) just
+      // leaves `user` null, same as before this existed.
+      if (accessToken) {
+        try {
+          const { getMe } = await import('@/services/users');
+          const user = await getMe(accessToken);
+          set({ user });
+        } catch {
+          // handled above
+        }
       }
-    }
-  },
+    },
 
-  setSession: async (result: AuthResult) => {
-    await Promise.all([
-      SecureStore.setItemAsync(ACCESS_TOKEN_KEY, result.accessToken),
-      SecureStore.setItemAsync(REFRESH_TOKEN_KEY, result.refreshToken),
-    ]);
-    set({ user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken });
-  },
+    setSession: async (result: AuthResult) => {
+      await useTokenStore.getState().setTokens(result.accessToken, result.refreshToken);
+      set({ user: result.user });
+    },
 
-  clearSession: async () => {
-    await Promise.all([
-      SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
-      SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
-    ]);
-    set({ user: null, accessToken: null, refreshToken: null });
-  },
+    clearSession: async () => {
+      await useTokenStore.getState().clearTokens();
+      set({ user: null });
+    },
 
-  updateUser: (patch: Partial<AuthUser>) => {
-    set((state) => (state.user ? { user: { ...state.user, ...patch } } : state));
-  },
-}));
+    updateUser: (patch: Partial<AuthUser>) => {
+      set((state) => (state.user ? { user: { ...state.user, ...patch } } : state));
+    },
+  };
+});

@@ -1,5 +1,5 @@
 import { env } from '@/app/config/env';
-import { useAuthStore } from '@/state/authStore';
+import { useTokenStore } from '@/state/tokenStore';
 
 /**
  * Thin fetch wrapper — every network call the app makes goes through here.
@@ -37,7 +37,7 @@ interface RequestOptions {
 let refreshPromise: Promise<string | null> | null = null;
 
 async function refreshAccessToken(): Promise<string | null> {
-  const { refreshToken } = useAuthStore.getState();
+  const { refreshToken } = useTokenStore.getState();
   if (!refreshToken) return null;
 
   try {
@@ -49,7 +49,12 @@ async function refreshAccessToken(): Promise<string | null> {
     if (!response.ok) return null;
 
     const result = await response.json();
-    await useAuthStore.getState().setSession(result);
+    // Only accessToken/refreshToken -- /auth/refresh never returns `user`
+    // (see AuthService.refresh's AuthTokens return type on the backend).
+    // Route this through tokenStore, not authStore.setSession, so a
+    // silent refresh rotates the tokens without clobbering the cached
+    // user profile with an undefined one.
+    await useTokenStore.getState().setTokens(result.accessToken, result.refreshToken);
     return result.accessToken as string;
   } catch {
     return null;
@@ -83,7 +88,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     if (newAccessToken) {
       response = await doFetch(newAccessToken);
     } else {
-      await useAuthStore.getState().clearSession();
+      await useTokenStore.getState().clearTokens();
     }
   }
 
