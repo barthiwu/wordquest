@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { VocabularyModule } from '../vocabulary/vocabulary.module';
 import { RewardEngineService } from './reward-engine.service';
 import { ArcadeChallengeService } from './challenge.service';
+import { ArcadeStatusController } from './arcade-status.controller';
 
 /**
  * Shared Arcade foundation module (spec §13 Phase 1). Hosts the
@@ -16,6 +17,7 @@ import { ArcadeChallengeService } from './challenge.service';
  */
 @Module({
   imports: [VocabularyModule],
+  controllers: [ArcadeStatusController],
   providers: [RewardEngineService, ArcadeChallengeService],
   exports: [RewardEngineService, ArcadeChallengeService],
 })

@@ -1,14 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Circle, Defs, Line, Path, RadialGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -21,8 +14,11 @@ import {
 } from '@/services/wordDuel';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
+import { DuelPrepJourney } from './DuelPrepJourney';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
+import { LetterBoxInput } from '@/components/LetterBoxInput';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -70,7 +66,7 @@ export function WordDuelScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
-  const { t } = useTranslation(['wordDuel', 'arcade']);
+  const { t } = useTranslation(['wordDuel', 'arcade', 'scrambleQuest']);
   const accessToken = useAuthStore((s) => s.accessToken);
 
   const [phase, setPhase] = useState<Phase>('loading');
@@ -193,12 +189,14 @@ export function WordDuelScreen({ navigation }: Props) {
 
   if (phase === 'waiting') {
     return (
-      <View style={styles.centered}>
-        <BackButton onPress={() => navigation.goBack()} />
-        <ActivityIndicator color={colors.arcaneSoft} />
-        <Text style={styles.title}>{t('waitingTitle')}</Text>
-        <Text style={styles.subtitle}>{t('waitingSubtitle')}</Text>
-      </View>
+      <DuelPrepJourney
+        colors={colors}
+        title={t('waitingTitle')}
+        subtitle={t('waitingSubtitle')}
+        wordTipLabel={t('wordTipLabel')}
+        cancelLabel={t('cancelSearch')}
+        onCancel={() => navigation.goBack()}
+      />
     );
   }
 
@@ -206,24 +204,78 @@ export function WordDuelScreen({ navigation }: Props) {
     return (
       <View style={styles.centered}>
         <BackButton onPress={() => navigation.goBack()} />
+
+        {/* "No opponent found" hero -- Design canvas review, Sept 2026
+            ("WordQuest Arcade Game Logos" artifact, Option A): the
+            crossed-quills Word Duel mark in a glowing badge with two
+            sparkle accents, replacing the bare title+subtitle the
+            screen used to show here. */}
+        <View style={styles.noOpponentIconOuter}>
+          <Svg width={120} height={120} viewBox="0 0 120 120" style={StyleSheet.absoluteFillObject}>
+            <Defs>
+              <RadialGradient id="noOpponentGlow" cx="50%" cy="50%" r="50%">
+                <Stop offset="0%" stopColor={colors.arcane} stopOpacity={0.35} />
+                <Stop offset="70%" stopColor={colors.arcane} stopOpacity={0} />
+              </RadialGradient>
+            </Defs>
+            <Circle cx={60} cy={60} r={60} fill="url(#noOpponentGlow)" />
+          </Svg>
+          <View
+            style={[styles.noOpponentSparkle, { top: 2, right: 10, backgroundColor: colors.glyph }]}
+          />
+          <View
+            style={[
+              styles.noOpponentSparkle,
+              { bottom: 8, left: 4, backgroundColor: colors.arcaneSoft },
+            ]}
+          />
+          <View style={styles.noOpponentBadge}>
+            <Svg width={52} height={52} viewBox="0 0 100 100">
+              <Line
+                x1={26}
+                y1={26}
+                x2={74}
+                y2={74}
+                stroke={colors.glyph}
+                strokeWidth={7}
+                strokeLinecap="round"
+              />
+              <Path d="M74,74 L84,78 L78,84 Z" fill={colors.glyph} />
+              <Line
+                x1={74}
+                y1={26}
+                x2={26}
+                y2={74}
+                stroke={colors.arcaneSoft}
+                strokeWidth={7}
+                strokeLinecap="round"
+              />
+              <Path d="M26,74 L16,78 L22,84 Z" fill={colors.arcaneSoft} />
+            </Svg>
+          </View>
+        </View>
+
         <Text style={styles.title}>{t('noOpponentTitle')}</Text>
         <Text style={styles.subtitle}>{t('noOpponentSubtitle')}</Text>
-        <Pressable
-          style={styles.button}
-          onPress={join}
-          accessibilityRole="button"
-          accessibilityLabel={t('tryAgain')}
-        >
-          <Text style={styles.buttonText}>{t('tryAgain')}</Text>
-        </Pressable>
-        <Pressable
-          style={styles.secondaryButton}
-          onPress={() => navigation.goBack()}
-          accessibilityRole="button"
-          accessibilityLabel={t('arcade:backToPlay')}
-        >
-          <Text style={styles.secondaryButtonText}>{t('arcade:backToPlay')}</Text>
-        </Pressable>
+
+        <View style={styles.noOpponentButtonCol}>
+          <Pressable
+            style={styles.button}
+            onPress={join}
+            accessibilityRole="button"
+            accessibilityLabel={t('tryAgain')}
+          >
+            <Text style={styles.buttonText}>{t('tryAgain')}</Text>
+          </Pressable>
+          <Pressable
+            style={styles.secondaryButton}
+            onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+            accessibilityLabel={t('arcade:backToPlay')}
+          >
+            <Text style={styles.secondaryButtonText}>{t('arcade:backToPlay')}</Text>
+          </Pressable>
+        </View>
       </View>
     );
   }
@@ -236,37 +288,33 @@ export function WordDuelScreen({ navigation }: Props) {
         : result.youWon
           ? t('resultWinTitle')
           : t('resultLoseTitle');
+    const extraLines = [
+      t('resultOpponentSummary', {
+        correct: state.opponent?.correctCount ?? 0,
+        xp: state.opponent?.totalXp ?? 0,
+      }),
+    ];
+    if (result.tieBreakReason) extraLines.push(t('resultTiebreakNote'));
     return (
       <ScrollView style={styles.flexFill} contentContainerStyle={styles.centeredScrollContent}>
-        <Text style={styles.title}>{outcomeTitle}</Text>
-        <Text style={styles.summaryLine}>
-          {t('resultYouSummary', { correct: state.correctCount, xp: state.totalXp })}
-        </Text>
-        <Text style={styles.summaryLine}>
-          {t('resultOpponentSummary', {
-            correct: state.opponent?.correctCount ?? 0,
-            xp: state.opponent?.totalXp ?? 0,
-          })}
-        </Text>
-        {result.tieBreakReason && (
-          <Text style={styles.tiebreakNote}>{t('resultTiebreakNote')}</Text>
-        )}
-        <Pressable
-          style={styles.button}
-          onPress={join}
-          accessibilityRole="button"
-          accessibilityLabel={t('playAgain')}
-        >
-          <Text style={styles.buttonText}>{t('playAgain')}</Text>
-        </Pressable>
-        <Pressable
-          style={styles.secondaryButton}
-          onPress={() => navigation.goBack()}
-          accessibilityRole="button"
-          accessibilityLabel={t('arcade:backToPlay')}
-        >
-          <Text style={styles.secondaryButtonText}>{t('arcade:backToPlay')}</Text>
-        </Pressable>
+        <ArcadeHeroResults
+          colors={colors}
+          title={outcomeTitle}
+          subtitle={t('resultYouSummary', { correct: state.correctCount, xp: state.totalXp })}
+          correctCount={state.correctCount}
+          totalCount={state.wordsTotal}
+          stats={[
+            {
+              icon: 'flame',
+              text: t('scrambleQuest:sessionLongestStreak', { streak: state.longestStreak }),
+            },
+          ]}
+          extraLines={extraLines}
+          primaryLabel={t('playAgain')}
+          onPrimary={join}
+          secondaryLabel={t('arcade:backToPlay')}
+          onSecondary={() => navigation.goBack()}
+        />
       </ScrollView>
     );
   }
@@ -332,14 +380,11 @@ export function WordDuelScreen({ navigation }: Props) {
               </Text>
             </View>
 
-            <TextInput
-              style={styles.input}
+            <LetterBoxInput
               value={answer}
               onChangeText={setAnswer}
-              placeholder={t('answerPlaceholder')}
-              placeholderTextColor={colors.inkMuted}
-              autoCapitalize="none"
-              autoCorrect={false}
+              length={state.current.displayHint.split(' ').length}
+              colors={colors}
               editable={!submitting}
               accessibilityLabel={t('yourAnswerLabel')}
               onSubmitEditing={handleSubmit}
@@ -411,6 +456,34 @@ function createStyles(colors: ThemeColors, topInset: number) {
       justifyContent: 'center',
       padding: spacing.xl,
       gap: spacing.md,
+    },
+    noOpponentIconOuter: {
+      width: 120,
+      height: 120,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    noOpponentBadge: {
+      width: 92,
+      height: 92,
+      borderRadius: 46,
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    noOpponentSparkle: {
+      position: 'absolute',
+      width: 5,
+      height: 5,
+      borderRadius: 3,
+    },
+    noOpponentButtonCol: {
+      width: '100%',
+      maxWidth: 360,
+      gap: spacing.sm,
+      marginTop: spacing.sm,
     },
     error: { color: colors.danger, fontSize: typography.scale.md, textAlign: 'center' },
     title: {

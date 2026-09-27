@@ -67,3 +67,24 @@ export function scrambleWord(word: string, seed: string): string {
   }
   return letters.join('');
 }
+
+/**
+ * Deterministic, seeded order in which a word's letters get revealed by
+ * hints. Randomized (not simply left-to-right) so hints don't trivially
+ * hand the player the word's prefix — but deterministic per (session,
+ * word) so requestHint() and buildChallengeView() independently agree
+ * on which position each hint count reveals, without persisting the
+ * order anywhere. The word's final letter is never eligible (spec:
+ * a hint can never fully give away the word).
+ */
+export function hintRevealOrder(word: string, seed: string): number[] {
+  const eligible = Array.from({ length: Math.max(word.length - 1, 0) }, (_, i) => i);
+  if (eligible.length <= 1) return eligible;
+
+  const rng = makeRng(seedFromString(seed));
+  for (let i = eligible.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [eligible[i], eligible[j]] = [eligible[j], eligible[i]];
+  }
+  return eligible;
+}

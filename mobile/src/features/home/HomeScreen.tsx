@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
   Image,
   Pressable,
   ScrollView,
@@ -17,6 +18,7 @@ import { useThemeColors } from '@/state/themeStore';
 import { getMyProgression, type Progression } from '@/services/progression';
 import { getMyJourney, type JourneyView } from '@/services/journey';
 import { getTodayQuestSummary, type TodayQuestSummary } from '@/services/quests';
+import { getLastPlayedArcadeGame, type LastPlayedArcadeGame } from '@/services/arcadeStatus';
 import { getClanLeaderboard, type LeaderboardEntry } from '@/services/leaderboards';
 import { listMyWordMastery, type WordMasteryListItem } from '@/services/users';
 import { useAuthStore } from '@/state/authStore';
@@ -56,6 +58,56 @@ const MONTH_ABBR = [
   'DEC',
 ];
 
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const CHAPTER_ROW_GAP = spacing.sm;
+/** Home's swipeable Today's Chapter + "Play <Game> again" row (Barth,
+ * Sept 2026) bleeds past the screen's own right-hand content padding
+ * out to the true screen edge (see chapterRowBleed below) rather than
+ * stopping at the same inset as the rest of the screen -- Chess.com's
+ * Home "Puzzles" + "Play Bot" row does the same. Its cards are sized
+ * off that fuller row width, not the padded content width: the
+ * chapter card fills 75% of it, and the "Play again" card is
+ * deliberately wider than the sliver left over, so it visibly peeks
+ * off the right edge instead of sitting fully in view -- a nudge to
+ * actually swipe rather than a second card you can already read in
+ * full. Only used when there is a last-played Arcade game to show
+ * (see chapterMeta below); otherwise the chapter card keeps its old
+ * full-width, non-scrolling layout. */
+const CHAPTER_ROW_WIDTH = SCREEN_WIDTH - spacing.xl;
+const CHAPTER_CARD_WIDTH = CHAPTER_ROW_WIDTH * 0.75 - CHAPTER_ROW_GAP / 2;
+const LAST_PLAYED_CARD_WIDTH = CHAPTER_ROW_WIDTH * 0.55;
+
+/** Per-game "logo" for the Home last-played card (Barth, Sept 2026) --
+ * a distinct icon glyph per game so the compact card reads as that
+ * game's own mark rather than a generic game-controller badge. Kept to
+ * the single arcaneSoft accent (theme.ts's "single accent, everything
+ * else stays quiet" rule) -- games are told apart by icon and wordmark,
+ * not by color-coding each one differently. */
+const ARCADE_GAME_META: Record<
+  LastPlayedArcadeGame['game'],
+  {
+    titleKey: string;
+    route: 'ScrambleQuest' | 'CompleteIt' | 'WordDuel';
+    icon: keyof typeof Ionicons.glyphMap;
+  }
+> = {
+  SCRAMBLE_QUEST: {
+    titleKey: 'arcade:scrambleQuestTitle',
+    route: 'ScrambleQuest',
+    icon: 'shuffle-outline',
+  },
+  COMPLETE_IT: {
+    titleKey: 'arcade:completeItTitle',
+    route: 'CompleteIt',
+    icon: 'create-outline',
+  },
+  WORD_DUEL: {
+    titleKey: 'arcade:wordDuelTitle',
+    route: 'WordDuel',
+    icon: 'people-outline',
+  },
+};
+
 /**
  * Screen 19 of the UI/UX Screen Bible, the Home tab — rebuilt for the
  * Sept 2026 homepage redesign (Design canvas "WordQuest Homepage
@@ -89,7 +141,7 @@ export function HomeScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
-  const { t } = useTranslation('home');
+  const { t } = useTranslation(['home', 'arcade']);
   const accessToken = useAuthStore((s) => s.accessToken);
   const displayName = useAuthStore((s) => s.user?.displayName);
   const avatarUrl = useAuthStore((s) => s.user?.avatarUrl);
@@ -99,6 +151,7 @@ export function HomeScreen({ navigation }: Props) {
   const [todaySummary, setTodaySummary] = useState<TodayQuestSummary | null>(null);
   const [clanViewer, setClanViewer] = useState<LeaderboardEntry | null>(null);
   const [wordMastery, setWordMastery] = useState<WordMasteryListItem[] | null>(null);
+  const [lastPlayedArcade, setLastPlayedArcade] = useState<LastPlayedArcadeGame | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -118,6 +171,9 @@ export function HomeScreen({ navigation }: Props) {
     listMyWordMastery(accessToken)
       .then(setWordMastery)
       .catch(() => {});
+    getLastPlayedArcadeGame(accessToken)
+      .then(setLastPlayedArcade)
+      .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
@@ -134,9 +190,16 @@ export function HomeScreen({ navigation }: Props) {
   // Same "has today's activity landed yet" signal DailyGoalsCard uses for
   // its streak ring -- the header flame dims in lockstep with it rather
   // than just reflecting currentStreak > 0, so a streak that's actually
-  // at risk today doesn't still look "lit" and safe.
-  const streakSafeToday = (todaySummary?.completedCount ?? 0) > 0;
+  // at risk today doesn't still look "lit" and safe. Reads the server's
+  // own playedToday (recordDailyActivity already fired for today's local
+  // date -- Daily Quest OR a completed Arcade session, both count)
+  // rather than Daily Quest's own completedCount -- 2026-09 bugfix: an
+  // Arcade-only session correctly recorded the streak server-side but
+  // never lit this up, since completedCount only counts Daily Quest
+  // (Barth).
+  const streakSafeToday = progression?.playedToday ?? false;
   const chapterVisual = journey ? journeyVisualFor(journey.currentStage.key) : null;
+  const chapterMeta = lastPlayedArcade ? ARCADE_GAME_META[lastPlayedArcade.game] : null;
 
   return (
     <ScrollView
@@ -190,7 +253,74 @@ export function HomeScreen({ navigation }: Props) {
       {!progression && !error && <ActivityIndicator color={colors.arcaneSoft} />}
       {error && <Text style={styles.error}>{error}</Text>}
 
-      {journey && (
+      {journey && chapterMeta && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          style={styles.chapterRowBleed}
+          contentContainerStyle={styles.chapterRow}
+        >
+          <Pressable
+            style={[
+              styles.chapterCard,
+              styles.chapterCardCompact,
+              { borderColor: chapterVisual?.color ?? colors.border },
+            ]}
+            onPress={() => navigation.navigate('Main', { screen: 'Play' })}
+            accessibilityRole="button"
+            accessibilityLabel={`${t('todaysChapter')}: ${journey.currentStage.name}`}
+          >
+            {chapterVisual && (
+              <JourneyMotif icons={chapterVisual.motif} color={chapterVisual.color} />
+            )}
+            <View style={styles.dateBadge}>
+              <Text style={styles.dateBadgeText}>{dateBadge}</Text>
+            </View>
+            <View style={styles.chapterBody}>
+              <Text style={styles.chapterEyebrow}>{t('todaysChapter')}</Text>
+              <Text
+                style={[styles.chapterName, { color: chapterVisual?.color ?? colors.ink }]}
+                numberOfLines={1}
+              >
+                {journey.currentStage.name}
+              </Text>
+              <Text style={styles.chapterSubtitle} numberOfLines={1}>
+                {wordsRemaining === null
+                  ? ' '
+                  : wordsRemaining > 0
+                    ? t('wordsRemaining', { count: wordsRemaining })
+                    : t('allCaughtUp')}
+              </Text>
+            </View>
+            <View style={styles.chapterButton}>
+              <Text style={styles.chapterButtonText}>
+                {wordsRemaining === 0 ? t('review') : t('open')}
+              </Text>
+            </View>
+          </Pressable>
+
+          <View style={styles.lastPlayedCard}>
+            <View style={styles.lastPlayedIconWrap}>
+              <Ionicons name={chapterMeta.icon} size={24} color={colors.arcaneSoft} />
+            </View>
+            <Text style={styles.lastPlayedWordmark} numberOfLines={1} adjustsFontSizeToFit>
+              {t(chapterMeta.titleKey)}
+            </Text>
+            <Pressable
+              style={styles.lastPlayedPlayButton}
+              onPress={() => navigation.navigate(chapterMeta.route)}
+              accessibilityRole="button"
+              accessibilityLabel={t('playAgainTitle', { game: t(chapterMeta.titleKey) })}
+            >
+              <Ionicons name="play" size={13} color={colors.ink} />
+              <Text style={styles.lastPlayedPlayButtonText}>{t('arcade:play')}</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      )}
+
+      {journey && !chapterMeta && (
         <Pressable
           style={[styles.chapterCard, { borderColor: chapterVisual?.color ?? colors.border }]}
           onPress={() => navigation.navigate('Main', { screen: 'Play' })}
@@ -228,6 +358,7 @@ export function HomeScreen({ navigation }: Props) {
         colors={colors}
         todaySummary={todaySummary}
         currentStreak={progression?.currentStreak ?? 0}
+        playedToday={progression?.playedToday ?? false}
       />
 
       <ClanRankCard
@@ -359,6 +490,51 @@ function createStyles(colors: ThemeColors, topInset: number) {
       alignItems: 'center',
       gap: spacing.md,
       overflow: 'hidden',
+    },
+    // Cancels the screen's own right-hand content padding so this row's
+    // cards can bleed to the true screen edge -- see the constants above.
+    chapterRowBleed: { marginRight: -spacing.xl },
+    chapterRow: { flexDirection: 'row', gap: CHAPTER_ROW_GAP, paddingRight: spacing.md },
+    chapterCardCompact: { width: CHAPTER_CARD_WIDTH },
+    lastPlayedCard: {
+      width: LAST_PLAYED_CARD_WIDTH,
+      borderRadius: radius.lg,
+      borderWidth: 2,
+      borderColor: colors.arcaneSoft,
+      padding: spacing.md,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.sm,
+    },
+    lastPlayedIconWrap: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: colors.surfaceRaised,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    lastPlayedWordmark: {
+      color: colors.ink,
+      fontSize: typography.scale.sm,
+      fontWeight: '800',
+      letterSpacing: 0.3,
+      textAlign: 'center',
+    },
+    lastPlayedPlayButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: colors.arcane,
+      borderRadius: radius.pill,
+      paddingVertical: 6,
+      paddingHorizontal: spacing.md,
+    },
+    lastPlayedPlayButtonText: {
+      color: colors.ink,
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
     },
     dateBadge: {
       backgroundColor: colors.surfaceRaised,

@@ -16,6 +16,7 @@ import { getUpcomingBattle, type UpcomingBattle } from '@/services/bossBattle';
 import { useAuthStore } from '@/state/authStore';
 import { formatLocalClock, timeOfDayPeriod } from '@/utils/timeOfDay';
 import { formatBossBattleCountdown } from '@/utils/bossBattleCountdown';
+import { CompleteItIcon, ScrambleQuestIcon, WordDuelIcon } from '@/components/ArcadeGameIcons';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -250,6 +251,7 @@ export function PlayScreen({ navigation }: Props) {
         cta={t('arcade:play')}
         enabled
         onPress={() => navigation.navigate('ScrambleQuest')}
+        icon={<ScrambleQuestIcon colors={colors} />}
         styles={styles}
       />
       <GameRow
@@ -258,6 +260,7 @@ export function PlayScreen({ navigation }: Props) {
         cta={t('arcade:play')}
         enabled
         onPress={() => navigation.navigate('WordDuel')}
+        icon={<WordDuelIcon colors={colors} />}
         styles={styles}
       />
       <GameRow
@@ -266,6 +269,7 @@ export function PlayScreen({ navigation }: Props) {
         cta={t('arcade:play')}
         enabled
         onPress={() => navigation.navigate('CompleteIt')}
+        icon={<CompleteItIcon colors={colors} />}
         styles={styles}
       />
       <GameRow
@@ -292,6 +296,7 @@ function GameRow({
   cta,
   enabled,
   onPress,
+  icon,
   badge,
   badgeSubtext,
   styles,
@@ -301,6 +306,7 @@ function GameRow({
   cta: string;
   enabled: boolean;
   onPress: () => void;
+  icon?: React.ReactNode;
   badge?: string;
   badgeSubtext?: string;
   styles: ReturnType<typeof createStyles>;
@@ -313,6 +319,7 @@ function GameRow({
       accessibilityRole="button"
       accessibilityLabel={title}
     >
+      {icon}
       <View style={styles.cardTextCol}>
         <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.cardSubtitle}>{subtitle}</Text>

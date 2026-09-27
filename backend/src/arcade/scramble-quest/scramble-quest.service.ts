@@ -14,7 +14,7 @@ import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
 import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, SCRAMBLE_QUEST_CONFIG } from '../config/arcade.config';
-import { scrambleWord } from './scramble.util';
+import { hintRevealOrder, scrambleWord } from './scramble.util';
 
 /** Client-safe view of the player's current ScrambleQuest word — the
  * scrambled letters, never the target word (spec §5/§8). */
@@ -175,11 +175,15 @@ export class ScrambleQuestService {
       throw new ConflictException('This hint was already requested');
     }
 
-    const position = session.currentWordHintsUsed; // 0-based: the hint just granted reveals this position
+    // The Nth hint reveals a randomized (but deterministic-per-session)
+    // position, not simply the Nth letter — see hintRevealOrder().
+    const hintsUsedNow = session.currentWordHintsUsed + 1;
+    const revealOrder = hintRevealOrder(word.word, `${session.id}:${session.currentIndex}:hints`);
+    const position = revealOrder[session.currentWordHintsUsed];
     return {
       position,
       letter: word.word[position],
-      hintsRemaining: maxHintsForWord - position - 1,
+      hintsRemaining: maxHintsForWord - hintsUsedNow,
     };
   }
 
@@ -358,7 +362,8 @@ export class ScrambleQuestService {
   ): Promise<ScrambleQuestChallengeView> {
     const word = await this.currentWord(session);
     const maxHintsForWord = this.maxHintsFor(word.word);
-    const revealedLetters = Array.from({ length: session.currentWordHintsUsed }, (_, position) => ({
+    const revealOrder = hintRevealOrder(word.word, `${session.id}:${session.currentIndex}:hints`);
+    const revealedLetters = revealOrder.slice(0, session.currentWordHintsUsed).map((position) => ({
       position,
       letter: word.word[position],
     }));

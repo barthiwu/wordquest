@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   Vibration,
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -22,8 +22,10 @@ import {
   type ScrambleQuestChallenge,
 } from '@/services/scrambleQuest';
 import { useAuthStore } from '@/state/authStore';
+import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
+import { LetterBoxInput } from '@/components/LetterBoxInput';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -40,6 +42,26 @@ type Phase = 'loading' | 'active' | 'submitting' | 'feedback' | 'complete' | 'er
  * added mid-Xcode-signing-session; Vibration ships now with zero new
  * native deps and no rebuild. */
 const URGENT_THRESHOLD_SECONDS = 10;
+
+/**
+ * Reconstructs the full word from the player's typed characters (which
+ * only cover the still-editable, non-hint-revealed positions -- see
+ * LetterBoxInput's `revealed` prop) plus the hint-revealed letters, so
+ * the server always receives a complete answer of the right length.
+ */
+function mergeRevealedAnswer(
+  typed: string,
+  revealedLetters: { position: number; letter: string }[],
+  length: number,
+): string {
+  const revealedMap = new Map(revealedLetters.map((r) => [r.position, r.letter]));
+  const editablePositions = Array.from({ length }, (_, i) => i).filter((i) => !revealedMap.has(i));
+  const letters = Array.from({ length }, (_, i) => revealedMap.get(i) ?? '');
+  editablePositions.forEach((position, editableIndex) => {
+    letters[position] = typed[editableIndex] ?? '';
+  });
+  return letters.join('');
+}
 
 /**
  * ScrambleQuest (spec §5) — one word at a time, 30s server-authoritative
@@ -62,6 +84,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   const [feedback, setFeedback] = useState<ScrambleQuestAnswerResult | null>(null);
   const [showMeaning, setShowMeaning] = useState(false);
   const [showSynonyms, setShowSynonyms] = useState(false);
+  const [displayedLetters, setDisplayedLetters] = useState('');
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const autoSubmittedRef = useRef(false);
   const lastVibratedSecondRef = useRef<number | null>(null);
@@ -72,6 +95,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     try {
       const view = await startScrambleQuest(accessToken);
       setChallenge(view);
+      setDisplayedLetters(view.scrambledLetters);
       setAnswer('');
       setShowSynonyms(false);
       autoSubmittedRef.current = false;
@@ -98,7 +122,10 @@ export function ScrambleQuestScreen({ navigation }: Props) {
         Math.ceil((new Date(challenge.deadlineAt).getTime() - Date.now()) / 1000),
       );
       setRemainingSeconds(secondsLeft);
-      if (secondsLeft <= URGENT_THRESHOLD_SECONDS && lastVibratedSecondRef.current !== secondsLeft) {
+      if (
+        secondsLeft <= URGENT_THRESHOLD_SECONDS &&
+        lastVibratedSecondRef.current !== secondsLeft
+      ) {
         lastVibratedSecondRef.current = secondsLeft;
         Vibration.vibrate(80);
       }
@@ -113,12 +140,17 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, challenge]);
 
-  const handleSubmit = async (submittedAnswer: string) => {
+  const handleSubmit = async (typedAnswer: string) => {
     if (!accessToken || !challenge || phase === 'submitting') return;
     setPhase('submitting');
     setShowMeaning(false);
+    const fullAnswer = mergeRevealedAnswer(
+      typedAnswer,
+      challenge.revealedLetters,
+      challenge.wordLength,
+    );
     try {
-      const result = await submitScrambleAnswer(accessToken, challenge.sessionId, submittedAnswer);
+      const result = await submitScrambleAnswer(accessToken, challenge.sessionId, fullAnswer);
       setFeedback(result);
       setPhase('feedback');
     } catch {
@@ -148,6 +180,22 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     }
   };
 
+  const handleShuffle = () => {
+    setDisplayedLetters((current) => {
+      const shuffleOnce = () => {
+        const letters = current.split('');
+        for (let i = letters.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [letters[i], letters[j]] = [letters[j], letters[i]];
+        }
+        return letters.join('');
+      };
+      let next = shuffleOnce();
+      if (next === current && current.length > 1) next = shuffleOnce();
+      return next;
+    });
+  };
+
   const handleContinue = () => {
     if (!feedback) return;
     if (feedback.sessionComplete || !feedback.nextChallenge) {
@@ -155,6 +203,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
       return;
     }
     setChallenge(feedback.nextChallenge);
+    setDisplayedLetters(feedback.nextChallenge.scrambledLetters);
     setFeedback(null);
     setAnswer('');
     setShowSynonyms(false);
@@ -183,45 +232,29 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   if (phase === 'complete' && feedback) {
     return (
       <ScrollView style={styles.flexFill} contentContainerStyle={styles.centeredScrollContent}>
-        <Text style={styles.title}>{t('sessionCompleteTitle')}</Text>
-        <Text style={styles.summaryLine}>
-          {t('sessionXpEarned', { xp: feedback.totalXpAwarded })}
-        </Text>
-        <Text style={styles.summaryLine}>
-          {t('sessionCorrectSummary', {
+        <ArcadeHeroResults
+          colors={colors}
+          title={t('sessionCompleteTitle')}
+          subtitle={t('sessionCorrectSummary', {
             correct: feedback.correctCount,
             total: feedback.wordsTotal,
           })}
-        </Text>
-        <Text style={styles.summaryLine}>
-          {t('sessionLongestStreak', { streak: feedback.longestStreak })}
-        </Text>
-        <Pressable
-          style={styles.button}
-          onPress={load}
-          accessibilityRole="button"
-          accessibilityLabel={t('playAgain')}
-        >
-          <Text style={styles.buttonText}>{t('playAgain')}</Text>
-        </Pressable>
-        <Pressable
-          style={styles.secondaryButton}
-          onPress={() => navigation.goBack()}
-          accessibilityRole="button"
-          accessibilityLabel={t('arcade:backToPlay')}
-        >
-          <Text style={styles.secondaryButtonText}>{t('arcade:backToPlay')}</Text>
-        </Pressable>
+          correctCount={feedback.correctCount}
+          totalCount={feedback.wordsTotal}
+          stats={[
+            { icon: 'flash', text: t('sessionXpEarned', { xp: feedback.totalXpAwarded }) },
+            { icon: 'flame', text: t('sessionLongestStreak', { streak: feedback.longestStreak }) },
+          ]}
+          primaryLabel={t('playAgain')}
+          onPrimary={load}
+          secondaryLabel={t('arcade:backToPlay')}
+          onSecondary={() => navigation.goBack()}
+        />
       </ScrollView>
     );
   }
 
   if (!challenge) return null;
-
-  const skeleton = Array.from({ length: challenge.wordLength }, (_, i) => {
-    const revealed = challenge.revealedLetters.find((r) => r.position === i);
-    return revealed ? revealed.letter.toUpperCase() : '_';
-  }).join(' ');
 
   return (
     <View style={styles.flexFill}>
@@ -253,10 +286,19 @@ export function ScrambleQuestScreen({ navigation }: Props) {
             end={{ x: 1, y: 0 }}
             style={styles.puzzleCardAccentBar}
           />
-          <Text style={styles.scrambledLetters}>
-            {challenge.scrambledLetters.toUpperCase().split('').join(' ')}
-          </Text>
-          {challenge.revealedLetters.length > 0 && <Text style={styles.skeleton}>{skeleton}</Text>}
+          <View style={styles.scrambledRow}>
+            <Text style={styles.scrambledLetters}>
+              {displayedLetters.toUpperCase().split('').join(' ')}
+            </Text>
+            <Pressable
+              style={styles.shuffleButton}
+              onPress={handleShuffle}
+              accessibilityRole="button"
+              accessibilityLabel={t('shuffleButton')}
+            >
+              <Ionicons name="shuffle-outline" size={16} color={colors.glyph} />
+            </Pressable>
+          </View>
 
           <Text style={styles.definitionText}>
             {t('hintFormat', { definition: challenge.definition })}
@@ -282,16 +324,14 @@ export function ScrambleQuestScreen({ navigation }: Props) {
 
         {phase === 'active' && (
           <>
-            <TextInput
-              style={styles.input}
+            <LetterBoxInput
               value={answer}
               onChangeText={setAnswer}
-              placeholder={t('answerPlaceholder')}
-              placeholderTextColor={colors.inkMuted}
-              autoCapitalize="none"
-              autoCorrect={false}
+              length={challenge.wordLength}
+              colors={colors}
               accessibilityLabel={t('yourAnswerLabel')}
               onSubmitEditing={() => handleSubmit(answer)}
+              revealed={challenge.revealedLetters}
             />
             <Pressable
               style={[styles.button, !answer.trim() && styles.buttonDisabled]}
@@ -453,17 +493,26 @@ function createStyles(colors: ThemeColors, topInset: number) {
       right: 0,
       height: 5,
     },
+    scrambledRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
     scrambledLetters: {
       color: colors.ink,
       fontSize: typography.scale.xl,
       fontWeight: '700',
       letterSpacing: 4,
     },
-    skeleton: {
-      color: colors.arcaneSoft,
-      fontSize: typography.scale.lg,
-      fontWeight: '700',
-      letterSpacing: 4,
+    shuffleButton: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.glyph,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     definitionText: {
       color: colors.glyph,

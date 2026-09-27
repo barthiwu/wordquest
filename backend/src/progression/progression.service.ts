@@ -582,6 +582,36 @@ export class ProgressionService {
   }
 
   /**
+   * Whether today's daily-streak activity has already been recorded for
+   * this player — the read-only counterpart to recordDailyActivity's own
+   * "already counted today" check (same tz-aware local-date comparison).
+   * Exposed so a client can show "today's streak activity is in" without
+   * guessing from an unrelated signal.
+   *
+   * 2026-09 bugfix: Home's streak ring was wired to
+   * `todaySummary.completedCount` (Daily Quest only), so finishing an
+   * Arcade session — which DOES call recordDailyActivity, see
+   * ScrambleQuestService/CompleteItService/WordDuelService — correctly
+   * updated currentStreak/lastActiveOn server-side but never flipped the
+   * ring, because nothing client-visible reflected lastActiveOn. This is
+   * that missing signal (see ProgressionController#me's `playedToday`).
+   */
+  async hasRecordedActivityToday(userId: string, db: Db = this.prisma): Promise<boolean> {
+    const progression = await db.userProgression.findUniqueOrThrow({ where: { userId } });
+    if (!progression.lastActiveOn) return false;
+
+    const user = db.user
+      ? await db.user.findUnique({ where: { id: userId }, select: { timezone: true } })
+      : null;
+    const tz = user?.timezone ?? null;
+    const now = new Date();
+
+    const today = this.localDateIdentity(playerLocalDate(tz, now));
+    const lastActive = this.localDateIdentity(playerLocalDate(tz, progression.lastActiveOn));
+    return lastActive.getTime() === today.getTime();
+  }
+
+  /**
    * Boxes a "YYYY-MM-DD" local-date string as a UTC-midnight Date purely
    * as a comparable/diffable identity — never a real instant, never
    * written back to the database. Both sides of every comparison in this

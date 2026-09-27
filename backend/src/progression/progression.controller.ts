@@ -2,6 +2,7 @@ import { Controller, Get, UseGuards } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user.decorator';
+import { ProgressionService } from './progression.service';
 
 /**
  * GET /api/v1/progression/me — read-only snapshot for Home / Quest
@@ -12,11 +13,15 @@ import { CurrentUserId } from '../auth/decorators/current-user.decorator';
 @Controller('progression')
 @UseGuards(JwtAuthGuard)
 export class ProgressionController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly progression: ProgressionService,
+  ) {}
 
   @Get('me')
   async me(@CurrentUserId() userId: string) {
     const progression = await this.prisma.userProgression.findUniqueOrThrow({ where: { userId } });
+    const playedToday = await this.progression.hasRecordedActivityToday(userId);
     return {
       level: progression.level,
       totalXp: progression.totalXp,
@@ -24,6 +29,13 @@ export class ProgressionController {
       journeyStage: progression.journeyStage,
       currentStreak: progression.currentStreak,
       longestStreak: progression.longestStreak,
+      // Whether recordDailyActivity has already fired for today's local
+      // date -- Daily Quest completion OR any completed Arcade session
+      // both call it (see ProgressionService.recordDailyActivity's
+      // callers). Home's streak ring reads this instead of Daily Quest's
+      // own completedCount, which used to make Arcade-only play look
+      // like the streak wasn't kept (Barth, Sept 2026).
+      playedToday,
       masteredWordsCount: progression.masteredWordsCount,
       bossBattlesCompleted: progression.bossBattlesCompleted,
       cefrUnlocked: progression.cefrUnlocked,

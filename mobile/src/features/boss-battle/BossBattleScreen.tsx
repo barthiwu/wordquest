@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
+  getBattleLeaderboard,
   getUpcomingBattle,
   joinBattle,
   submitBattleAnswer,
@@ -28,6 +29,7 @@ import {
 import { getMyPassport, type PassportBossBattleResult } from '@/services/passport';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { AliBubble } from '@/components/AliBubble';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -64,7 +66,7 @@ export function BossBattleScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
-  const { t } = useTranslation('bossBattle');
+  const { t } = useTranslation(['bossBattle', 'scrambleQuest']);
   const accessToken = useAuthStore((s) => s.accessToken);
   const [phase, setPhase] = useState<Phase>('loading');
   const [errorMessage, setErrorMessage] = useState(t('genericError'));
@@ -76,6 +78,18 @@ export function BossBattleScreen({ navigation }: Props) {
   const aliBubbleCounter = useRef(0);
   const [now, setNow] = useState(() => Date.now());
   const [history, setHistory] = useState<PassportBossBattleResult[]>([]);
+  // Fetched once the battle ends, for the Hero Ring results screen —
+  // Boss Battle's own submit/feedback loop only ever tracks the current
+  // question's xpAwarded, never a running correct/incorrect tally, so
+  // the group leaderboard (which needs this shape anyway) is reused as
+  // the source for "my" final line (Barth, Sept 2026: Hero Ring
+  // extended to every arcade completion screen ahead of the separate
+  // group-leaderboard reveal).
+  const [myBattleResult, setMyBattleResult] = useState<{
+    correct: number;
+    incorrect: number;
+    xp: number;
+  } | null>(null);
 
   const load = useCallback(
     (showSpinner = true) => {
@@ -92,6 +106,22 @@ export function BossBattleScreen({ navigation }: Props) {
   );
 
   useFocusEffect(useCallback(() => load(), [load]));
+
+  useEffect(() => {
+    if (phase !== 'ended' || !accessToken) return;
+    getBattleLeaderboard(accessToken)
+      .then((view) => {
+        const mine = view.entries.find((e) => e.isYou);
+        if (mine) {
+          setMyBattleResult({
+            correct: mine.correctAnswers,
+            incorrect: mine.incorrectAnswers,
+            xp: mine.battleXp,
+          });
+        }
+      })
+      .catch(() => {});
+  }, [phase, accessToken]);
 
   // Passport already computes the full ranked history (weekId,
   // placement, isWinner, battleXp) for the profile screen -- reused
@@ -248,15 +278,31 @@ export function BossBattleScreen({ navigation }: Props) {
   if (phase === 'ended') {
     return (
       <ScrollView style={styles.flexFill} contentContainerStyle={styles.centeredScrollContent}>
-        <Text style={styles.title}>{t('battleComplete')}</Text>
-        <Pressable
-          style={styles.button}
-          onPress={() => navigation.navigate('BossBattleLeaderboard')}
-          accessibilityRole="button"
-          accessibilityLabel={t('seeLeaderboard')}
-        >
-          <Text style={styles.buttonText}>{t('seeLeaderboard')}</Text>
-        </Pressable>
+        {myBattleResult ? (
+          <ArcadeHeroResults
+            colors={colors}
+            title={t('battleComplete')}
+            subtitle={t('scrambleQuest:sessionCorrectSummary', {
+              correct: myBattleResult.correct,
+              total: myBattleResult.correct + myBattleResult.incorrect,
+            })}
+            correctCount={myBattleResult.correct}
+            totalCount={myBattleResult.correct + myBattleResult.incorrect}
+            stats={[
+              {
+                icon: 'flash',
+                text: t('scrambleQuest:sessionXpEarned', { xp: myBattleResult.xp }),
+              },
+            ]}
+            primaryLabel={t('seeLeaderboard')}
+            onPrimary={() => navigation.navigate('BossBattleLeaderboard')}
+          />
+        ) : (
+          <>
+            <Text style={styles.title}>{t('battleComplete')}</Text>
+            <ActivityIndicator color={colors.arcaneSoft} />
+          </>
+        )}
         <HistorySection history={history} colors={colors} styles={styles} t={t} />
       </ScrollView>
     );

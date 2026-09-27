@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ScrambleQuestService } from './scramble-quest.service';
+import { hintRevealOrder } from './scramble.util';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ArcadeChallengeService } from '../challenge.service';
 import { RewardEngineService } from '../reward-engine.service';
@@ -139,12 +140,18 @@ describe('ScrambleQuestService', () => {
   });
 
   describe('requestHint', () => {
-    it('reveals the next letter and increments the hint count', async () => {
+    it('reveals a hint letter (randomized order, excluding the last letter) and increments the hint count', async () => {
       prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(baseSession());
 
       const result = await service.requestHint('u1', 's1');
 
-      expect(result).toEqual({ position: 0, letter: 't', hintsRemaining: 2 });
+      const expectedPosition = hintRevealOrder('train', 's1:0:hints')[0];
+      expect(result).toEqual({
+        position: expectedPosition,
+        letter: 'train'[expectedPosition],
+        hintsRemaining: 2,
+      });
+      expect(result.position).toBeLessThan('train'.length - 1); // never the final letter
       expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith({
         where: { id: 's1', currentWordHintsUsed: 0 },
         data: { currentWordHintsUsed: { increment: 1 } },

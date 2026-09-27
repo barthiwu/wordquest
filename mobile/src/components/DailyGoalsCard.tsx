@@ -11,6 +11,13 @@ interface Props {
   /** null while still loading — rings render at 0 rather than blocking the rest of the card. */
   todaySummary: TodayQuestSummary | null;
   currentStreak: number;
+  /** Server-authoritative "has today's streak activity already landed"
+   * (Progression#playedToday) -- Daily Quest OR any completed Arcade
+   * session, not just Daily Quest's own completedCount. 2026-09 bugfix:
+   * this ring used to derive doneForToday from completedCount alone, so
+   * an Arcade-only session never lit it even though the streak itself
+   * was correctly recorded server-side (Barth). */
+  playedToday: boolean;
 }
 
 /**
@@ -31,14 +38,14 @@ interface Props {
  * header pill's flame which gets the same dim/lit treatment for the
  * same reason.
  */
-export function DailyGoalsCard({ colors, todaySummary, currentStreak }: Props) {
+export function DailyGoalsCard({ colors, todaySummary, currentStreak, playedToday }: Props) {
   const { t } = useTranslation('common');
   const styles = useMemo(() => createStyles(colors), [colors]);
   const resetsIn = useCountdownToLocalMidnight();
 
   const completed = todaySummary?.completedCount ?? 0;
   const total = todaySummary?.totalCount ?? 3;
-  const doneForToday = completed > 0;
+  const doneForToday = playedToday;
 
   return (
     <View style={styles.card}>

@@ -5,7 +5,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   Vibration,
   View,
 } from 'react-native';
@@ -21,8 +20,10 @@ import {
   type CompleteItChallenge,
 } from '@/services/completeIt';
 import { useAuthStore } from '@/state/authStore';
+import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
+import { LetterBoxInput } from '@/components/LetterBoxInput';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -91,7 +92,10 @@ export function CompleteItScreen({ navigation }: Props) {
         Math.ceil((new Date(challenge.deadlineAt).getTime() - Date.now()) / 1000),
       );
       setRemainingSeconds(secondsLeft);
-      if (secondsLeft <= URGENT_THRESHOLD_SECONDS && lastVibratedSecondRef.current !== secondsLeft) {
+      if (
+        secondsLeft <= URGENT_THRESHOLD_SECONDS &&
+        lastVibratedSecondRef.current !== secondsLeft
+      ) {
         lastVibratedSecondRef.current = secondsLeft;
         Vibration.vibrate(80);
       }
@@ -155,35 +159,30 @@ export function CompleteItScreen({ navigation }: Props) {
   if (phase === 'complete' && feedback) {
     return (
       <ScrollView style={styles.flexFill} contentContainerStyle={styles.centeredScrollContent}>
-        <Text style={styles.title}>{t('scrambleQuest:sessionCompleteTitle')}</Text>
-        <Text style={styles.summaryLine}>
-          {t('scrambleQuest:sessionXpEarned', { xp: feedback.totalXpAwarded })}
-        </Text>
-        <Text style={styles.summaryLine}>
-          {t('scrambleQuest:sessionCorrectSummary', {
+        <ArcadeHeroResults
+          colors={colors}
+          title={t('scrambleQuest:sessionCompleteTitle')}
+          subtitle={t('scrambleQuest:sessionCorrectSummary', {
             correct: feedback.correctCount,
             total: feedback.wordsTotal,
           })}
-        </Text>
-        <Text style={styles.summaryLine}>
-          {t('scrambleQuest:sessionLongestStreak', { streak: feedback.longestStreak })}
-        </Text>
-        <Pressable
-          style={styles.button}
-          onPress={load}
-          accessibilityRole="button"
-          accessibilityLabel={t('scrambleQuest:playAgain')}
-        >
-          <Text style={styles.buttonText}>{t('scrambleQuest:playAgain')}</Text>
-        </Pressable>
-        <Pressable
-          style={styles.secondaryButton}
-          onPress={() => navigation.goBack()}
-          accessibilityRole="button"
-          accessibilityLabel={t('arcade:backToPlay')}
-        >
-          <Text style={styles.secondaryButtonText}>{t('arcade:backToPlay')}</Text>
-        </Pressable>
+          correctCount={feedback.correctCount}
+          totalCount={feedback.wordsTotal}
+          stats={[
+            {
+              icon: 'flash',
+              text: t('scrambleQuest:sessionXpEarned', { xp: feedback.totalXpAwarded }),
+            },
+            {
+              icon: 'flame',
+              text: t('scrambleQuest:sessionLongestStreak', { streak: feedback.longestStreak }),
+            },
+          ]}
+          primaryLabel={t('scrambleQuest:playAgain')}
+          onPrimary={load}
+          secondaryLabel={t('arcade:backToPlay')}
+          onSecondary={() => navigation.goBack()}
+        />
       </ScrollView>
     );
   }
@@ -232,14 +231,11 @@ export function CompleteItScreen({ navigation }: Props) {
 
         {phase === 'active' && (
           <>
-            <TextInput
-              style={styles.input}
+            <LetterBoxInput
               value={answer}
               onChangeText={setAnswer}
-              placeholder={t('scrambleQuest:answerPlaceholder')}
-              placeholderTextColor={colors.inkMuted}
-              autoCapitalize="none"
-              autoCorrect={false}
+              length={challenge.wordLength}
+              colors={colors}
               accessibilityLabel={t('scrambleQuest:yourAnswerLabel')}
               onSubmitEditing={() => handleSubmit(answer)}
             />
