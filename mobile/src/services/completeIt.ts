@@ -2,9 +2,11 @@ import { apiRequest } from './apiClient';
 
 /** Client-safe view of the current word — the word's own example
  * sentence with the target word blanked out, never the target word
- * itself (backend CompleteItChallengeView). No hint fields at all:
- * Complete It never offers hints (COMPLETE_IT_CONFIG.HINTS_ENABLED is
- * false), unlike ScrambleQuest. */
+ * itself (backend CompleteItChallengeView). Hints work the same way
+ * ScrambleQuest's do -- an on-demand, server-tracked reveal -- just
+ * sized differently (60% of the word's own letter count, rounded,
+ * rather than ScrambleQuest's flat 3-hint cap; see backend
+ * CompleteItService.maxHintsFor). */
 export interface CompleteItChallenge {
   sessionId: string;
   wordIndex: number;
@@ -17,8 +19,17 @@ export interface CompleteItChallenge {
   /** ISO timestamp — server-authoritative deadline for this word. Render
    * a countdown from it; the server, not this clock, decides timeout. */
   deadlineAt: string;
+  hintsRemaining: number;
+  maxHints: number;
+  revealedLetters: { position: number; letter: string }[];
   currentStreak: number;
   longestStreak: number;
+}
+
+export interface CompleteItHint {
+  position: number;
+  letter: string;
+  hintsRemaining: number;
 }
 
 export interface CompleteItAnswerResult {
@@ -38,6 +49,16 @@ export interface CompleteItAnswerResult {
 /** Starts a new session, or resumes one already in progress. */
 export function startCompleteIt(accessToken: string): Promise<CompleteItChallenge> {
   return apiRequest<CompleteItChallenge>('/arcade/complete-it/start', {
+    method: 'POST',
+    accessToken,
+  });
+}
+
+export function requestCompleteItHint(
+  accessToken: string,
+  sessionId: string,
+): Promise<CompleteItHint> {
+  return apiRequest<CompleteItHint>(`/arcade/complete-it/${sessionId}/hint`, {
     method: 'POST',
     accessToken,
   });

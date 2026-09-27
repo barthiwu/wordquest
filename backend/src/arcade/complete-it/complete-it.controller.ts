@@ -8,13 +8,16 @@ import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
 
 /**
  * POST /api/v1/arcade/complete-it/start
+ * POST /api/v1/arcade/complete-it/:sessionId/hint
  * POST /api/v1/arcade/complete-it/:sessionId/answer
  *
- * No hint route — COMPLETE_IT_CONFIG.HINTS_ENABLED is false (2026-09
- * decision), unlike ScrambleQuest. All routes act only on the
- * authenticated player's own session (enforced again inside the
- * service); answer gets the same tighter rate limit ScrambleQuest's
- * answer route uses (spec §11).
+ * Hints are enabled here (2026-09 decision, Barth) — sized to 60% of
+ * the word's own letter count (CompleteItService.maxHintsFor) rather
+ * than ScrambleQuest's flat 3-hint cap, but otherwise the same
+ * mechanic. All routes act only on the authenticated player's own
+ * session (enforced again inside the service); hint/answer get the
+ * same tighter rate limit ScrambleQuestController's routes use
+ * (spec §11).
  */
 @Controller('arcade/complete-it')
 @UseGuards(JwtAuthGuard, EmailVerificationGuard)
@@ -25,6 +28,12 @@ export class CompleteItController {
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   start(@CurrentUserId() userId: string) {
     return this.completeIt.start(userId);
+  }
+
+  @Post(':sessionId/hint')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  requestHint(@CurrentUserId() userId: string, @Param('sessionId') sessionId: string) {
+    return this.completeIt.requestHint(userId, sessionId);
   }
 
   @Post(':sessionId/answer')

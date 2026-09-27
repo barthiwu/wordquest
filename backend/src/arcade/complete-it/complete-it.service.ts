@@ -15,6 +15,7 @@ import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
 import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, COMPLETE_IT_CONFIG } from '../config/arcade.config';
 import { blankSentence, isCompleteItSentenceUsable } from './complete-it.util';
+import { hintRevealOrder } from '../scramble-quest/scramble.util';
 import { renderWord } from '../../vocabulary/english-variant';
 import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant';
 
@@ -34,8 +35,20 @@ export interface CompleteItChallengeView {
    * a countdown from it; never decide anything about timing client-side
    * (spec §10/§11). */
   deadlineAt: string;
+  hintsRemaining: number;
+  maxHints: number;
+  /** Hints already spent on this word, so a resumed/re-fetched challenge
+   * (app relaunch mid-word) shows the same revealed letters instead of
+   * "forgetting" them -- same convention as ScrambleQuestChallengeView. */
+  revealedLetters: { position: number; letter: string }[];
   currentStreak: number;
   longestStreak: number;
+}
+
+export interface CompleteItHintResult {
+  position: number;
+  letter: string;
+  hintsRemaining: number;
 }
 
 export interface CompleteItAnswerResult {
@@ -61,10 +74,14 @@ type ArcadeGameSessionRow = Prisma.ArcadeGameSessionGetPayload<Record<string, ne
  * Shares ArcadeGameSession/ArcadeAnswer with ScrambleQuest (schema
  * comment: "ScrambleQuest or Complete It") — same session lifecycle,
  * same [sessionId, wordIndex] idempotency guard, same reward formula.
- * COMPLETE_IT_CONFIG.HINTS_ENABLED is false (2026-09 decision), so
- * there's no hint endpoint at all here — currentWordHintsUsed always
- * stays 0, which also means the hint modifier is always 1 (no penalty
- * ever applies).
+ * Hints work the same way ScrambleQuest's do (an on-demand, server-
+ * tracked requestHint call that reveals one more letter of the target
+ * word and increments currentWordHintsUsed, which then feeds the same
+ * shared hintModifierFor XP penalty) -- the only difference is how many
+ * hints a word gets: COMPLETE_IT_CONFIG.HINT_PERCENTAGE_OF_WORD_LENGTH
+ * (60%) of the word's own letter count, rounded, instead of
+ * ScrambleQuest's flat MAX_HINTS_PER_WORD (2026-09 decision, Barth).
+ * See maxHintsFor.
  *
  * TIMER_SECONDS wasn't in the spec's own Complete It config (only
  * HINTS_ENABLED/WORDS_PER_SESSION were) even though the shared
@@ -143,6 +160,50 @@ export class CompleteItService {
     return this.buildChallengeView(session, variant);
   }
 
+  /**
+   * Reveals the next hint letter of the current word (randomized but
+   * deterministic-per-session order, same hintRevealOrder helper
+   * ScrambleQuest uses) — up to maxHintsFor(word), capped so a hint can
+   * never reveal the word's very last letter. Mirrors
+   * ScrambleQuestService.requestHint exactly except for the hint-count
+   * formula itself (see maxHintsFor).
+   */
+  async requestHint(userId: string, sessionId: string): Promise<CompleteItHintResult> {
+    const session = await this.loadActiveSession(userId, sessionId);
+    const word = await this.currentWord(session);
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
+    const maxHintsForWord = this.maxHintsFor(rendered.text);
+
+    if (session.currentWordHintsUsed >= maxHintsForWord) {
+      throw new BadRequestException(`No hints remaining (max ${maxHintsForWord}).`);
+    }
+
+    // Compare-and-swap on the exact hint count just read — a race loser
+    // (double-tap, or two requests in flight) can't both succeed and
+    // silently grant an extra hint. Same pattern as
+    // ScrambleQuestService.requestHint.
+    const claimed = await this.prisma.arcadeGameSession.updateMany({
+      where: { id: sessionId, currentWordHintsUsed: session.currentWordHintsUsed },
+      data: { currentWordHintsUsed: { increment: 1 } },
+    });
+    if (claimed.count === 0) {
+      throw new ConflictException('This hint was already requested');
+    }
+
+    const hintsUsedNow = session.currentWordHintsUsed + 1;
+    const revealOrder = hintRevealOrder(
+      rendered.text,
+      `${session.id}:${session.currentIndex}:hints`,
+    );
+    const position = revealOrder[session.currentWordHintsUsed];
+    return {
+      position,
+      letter: rendered.text[position],
+      hintsRemaining: maxHintsForWord - hintsUsedNow,
+    };
+  }
+
   async submitAnswer(
     userId: string,
     sessionId: string,
@@ -175,7 +236,7 @@ export class CompleteItService {
         difficulty: word.baseDifficulty,
         responseTimeMs,
         timeLimitMs,
-        hintsUsed: 0, // Complete It never offers hints — COMPLETE_IT_CONFIG.HINTS_ENABLED is false
+        hintsUsed: session.currentWordHintsUsed,
         streakBefore,
       });
     }
@@ -193,7 +254,7 @@ export class CompleteItService {
               wordId: word.id,
               submittedAnswer: rawAnswer,
               isCorrect,
-              hintsUsed: 0,
+              hintsUsed: session.currentWordHintsUsed,
               timedOut,
               baseXp: reward.baseXp,
               speedModifier: reward.speedModifier,
@@ -227,6 +288,7 @@ export class CompleteItService {
             longestStreak: newLongestStreak,
             totalXpAwarded: { increment: reward.finalXp },
             currentWordStartedAt: new Date(),
+            currentWordHintsUsed: 0,
             ...(isLastWord ? { status: 'COMPLETED' as const, endedAt: new Date() } : {}),
           },
         });
@@ -302,6 +364,20 @@ export class CompleteItService {
     return this.prisma.word.findUniqueOrThrow({ where: { id: wordId } });
   }
 
+  /** A hint can never reveal the word's final letter -- leaves at least
+   * one letter for the player to actually solve (same convention as
+   * ScrambleQuestService.maxHintsFor). Sized to
+   * HINT_PERCENTAGE_OF_WORD_LENGTH (60%) of the word's own letter
+   * count, rounded to the nearest integer, rather than ScrambleQuest's
+   * flat MAX_HINTS_PER_WORD -- e.g. 5 letters -> 3 hints, 10 letters ->
+   * 6 hints. */
+  private maxHintsFor(word: string): number {
+    const percentageHints = Math.round(
+      word.length * COMPLETE_IT_CONFIG.HINT_PERCENTAGE_OF_WORD_LENGTH,
+    );
+    return Math.min(percentageHints, Math.max(0, word.length - 1));
+  }
+
   private async buildChallengeView(
     session: ArcadeGameSessionRow,
     variant: 'US' | 'UK' | null,
@@ -317,6 +393,15 @@ export class CompleteItService {
     // the unblanked sentence would leak the answer, so this
     // deliberately does NOT have a silent fallback.
     const { sentenceWithBlank } = blankSentence(rendered.sentence, rendered.text);
+    const maxHintsForWord = this.maxHintsFor(rendered.text);
+    const revealOrder = hintRevealOrder(
+      rendered.text,
+      `${session.id}:${session.currentIndex}:hints`,
+    );
+    const revealedLetters = revealOrder.slice(0, session.currentWordHintsUsed).map((position) => ({
+      position,
+      letter: rendered.text[position],
+    }));
 
     return {
       sessionId: session.id,
@@ -333,6 +418,9 @@ export class CompleteItService {
       deadlineAt: new Date(
         session.currentWordStartedAt.getTime() + COMPLETE_IT_CONFIG.TIMER_SECONDS * 1000,
       ).toISOString(),
+      hintsRemaining: maxHintsForWord - session.currentWordHintsUsed,
+      maxHints: maxHintsForWord,
+      revealedLetters,
       currentStreak: session.currentStreak,
       longestStreak: session.longestStreak,
     };

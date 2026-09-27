@@ -89,7 +89,21 @@ export const COMPLETE_IT_CONFIG = {
   // since Complete It gives no letters at all up front, only sentence
   // + definition context, unlike ScrambleQuest's scrambled letters.
   TIMER_SECONDS: 45,
-  HINTS_ENABLED: false, // 2026-09 decision: no hints in V1
+  // 2026-09 decision (Barth): hints are now enabled here, but sized
+  // differently from ScrambleQuest's flat MAX_HINTS_PER_WORD. Complete
+  // It's blank gives no up-front signal of relative difficulty the way
+  // a scrambled word's visible letter count does, so its hint budget
+  // scales with the word itself instead: round(HINT_PERCENTAGE_OF_
+  // WORD_LENGTH * the word's own letter count) -- e.g. a 5-letter word
+  // gets 3 hints, a 10-letter word gets 6. See CompleteItService.
+  // maxHintsFor (same "never reveal the final letter" cap ScrambleQuest
+  // uses). The per-hint XP penalty is the same shared
+  // ARCADE_HINT_PENALTY_PER_HINT/hintModifierFor every Arcade game
+  // already uses via RewardEngineService -- nothing Complete It-
+  // specific about the deduction itself, only about how many hints a
+  // player gets to spend.
+  HINTS_ENABLED: true,
+  HINT_PERCENTAGE_OF_WORD_LENGTH: 0.6,
   WORDS_PER_SESSION: 20,
   // 2026-09 decision: the one Arcade game that reaches all the way down
   // to the vault's actual floor -- a blanked-out short word ("_at") is

@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
+  requestCompleteItHint,
   startCompleteIt,
   submitCompleteItAnswer,
   type CompleteItAnswerResult,
@@ -38,16 +39,41 @@ type Phase = 'loading' | 'active' | 'submitting' | 'feedback' | 'complete' | 'er
 const URGENT_THRESHOLD_SECONDS = 10;
 
 /**
+ * Reconstructs the full word from the player's typed characters (which
+ * only cover the still-editable, non-hint-revealed positions -- see
+ * LetterBoxInput's `revealed` prop) plus the hint-revealed letters, so
+ * the server always receives a complete answer of the right length.
+ * Identical to ScrambleQuestScreen's own helper of the same name.
+ */
+function mergeRevealedAnswer(
+  typed: string,
+  revealedLetters: { position: number; letter: string }[],
+  length: number,
+): string {
+  const revealedMap = new Map(revealedLetters.map((r) => [r.position, r.letter]));
+  const editablePositions = Array.from({ length }, (_, i) => i).filter((i) => !revealedMap.has(i));
+  const letters = Array.from({ length }, (_, i) => revealedMap.get(i) ?? '');
+  editablePositions.forEach((position, editableIndex) => {
+    letters[position] = typed[editableIndex] ?? '';
+  });
+  return letters.join('');
+}
+
+/**
  * Complete It (spec §5 sibling of ScrambleQuest) — the player sees the
  * word's own example sentence with the target word blanked out, plus
- * its definition/part of speech, and types the missing word. No hints
- * at all (COMPLETE_IT_CONFIG.HINTS_ENABLED is false), unlike
- * ScrambleQuest — this screen is ScrambleQuestScreen's structure minus
- * the hint UI, with a sentence+definition card in place of the
- * scrambled-letters puzzle. The local countdown is purely cosmetic: the
- * server decides timeout from its own recorded start time
- * (CompleteItService), so a submission landing right as this screen's
- * clock hits zero is judged by the server's clock, not this one's.
+ * its definition/part of speech, and types the missing word. Hints work
+ * the same way ScrambleQuest's do (an on-demand, server-tracked
+ * letter-reveal button, same XP penalty via the shared reward engine),
+ * just sized differently -- 60% of the word's own letter count, rounded,
+ * instead of ScrambleQuest's flat 3-hint cap (2026-09 decision, Barth).
+ * This screen is ScrambleQuestScreen's structure with a sentence+
+ * definition card in place of the scrambled-letters puzzle (no shuffle
+ * button or synonyms reveal here -- Complete It has neither). The local
+ * countdown is purely cosmetic: the server decides timeout from its own
+ * recorded start time (CompleteItService), so a submission landing
+ * right as this screen's clock hits zero is judged by the server's
+ * clock, not this one's.
  */
 export function CompleteItScreen({ navigation }: Props) {
   const colors = useThemeColors();
@@ -110,19 +136,42 @@ export function CompleteItScreen({ navigation }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, challenge]);
 
-  const handleSubmit = async (submittedAnswer: string) => {
+  const handleSubmit = async (typedAnswer: string) => {
     if (!accessToken || !challenge || phase === 'submitting') return;
     setPhase('submitting');
+    const fullAnswer = mergeRevealedAnswer(
+      typedAnswer,
+      challenge.revealedLetters,
+      challenge.wordLength,
+    );
     try {
-      const result = await submitCompleteItAnswer(
-        accessToken,
-        challenge.sessionId,
-        submittedAnswer,
-      );
+      const result = await submitCompleteItAnswer(accessToken, challenge.sessionId, fullAnswer);
       setFeedback(result);
       setPhase('feedback');
     } catch {
       setPhase('error');
+    }
+  };
+
+  const handleHint = async () => {
+    if (!accessToken || !challenge || challenge.hintsRemaining <= 0) return;
+    try {
+      const hint = await requestCompleteItHint(accessToken, challenge.sessionId);
+      setChallenge((prev) =>
+        prev
+          ? {
+              ...prev,
+              hintsRemaining: hint.hintsRemaining,
+              revealedLetters: [
+                ...prev.revealedLetters,
+                { position: hint.position, letter: hint.letter },
+              ],
+            }
+          : prev,
+      );
+    } catch {
+      // A failed hint request (rate limit, race) just leaves the hint
+      // count where it was -- not worth interrupting the game over.
     }
   };
 
@@ -238,6 +287,7 @@ export function CompleteItScreen({ navigation }: Props) {
               colors={colors}
               accessibilityLabel={t('scrambleQuest:yourAnswerLabel')}
               onSubmitEditing={() => handleSubmit(answer)}
+              revealed={challenge.revealedLetters}
             />
             <Pressable
               style={[styles.button, !answer.trim() && styles.buttonDisabled]}
@@ -247,6 +297,19 @@ export function CompleteItScreen({ navigation }: Props) {
               accessibilityLabel={t('scrambleQuest:submit')}
             >
               <Text style={styles.buttonText}>{t('scrambleQuest:submit')}</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.hintButton, challenge.hintsRemaining <= 0 && styles.buttonDisabled]}
+              onPress={handleHint}
+              disabled={challenge.hintsRemaining <= 0}
+              accessibilityRole="button"
+              accessibilityLabel={t('scrambleQuest:hintButton')}
+            >
+              <Text style={styles.hintButtonText}>
+                {challenge.hintsRemaining > 0
+                  ? `${t('scrambleQuest:hintButton')} (${t('scrambleQuest:hintsRemainingLabel', { count: challenge.hintsRemaining })})`
+                  : t('scrambleQuest:noHintsRemaining')}
+              </Text>
             </Pressable>
           </>
         )}
@@ -402,6 +465,14 @@ function createStyles(colors: ThemeColors, topInset: number) {
     },
     buttonDisabled: { opacity: 0.4 },
     buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
+    hintButton: {
+      borderRadius: radius.md,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.glyph,
+    },
+    hintButtonText: { color: colors.glyph, fontSize: typography.scale.sm, fontWeight: '700' },
     secondaryButton: {
       borderRadius: radius.md,
       paddingVertical: spacing.md,

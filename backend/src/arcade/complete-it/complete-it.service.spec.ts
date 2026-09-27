@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { CompleteItService } from './complete-it.service';
+import { hintRevealOrder } from '../scramble-quest/scramble.util';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ArcadeChallengeService } from '../challenge.service';
 import { RewardEngineService } from '../reward-engine.service';
@@ -204,6 +205,71 @@ describe('CompleteItService', () => {
     });
   });
 
+  describe('maxHintsFor (60% of word length, rounded, never the final letter)', () => {
+    it('gives a 5-letter word 3 hints', () => {
+      expect(service['maxHintsFor']('train')).toBe(3);
+    });
+
+    it('gives a 10-letter word 6 hints', () => {
+      expect(service['maxHintsFor']('vocabulary')).toBe(6);
+    });
+
+    it('never exceeds word.length - 1, even if the percentage would round higher', () => {
+      // 3 letters * 0.6 = 1.8 -> rounds to 2, which is exactly length-1,
+      // so this also doubles as the "leaves at least one letter" check.
+      expect(service['maxHintsFor']('cat')).toBe(2);
+    });
+  });
+
+  describe('requestHint', () => {
+    it('reveals a hint letter (randomized order, excluding the last letter) and increments the hint count', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(baseSession());
+
+      const result = await service.requestHint('u1', 's1');
+
+      const expectedPosition = hintRevealOrder('train', 's1:0:hints')[0];
+      expect(result).toEqual({
+        position: expectedPosition,
+        letter: 'train'[expectedPosition],
+        hintsRemaining: 2, // maxHintsFor('train') = 3, minus the 1 just used
+      });
+      expect(result.position).toBeLessThan('train'.length - 1); // never the final letter
+      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith({
+        where: { id: 's1', currentWordHintsUsed: 0 },
+        data: { currentWordHintsUsed: { increment: 1 } },
+      });
+    });
+
+    it('throws BadRequestException once max hints for the word are used', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        currentWordHintsUsed: 3, // maxHintsFor('train') = 3
+      });
+
+      await expect(service.requestHint('u1', 's1')).rejects.toThrow(BadRequestException);
+    });
+
+    it('throws ConflictException when a concurrent hint request wins the race', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(baseSession());
+      prismaMock.arcadeGameSession.updateMany.mockResolvedValueOnce({ count: 0 });
+
+      await expect(service.requestHint('u1', 's1')).rejects.toThrow(ConflictException);
+    });
+
+    it('throws NotFoundException when the session does not exist', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(null);
+      await expect(service.requestHint('u1', 'missing')).rejects.toThrow(NotFoundException);
+    });
+
+    it("throws ForbiddenException for another player's session", async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        userId: 'someone-else',
+      });
+      await expect(service.requestHint('u1', 's1')).rejects.toThrow(ForbiddenException);
+    });
+  });
+
   describe('loadActiveSession guards (via submitAnswer)', () => {
     it('throws NotFoundException when the session does not exist', async () => {
       prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(null);
@@ -337,6 +403,59 @@ describe('CompleteItService', () => {
       expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({ status: 'COMPLETED' }),
+        }),
+      );
+    });
+  });
+
+  describe('hint usage feeds the shared XP penalty (submitAnswer)', () => {
+    it('passes the hints used this word into the reward engine', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        currentWordHintsUsed: 2,
+      });
+      rewardEngineMock.calculate.mockReturnValueOnce({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 0.7225, // 0.85^2, same compounding every Arcade game uses
+        streakModifier: 1,
+        finalXp: 22,
+      });
+      prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 1,
+      });
+
+      const result = await service.submitAnswer('u1', 's1', 'train');
+
+      expect(rewardEngineMock.calculate).toHaveBeenCalledWith(
+        expect.objectContaining({ hintsUsed: 2 }),
+      );
+      expect(result.xpAwarded).toBe(22);
+    });
+
+    it('resets currentWordHintsUsed to 0 when advancing to the next word', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        currentWordHintsUsed: 1,
+      });
+      rewardEngineMock.calculate.mockReturnValueOnce({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 0.85,
+        streakModifier: 1,
+        finalXp: 26,
+      });
+      prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 1,
+      });
+
+      await service.submitAnswer('u1', 's1', 'train');
+
+      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ currentWordHintsUsed: 0 }),
         }),
       );
     });
