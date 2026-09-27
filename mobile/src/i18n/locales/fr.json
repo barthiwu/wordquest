@@ -102,9 +102,9 @@
     "tabs": {
       "home": "Accueil",
       "journey": "Parcours",
-      "compete": "Compétition",
+      "compete": "Classement",
       "profile": "Profil",
-      "play": "Jouer"
+      "play": "Compétition"
     },
     "stagePathRail": {
       "heading": "Ton Chemin"
@@ -366,19 +366,9 @@
   },
   "leaderboards": {
     "title": "Classement",
-    "bossBattleButton": "Combat de Boss",
-    "tabGlobal": "Mondial",
     "tabClan": "Clan",
-    "tabCountry": "Pays",
-    "tabContinent": "Continent",
-    "unavailableGlobal": "Impossible de charger le classement.",
     "unavailableClan": "Rejoins un clan pour voir le classement du clan.",
-    "unavailableCountry": "Définis ton pays dans ton profil pour voir le classement du pays.",
-    "unavailableContinent": "Définis ton pays dans ton profil pour voir le classement du continent.",
-    "emptyGlobal": "Personne n’est encore classé.",
     "emptyClan": "Personne dans ton clan n’est encore classé.",
-    "emptyCountry": "Personne de ton pays n’est encore classé.",
-    "emptyContinent": "Personne de ton continent n’est encore classé.",
     "genericError": "Impossible de charger le classement.",
     "you": "Toi",
     "xpValue": "{{xp}} XP",

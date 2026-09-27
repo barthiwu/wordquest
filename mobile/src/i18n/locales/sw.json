@@ -102,9 +102,9 @@
     "tabs": {
       "home": "Nyumbani",
       "journey": "Safari",
-      "compete": "Ushindani",
+      "compete": "Ubao wa Viwango",
       "profile": "Wasifu",
-      "play": "Cheza"
+      "play": "Ushindani"
     },
     "stagePathRail": {
       "heading": "Njia Yako"
@@ -366,19 +366,9 @@
   },
   "leaderboards": {
     "title": "Ubao wa Viwango",
-    "bossBattleButton": "Vita vya Boss",
-    "tabGlobal": "Dunia",
     "tabClan": "Ukoo",
-    "tabCountry": "Nchi",
-    "tabContinent": "Bara",
-    "unavailableGlobal": "Imeshindwa kupakia ubao wa viwango.",
     "unavailableClan": "Jiunge na ukoo ili kuona ubao wa viwango wa ukoo.",
-    "unavailableCountry": "Weka nchi yako kwenye wasifu wako ili kuona ubao wa viwango wa nchi.",
-    "unavailableContinent": "Weka nchi yako kwenye wasifu wako ili kuona ubao wa viwango wa bara.",
-    "emptyGlobal": "Bado hakuna aliyeorodheshwa.",
     "emptyClan": "Bado hakuna mtu kwenye ukoo wako aliyeorodheshwa.",
-    "emptyCountry": "Bado hakuna mtu kutoka nchi yako aliyeorodheshwa.",
-    "emptyContinent": "Bado hakuna mtu kutoka bara lako aliyeorodheshwa.",
     "genericError": "Imeshindwa kupakia ubao wa viwango.",
     "you": "Wewe",
     "xpValue": "{{xp}} XP",

@@ -8,10 +8,7 @@ import { useThemeColors } from '@/state/themeStore';
 import {
   getBossBattleXpLeaderboard,
   getClanLeaderboard,
-  getContinentLeaderboard,
-  getCountryLeaderboard,
   getFriendLeaderboard,
-  getGlobalLeaderboard,
   type LeaderboardEntry,
   type LeaderboardView,
 } from '@/services/leaderboards';
@@ -30,27 +27,35 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-type Category = 'global' | 'clan' | 'country' | 'continent' | 'friend' | 'bossBattle';
+type Category = 'clan' | 'friend' | 'bossBattle';
 
 /**
- * §30 Leaderboards, now the Compete tab (Boss Battles joins this tab
- * later — build order §47 item 26). Global, Clan, Country, Continent,
- * Friend and Boss Battle are all real, ranked from the same
- * authoritative data as Home/Passport — Country and Continent scope to
- * the viewer's own countryCode (set via the onboarding flag picker),
- * same pattern as Clan scoping to the viewer's clan. Friend ranks the
- * viewer against their accepted friends (backend/src/friends), and
- * Boss Battle ranks by lifetime Boss Battle XP rather than general
- * totalXp — see Row below for how that category suppresses the
- * (meaningless, always-0) level in its subtitle.
+ * §30 Leaderboards, now the Leaderboard tab. Trimmed to Clan, Friend
+ * and Boss Battle (Sept 2026 — Global/Country/Continent removed as
+ * noise once Clan/Friend/Boss Battle covered what players actually
+ * cared about ranking against). All three are real, ranked from the
+ * same authoritative data as Home/Passport — Clan scopes to the
+ * viewer's own clan, Friend ranks the viewer against their accepted
+ * friends (backend/src/friends), and Boss Battle ranks by lifetime
+ * Boss Battle XP rather than general totalXp — see Row below for how
+ * that category suppresses the (meaningless, always-0) level in its
+ * subtitle. The standalone "play Boss Battle" CTA that used to sit
+ * above these tabs was removed too — PlayScreen (now the Compete tab)
+ * already has its own Boss Battle entry point, so this screen is
+ * leaderboards only.
  */
-export function LeaderboardScreen({ navigation }: Props) {
+// Boss Battle's own entry point moved fully to PlayScreen (the
+// Compete tab) — this screen no longer navigates anywhere, so its
+// screen props go unused; still typed as `Props` so it keeps
+// matching the Tab.Screen signature React Navigation expects.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function LeaderboardScreen(_props: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation('leaderboards');
   const accessToken = useAuthStore((s) => s.accessToken);
-  const [category, setCategory] = useState<Category>('global');
+  const [category, setCategory] = useState<Category>('clan');
   const [view, setView] = useState<LeaderboardView | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,19 +63,13 @@ export function LeaderboardScreen({ navigation }: Props) {
   // live inside the component rather than as module-level constants —
   // same maps, same keys, just built from t() each render.
   const categoryUnavailableMessage: Record<Category, string> = {
-    global: t('unavailableGlobal'),
     clan: t('unavailableClan'),
-    country: t('unavailableCountry'),
-    continent: t('unavailableContinent'),
     friend: t('unavailableFriend'),
     bossBattle: t('unavailableBossBattle'),
   };
 
   const categoryEmptyMessage: Record<Category, string> = {
-    global: t('emptyGlobal'),
     clan: t('emptyClan'),
-    country: t('emptyCountry'),
-    continent: t('emptyContinent'),
     friend: t('emptyFriend'),
     bossBattle: t('emptyBossBattle'),
   };
@@ -81,17 +80,11 @@ export function LeaderboardScreen({ navigation }: Props) {
       setView(null);
       setError(null);
       const request =
-        cat === 'global'
-          ? getGlobalLeaderboard(accessToken)
-          : cat === 'clan'
-            ? getClanLeaderboard(accessToken)
-            : cat === 'country'
-              ? getCountryLeaderboard(accessToken)
-              : cat === 'continent'
-                ? getContinentLeaderboard(accessToken)
-                : cat === 'friend'
-                  ? getFriendLeaderboard(accessToken)
-                  : getBossBattleXpLeaderboard(accessToken);
+        cat === 'clan'
+          ? getClanLeaderboard(accessToken)
+          : cat === 'friend'
+            ? getFriendLeaderboard(accessToken)
+            : getBossBattleXpLeaderboard(accessToken);
       request.then(setView).catch((err) => {
         if (err instanceof ApiError && err.status === 400) {
           setError(categoryUnavailableMessage[cat]);
@@ -119,38 +112,11 @@ export function LeaderboardScreen({ navigation }: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>{t('title')}</Text>
 
-      <Pressable
-        style={styles.bossBattleButton}
-        onPress={() => navigation.navigate('BossBattle')}
-        accessibilityRole="button"
-        accessibilityLabel={t('bossBattleButton')}
-      >
-        <Text style={styles.bossBattleButtonText}>{t('bossBattleButton')}</Text>
-      </Pressable>
-
       <View style={styles.tabs}>
-        <Tab
-          label={t('tabGlobal')}
-          active={category === 'global'}
-          onPress={() => selectCategory('global')}
-          styles={styles}
-        />
         <Tab
           label={t('tabClan')}
           active={category === 'clan'}
           onPress={() => selectCategory('clan')}
-          styles={styles}
-        />
-        <Tab
-          label={t('tabCountry')}
-          active={category === 'country'}
-          onPress={() => selectCategory('country')}
-          styles={styles}
-        />
-        <Tab
-          label={t('tabContinent')}
-          active={category === 'continent'}
-          onPress={() => selectCategory('continent')}
           styles={styles}
         />
         <Tab
@@ -289,13 +255,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontSize: typography.scale.xl,
       fontWeight: typography.display.weight,
     },
-    bossBattleButton: {
-      backgroundColor: colors.arcane,
-      borderRadius: radius.md,
-      paddingVertical: spacing.sm,
-      alignItems: 'center',
-    },
-    bossBattleButtonText: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
     centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     error: { color: colors.danger, fontSize: typography.scale.md, textAlign: 'center' },
     emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm, textAlign: 'center' },

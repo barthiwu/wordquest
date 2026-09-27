@@ -102,9 +102,9 @@
     "tabs": {
       "home": "首页",
       "journey": "旅程",
-      "compete": "比赛",
+      "compete": "排行榜",
       "profile": "我的",
-      "play": "玩"
+      "play": "比赛"
     },
     "stagePathRail": {
       "heading": "你的路径"
@@ -366,19 +366,9 @@
   },
   "leaderboards": {
     "title": "排行榜",
-    "bossBattleButton": "Boss 战斗",
-    "tabGlobal": "全球",
     "tabClan": "部落",
-    "tabCountry": "国家",
-    "tabContinent": "大洲",
-    "unavailableGlobal": "无法加载排行榜。",
     "unavailableClan": "加入部落即可查看部落排行榜。",
-    "unavailableCountry": "在个人资料中设置你的国家,即可查看国家排行榜。",
-    "unavailableContinent": "在个人资料中设置你的国家,即可查看大洲排行榜。",
-    "emptyGlobal": "还没有人上榜。",
     "emptyClan": "你的部落中还没有人上榜。",
-    "emptyCountry": "你的国家还没有人上榜。",
-    "emptyContinent": "你的大洲还没有人上榜。",
     "genericError": "无法加载排行榜。",
     "you": "你",
     "xpValue": "{{xp}} XP",

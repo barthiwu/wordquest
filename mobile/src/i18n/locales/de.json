@@ -102,9 +102,9 @@
     "tabs": {
       "home": "Start",
       "journey": "Reise",
-      "compete": "Wettkampf",
+      "compete": "Bestenliste",
       "profile": "Profil",
-      "play": "Spielen"
+      "play": "Wettkampf"
     },
     "stagePathRail": {
       "heading": "Dein Weg"
@@ -366,19 +366,9 @@
   },
   "leaderboards": {
     "title": "Bestenliste",
-    "bossBattleButton": "Bosskampf",
-    "tabGlobal": "Global",
     "tabClan": "Clan",
-    "tabCountry": "Land",
-    "tabContinent": "Kontinent",
-    "unavailableGlobal": "Die Bestenliste konnte nicht geladen werden.",
     "unavailableClan": "Tritt einem Clan bei, um die Clan-Bestenliste zu sehen.",
-    "unavailableCountry": "Lege dein Land in deinem Profil fest, um die Länder-Bestenliste zu sehen.",
-    "unavailableContinent": "Lege dein Land in deinem Profil fest, um die Kontinent-Bestenliste zu sehen.",
-    "emptyGlobal": "Noch niemand ist platziert.",
     "emptyClan": "Noch niemand in deinem Clan ist platziert.",
-    "emptyCountry": "Noch niemand aus deinem Land ist platziert.",
-    "emptyContinent": "Noch niemand von deinem Kontinent ist platziert.",
     "genericError": "Die Bestenliste konnte nicht geladen werden.",
     "you": "Du",
     "xpValue": "{{xp}} XP",

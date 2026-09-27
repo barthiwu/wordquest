@@ -102,9 +102,9 @@
     "tabs": {
       "home": "Inicio",
       "journey": "Travesía",
-      "compete": "Competir",
+      "compete": "Clasificación",
       "profile": "Perfil",
-      "play": "Jugar"
+      "play": "Competir"
     },
     "stagePathRail": {
       "heading": "Tu Camino"
@@ -366,19 +366,9 @@
   },
   "leaderboards": {
     "title": "Clasificación",
-    "bossBattleButton": "Batalla Jefe",
-    "tabGlobal": "Global",
     "tabClan": "Clan",
-    "tabCountry": "País",
-    "tabContinent": "Continente",
-    "unavailableGlobal": "No se pudo cargar la clasificación.",
     "unavailableClan": "Únete a un clan para ver la clasificación del clan.",
-    "unavailableCountry": "Configura tu país en tu perfil para ver la clasificación por país.",
-    "unavailableContinent": "Configura tu país en tu perfil para ver la clasificación por continente.",
-    "emptyGlobal": "Todavía nadie tiene una posición.",
     "emptyClan": "Todavía nadie en tu clan tiene una posición.",
-    "emptyCountry": "Todavía nadie de tu país tiene una posición.",
-    "emptyContinent": "Todavía nadie de tu continente tiene una posición.",
     "genericError": "No se pudo cargar la clasificación.",
     "you": "Tú",
     "xpValue": "{{xp}} XP",

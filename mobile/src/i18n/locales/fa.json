@@ -102,9 +102,9 @@
     "tabs": {
       "home": "خانه",
       "journey": "سفر",
-      "compete": "رقابت",
+      "compete": "جدول امتیازات",
       "profile": "پروفایل",
-      "play": "بازی"
+      "play": "رقابت"
     },
     "stagePathRail": {
       "heading": "مسیر شما"
@@ -366,19 +366,9 @@
   },
   "leaderboards": {
     "title": "جدول امتیازات",
-    "bossBattleButton": "نبرد با رئیس",
-    "tabGlobal": "جهانی",
     "tabClan": "کلن",
-    "tabCountry": "کشور",
-    "tabContinent": "قاره",
-    "unavailableGlobal": "بارگذاری جدول امتیازات ممکن نشد.",
     "unavailableClan": "برای مشاهده جدول امتیازات کلن، به یک کلن بپیوندید.",
-    "unavailableCountry": "برای مشاهده جدول امتیازات کشور، کشور خود را در پروفایلتان تنظیم کنید.",
-    "unavailableContinent": "برای مشاهده جدول امتیازات قاره، کشور خود را در پروفایلتان تنظیم کنید.",
-    "emptyGlobal": "هنوز کسی رتبه‌بندی نشده است.",
     "emptyClan": "هنوز کسی در کلن شما رتبه‌بندی نشده است.",
-    "emptyCountry": "هنوز کسی از کشور شما رتبه‌بندی نشده است.",
-    "emptyContinent": "هنوز کسی از قاره شما رتبه‌بندی نشده است.",
     "genericError": "بارگذاری جدول امتیازات ممکن نشد.",
     "you": "شما",
     "xpValue": "{{xp}} XP",

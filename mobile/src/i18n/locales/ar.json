@@ -102,9 +102,9 @@
     "tabs": {
       "home": "الرئيسية",
       "journey": "الرحلة",
-      "compete": "المنافسة",
+      "compete": "لوحة المتصدرين",
       "profile": "الملف الشخصي",
-      "play": "لعب"
+      "play": "المنافسة"
     },
     "stagePathRail": {
       "heading": "مسارك"
@@ -366,19 +366,9 @@
   },
   "leaderboards": {
     "title": "لوحة المتصدرين",
-    "bossBattleButton": "معركة الزعيم",
-    "tabGlobal": "العالمي",
     "tabClan": "العشيرة",
-    "tabCountry": "الدولة",
-    "tabContinent": "القارة",
-    "unavailableGlobal": "تعذّر تحميل لوحة المتصدرين.",
     "unavailableClan": "انضم إلى عشيرة لرؤية لوحة متصدري العشيرة.",
-    "unavailableCountry": "حدّد دولتك في ملفك الشخصي لرؤية لوحة متصدري الدولة.",
-    "unavailableContinent": "حدّد دولتك في ملفك الشخصي لرؤية لوحة متصدري القارة.",
-    "emptyGlobal": "لم يحقق أحد ترتيبًا بعد.",
     "emptyClan": "لم يحقق أحد في عشيرتك ترتيبًا بعد.",
-    "emptyCountry": "لم يحقق أحد من دولتك ترتيبًا بعد.",
-    "emptyContinent": "لم يحقق أحد من قارتك ترتيبًا بعد.",
     "genericError": "تعذّر تحميل لوحة المتصدرين.",
     "you": "أنت",
     "xpValue": "{{xp}} نقطة خبرة",

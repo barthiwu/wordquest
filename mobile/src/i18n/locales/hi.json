@@ -102,9 +102,9 @@
     "tabs": {
       "home": "होम",
       "journey": "यात्रा",
-      "compete": "कॉम्पीट",
+      "compete": "लीडरबोर्ड",
       "profile": "प्रोफ़ाइल",
-      "play": "खेलें"
+      "play": "कॉम्पीट"
     },
     "stagePathRail": {
       "heading": "आपका पथ"
@@ -366,19 +366,9 @@
   },
   "leaderboards": {
     "title": "लीडरबोर्ड",
-    "bossBattleButton": "बॉस बैटल",
-    "tabGlobal": "वैश्विक",
     "tabClan": "क्लैन",
-    "tabCountry": "देश",
-    "tabContinent": "महाद्वीप",
-    "unavailableGlobal": "लीडरबोर्ड लोड नहीं हो सका।",
     "unavailableClan": "क्लैन लीडरबोर्ड देखने के लिए किसी क्लैन से जुड़ें।",
-    "unavailableCountry": "देश लीडरबोर्ड देखने के लिए अपनी प्रोफ़ाइल में अपना देश सेट करें।",
-    "unavailableContinent": "महाद्वीप लीडरबोर्ड देखने के लिए अपनी प्रोफ़ाइल में अपना देश सेट करें।",
-    "emptyGlobal": "अभी तक कोई रैंक नहीं हुआ है।",
     "emptyClan": "आपके क्लैन में अभी तक किसी ने रैंक नहीं बनाई है।",
-    "emptyCountry": "आपके देश से अभी तक किसी ने रैंक नहीं बनाई है।",
-    "emptyContinent": "आपके महाद्वीप से अभी तक किसी ने रैंक नहीं बनाई है।",
     "genericError": "लीडरबोर्ड लोड नहीं हो सका।",
     "you": "आप",
     "xpValue": "{{xp}} XP",

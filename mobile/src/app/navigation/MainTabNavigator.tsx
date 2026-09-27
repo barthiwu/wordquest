@@ -31,11 +31,16 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 /**
  * The authenticated app's main navigation, per the handover doc's
- * five-tab structure. Compete hosts Leaderboards today (Boss Battles
- * lands here later — build order §47 item 26). Profile hosts Passport,
- * which already serves as the player's profile/résumé view. Skill Radar
- * doesn't get its own tab — it's one tap from Journey, the content it's
- * most directly about.
+ * five-tab structure. Internal route keys stay 'Play'/'Compete' (every
+ * navigation.navigate/screen-prop type still keys off them), but their
+ * on-screen labels were swapped Sept 2026: the 'Play' route now reads
+ * "Compete" (t('tabs.play')) — Daily Quest, Arcade and Boss Battle all
+ * live there, and Boss Battle is the game's headline competitive mode —
+ * and the 'Compete' route, which only ever hosted leaderboards, now
+ * reads "Leaderboard" (t('tabs.compete')) to say what it actually is.
+ * Profile hosts Passport, which already serves as the player's
+ * profile/résumé view. Skill Radar doesn't get its own tab — it's one
+ * tap from Journey, the content it's most directly about.
  */
 export function MainTabNavigator() {
   const { t } = useTranslation('common');

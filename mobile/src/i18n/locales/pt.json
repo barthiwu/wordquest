@@ -102,9 +102,9 @@
     "tabs": {
       "home": "Início",
       "journey": "Jornada",
-      "compete": "Competir",
+      "compete": "Ranking",
       "profile": "Perfil",
-      "play": "Jogar"
+      "play": "Competir"
     },
     "stagePathRail": {
       "heading": "Seu Caminho"
@@ -366,19 +366,9 @@
   },
   "leaderboards": {
     "title": "Ranking",
-    "bossBattleButton": "Batalha do Chefe",
-    "tabGlobal": "Global",
     "tabClan": "Clã",
-    "tabCountry": "País",
-    "tabContinent": "Continente",
-    "unavailableGlobal": "Não foi possível carregar o ranking.",
     "unavailableClan": "Entre em um clã para ver o ranking do clã.",
-    "unavailableCountry": "Defina seu país no seu perfil para ver o ranking do país.",
-    "unavailableContinent": "Defina seu país no seu perfil para ver o ranking do continente.",
-    "emptyGlobal": "Ainda ninguém entrou no ranking.",
     "emptyClan": "Ainda ninguém do seu clã entrou no ranking.",
-    "emptyCountry": "Ainda ninguém do seu país entrou no ranking.",
-    "emptyContinent": "Ainda ninguém do seu continente entrou no ranking.",
     "genericError": "Não foi possível carregar o ranking.",
     "you": "Você",
     "xpValue": "{{xp}} XP",
