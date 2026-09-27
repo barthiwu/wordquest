@@ -1,4 +1,5 @@
 import { apiRequest } from './apiClient';
+import type { AliExpressionCue } from './aliExpression';
 
 export type BossBattleStatus = 'SCHEDULED' | 'LIVE' | 'COMPLETED';
 
@@ -47,6 +48,10 @@ export interface BattleAnswerResult {
   nextChallenge: BattleChallengeView | null;
   /** A short, zero-cost ALI reaction to this specific answer (V21 §6) — null once the battle has ended. */
   aliQuickReaction: string | null;
+  /** The visual pairing for aliQuickReaction (ALI Character & Animation
+   * Bible v1 §12) — same null-once-ended rule. Rendered by
+   * components/AliCharacter.tsx. */
+  aliQuickExpression: AliExpressionCue | null;
 }
 
 export interface LeaderboardEntry {

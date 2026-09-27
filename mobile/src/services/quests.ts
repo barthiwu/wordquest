@@ -1,4 +1,6 @@
 import { apiRequest } from './apiClient';
+import type { AliExpressionCue } from './aliExpression';
+import type { AliMessage } from './ali';
 
 export type MasteryLevel = 'NEW' | 'RECOGNIZING' | 'RECALLING' | 'STRONG' | 'MASTERED';
 
@@ -54,6 +56,10 @@ export interface AnswerResult {
   understanding: UnderstandingContent | null;
   /** A short, zero-cost ALI reaction to this specific answer (V21 §6) — null only when timedOut. */
   aliQuickReaction: string | null;
+  /** The visual pairing for aliQuickReaction (ALI Character & Animation
+   * Bible v1 §12) — same null-only-when-timedOut rule. Rendered by
+   * components/AliCharacter.tsx. */
+  aliQuickExpression: AliExpressionCue | null;
 }
 
 export interface HintResult {
@@ -121,7 +127,10 @@ export interface WordCompletionResult {
   /** True when this word completion was the 3rd Daily Quest word, triggering the Adaptive AI Learning Engine's Initial Calibration. */
   calibrationJustCompleted: boolean;
   /** ALI's send-off for this word, shown on QuestCompleteScreen before the player heads home. null when ALI wasn't configured or the call failed. */
-  aliMessage: { text: string; recommendation: string | null } | null;
+  aliMessage: Pick<
+    AliMessage,
+    'text' | 'recommendation' | 'expression' | 'pose' | 'intensity' | 'priority' | 'durationMs'
+  > | null;
 }
 
 export interface OptionalWildMission {

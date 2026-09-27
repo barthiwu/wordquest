@@ -1,6 +1,7 @@
 import { apiRequest } from './apiClient';
+import type { AliExpressionCue } from './aliExpression';
 
-export interface AliMessage {
+export interface AliMessage extends AliExpressionCue {
   text: string;
   recommendation: string | null;
   tone: string;
