@@ -8,6 +8,10 @@ export interface ScrambleQuestChallenge {
   wordsTotal: number;
   scrambledLetters: string;
   wordLength: number;
+  /** Always shown under the puzzle, not gated behind a hint. */
+  definition: string;
+  /** Optional, player-initiated reveal — showing it never affects XP. */
+  synonyms: string[];
   timeLimitSeconds: number;
   /** ISO timestamp — server-authoritative deadline for this word. Render
    * a countdown from it; the server, not this clock, decides timeout. */

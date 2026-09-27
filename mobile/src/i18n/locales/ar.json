@@ -805,6 +805,8 @@
     "incorrectFeedback": "ليس تمامًا.",
     "timedOutFeedback": "انتهى الوقت!",
     "revealPrefix": "كانت الكلمة",
+    "hintFormat": "(تلميح: {{definition}})",
+    "synonymsButton": "المرادفات",
     "meaningButton": "المعنى والمرادفات",
     "synonymsListLabel": "المرادفات: {{list}}",
     "continue": "استمرار",

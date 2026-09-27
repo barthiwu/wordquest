@@ -805,6 +805,8 @@
     "incorrectFeedback": "No es correcto.",
     "timedOutFeedback": "¡Se acabó el tiempo!",
     "revealPrefix": "La palabra era",
+    "hintFormat": "(pista: {{definition}})",
+    "synonymsButton": "Sinónimos",
     "meaningButton": "Significado y sinónimos",
     "synonymsListLabel": "Sinónimos: {{list}}",
     "continue": "Continuar",

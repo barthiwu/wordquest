@@ -805,6 +805,8 @@
     "incorrectFeedback": "Si sahihi kabisa.",
     "timedOutFeedback": "Muda umeisha!",
     "revealPrefix": "Neno lilikuwa",
+    "hintFormat": "(kidokezo: {{definition}})",
+    "synonymsButton": "Visawe",
     "meaningButton": "Maana na visawe",
     "synonymsListLabel": "Visawe: {{list}}",
     "continue": "Endelea",

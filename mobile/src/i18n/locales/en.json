@@ -805,6 +805,8 @@
     "incorrectFeedback": "Not quite.",
     "timedOutFeedback": "Time's up!",
     "revealPrefix": "The word was",
+    "hintFormat": "(hint: {{definition}})",
+    "synonymsButton": "Synonyms",
     "meaningButton": "Meaning & synonyms",
     "synonymsListLabel": "Synonyms: {{list}}",
     "continue": "Continue",

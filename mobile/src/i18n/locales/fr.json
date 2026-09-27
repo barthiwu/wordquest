@@ -805,6 +805,8 @@
     "incorrectFeedback": "Pas tout à fait.",
     "timedOutFeedback": "Temps écoulé !",
     "revealPrefix": "Le mot était",
+    "hintFormat": "(indice : {{definition}})",
+    "synonymsButton": "Synonymes",
     "meaningButton": "Signification et synonymes",
     "synonymsListLabel": "Synonymes : {{list}}",
     "continue": "Continuer",

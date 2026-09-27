@@ -805,6 +805,8 @@
     "incorrectFeedback": "Не совсем.",
     "timedOutFeedback": "Время вышло!",
     "revealPrefix": "Слово было",
+    "hintFormat": "(подсказка: {{definition}})",
+    "synonymsButton": "Синонимы",
     "meaningButton": "Значение и синонимы",
     "synonymsListLabel": "Синонимы: {{list}}",
     "continue": "Продолжить",

@@ -805,6 +805,8 @@
     "incorrectFeedback": "不太对。",
     "timedOutFeedback": "时间到！",
     "revealPrefix": "正确答案是",
+    "hintFormat": "（提示：{{definition}}）",
+    "synonymsButton": "同义词",
     "meaningButton": "含义和同义词",
     "synonymsListLabel": "同义词：{{list}}",
     "continue": "继续",

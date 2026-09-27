@@ -805,6 +805,8 @@
     "incorrectFeedback": "کاملاً درست نیست.",
     "timedOutFeedback": "زمان به پایان رسید!",
     "revealPrefix": "کلمه این بود:",
+    "hintFormat": "(راهنمایی: {{definition}})",
+    "synonymsButton": "مترادف‌ها",
     "meaningButton": "معنی و مترادف‌ها",
     "synonymsListLabel": "مترادف‌ها: {{list}}",
     "continue": "ادامه",

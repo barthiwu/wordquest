@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
+  Easing,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  Vibration,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Circle } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -27,6 +32,18 @@ import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 type Props = NativeStackScreenProps<RootStackParamList, 'ScrambleQuest'>;
 
 type Phase = 'loading' | 'active' | 'submitting' | 'feedback' | 'complete' | 'error';
+
+/** Seconds remaining at or below which the timer ring turns urgent
+ * (danger red, pulsing glow, a short vibration each second) — "Bold
+ * Modern" design canvas review, Sept 2026 (Barth: keep E's overall look,
+ * D's gold hint-button outline, and the timer needs to visibly + audibly
+ * warn under 10s). True audio "beeping" needs expo-av, a new native
+ * dependency that would need a rebuild — flagged to Barth rather than
+ * added mid-Xcode-signing-session; Vibration ships now with zero new
+ * native deps and no rebuild. */
+const URGENT_THRESHOLD_SECONDS = 10;
+const RING_RADIUS = 52;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 /**
  * ScrambleQuest (spec §5) — one word at a time, 30s server-authoritative
@@ -48,8 +65,10 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   const [answer, setAnswer] = useState('');
   const [feedback, setFeedback] = useState<ScrambleQuestAnswerResult | null>(null);
   const [showMeaning, setShowMeaning] = useState(false);
+  const [showSynonyms, setShowSynonyms] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const autoSubmittedRef = useRef(false);
+  const lastVibratedSecondRef = useRef<number | null>(null);
 
   const load = useCallback(async () => {
     if (!accessToken) return;
@@ -58,7 +77,9 @@ export function ScrambleQuestScreen({ navigation }: Props) {
       const view = await startScrambleQuest(accessToken);
       setChallenge(view);
       setAnswer('');
+      setShowSynonyms(false);
       autoSubmittedRef.current = false;
+      lastVibratedSecondRef.current = null;
       setPhase('active');
     } catch {
       setPhase('error');
@@ -70,6 +91,9 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   }, [load]);
 
   // Cosmetic-only countdown, ticked from the server-issued deadlineAt.
+  // Also fires one short vibration per second once inside the urgent
+  // window — lastVibratedSecondRef keeps that to once per whole second
+  // even though this tick runs every 250ms.
   useEffect(() => {
     if (phase !== 'active' || !challenge) return undefined;
     const tick = () => {
@@ -78,6 +102,10 @@ export function ScrambleQuestScreen({ navigation }: Props) {
         Math.ceil((new Date(challenge.deadlineAt).getTime() - Date.now()) / 1000),
       );
       setRemainingSeconds(secondsLeft);
+      if (secondsLeft <= URGENT_THRESHOLD_SECONDS && lastVibratedSecondRef.current !== secondsLeft) {
+        lastVibratedSecondRef.current = secondsLeft;
+        Vibration.vibrate(80);
+      }
       if (secondsLeft <= 0 && !autoSubmittedRef.current) {
         autoSubmittedRef.current = true;
         handleSubmit(answer);
@@ -133,7 +161,9 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     setChallenge(feedback.nextChallenge);
     setFeedback(null);
     setAnswer('');
+    setShowSynonyms(false);
     autoSubmittedRef.current = false;
+    lastVibratedSecondRef.current = null;
     setPhase('active');
   };
 
@@ -213,17 +243,45 @@ export function ScrambleQuestScreen({ navigation }: Props) {
           </View>
         </View>
 
-        <View style={styles.timerRow}>
-          <Text style={[styles.timerText, remainingSeconds <= 10 && styles.timerTextUrgent]}>
-            {remainingSeconds}s
-          </Text>
-        </View>
+        <PuzzleTimerRing
+          remainingSeconds={remainingSeconds}
+          timeLimitSeconds={challenge.timeLimitSeconds}
+          colors={colors}
+          styles={styles}
+        />
 
         <View style={styles.puzzleCard}>
+          <LinearGradient
+            colors={[colors.glyph, colors.arcane]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.puzzleCardAccentBar}
+          />
           <Text style={styles.scrambledLetters}>
             {challenge.scrambledLetters.toUpperCase().split('').join(' ')}
           </Text>
           {challenge.revealedLetters.length > 0 && <Text style={styles.skeleton}>{skeleton}</Text>}
+
+          <Text style={styles.definitionText}>
+            {t('hintFormat', { definition: challenge.definition })}
+          </Text>
+
+          {/* Optional, player-initiated — revealing it never touches XP or the
+              server-tracked hint count, unlike the letter-reveal Hint button
+              below (Barth, Sept 2026: "shouldn't impact their XP"). */}
+          <Pressable
+            style={styles.synonymsButton}
+            onPress={() => setShowSynonyms((v) => !v)}
+            accessibilityRole="button"
+            accessibilityLabel={t('synonymsButton')}
+          >
+            <Text style={styles.synonymsButtonText}>{t('synonymsButton')}</Text>
+          </Pressable>
+          {showSynonyms && challenge.synonyms.length > 0 && (
+            <Text style={styles.synonymsText}>
+              {t('synonymsListLabel', { list: challenge.synonyms.join(', ') })}
+            </Text>
+          )}
         </View>
 
         {phase === 'active' && (
@@ -323,6 +381,89 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   );
 }
 
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+/**
+ * "Bold Modern" design canvas review, Sept 2026 (Barth: "the flat plain
+ * timer text doesn't feel like a game"). Same glowing-ring pattern as
+ * Boss Battle's SiegeRing, adapted for a race against a 30s word timer
+ * instead of a countdown-to-start: the ring drains as a real fraction of
+ * timeLimitSeconds — full ring the moment a fresh word starts, down to a
+ * sliver right before the deadline (Barth, Sept 2026: "when it is on
+ * 1sec, the ring itself should also show it that it is a tiny dot
+ * left") — and only turns danger-red + starts pulsing once inside the
+ * urgent window, so a calm ring reads as "plenty of time left" the rest
+ * of the run.
+ */
+function PuzzleTimerRing({
+  remainingSeconds,
+  timeLimitSeconds,
+  colors,
+  styles,
+}: {
+  remainingSeconds: number;
+  timeLimitSeconds: number;
+  colors: ThemeColors;
+  styles: ReturnType<typeof createStyles>;
+}) {
+  const urgent = remainingSeconds <= URGENT_THRESHOLD_SECONDS;
+  const pulse = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!urgent) {
+      pulse.setValue(1);
+      return undefined;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 0.45,
+          duration: 450,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 450,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [urgent, pulse]);
+
+  const progress = timeLimitSeconds > 0 ? Math.min(1, Math.max(0, remainingSeconds / timeLimitSeconds)) : 0;
+  const dashoffset = RING_CIRCUMFERENCE * (1 - progress);
+  const ringColor = urgent ? colors.danger : colors.arcaneSoft;
+
+  return (
+    <View style={styles.ringWrap}>
+      <Svg width={116} height={116} viewBox="0 0 116 116" style={styles.ringSvg}>
+        <Circle cx={58} cy={58} r={RING_RADIUS} fill="none" stroke={colors.border} strokeWidth={8} />
+        <AnimatedCircle
+          cx={58}
+          cy={58}
+          r={RING_RADIUS}
+          fill="none"
+          stroke={ringColor}
+          strokeWidth={8}
+          strokeLinecap="round"
+          strokeDasharray={RING_CIRCUMFERENCE}
+          strokeDashoffset={dashoffset}
+          opacity={pulse}
+          rotation={-90}
+          origin="58, 58"
+        />
+      </Svg>
+      <View style={styles.ringCenter}>
+        <Text style={[styles.timerText, urgent && styles.timerTextUrgent]}>{remainingSeconds}s</Text>
+      </View>
+    </View>
+  );
+}
+
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
     flexFill: { flex: 1 },
@@ -371,27 +512,48 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontWeight: '700',
     },
     streakPill: {
-      backgroundColor: colors.surfaceRaised,
+      backgroundColor: colors.surface,
       borderRadius: radius.pill,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.xs,
+      borderWidth: 1,
+      borderColor: colors.glyph,
     },
     streakPillText: { color: colors.glyph, fontSize: typography.scale.sm, fontWeight: '700' },
-    timerRow: { alignItems: 'center' },
+    ringWrap: {
+      alignSelf: 'center',
+      width: 116,
+      height: 116,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    ringSvg: { position: 'absolute' },
+    ringCenter: { alignItems: 'center', justifyContent: 'center' },
     timerText: {
       color: colors.ink,
-      fontSize: typography.scale.xxl,
+      fontSize: typography.scale.xl,
       fontWeight: typography.display.weight,
     },
     timerTextUrgent: { color: colors.danger },
     puzzleCard: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.surfaceRaised,
       borderRadius: radius.lg,
-      borderWidth: 1,
-      borderColor: colors.border,
+      overflow: 'hidden',
       padding: spacing.lg,
       alignItems: 'center',
       gap: spacing.sm,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.35,
+      shadowRadius: 18,
+      elevation: 8,
+    },
+    puzzleCardAccentBar: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 5,
     },
     scrambledLetters: {
       color: colors.ink,
@@ -405,6 +567,28 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontWeight: '700',
       letterSpacing: 4,
     },
+    definitionText: {
+      color: colors.glyph,
+      fontSize: typography.scale.sm,
+      fontStyle: 'italic',
+      textAlign: 'center',
+      marginTop: spacing.xs,
+    },
+    synonymsButton: {
+      borderRadius: radius.pill,
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.glyph,
+      marginTop: spacing.xs,
+    },
+    synonymsButtonText: { color: colors.glyph, fontSize: typography.scale.xs, fontWeight: '700' },
+    synonymsText: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+      textAlign: 'center',
+      paddingHorizontal: spacing.sm,
+    },
     input: {
       backgroundColor: colors.surface,
       borderRadius: radius.md,
@@ -416,9 +600,14 @@ function createStyles(colors: ThemeColors, topInset: number) {
     },
     button: {
       backgroundColor: colors.arcane,
-      borderRadius: radius.md,
+      borderRadius: radius.pill,
       paddingVertical: spacing.md,
       alignItems: 'center',
+      shadowColor: colors.arcane,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.4,
+      shadowRadius: 14,
+      elevation: 4,
     },
     buttonDisabled: { opacity: 0.4 },
     buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
@@ -439,9 +628,9 @@ function createStyles(colors: ThemeColors, topInset: number) {
       paddingVertical: spacing.sm,
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: colors.arcaneSoft,
+      borderColor: colors.glyph,
     },
-    hintButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
+    hintButtonText: { color: colors.glyph, fontSize: typography.scale.sm, fontWeight: '700' },
     meaningButton: {
       borderRadius: radius.md,
       paddingVertical: spacing.sm,

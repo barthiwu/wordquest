@@ -24,6 +24,16 @@ export interface ScrambleQuestChallengeView {
   wordsTotal: number;
   scrambledLetters: string;
   wordLength: number;
+  /** Always shown under the puzzle, not gated behind a hint — Barth,
+   * Sept 2026 design review: "the word is supposed to have the
+   * dictionary meaning under it". */
+  definition: string;
+  /** Optional, player-initiated reveal (a "Synonyms" card the mobile
+   * screen shows behind a toggle) — included here unconditionally since
+   * showing it is purely a client-side choice with no server-tracked
+   * state and, per Barth, must never affect XP the way the letter-reveal
+   * Hint button does. */
+  synonyms: string[];
   timeLimitSeconds: number;
   /** ISO timestamp — server-authoritative deadline for this word. Render
    * a countdown from it; never decide anything about timing client-side
@@ -357,6 +367,8 @@ export class ScrambleQuestService {
       wordsTotal: session.wordsTotal,
       scrambledLetters: scrambleWord(word.word, `${session.id}:${session.currentIndex}`),
       wordLength: word.word.length,
+      definition: word.definition,
+      synonyms: word.synonyms,
       timeLimitSeconds: SCRAMBLE_QUEST_CONFIG.TIMER_SECONDS,
       deadlineAt: new Date(
         session.currentWordStartedAt.getTime() + SCRAMBLE_QUEST_CONFIG.TIMER_SECONDS * 1000,

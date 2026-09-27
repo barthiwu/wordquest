@@ -805,6 +805,8 @@
     "incorrectFeedback": "Nicht ganz.",
     "timedOutFeedback": "Zeit abgelaufen!",
     "revealPrefix": "Das Wort war",
+    "hintFormat": "(Hinweis: {{definition}})",
+    "synonymsButton": "Synonyme",
     "meaningButton": "Bedeutung & Synonyme",
     "synonymsListLabel": "Synonyme: {{list}}",
     "continue": "Weiter",
