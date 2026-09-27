@@ -42,6 +42,33 @@ export interface AliResponse extends AliExpressionCue {
 }
 
 /**
+ * The subset of AliResponse every "here's what ALI has to say" client
+ * surface actually renders — trims tone/promptVersion, which are
+ * persistence/audit fields (versioning, historical-record-keeping),
+ * never shown to the player. Shared across every flow that resolves
+ * ALI's reaction and hands it to a client (Daily Quest's aliMessage/
+ * liveAliReactions/streakReaction, arcade's streakReaction/
+ * deferredAliReactions, and so on) so they all agree on one shape.
+ */
+export type AliDisplayMessage = Pick<
+  AliResponse,
+  'text' | 'recommendation' | 'expression' | 'pose' | 'intensity' | 'priority' | 'durationMs'
+>;
+
+/** Trims a full AliResponse down to what a client actually renders — see AliDisplayMessage's doc comment. */
+export function toAliDisplayMessage(response: AliResponse): AliDisplayMessage {
+  return {
+    text: response.text,
+    recommendation: response.recommendation,
+    expression: response.expression,
+    pose: response.pose,
+    intensity: response.intensity,
+    priority: response.priority,
+    durationMs: response.durationMs,
+  };
+}
+
+/**
  * What the ALI feed screen actually renders — AliResponse plus the two
  * fields that let the client tell messages apart instead of showing an
  * identical card for every event (V24 product feedback: the feed read
@@ -236,6 +263,20 @@ export class AliService {
     });
     return rows.map((r) => this.toFeedMessage(r));
   }
+
+  /**
+   * Every "major progression event" type a session's results screen can
+   * recap after the fact via listReactionsSince, EXCLUDING
+   * STREAK_MILESTONE -- see that method's own doc comment for why
+   * streak reactions are deliberately not read back through this list
+   * (they're resolved live instead, anchored to the streak container).
+   */
+  static readonly DEFERRED_REACTION_EVENT_TYPES: AliEventType[] = [
+    'LEVEL_UP',
+    'JOURNEY_COMPLETION',
+    'MASTERY_EVENT',
+    'ACHIEVEMENT_UNLOCK',
+  ];
 
   /**
    * Reactions generated at/after `since`, restricted to `eventTypes` --

@@ -28,7 +28,12 @@ import { shuffleIndexes } from '../arcade/scramble-quest/scramble.util';
 import { gameplayRules, computeGuessXp } from '../config/gameplay-rules';
 import { LearningProfileService } from '../learning-profile/learning-profile.service';
 import { averageScoreDimensions } from '../common/score-average';
-import { AliService, type AliResponse, type AliEvent } from '../ali/ali.service';
+import {
+  AliService,
+  type AliEvent,
+  type AliDisplayMessage,
+  toAliDisplayMessage,
+} from '../ali/ali.service';
 import { quickAliReaction } from '../ali/ali-quick-reactions';
 import { quickAliExpression, type AliExpressionCue } from '../ali/ali-expression';
 import { AnalyticsService } from '../analytics/analytics.service';
@@ -190,12 +195,6 @@ export interface ParagraphResult {
   suggestedRevision: string | null;
   nextAction: string;
 }
-
-/** The subset of AliResponse every "here's what ALI has to say" client surface actually renders. */
-export type AliDisplayMessage = Pick<
-  AliResponse,
-  'text' | 'recommendation' | 'expression' | 'pose' | 'intensity' | 'priority' | 'durationMs'
->;
 
 export interface WordCompletionResult {
   xpAwarded: number;
@@ -1106,15 +1105,7 @@ export class QuestsService {
         type: 'QUEST_COMPLETION',
         ...aliContext,
       });
-      aliMessage = {
-        text: response.text,
-        recommendation: response.recommendation,
-        expression: response.expression,
-        pose: response.pose,
-        intensity: response.intensity,
-        priority: response.priority,
-        durationMs: response.durationMs,
-      };
+      aliMessage = toAliDisplayMessage(response);
     } catch {
       // QuestCompleteScreen just won't show a message this time.
     }
@@ -1132,15 +1123,7 @@ export class QuestsService {
       aliEvents.map(async (event) => {
         try {
           const response = await this.ali.react(userId, event);
-          const display: AliDisplayMessage = {
-            text: response.text,
-            recommendation: response.recommendation,
-            expression: response.expression,
-            pose: response.pose,
-            intensity: response.intensity,
-            priority: response.priority,
-            durationMs: response.durationMs,
-          };
+          const display = toAliDisplayMessage(response);
           if (event.type === 'STREAK_MILESTONE') {
             streakReaction = display;
           } else {

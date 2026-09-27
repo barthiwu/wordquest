@@ -11,6 +11,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ArcadeChallengeService } from '../challenge.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { ProgressionService } from '../../progression/progression.service';
+import { AliService } from '../../ali/ali.service';
 
 describe('ScrambleQuestService', () => {
   let service: ScrambleQuestService;
@@ -46,6 +47,7 @@ describe('ScrambleQuestService', () => {
     currentIndex: 0,
     currentWordStartedAt: new Date(),
     currentWordHintsUsed: 0,
+    startedAt: new Date('2026-09-01T00:00:00Z'),
   });
 
   const prismaMock = {
@@ -76,6 +78,10 @@ describe('ScrambleQuestService', () => {
     awardXp: jest.fn().mockResolvedValue(undefined),
     recordDailyActivity: jest.fn().mockResolvedValue({ currentStreak: 1 }),
   };
+  const aliMock = {
+    react: jest.fn(),
+    listReactionsSince: jest.fn().mockResolvedValue([]),
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -87,6 +93,7 @@ describe('ScrambleQuestService', () => {
     prismaMock.user.findUnique.mockResolvedValue({ englishVariant: null });
     progressionMock.awardXp.mockResolvedValue(undefined);
     progressionMock.recordDailyActivity.mockResolvedValue({ currentStreak: 1 });
+    aliMock.listReactionsSince.mockResolvedValue([]);
 
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -95,6 +102,7 @@ describe('ScrambleQuestService', () => {
         { provide: ArcadeChallengeService, useValue: challengesMock },
         { provide: RewardEngineService, useValue: rewardEngineMock },
         { provide: ProgressionService, useValue: progressionMock },
+        { provide: AliService, useValue: aliMock },
       ],
     }).compile();
     service = moduleRef.get(ScrambleQuestService);
@@ -313,12 +321,127 @@ describe('ScrambleQuestService', () => {
 
       expect(result.sessionComplete).toBe(true);
       expect(result.nextChallenge).toBeNull();
-      expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u1', prismaMock);
+      expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u1', prismaMock, []);
       expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({ status: 'COMPLETED' }),
         }),
       );
+    });
+
+    it('resolves a STREAK_MILESTONE reaction live on the last word (task #99 follow-up: anchored to the streak container)', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 2,
+      });
+      rewardEngineMock.calculate.mockReturnValueOnce({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+      // Stands in for recordDailyActivity's real behavior of pushing a
+      // descriptor onto the aliEvents collector it's passed.
+      progressionMock.recordDailyActivity.mockImplementationOnce(
+        async (_userId: string, _db: unknown, aliEvents?: Array<{ type: string }>) => {
+          aliEvents?.push({
+            type: 'STREAK_MILESTONE',
+            journeyStage: 1,
+            context: { streakDays: 7 },
+          } as never);
+          return { currentStreak: 7 };
+        },
+      );
+      aliMock.react.mockResolvedValueOnce({
+        text: 'Seven days!',
+        recommendation: null,
+        tone: 'Village',
+        promptVersion: 'v2',
+        expression: 'PROUD',
+        pose: 'APPROVING_NOD',
+        intensity: 3,
+        priority: 3,
+        durationMs: 2500,
+      });
+
+      const result = await service.submitAnswer('u1', 's1', 'train');
+
+      expect(result.streakReaction).toEqual({
+        text: 'Seven days!',
+        recommendation: null,
+        expression: 'PROUD',
+        pose: 'APPROVING_NOD',
+        intensity: 3,
+        priority: 3,
+        durationMs: 2500,
+      });
+    });
+
+    it('reads back any earlier deferred LEVEL_UP/JOURNEY reaction on the last word, via listReactionsSince since the session started', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 2,
+      });
+      rewardEngineMock.calculate.mockReturnValueOnce({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+      aliMock.listReactionsSince.mockResolvedValueOnce([
+        {
+          text: 'Level 5!',
+          recommendation: null,
+          expression: 'EXCITED',
+          pose: 'CELEBRATORY_HOP',
+          intensity: 4,
+          priority: 4,
+          durationMs: 3000,
+        },
+      ]);
+
+      const result = await service.submitAnswer('u1', 's1', 'train');
+
+      expect(aliMock.listReactionsSince).toHaveBeenCalledWith(
+        'u1',
+        baseSession().startedAt,
+        AliService.DEFERRED_REACTION_EVENT_TYPES,
+      );
+      expect(result.deferredAliReactions).toEqual([
+        {
+          text: 'Level 5!',
+          recommendation: null,
+          expression: 'EXCITED',
+          pose: 'CELEBRATORY_HOP',
+          intensity: 4,
+          priority: 4,
+          durationMs: 3000,
+        },
+      ]);
+    });
+
+    it('leaves streakReaction/deferredAliReactions empty on a non-final word', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(baseSession());
+      rewardEngineMock.calculate.mockReturnValueOnce({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+      prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 1,
+      });
+
+      const result = await service.submitAnswer('u1', 's1', 'train');
+
+      expect(result.sessionComplete).toBe(false);
+      expect(result.streakReaction).toBeNull();
+      expect(result.deferredAliReactions).toEqual([]);
+      expect(aliMock.listReactionsSince).not.toHaveBeenCalled();
     });
   });
 
