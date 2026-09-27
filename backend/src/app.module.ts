@@ -15,6 +15,7 @@ import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { ArcadeModule } from './arcade/arcade.module';
 import { ScrambleQuestModule } from './arcade/scramble-quest/scramble-quest.module';
 import { CompleteItModule } from './arcade/complete-it/complete-it.module';
+import { WordDuelModule } from './arcade/word-duel/word-duel.module';
 import { MasteryModule } from './mastery/mastery.module';
 import { ProgressionModule } from './progression/progression.module';
 import { QuestsModule } from './quests/quests.module';
@@ -65,6 +66,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     ArcadeModule,
     ScrambleQuestModule,
     CompleteItModule,
+    WordDuelModule,
     MasteryModule,
     ProgressionModule,
     QuestsModule,

@@ -1610,6 +1610,20 @@ model WordDuelPlayerState {
   longestStreak Int @default(0)
   correctCount  Int @default(0) // used ahead of totalXp in the tiebreak rule (spec §6, product decision 2026-09)
 
+  // Phase 4 addition (discovered building WordDuelService — the original
+  // shape had nowhere to remember a player's own progress through the
+  // match's shared wordIds, mirroring the exact gap Phase 2 found on
+  // ArcadeGameSession). Since players progress independently through
+  // WordDuelMatch.wordIds (spec §6), each player needs their OWN index
+  // and OWN per-word clock, not one shared at the match level.
+  currentIndex Int @default(0)
+
+  // Server-authoritative clock for this player's CURRENT word only —
+  // anchors the progressive-clue reveal schedule (spec §6: "progressive
+  // clues") and responseTimeMs, exactly like ArcadeGameSession's own
+  // currentWordStartedAt. Reset every time currentIndex advances.
+  currentWordStartedAt DateTime @default(now())
+
   joinedAt       DateTime  @default(now())
   disconnectedAt DateTime?
   reconnectedAt  DateTime?

@@ -90,8 +90,34 @@ export const COMPLETE_IT_CONFIG = {
 // ── Word Duel ──────────────────────────────────────────────────────────
 export const WORD_DUEL_CONFIG = {
   MATCH_DURATION_MINUTES: 5,
-  MATCHMAKING_TIMEOUT_SECONDS: 30, // spec §6 recommended 3-5 min range; 2026-09 decision: 5 min
+  // spec §6 recommended a 3-5 min matchmaking WAIT range before giving
+  // up; 2026-09 decision deliberately undercut that for snappier UX (a
+  // player who can't be paired in 30s sees a clear "no opponent found"
+  // and can retry or play something else, rather than staring at a
+  // spinner for minutes) -- this comment used to contradict its own
+  // value ("5 min" written here next to a 30-second number); fixed to
+  // describe what the code actually does.
+  MATCHMAKING_TIMEOUT_SECONDS: 30,
   WRONG_ANSWER_LOCKOUT_MS: 0, // 2026-09 decision: streak reset only, no extra lockout
+  // Word bank size for one match (mirrors SCRAMBLE_QUEST_CONFIG/
+  // COMPLETE_IT_CONFIG's WORDS_PER_SESSION) -- generous relative to
+  // MATCH_DURATION_MINUTES so exhausting the bank before time's up is
+  // rare; a player who does just waits for the match clock to run out.
+  WORDS_PER_MATCH: 20,
+  // Progressive clues (spec §6): not in the spec's own Word Duel config
+  // any more than Complete It's timer was -- both added as 2026-09
+  // product decisions once the actual mechanic had to be implemented.
+  // Every CLUE_INTERVAL_SECONDS elapsed on a player's current word, one
+  // more letter reveals automatically (no request needed, unlike
+  // ScrambleQuest's on-demand hints) -- same "never reveal the final
+  // letter" cap as ScrambleQuest's MAX_HINTS_PER_WORD.
+  CLUE_INTERVAL_SECONDS: 8,
+  MAX_CLUES_PER_WORD: 3,
+  // Denominator for speedModifierFor's fast/normal/slow bucketing only
+  // -- NOT an enforced per-word timeout (WordDuelAnswer has no
+  // `timedOut` column, unlike ArcadeAnswer: a word Duel player is only
+  // ever cut off by the match-wide endsAt, never a per-word deadline).
+  WORD_TIME_REFERENCE_SECONDS: 20,
 } as const;
 
 /**
