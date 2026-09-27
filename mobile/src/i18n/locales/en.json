@@ -75,6 +75,24 @@
       "gainedSpots_other": "You've gained {{count}} spots this week",
       "viewLeaderboard": "View Leaderboard"
     },
+    "bossBattleRankCard": {
+      "inviteLabel": "Join a Boss Battle to get ranked",
+      "inviteTitle": "Get in the fight",
+      "inviteSubtitle": "Join a Boss Battle to get ranked",
+      "eyebrow": "Boss Battle Rank",
+      "lifetime": "Lifetime",
+      "cardLabel": "Boss Battle Rank, rank {{rank}}",
+      "viewLeaderboard": "View Leaderboard"
+    },
+    "friendRankCard": {
+      "inviteLabel": "Add friends to get ranked",
+      "inviteTitle": "Rank up together",
+      "inviteSubtitle": "Add friends to compare your progress",
+      "eyebrow": "Friend Rank",
+      "amongFriends": "Among friends",
+      "cardLabel": "Friend Rank, rank {{rank}}",
+      "viewLeaderboard": "View Leaderboard"
+    },
     "wordMasteryCard": {
       "practiceLabel": "Practice {{word}}",
       "levelNew": "New",
@@ -353,14 +371,20 @@
     "tabClan": "Clan",
     "tabCountry": "Country",
     "tabContinent": "Continent",
+    "tabFriend": "Friends",
+    "tabBossBattle": "Boss Battle",
     "unavailableGlobal": "Could not load the leaderboard.",
     "unavailableClan": "Join a clan to see the clan leaderboard.",
     "unavailableCountry": "Set your country in your profile to see the country leaderboard.",
     "unavailableContinent": "Set your country in your profile to see the continent leaderboard.",
+    "unavailableFriend": "Could not load the friend leaderboard.",
+    "unavailableBossBattle": "Could not load the Boss Battle leaderboard.",
     "emptyGlobal": "No one has ranked yet.",
     "emptyClan": "No one in your clan has ranked yet.",
     "emptyCountry": "No one from your country has ranked yet.",
     "emptyContinent": "No one from your continent has ranked yet.",
+    "emptyFriend": "Add some friends to see how you rank.",
+    "emptyBossBattle": "No one has ranked in Boss Battle yet.",
     "genericError": "Could not load the leaderboard.",
     "you": "You",
     "xpValue": "{{xp}} XP",
@@ -484,7 +508,9 @@
     "notificationsTitle": "Notifications",
     "notificationsBody": "Your inbox and reminder preferences.",
     "settingsTitle": "Settings",
-    "settingsBody": "Account, verification, and session"
+    "settingsBody": "Account, verification, and session",
+    "friendsTitle": "Friends",
+    "friendsBody": "Add friends and see their activity"
   },
   "wordMastery": {
     "loadError": "Could not load your words.",
@@ -900,5 +926,60 @@
     "resultOpponentSummary": "Opponent: {{correct}} correct, {{xp}} XP",
     "resultTiebreakNote": "Decided by a tiebreak — most correct answers, then fastest to your final score.",
     "playAgain": "Play again"
+  },
+  "friends": {
+    "popup": {
+      "profile": "Profile",
+      "addFriend": "Add Friend",
+      "requestSent": "Request Sent",
+      "friends": "Friends",
+      "respondToRequest": "Respond to Request",
+      "block": "Block",
+      "unblock": "Unblock",
+      "avatarLabel": "Open {{username}}’s options",
+      "addFriendSentTitle": "Friend request sent",
+      "addFriendSentMessage": "{{username}} will see your request in their Friends list.",
+      "addFriendErrorTitle": "Couldn’t send request",
+      "nowFriendsTitle": "You’re now friends",
+      "nowFriendsMessage": "{{username}} had already sent you a request — you’re friends now.",
+      "blockConfirmTitle": "Block {{username}}?",
+      "blockConfirmMessage": "They won’t be able to add you as a friend, challenge you in Word Duel, or find you in search. You can unblock them anytime from their profile.",
+      "blockConfirmBlock": "Block",
+      "blockErrorTitle": "Couldn’t block player"
+    },
+    "profile": {
+      "genericError": "Could not load this profile.",
+      "youLabel": "This is you",
+      "levelStatLabel": "Level",
+      "streakStatLabel": "Day streak",
+      "clanLabel": "Clan: {{clanName}}",
+      "noClan": "No clan yet",
+      "joinedLabel": "Joined {{date}}",
+      "acceptRequest": "Accept",
+      "declineRequest": "Decline",
+      "unfriend": "Unfriend",
+      "unfriendConfirmTitle": "Unfriend {{username}}?",
+      "unfriendConfirmMessage": "You can send them a new friend request later.",
+      "unfriendConfirmUnfriend": "Unfriend",
+      "unfriendErrorTitle": "Couldn’t unfriend player",
+      "unblockErrorTitle": "Couldn’t unblock player"
+    },
+    "list": {
+      "title": "Friends",
+      "searchPlaceholder": "Search by username",
+      "searchButton": "Search",
+      "searchNoResults": "No player found with that username.",
+      "genericError": "Could not load Friends right now.",
+      "incomingRequestsTitle": "Requests",
+      "outgoingRequestsTitle": "Sent",
+      "myFriendsTitle": "My Friends",
+      "emptyFriends": "Add friends to see them here.",
+      "accept": "Accept",
+      "decline": "Decline",
+      "add": "Add",
+      "pending": "Pending",
+      "acceptErrorTitle": "Couldn’t accept request",
+      "declineErrorTitle": "Couldn’t decline request"
+    }
   }
 }

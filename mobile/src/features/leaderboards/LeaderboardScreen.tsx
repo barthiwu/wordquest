@@ -6,9 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
+  getBossBattleXpLeaderboard,
   getClanLeaderboard,
   getContinentLeaderboard,
   getCountryLeaderboard,
+  getFriendLeaderboard,
   getGlobalLeaderboard,
   type LeaderboardEntry,
   type LeaderboardView,
@@ -28,18 +30,19 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-type Category = 'global' | 'clan' | 'country' | 'continent';
+type Category = 'global' | 'clan' | 'country' | 'continent' | 'friend' | 'bossBattle';
 
 /**
  * §30 Leaderboards, now the Compete tab (Boss Battles joins this tab
- * later — build order §47 item 26). Global, Clan, Country and
- * Continent are all real, ranked from the same authoritative data as
- * Home/Passport — Country and Continent scope to the viewer's own
- * countryCode (set via the onboarding flag picker), same pattern as
- * Clan scoping to the viewer's clan. Friends isn't shown as a fifth
- * category — there's no friends graph in WordQuest yet, and a
- * category that always renders empty would look broken rather than
- * honestly unbuilt.
+ * later — build order §47 item 26). Global, Clan, Country, Continent,
+ * Friend and Boss Battle are all real, ranked from the same
+ * authoritative data as Home/Passport — Country and Continent scope to
+ * the viewer's own countryCode (set via the onboarding flag picker),
+ * same pattern as Clan scoping to the viewer's clan. Friend ranks the
+ * viewer against their accepted friends (backend/src/friends), and
+ * Boss Battle ranks by lifetime Boss Battle XP rather than general
+ * totalXp — see Row below for how that category suppresses the
+ * (meaningless, always-0) level in its subtitle.
  */
 export function LeaderboardScreen({ navigation }: Props) {
   const colors = useThemeColors();
@@ -59,6 +62,8 @@ export function LeaderboardScreen({ navigation }: Props) {
     clan: t('unavailableClan'),
     country: t('unavailableCountry'),
     continent: t('unavailableContinent'),
+    friend: t('unavailableFriend'),
+    bossBattle: t('unavailableBossBattle'),
   };
 
   const categoryEmptyMessage: Record<Category, string> = {
@@ -66,6 +71,8 @@ export function LeaderboardScreen({ navigation }: Props) {
     clan: t('emptyClan'),
     country: t('emptyCountry'),
     continent: t('emptyContinent'),
+    friend: t('emptyFriend'),
+    bossBattle: t('emptyBossBattle'),
   };
 
   const load = useCallback(
@@ -80,7 +87,11 @@ export function LeaderboardScreen({ navigation }: Props) {
             ? getClanLeaderboard(accessToken)
             : cat === 'country'
               ? getCountryLeaderboard(accessToken)
-              : getContinentLeaderboard(accessToken);
+              : cat === 'continent'
+                ? getContinentLeaderboard(accessToken)
+                : cat === 'friend'
+                  ? getFriendLeaderboard(accessToken)
+                  : getBossBattleXpLeaderboard(accessToken);
       request.then(setView).catch((err) => {
         if (err instanceof ApiError && err.status === 400) {
           setError(categoryUnavailableMessage[cat]);
@@ -142,6 +153,18 @@ export function LeaderboardScreen({ navigation }: Props) {
           onPress={() => selectCategory('continent')}
           styles={styles}
         />
+        <Tab
+          label={t('tabFriend')}
+          active={category === 'friend'}
+          onPress={() => selectCategory('friend')}
+          styles={styles}
+        />
+        <Tab
+          label={t('tabBossBattle')}
+          active={category === 'bossBattle'}
+          onPress={() => selectCategory('bossBattle')}
+          styles={styles}
+        />
       </View>
 
       {!view && !error && (
@@ -171,6 +194,7 @@ export function LeaderboardScreen({ navigation }: Props) {
               <Row
                 entry={item}
                 isViewer={item.userId === view.viewer.userId}
+                showLevel={category !== 'bossBattle'}
                 styles={styles}
                 t={t}
               />
@@ -216,11 +240,16 @@ function Tab({
 function Row({
   entry,
   isViewer,
+  showLevel,
   styles,
   t,
 }: {
   entry: LeaderboardEntry;
   isViewer: boolean;
+  /** false for the Boss Battle category, where entry.level is always 0
+   * and meaningless (Boss Battle XP isn't account level) — suppresses
+   * just that part of the subtitle line rather than the whole row. */
+  showLevel: boolean;
   styles: ReturnType<typeof createStyles>;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
@@ -233,8 +262,8 @@ function Row({
           {entry.username}
         </Text>
         <Text style={styles.rowSub}>
-          {t('levelLabel', { level: entry.level })}
-          {entry.clanName ? ` · ${entry.clanName}` : ''}
+          {showLevel ? t('levelLabel', { level: entry.level }) : ''}
+          {entry.clanName ? `${showLevel ? ' · ' : ''}${entry.clanName}` : ''}
         </Text>
       </View>
       <Text style={styles.rowXp}>{t('xpValue', { xp: entry.totalXp })}</Text>

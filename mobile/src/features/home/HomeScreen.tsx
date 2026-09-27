@@ -25,7 +25,12 @@ import {
   WordDuelIcon,
   type ArcadeGameIconProps,
 } from '@/components/ArcadeGameIcons';
-import { getClanLeaderboard, type LeaderboardEntry } from '@/services/leaderboards';
+import {
+  getBossBattleXpLeaderboard,
+  getClanLeaderboard,
+  getFriendLeaderboard,
+  type LeaderboardEntry,
+} from '@/services/leaderboards';
 import { listMyWordMastery, type WordMasteryListItem } from '@/services/users';
 import { useAuthStore } from '@/state/authStore';
 import { timeOfDayGreeting } from '@/utils/timeOfDay';
@@ -34,6 +39,8 @@ import { GlyphCoin } from '@/components/GlyphIcon';
 import { StreakMilestoneRibbon } from '@/components/StreakMilestoneRibbon';
 import { DailyGoalsCard } from '@/components/DailyGoalsCard';
 import { ClanRankCard } from '@/components/ClanRankCard';
+import { BossBattleRankCard } from '@/components/BossBattleRankCard';
+import { FriendRankCard } from '@/components/FriendRankCard';
 import { StagePathRail } from '@/components/StagePathRail';
 import { WordMasteryCard } from '@/components/WordMasteryCard';
 import { JourneyMotif } from '@/components/JourneyMotif';
@@ -82,6 +89,14 @@ const CHAPTER_ROW_GAP = spacing.sm;
 const CHAPTER_ROW_WIDTH = SCREEN_WIDTH - spacing.xl;
 const CHAPTER_CARD_WIDTH = CHAPTER_ROW_WIDTH * 0.75 - CHAPTER_ROW_GAP / 2;
 const LAST_PLAYED_CARD_WIDTH = CHAPTER_ROW_WIDTH * 0.55;
+
+/** Home's swipeable Clan/Boss Battle/Friend rank carousel (Barth, Sept
+ * 2026) — same 85%-of-row-width bleed mechanism as the chapter row
+ * above (CHAPTER_ROW_WIDTH), just at 85% instead of 75% and with three
+ * equal-size cards instead of two differently-sized ones, so the next
+ * card visibly peeks in from the edge as a swipe affordance. */
+const RANK_ROW_GAP = spacing.sm;
+const RANK_CARD_WIDTH = CHAPTER_ROW_WIDTH * 0.85 - RANK_ROW_GAP / 2;
 
 /** Per-game "logo" for the Home last-played card (Barth, Sept 2026) --
  * a distinct icon glyph per game so the compact card reads as that
@@ -156,6 +171,9 @@ export function HomeScreen({ navigation }: Props) {
   const [journey, setJourney] = useState<JourneyView | null>(null);
   const [todaySummary, setTodaySummary] = useState<TodayQuestSummary | null>(null);
   const [clanViewer, setClanViewer] = useState<LeaderboardEntry | null>(null);
+  const [bossBattleRankViewer, setBossBattleRankViewer] = useState<LeaderboardEntry | null>(null);
+  const [friendRankViewer, setFriendRankViewer] = useState<LeaderboardEntry | null>(null);
+  const [friendCount, setFriendCount] = useState<number | null>(null);
   const [wordMastery, setWordMastery] = useState<WordMasteryListItem[] | null>(null);
   const [lastPlayedArcade, setLastPlayedArcade] = useState<LastPlayedArcadeGame | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -173,6 +191,15 @@ export function HomeScreen({ navigation }: Props) {
       .catch(() => {});
     getClanLeaderboard(accessToken)
       .then((view) => setClanViewer(view.viewer))
+      .catch(() => {});
+    getBossBattleXpLeaderboard(accessToken)
+      .then((view) => setBossBattleRankViewer(view.viewer))
+      .catch(() => {});
+    getFriendLeaderboard(accessToken)
+      .then((view) => {
+        setFriendRankViewer(view.viewer);
+        setFriendCount(view.entries.length - 1);
+      })
       .catch(() => {});
     listMyWordMastery(accessToken)
       .then(setWordMastery)
@@ -374,15 +401,40 @@ export function HomeScreen({ navigation }: Props) {
         playedToday={progression?.playedToday ?? false}
       />
 
-      <ClanRankCard
-        colors={colors}
-        viewer={clanViewer}
-        onPress={() =>
-          clanViewer?.clanName
-            ? navigation.navigate('Main', { screen: 'Compete' })
-            : navigation.navigate('ClanSelection')
-        }
-      />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        decelerationRate="fast"
+        style={styles.rankRowBleed}
+        contentContainerStyle={styles.rankRow}
+      >
+        <View style={styles.rankCard}>
+          <ClanRankCard
+            colors={colors}
+            viewer={clanViewer}
+            onPress={() =>
+              clanViewer?.clanName
+                ? navigation.navigate('Main', { screen: 'Compete' })
+                : navigation.navigate('ClanSelection')
+            }
+          />
+        </View>
+        <View style={styles.rankCard}>
+          <BossBattleRankCard
+            colors={colors}
+            viewer={bossBattleRankViewer}
+            onPress={() => navigation.navigate('Main', { screen: 'Compete' })}
+          />
+        </View>
+        <View style={styles.rankCard}>
+          <FriendRankCard
+            colors={colors}
+            viewer={friendRankViewer}
+            friendCount={friendCount}
+            onPress={() => navigation.navigate('Main', { screen: 'Compete' })}
+          />
+        </View>
+      </ScrollView>
 
       {journey && <StagePathRail stages={journey.stages} colors={colors} />}
 
@@ -517,6 +569,10 @@ function createStyles(colors: ThemeColors, topInset: number) {
     chapterRowBleed: { marginRight: -spacing.xl },
     chapterRow: { flexDirection: 'row', gap: CHAPTER_ROW_GAP, paddingRight: spacing.md },
     chapterCardCompact: { width: CHAPTER_CARD_WIDTH },
+    // Same bleed trick as chapterRowBleed above, for the rank carousel.
+    rankRowBleed: { marginRight: -spacing.xl },
+    rankRow: { flexDirection: 'row', gap: RANK_ROW_GAP, paddingRight: spacing.md },
+    rankCard: { width: RANK_CARD_WIDTH },
     lastPlayedCard: {
       width: LAST_PLAYED_CARD_WIDTH,
       borderRadius: radius.lg,

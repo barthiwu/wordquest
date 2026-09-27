@@ -30,3 +30,13 @@ export function getCountryLeaderboard(accessToken: string): Promise<LeaderboardV
 export function getContinentLeaderboard(accessToken: string): Promise<LeaderboardView> {
   return apiRequest<LeaderboardView>('/leaderboards/continent', { accessToken });
 }
+
+/** Ranks the viewer together with their accepted friends only. */
+export function getFriendLeaderboard(accessToken: string): Promise<LeaderboardView> {
+  return apiRequest<LeaderboardView>('/leaderboards/friends', { accessToken });
+}
+
+/** Ranks players by lifetime Boss Battle XP — entry.level is always 0 here and entry.totalXp holds the lifetime Boss Battle XP sum, not general XP. */
+export function getBossBattleXpLeaderboard(accessToken: string): Promise<LeaderboardView> {
+  return apiRequest<LeaderboardView>('/leaderboards/boss-battle', { accessToken });
+}
