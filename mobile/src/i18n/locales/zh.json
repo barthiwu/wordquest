@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "首页",
-      "quest": "任务",
       "journey": "旅程",
       "compete": "比赛",
-      "profile": "我的"
+      "profile": "我的",
+      "play": "玩"
     },
     "stagePathRail": {
       "heading": "你的路径"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "最长连续正确：{{streak}}",
     "playAgain": "再玩一次",
     "backToArcade": "返回街机厅"
+  },
+  "play": {
+    "title": "玩",
+    "loadError": "暂时无法加载你的任务。",
+    "startQuest": "开始任务",
+    "completedBadge": "已完成",
+    "allDoneToday": "今天的任务都完成了——干得好！",
+    "otherQuestsLabel": "其他任务",
+    "dropdownToggleAccessibilityLabel": "显示其他任务",
+    "selectQuestAccessibilityLabel": "选择{{title}}",
+    "completedAccessibilityLabel": "{{title}}，已完成",
+    "bossBattleSubtitle": "每周限时挑战，所有人同场竞技"
   }
 }

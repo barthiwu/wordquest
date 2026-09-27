@@ -39,7 +39,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
       Main: {
         screens: {
           Home: 'home',
-          Quest: 'quest',
+          Play: 'play',
           Journey: 'journey',
           Compete: 'compete',
           Profile: 'profile',

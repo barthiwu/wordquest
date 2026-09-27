@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "Accueil",
-      "quest": "Quête",
       "journey": "Parcours",
       "compete": "Compétition",
-      "profile": "Profil"
+      "profile": "Profil",
+      "play": "Jouer"
     },
     "stagePathRail": {
       "heading": "Ton Chemin"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "Plus longue série : {{streak}}",
     "playAgain": "Rejouer",
     "backToArcade": "Retour à l'Arcade"
+  },
+  "play": {
+    "title": "Jouer",
+    "loadError": "Impossible de charger tes quêtes pour le moment.",
+    "startQuest": "Commencer la quête",
+    "completedBadge": "Terminée",
+    "allDoneToday": "Tout est terminé pour aujourd'hui — bravo !",
+    "otherQuestsLabel": "Autres quêtes",
+    "dropdownToggleAccessibilityLabel": "Afficher les autres quêtes",
+    "selectQuestAccessibilityLabel": "Sélectionner {{title}}",
+    "completedAccessibilityLabel": "{{title}}, terminée",
+    "bossBattleSubtitle": "Défi hebdomadaire chronométré contre tout le monde"
   }
 }

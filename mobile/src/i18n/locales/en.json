@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "Home",
-      "quest": "Quest",
       "journey": "Journey",
       "compete": "Compete",
-      "profile": "Profile"
+      "profile": "Profile",
+      "play": "Play"
     },
     "stagePathRail": {
       "heading": "Your Path"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "Longest streak: {{streak}}",
     "playAgain": "Play again",
     "backToArcade": "Back to Arcade"
+  },
+  "play": {
+    "title": "Play",
+    "loadError": "Could not load your quests right now.",
+    "startQuest": "Start Quest",
+    "completedBadge": "Completed",
+    "allDoneToday": "All done for today — nice work!",
+    "otherQuestsLabel": "Other quests",
+    "dropdownToggleAccessibilityLabel": "Show other quests",
+    "selectQuestAccessibilityLabel": "Select {{title}}",
+    "completedAccessibilityLabel": "{{title}}, completed",
+    "bossBattleSubtitle": "Weekly timed challenge against everyone"
   }
 }

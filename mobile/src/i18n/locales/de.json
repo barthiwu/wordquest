@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "Start",
-      "quest": "Quest",
       "journey": "Reise",
       "compete": "Wettkampf",
-      "profile": "Profil"
+      "profile": "Profil",
+      "play": "Spielen"
     },
     "stagePathRail": {
       "heading": "Dein Weg"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "Längste Serie: {{streak}}",
     "playAgain": "Nochmal spielen",
     "backToArcade": "Zurück zur Arcade"
+  },
+  "play": {
+    "title": "Spielen",
+    "loadError": "Deine Quests konnten momentan nicht geladen werden.",
+    "startQuest": "Quest starten",
+    "completedBadge": "Abgeschlossen",
+    "allDoneToday": "Für heute alles erledigt — gut gemacht!",
+    "otherQuestsLabel": "Weitere Quests",
+    "dropdownToggleAccessibilityLabel": "Weitere Quests anzeigen",
+    "selectQuestAccessibilityLabel": "{{title}} auswählen",
+    "completedAccessibilityLabel": "{{title}}, abgeschlossen",
+    "bossBattleSubtitle": "Wöchentliche Zeit-Challenge gegen alle"
   }
 }

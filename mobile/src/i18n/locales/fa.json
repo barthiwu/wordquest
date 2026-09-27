@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "خانه",
-      "quest": "کوئست",
       "journey": "سفر",
       "compete": "رقابت",
-      "profile": "پروفایل"
+      "profile": "پروفایل",
+      "play": "بازی"
     },
     "stagePathRail": {
       "heading": "مسیر شما"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "طولانی‌ترین پیاپی: {{streak}}",
     "playAgain": "دوباره بازی کن",
     "backToArcade": "بازگشت به آرکید"
+  },
+  "play": {
+    "title": "بازی",
+    "loadError": "بارگذاری کوئست‌های شما اکنون ممکن نشد.",
+    "startQuest": "شروع کوئست",
+    "completedBadge": "تکمیل‌شده",
+    "allDoneToday": "همه‌چیز برای امروز تمام شد — عالی بود!",
+    "otherQuestsLabel": "کوئست‌های دیگر",
+    "dropdownToggleAccessibilityLabel": "نمایش کوئست‌های دیگر",
+    "selectQuestAccessibilityLabel": "انتخاب {{title}}",
+    "completedAccessibilityLabel": "{{title}}، تکمیل‌شده",
+    "bossBattleSubtitle": "چالش زمان‌دار هفتگی در برابر همه"
   }
 }

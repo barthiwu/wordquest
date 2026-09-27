@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "होम",
-      "quest": "क्वेस्ट",
       "journey": "यात्रा",
       "compete": "कॉम्पीट",
-      "profile": "प्रोफ़ाइल"
+      "profile": "प्रोफ़ाइल",
+      "play": "खेलें"
     },
     "stagePathRail": {
       "heading": "आपका पथ"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "सबसे लंबी स्ट्रीक: {{streak}}",
     "playAgain": "फिर से खेलें",
     "backToArcade": "आर्केड पर वापस जाएं"
+  },
+  "play": {
+    "title": "खेलें",
+    "loadError": "अभी आपके क्वेस्ट लोड नहीं हो सके।",
+    "startQuest": "क्वेस्ट शुरू करें",
+    "completedBadge": "पूर्ण",
+    "allDoneToday": "आज के लिए सब पूरा हो गया — बहुत बढ़िया!",
+    "otherQuestsLabel": "अन्य क्वेस्ट",
+    "dropdownToggleAccessibilityLabel": "अन्य क्वेस्ट दिखाएं",
+    "selectQuestAccessibilityLabel": "{{title}} चुनें",
+    "completedAccessibilityLabel": "{{title}}, पूर्ण",
+    "bossBattleSubtitle": "सभी के खिलाफ साप्ताहिक समय-सीमा चुनौती"
   }
 }

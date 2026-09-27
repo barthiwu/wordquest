@@ -3,14 +3,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/state/themeStore';
 import { HomeScreen } from '@/features/home/HomeScreen';
-import { QuestScreen } from '@/features/quests/QuestScreen';
+import { PlayScreen } from '@/features/play/PlayScreen';
 import { JourneyScreen } from '@/features/journey/JourneyScreen';
 import { LeaderboardScreen } from '@/features/leaderboards/LeaderboardScreen';
 import { PassportScreen } from '@/features/passport/PassportScreen';
 
 export type MainTabParamList = {
   Home: undefined;
-  Quest: undefined;
+  Play: undefined;
   Journey: undefined;
   Compete: undefined;
   Profile: undefined;
@@ -21,7 +21,7 @@ const TAB_ICONS: Record<
   { active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }
 > = {
   Home: { active: 'home', inactive: 'home-outline' },
-  Quest: { active: 'flash', inactive: 'flash-outline' },
+  Play: { active: 'game-controller', inactive: 'game-controller-outline' },
   Journey: { active: 'map', inactive: 'map-outline' },
   Compete: { active: 'trophy', inactive: 'trophy-outline' },
   Profile: { active: 'person', inactive: 'person-outline' },
@@ -56,7 +56,7 @@ export function MainTabNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: t('tabs.home') }} />
-      <Tab.Screen name="Quest" component={QuestScreen} options={{ tabBarLabel: t('tabs.quest') }} />
+      <Tab.Screen name="Play" component={PlayScreen} options={{ tabBarLabel: t('tabs.play') }} />
       <Tab.Screen
         name="Journey"
         component={JourneyScreen}

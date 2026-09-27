@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "Главная",
-      "quest": "Квест",
       "journey": "Путь",
       "compete": "Соревнования",
-      "profile": "Профиль"
+      "profile": "Профиль",
+      "play": "Играть"
     },
     "stagePathRail": {
       "heading": "Ваш Путь"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "Самая длинная серия: {{streak}}",
     "playAgain": "Играть снова",
     "backToArcade": "Назад в Аркаду"
+  },
+  "play": {
+    "title": "Играть",
+    "loadError": "Не удалось загрузить ваши квесты.",
+    "startQuest": "Начать квест",
+    "completedBadge": "Завершён",
+    "allDoneToday": "На сегодня всё сделано — отличная работа!",
+    "otherQuestsLabel": "Другие квесты",
+    "dropdownToggleAccessibilityLabel": "Показать другие квесты",
+    "selectQuestAccessibilityLabel": "Выбрать {{title}}",
+    "completedAccessibilityLabel": "{{title}}, завершён",
+    "bossBattleSubtitle": "Еженедельное соревнование на время против всех"
   }
 }

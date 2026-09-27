@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "Inicio",
-      "quest": "Misión",
       "journey": "Travesía",
       "compete": "Competir",
-      "profile": "Perfil"
+      "profile": "Perfil",
+      "play": "Jugar"
     },
     "stagePathRail": {
       "heading": "Tu Camino"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "Racha más larga: {{streak}}",
     "playAgain": "Jugar de nuevo",
     "backToArcade": "Volver al Arcade"
+  },
+  "play": {
+    "title": "Jugar",
+    "loadError": "No se pudieron cargar tus misiones en este momento.",
+    "startQuest": "Comenzar misión",
+    "completedBadge": "Completada",
+    "allDoneToday": "Todo listo por hoy — ¡buen trabajo!",
+    "otherQuestsLabel": "Otras misiones",
+    "dropdownToggleAccessibilityLabel": "Mostrar otras misiones",
+    "selectQuestAccessibilityLabel": "Seleccionar {{title}}",
+    "completedAccessibilityLabel": "{{title}}, completada",
+    "bossBattleSubtitle": "Desafío semanal cronometrado contra todos"
   }
 }

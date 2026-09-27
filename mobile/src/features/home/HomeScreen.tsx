@@ -19,10 +19,8 @@ import { getMyJourney, type JourneyView } from '@/services/journey';
 import { getTodayQuestSummary, type TodayQuestSummary } from '@/services/quests';
 import { getClanLeaderboard, type LeaderboardEntry } from '@/services/leaderboards';
 import { listMyWordMastery, type WordMasteryListItem } from '@/services/users';
-import { getUpcomingBattle, type UpcomingBattle } from '@/services/bossBattle';
 import { useAuthStore } from '@/state/authStore';
 import { timeOfDayGreeting } from '@/utils/timeOfDay';
-import { formatBossBattleCountdown } from '@/utils/bossBattleCountdown';
 import { VerificationBanner } from '@/components/VerificationBanner';
 import { GlyphCoin } from '@/components/GlyphIcon';
 import { StreakMilestoneRibbon } from '@/components/StreakMilestoneRibbon';
@@ -101,7 +99,6 @@ export function HomeScreen({ navigation }: Props) {
   const [todaySummary, setTodaySummary] = useState<TodayQuestSummary | null>(null);
   const [clanViewer, setClanViewer] = useState<LeaderboardEntry | null>(null);
   const [wordMastery, setWordMastery] = useState<WordMasteryListItem[] | null>(null);
-  const [upcomingBattle, setUpcomingBattle] = useState<UpcomingBattle | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -120,9 +117,6 @@ export function HomeScreen({ navigation }: Props) {
       .catch(() => {});
     listMyWordMastery(accessToken)
       .then(setWordMastery)
-      .catch(() => {});
-    getUpcomingBattle(accessToken)
-      .then(setUpcomingBattle)
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
@@ -143,10 +137,6 @@ export function HomeScreen({ navigation }: Props) {
   // at risk today doesn't still look "lit" and safe.
   const streakSafeToday = (todaySummary?.completedCount ?? 0) > 0;
   const chapterVisual = journey ? journeyVisualFor(journey.currentStage.key) : null;
-
-  const battleCountdown = upcomingBattle
-    ? formatBossBattleCountdown(upcomingBattle.scheduledStartUtc, upcomingBattle.status)
-    : null;
 
   return (
     <ScrollView
@@ -203,7 +193,7 @@ export function HomeScreen({ navigation }: Props) {
       {journey && (
         <Pressable
           style={[styles.chapterCard, { borderColor: chapterVisual?.color ?? colors.border }]}
-          onPress={() => navigation.navigate('Main', { screen: 'Quest' })}
+          onPress={() => navigation.navigate('Main', { screen: 'Play' })}
           accessibilityRole="button"
           accessibilityLabel={`${t('todaysChapter')}: ${journey.currentStage.name}`}
         >
@@ -254,7 +244,7 @@ export function HomeScreen({ navigation }: Props) {
 
       <Pressable
         style={styles.questButton}
-        onPress={() => navigation.navigate('Main', { screen: 'Quest' })}
+        onPress={() => navigation.navigate('Main', { screen: 'Play' })}
         accessibilityRole="button"
         accessibilityLabel={t('newQuest')}
       >
@@ -290,6 +280,9 @@ export function HomeScreen({ navigation }: Props) {
         )}
       </View>
 
+      {/* Boss Battle and Arcade moved into the Play tab (Sept 2026
+          consolidation) — both are reachable from there now, so this row
+          only needs the two destinations Play doesn't cover. */}
       <View style={styles.linkRow}>
         <Pressable
           style={styles.linkButton}
@@ -298,30 +291,6 @@ export function HomeScreen({ navigation }: Props) {
           accessibilityLabel={t('masterChallenge')}
         >
           <Text style={styles.linkButtonText}>{t('masterChallenge')}</Text>
-        </Pressable>
-        <Pressable
-          style={styles.linkButton}
-          onPress={() => navigation.navigate('BossBattle')}
-          accessibilityRole="button"
-          accessibilityLabel={t('bossBattle')}
-        >
-          <Text style={styles.linkButtonText}>{t('bossBattle')}</Text>
-          {battleCountdown && (
-            <View style={styles.linkBadge}>
-              <Text style={styles.linkBadgeText}>{battleCountdown.compact}</Text>
-            </View>
-          )}
-          {battleCountdown && (
-            <Text style={styles.linkButtonSubtext}>{battleCountdown.subtitle}</Text>
-          )}
-        </Pressable>
-        <Pressable
-          style={styles.linkButton}
-          onPress={() => navigation.navigate('Arcade')}
-          accessibilityRole="button"
-          accessibilityLabel={t('arcade')}
-        >
-          <Text style={styles.linkButtonText}>{t('arcade')}</Text>
         </Pressable>
         <Pressable
           style={styles.linkButton}
@@ -444,13 +413,5 @@ function createStyles(colors: ThemeColors, topInset: number) {
       gap: 2,
     },
     linkButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
-    linkButtonSubtext: { color: colors.inkMuted, fontSize: 10 },
-    linkBadge: {
-      backgroundColor: colors.surface,
-      borderRadius: radius.pill,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: 1,
-    },
-    linkBadgeText: { color: colors.inkMuted, fontSize: 10, fontWeight: '700' },
   });
 }

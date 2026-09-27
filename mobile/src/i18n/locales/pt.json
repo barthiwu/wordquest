@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "Início",
-      "quest": "Missão",
       "journey": "Jornada",
       "compete": "Competir",
-      "profile": "Perfil"
+      "profile": "Perfil",
+      "play": "Jogar"
     },
     "stagePathRail": {
       "heading": "Seu Caminho"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "Maior sequência: {{streak}}",
     "playAgain": "Jogar novamente",
     "backToArcade": "Voltar ao Arcade"
+  },
+  "play": {
+    "title": "Jogar",
+    "loadError": "Não foi possível carregar suas missões agora.",
+    "startQuest": "Começar missão",
+    "completedBadge": "Concluída",
+    "allDoneToday": "Tudo concluído por hoje — ótimo trabalho!",
+    "otherQuestsLabel": "Outras missões",
+    "dropdownToggleAccessibilityLabel": "Mostrar outras missões",
+    "selectQuestAccessibilityLabel": "Selecionar {{title}}",
+    "completedAccessibilityLabel": "{{title}}, concluída",
+    "bossBattleSubtitle": "Desafio semanal cronometrado contra todos"
   }
 }

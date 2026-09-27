@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "الرئيسية",
-      "quest": "المهمة",
       "journey": "الرحلة",
       "compete": "المنافسة",
-      "profile": "الملف الشخصي"
+      "profile": "الملف الشخصي",
+      "play": "لعب"
     },
     "stagePathRail": {
       "heading": "مسارك"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "أطول تتالٍ: {{streak}}",
     "playAgain": "اللعب مرة أخرى",
     "backToArcade": "العودة إلى الأركيد"
+  },
+  "play": {
+    "title": "لعب",
+    "loadError": "تعذّر تحميل مهامك حاليًا.",
+    "startQuest": "ابدأ المهمة",
+    "completedBadge": "مكتملة",
+    "allDoneToday": "أنجزت كل شيء لهذا اليوم — عمل رائع!",
+    "otherQuestsLabel": "مهام أخرى",
+    "dropdownToggleAccessibilityLabel": "إظهار المهام الأخرى",
+    "selectQuestAccessibilityLabel": "اختيار {{title}}",
+    "completedAccessibilityLabel": "{{title}}، مكتملة",
+    "bossBattleSubtitle": "تحدٍّ أسبوعي محدد بوقت ضد الجميع"
   }
 }

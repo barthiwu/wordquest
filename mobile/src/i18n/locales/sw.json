@@ -101,10 +101,10 @@
     },
     "tabs": {
       "home": "Nyumbani",
-      "quest": "Jukumu",
       "journey": "Safari",
       "compete": "Ushindani",
-      "profile": "Wasifu"
+      "profile": "Wasifu",
+      "play": "Cheza"
     },
     "stagePathRail": {
       "heading": "Njia Yako"
@@ -812,5 +812,17 @@
     "sessionLongestStreak": "Mfululizo mrefu zaidi: {{streak}}",
     "playAgain": "Cheza tena",
     "backToArcade": "Rudi kwenye Arcade"
+  },
+  "play": {
+    "title": "Cheza",
+    "loadError": "Imeshindwa kupakia majukumu yako kwa sasa.",
+    "startQuest": "Anza Jukumu",
+    "completedBadge": "Imekamilika",
+    "allDoneToday": "Kila kitu kimekamilika kwa leo — kazi nzuri!",
+    "otherQuestsLabel": "Majukumu mengine",
+    "dropdownToggleAccessibilityLabel": "Onyesha majukumu mengine",
+    "selectQuestAccessibilityLabel": "Chagua {{title}}",
+    "completedAccessibilityLabel": "{{title}}, imekamilika",
+    "bossBattleSubtitle": "Changamoto ya kila wiki yenye muda dhidi ya kila mtu"
   }
 }
