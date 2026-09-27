@@ -5,6 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ArcadeChallengeService } from '../challenge.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { ProgressionService } from '../../progression/progression.service';
+import { FriendsService } from '../../friends/friends.service';
 import { WORD_DUEL_CONFIG, WORD_DUEL_TIEBREAK_DESCRIPTION } from '../config/arcade.config';
 
 /**
@@ -290,6 +291,7 @@ describe('WordDuelService', () => {
     awardXp: jest.fn().mockResolvedValue(undefined),
     recordDailyActivity: jest.fn().mockResolvedValue({ currentStreak: 1 }),
   };
+  const friendsMock = { areBlocked: jest.fn().mockResolvedValue(false) };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -304,6 +306,7 @@ describe('WordDuelService', () => {
     };
     progressionMock.awardXp.mockResolvedValue(undefined);
     progressionMock.recordDailyActivity.mockResolvedValue({ currentStreak: 1 });
+    friendsMock.areBlocked.mockReset().mockResolvedValue(false);
 
     store.words.set('w1', {
       id: 'w1',
@@ -325,6 +328,7 @@ describe('WordDuelService', () => {
         { provide: ArcadeChallengeService, useValue: challengesMock },
         { provide: RewardEngineService, useValue: rewardEngineMock },
         { provide: ProgressionService, useValue: progressionMock },
+        { provide: FriendsService, useValue: friendsMock },
       ],
     }).compile();
     service = moduleRef.get(WordDuelService);
@@ -430,6 +434,44 @@ describe('WordDuelService', () => {
       expect(view.status).toBe('ACTIVE');
       expect(challengesMock.pickChallenges).not.toHaveBeenCalled();
       expect(store.wordDuelPlayerState.create).not.toHaveBeenCalled();
+    });
+
+    it('never claims a WAITING match whose only player has blocked (or been blocked by) the joiner', async () => {
+      store.matches.set('m1', {
+        id: 'm1',
+        status: 'WAITING',
+        wordIds: ['w1', 'w2'],
+        startedAt: null,
+        endsAt: null,
+        completedAt: null,
+        winnerId: null,
+        tieBreakReason: null,
+        createdAt: new Date(),
+      });
+      store.playerStates.set('ps1', {
+        id: 'ps1',
+        matchId: 'm1',
+        userId: 'u1',
+        totalXp: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        correctCount: 0,
+        currentIndex: 0,
+        currentWordStartedAt: new Date(),
+        joinedAt: new Date(),
+        disconnectedAt: null,
+        reconnectedAt: null,
+      });
+      friendsMock.areBlocked.mockResolvedValue(true);
+      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w1' } }]);
+
+      const view = await service.joinQueue('u2');
+
+      expect(friendsMock.areBlocked).toHaveBeenCalledWith('u2', 'u1');
+      expect(store.matches.get('m1')?.status).toBe('WAITING'); // never claimed
+      expect(view.matchId).not.toBe('m1'); // u2 got a fresh match of their own instead
+      expect(view.status).toBe('WAITING');
+      expect(challengesMock.pickChallenges).toHaveBeenCalled();
     });
 
     it("abandons the caller's own stale WAITING match and starts fresh matchmaking", async () => {

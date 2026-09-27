@@ -19,6 +19,7 @@ import {
 } from '../config/arcade.config';
 import { renderWord } from '../../vocabulary/english-variant';
 import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant';
+import { FriendsService } from '../../friends/friends.service';
 
 /** Client-safe view of the opponent's progress — score only, never their
  * current word or answers (spec §6/§8). */
@@ -113,6 +114,7 @@ export class WordDuelService {
     private readonly challenges: ArcadeChallengeService,
     private readonly rewardEngine: RewardEngineService,
     private readonly progression: ProgressionService,
+    private readonly friends: FriendsService,
   ) {}
 
   /**
@@ -147,14 +149,33 @@ export class WordDuelService {
 
     // Try to claim a waiting opponent's match — a few bounded attempts
     // so losing one race (someone else claimed the same candidate first)
-    // doesn't give up immediately.
+    // doesn't give up immediately. A blocked-either-way candidate (2026-09
+    // Friends/Block feature) is skipped the same way a lost race is —
+    // never claimed, never surfaced to this player — rather than treated
+    // as a hard failure, so a blocked pairing just falls through to the
+    // next candidate or, having none, a fresh match of this player's own.
+    const excludedMatchIds: string[] = [];
     for (let attempt = 0; attempt < 3; attempt++) {
       const cutoff = new Date(Date.now() - WORD_DUEL_CONFIG.MATCHMAKING_TIMEOUT_SECONDS * 1000);
       const candidate = await this.prisma.wordDuelMatch.findFirst({
-        where: { status: 'WAITING', createdAt: { gte: cutoff }, players: { none: { userId } } },
+        where: {
+          status: 'WAITING',
+          createdAt: { gte: cutoff },
+          players: { none: { userId } },
+          ...(excludedMatchIds.length > 0 ? { id: { notIn: excludedMatchIds } } : {}),
+        },
         orderBy: { createdAt: 'asc' },
       });
       if (!candidate) break;
+
+      const waitingPlayer = await this.prisma.wordDuelPlayerState.findFirst({
+        where: { matchId: candidate.id },
+        select: { userId: true },
+      });
+      if (waitingPlayer && (await this.friends.areBlocked(userId, waitingPlayer.userId))) {
+        excludedMatchIds.push(candidate.id);
+        continue;
+      }
 
       const now = new Date();
       const endsAt = new Date(now.getTime() + WORD_DUEL_CONFIG.MATCH_DURATION_MINUTES * 60_000);

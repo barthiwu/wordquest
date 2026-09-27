@@ -28,7 +28,8 @@ const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
 
 /**
- * Leaderboards (build order §47 item 25, spec §30): Global and Clan today.
+ * Leaderboards (build order §47 item 25, spec §30): Global, Clan,
+ * Country, Continent, Friends, and Boss Battle.
  *
  * Postgres is the only source of truth here — §30 allows Redis for fast
  * ranking at scale, but that's a caching optimization on top of this
@@ -37,12 +38,23 @@ const MAX_LIMIT = 100;
  * rows by an indexed column is cheap enough that Postgres alone is the
  * right call until it measurably isn't.
  *
- * "Friends" (§30) is NOT implemented — WordQuest has no social/friends
- * graph yet, so there's nothing authoritative to rank. Faking one from
- * clan-mates or global neighbors would misrepresent a feature that
- * doesn't exist. "Personal" is folded into `viewer` on every response
- * rather than being a separate endpoint, since "your rank" only means
- * something in the context of a specific leaderboard.
+ * "Friends" (§30) went in once the Friends module (2026-09, Barth) gave
+ * WordQuest an actual social graph to rank against — getFriends reads
+ * FriendsService's underlying Friendship rows directly rather than
+ * importing FriendsService itself, since "accepted friendship" is a
+ * one-line Prisma query and doesn't need that module's full surface.
+ * "Personal" is folded into `viewer` on every response rather than
+ * being a separate endpoint, since "your rank" only means something in
+ * the context of a specific leaderboard.
+ *
+ * "Boss Battle" (getBossBattle, 2026-09, Barth) ranks by lifetime Boss
+ * Battle XP -- the sum of BossBattlePlayer.rewardXp across every battle
+ * a player has finished, NOT UserProgression.totalXp (which blends
+ * every XP source together). This is deliberately a different shape
+ * from every other leaderboard here (a groupBy aggregate over
+ * BossBattlePlayer, not a ProgressionRow), since Boss Battle is a group
+ * event with its own XP pool rather than a per-player running total
+ * WordQuest already tracks anywhere else.
  */
 @Injectable()
 export class LeaderboardsService {
@@ -55,7 +67,9 @@ export class LeaderboardsService {
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       take: clampedLimit,
       include: {
-        user: { select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true } },
+        user: {
+          select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true },
+        },
       },
     });
 
@@ -79,7 +93,9 @@ export class LeaderboardsService {
       where: { user: { clanId: viewer.clanId } },
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       include: {
-        user: { select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true } },
+        user: {
+          select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true },
+        },
       },
     });
 
@@ -180,7 +196,9 @@ export class LeaderboardsService {
     const progression = await this.prisma.userProgression.findUniqueOrThrow({
       where: { userId },
       include: {
-        user: { select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true } },
+        user: {
+          select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true },
+        },
       },
     });
 
@@ -202,6 +220,118 @@ export class LeaderboardsService {
       where: { totalXp: { gt: totalXp } },
     });
     return aheadCount + 1;
+  }
+
+  /**
+   * Ranks the viewer together with their accepted friends only (2026-09,
+   * Barth) -- always includes the viewer even if they have zero friends
+   * yet (rank 1 of 1), unlike getClan's "not in a clan" error, since
+   * having no friends yet is a perfectly normal state, not a
+   * precondition failure.
+   */
+  async getFriends(userId: string): Promise<LeaderboardView> {
+    const friendships = await this.prisma.friendship.findMany({
+      where: { status: 'ACCEPTED', OR: [{ requesterId: userId }, { addresseeId: userId }] },
+      select: { requesterId: true, addresseeId: true },
+    });
+    const friendIds = friendships.map((f: { requesterId: string; addresseeId: string }) =>
+      f.requesterId === userId ? f.addresseeId : f.requesterId,
+    );
+    const memberIds = [userId, ...friendIds];
+
+    const rows = await this.prisma.userProgression.findMany({
+      where: { userId: { in: memberIds } },
+      orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
+      include: {
+        user: {
+          select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true },
+        },
+      },
+    });
+
+    const entries = rows.map((row: ProgressionRow, index: number) => this.toEntry(row, index + 1));
+    const viewerEntry = entries.find((e: LeaderboardEntry) => e.userId === userId);
+    if (!viewerEntry) {
+      // Should be unreachable -- the viewer is always in memberIds -- but
+      // fail loudly rather than fabricate a viewer entry, same defensive
+      // stance getClan takes.
+      throw new BadRequestException('Could not locate your entry on the friend leaderboard.');
+    }
+
+    return { entries, viewer: viewerEntry };
+  }
+
+  /**
+   * Ranks players by lifetime Boss Battle XP (sum of
+   * BossBattlePlayer.rewardXp across every battle they've finished) --
+   * see the class doc comment for why this is a different data shape
+   * from every other leaderboard here. `level` is meaningless for this
+   * view (Boss Battle XP isn't account level) and is always 0.
+   */
+  async getBossBattle(userId: string, limit: number = DEFAULT_LIMIT): Promise<LeaderboardView> {
+    const clampedLimit = this.clampLimit(limit);
+
+    const grouped = await this.prisma.bossBattlePlayer.groupBy({
+      by: ['userId'],
+      _sum: { rewardXp: true },
+      orderBy: { _sum: { rewardXp: 'desc' } },
+      take: clampedLimit,
+    });
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: grouped.map((g: { userId: string }) => g.userId) } },
+      select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true },
+    });
+    const userById = new Map(users.map((u) => [u.id, u]));
+
+    const entries: LeaderboardEntry[] = grouped.map(
+      (g: { userId: string; _sum: { rewardXp: number | null } }, index: number) => {
+        const user = userById.get(g.userId);
+        return {
+          rank: index + 1,
+          userId: g.userId,
+          username: user?.username ?? 'Unknown',
+          clanName: user?.clan?.name ?? null,
+          countryCode: user?.countryCode ?? null,
+          level: 0,
+          totalXp: g._sum.rewardXp ?? 0,
+        };
+      },
+    );
+
+    const viewer = await this.getBossBattleViewerEntry(userId);
+    return { entries, viewer };
+  }
+
+  private async getBossBattleViewerEntry(userId: string): Promise<LeaderboardEntry> {
+    const [viewerSum, user] = await Promise.all([
+      this.prisma.bossBattlePlayer.aggregate({ where: { userId }, _sum: { rewardXp: true } }),
+      this.prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { username: true, clan: { select: { name: true } }, countryCode: true },
+      }),
+    ]);
+    const totalBossXp = viewerSum._sum.rewardXp ?? 0;
+
+    // 1 + how many OTHER players' summed rewardXp exceeds the viewer's --
+    // the same "count who's ahead" shape getRankForXp uses for the
+    // global leaderboard, just over a groupBy aggregate instead of a
+    // plain column.
+    const ahead = await this.prisma.bossBattlePlayer.groupBy({
+      by: ['userId'],
+      _sum: { rewardXp: true },
+      having: { rewardXp: { _sum: { gt: totalBossXp } } },
+    });
+
+    return {
+      rank: ahead.length + 1,
+      userId,
+      username: user.username,
+      clanName: user.clan?.name ?? null,
+      countryCode: user.countryCode,
+      level: 0,
+      totalXp: totalBossXp,
+    };
   }
 
   private toEntry(row: ProgressionRow, rank: number): LeaderboardEntry {

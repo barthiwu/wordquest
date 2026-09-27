@@ -85,4 +85,19 @@ export function isWithinQuietHours(
   return hour >= startHour || hour < endHour;
 }
 
+/**
+ * True if `localDate` ("YYYY-MM-DD") is the last calendar day of its month.
+ * Pure calendar arithmetic — `new Date(year, month, 0)` rolls back to the
+ * last day of the PREVIOUS month when constructed with JS's 0-indexed
+ * month, so passing the 1-indexed `month` we parsed out lands on the last
+ * day of the month we actually care about. Used to gate the end-of-month
+ * catch-up reminder so it fires exactly once, on the player's local last
+ * day of the month, regardless of whether that's the 28th, 30th, or 31st.
+ */
+export function isLastDayOfMonth(localDate: string): boolean {
+  const [year, month, day] = localDate.split('-').map(Number);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  return day === daysInMonth;
+}
+
 export { FALLBACK_TIMEZONE };

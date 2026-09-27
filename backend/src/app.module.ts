@@ -11,6 +11,7 @@ import { HealthModule } from './health/health.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ClansModule } from './clans/clans.module';
+import { FriendsModule } from './friends/friends.module';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { ArcadeModule } from './arcade/arcade.module';
 import { ScrambleQuestModule } from './arcade/scramble-quest/scramble-quest.module';
@@ -62,6 +63,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     UsersModule,
     AuthModule,
     ClansModule,
+    FriendsModule,
     VocabularyModule,
     ArcadeModule,
     ScrambleQuestModule,

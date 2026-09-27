@@ -5,8 +5,7 @@ import { LeaderboardsService, type LeaderboardView } from './leaderboards.servic
 
 /**
  * §30 LEADERBOARDS / build order §47 item 25. See LeaderboardsService for
- * which categories are implemented and why (Global + Clan; Friends is
- * deliberately not, since WordQuest has no friends graph to rank yet).
+ * what each category ranks by and why.
  */
 @Controller('leaderboards')
 @UseGuards(JwtAuthGuard)
@@ -34,5 +33,18 @@ export class LeaderboardsController {
   @Get('continent')
   getContinent(@CurrentUserId() userId: string): Promise<LeaderboardView> {
     return this.leaderboards.getContinent(userId);
+  }
+
+  @Get('friends')
+  getFriends(@CurrentUserId() userId: string): Promise<LeaderboardView> {
+    return this.leaderboards.getFriends(userId);
+  }
+
+  @Get('boss-battle')
+  getBossBattle(
+    @CurrentUserId() userId: string,
+    @Query('limit') limit?: string,
+  ): Promise<LeaderboardView> {
+    return this.leaderboards.getBossBattle(userId, limit ? Number(limit) : undefined);
   }
 }

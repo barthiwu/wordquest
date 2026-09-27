@@ -4,6 +4,7 @@ import {
   playerLocalDate,
   playerLocalHour,
   isWithinQuietHours,
+  isLastDayOfMonth,
 } from './timezone';
 
 describe('timezone', () => {
@@ -85,6 +86,27 @@ describe('timezone', () => {
 
     it('treats a zero-width window as no quiet hours', () => {
       expect(isWithinQuietHours('UTC', 9, 9)).toBe(false);
+    });
+  });
+
+  describe('isLastDayOfMonth', () => {
+    it('is true on the 31st of a 31-day month', () => {
+      expect(isLastDayOfMonth('2026-08-31')).toBe(true);
+    });
+
+    it('is false before the last day of a 31-day month', () => {
+      expect(isLastDayOfMonth('2026-08-30')).toBe(false);
+    });
+
+    it('is true on the 30th of a 30-day month', () => {
+      expect(isLastDayOfMonth('2026-09-30')).toBe(true);
+      expect(isLastDayOfMonth('2026-09-29')).toBe(false);
+    });
+
+    it('handles February correctly, including a leap year', () => {
+      expect(isLastDayOfMonth('2026-02-28')).toBe(true); // 2026 is not a leap year
+      expect(isLastDayOfMonth('2024-02-29')).toBe(true); // 2024 is a leap year
+      expect(isLastDayOfMonth('2024-02-28')).toBe(false);
     });
   });
 });

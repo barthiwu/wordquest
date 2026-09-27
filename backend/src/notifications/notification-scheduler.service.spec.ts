@@ -10,7 +10,7 @@ describe('NotificationSchedulerService', () => {
   const prismaMock = {
     quest: { findMany: jest.fn() },
     user: { findMany: jest.fn() },
-    questAttempt: { findFirst: jest.fn() },
+    questAttempt: { findFirst: jest.fn(), findMany: jest.fn() },
     mastery: { count: jest.fn(), findMany: jest.fn() },
     learningProfile: { findUnique: jest.fn() },
     notification: { findFirst: jest.fn() },
@@ -500,9 +500,7 @@ describe('NotificationSchedulerService', () => {
       // Server UTC is 21:00; a user 3 hours behind UTC (offset -03:00) is
       // at local 18:00 right now -- their first checkpoint.
       jest.useFakeTimers().setSystemTime(utc(2026, 8, 23, 21, 0, 0));
-      prismaMock.user.findMany.mockResolvedValueOnce([
-        { id: 'u1', timezone: 'America/Sao_Paulo' },
-      ]);
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'America/Sao_Paulo' }]);
       prismaMock.userProgression.findUnique.mockResolvedValueOnce({
         currentStreak: 1,
         lastActiveOn: null,
@@ -523,6 +521,109 @@ describe('NotificationSchedulerService', () => {
       prismaMock.user.findMany.mockRejectedValueOnce(new Error('db down'));
 
       await expect(service.sendStreakAtRiskReminders()).resolves.toBeUndefined();
+    });
+  });
+
+  describe('sendMonthEndCatchUpReminders', () => {
+    it('nudges a player on the local last day of the month who missed at least one day', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 31, 17, 0, 0)); // Aug 31 -- last day, 17:00 local hour
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+      prismaMock.notification.findFirst.mockResolvedValueOnce(null);
+      prismaMock.questAttempt.findMany.mockResolvedValueOnce(
+        Array.from({ length: 25 }, (_, i) => ({
+          localDate: `2026-08-${String(i + 1).padStart(2, '0')}`,
+        })),
+      );
+
+      await service.sendMonthEndCatchUpReminders();
+
+      expect(prismaMock.questAttempt.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'u1', localDate: { startsWith: '2026-08' } },
+        }),
+      );
+      expect(notificationsMock.notifyFireAndForget).toHaveBeenCalledWith(
+        'u1',
+        'MONTH_END_CATCH_UP',
+        expect.any(String),
+        expect.stringContaining('6 days'),
+        { data: { missedDays: 6 }, deepLink: 'wordquest://catch-up' },
+      );
+    });
+
+    it('does not nudge a player who played every day this month', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 31, 17, 0, 0));
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+      prismaMock.notification.findFirst.mockResolvedValueOnce(null);
+      prismaMock.questAttempt.findMany.mockResolvedValueOnce(
+        Array.from({ length: 31 }, (_, i) => ({
+          localDate: `2026-08-${String(i + 1).padStart(2, '0')}`,
+        })),
+      );
+
+      await service.sendMonthEndCatchUpReminders();
+
+      expect(notificationsMock.notifyFireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('does not nudge on a day that is not the local last day of the month', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 30, 17, 0, 0)); // Aug 30 -- not the last day
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+
+      await service.sendMonthEndCatchUpReminders();
+
+      expect(prismaMock.questAttempt.findMany).not.toHaveBeenCalled();
+      expect(notificationsMock.notifyFireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('does not nudge outside the configured local hour', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 31, 16, 0, 0)); // last day, but wrong hour
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+
+      await service.sendMonthEndCatchUpReminders();
+
+      expect(notificationsMock.notifyFireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('does not nudge a player already reminded earlier today', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 31, 17, 0, 0));
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'UTC' }]);
+      prismaMock.notification.findFirst.mockResolvedValueOnce({
+        createdAt: utc(2026, 8, 31, 10, 0, 0), // earlier today, same local date
+        data: null,
+      });
+
+      await service.sendMonthEndCatchUpReminders();
+
+      expect(prismaMock.questAttempt.findMany).not.toHaveBeenCalled();
+      expect(notificationsMock.notifyFireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('checks each player at THEIR OWN local last-day-of-month, not server time', async () => {
+      // Server UTC is Sept 1 00:30 (already the next month in UTC), but a
+      // user 3 hours behind UTC (America/Sao_Paulo) is still Aug 31, 21:30
+      // local -- wait, use 17:00-local instead: UTC 20:00 on Aug 31 is
+      // 17:00 local for a UTC-3 offset, still within August for them.
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 31, 20, 0, 0));
+      prismaMock.user.findMany.mockResolvedValueOnce([{ id: 'u1', timezone: 'America/Sao_Paulo' }]);
+      prismaMock.notification.findFirst.mockResolvedValueOnce(null);
+      prismaMock.questAttempt.findMany.mockResolvedValueOnce([{ localDate: '2026-08-01' }]);
+
+      await service.sendMonthEndCatchUpReminders();
+
+      expect(notificationsMock.notifyFireAndForget).toHaveBeenCalledWith(
+        'u1',
+        'MONTH_END_CATCH_UP',
+        expect.any(String),
+        expect.any(String),
+        { data: { missedDays: 30 }, deepLink: 'wordquest://catch-up' },
+      );
+    });
+
+    it('swallows and logs errors rather than throwing', async () => {
+      prismaMock.user.findMany.mockRejectedValueOnce(new Error('db down'));
+
+      await expect(service.sendMonthEndCatchUpReminders()).resolves.toBeUndefined();
     });
   });
 });

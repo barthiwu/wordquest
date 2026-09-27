@@ -4,7 +4,7 @@ import { NotificationType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationService } from './notification.service';
 import { gameplayRules } from '../config/gameplay-rules';
-import { playerLocalDate, playerLocalHour } from '../common/timezone';
+import { playerLocalDate, playerLocalHour, isLastDayOfMonth } from '../common/timezone';
 import { nextBattleWindow } from '../boss-battle/battle-schedule';
 import { AliService } from '../ali/ali.service';
 import { LeaderboardsService } from '../leaderboards/leaderboards.service';
@@ -414,6 +414,70 @@ export class NotificationSchedulerService {
       }
     } catch (err) {
       this.logger.warn(`sendStreakAtRiskReminders failed: ${err}`);
+    }
+  }
+
+  /**
+   * MONTH_END_CATCH_UP (requested Sept 2026): once, on the player-local
+   * last day of the month at monthEndCatchUpReminderLocalHour, tells a
+   * player who missed at least one day this month that the catch-up
+   * calendar for the whole month disappears once their phone rolls into
+   * the next month -- the Catch-Up Calendar UI only ever shows the
+   * CURRENT local month (spec: "the moment their phone date enters
+   * October, the whole of September becomes unavailable"), so this is
+   * the one chance to nudge them before that window closes for good.
+   *
+   * "Missed at least one day" is derived the same way the rest of the
+   * app derives player-local activity -- distinct QuestAttempt.localDate
+   * rows for this calendar month, compared against how many days of the
+   * month have actually elapsed (today's day-of-month number). Fewer
+   * distinct active days than elapsed days means at least one gap.
+   * Anti-repeat reuses the shared lastNotificationOfType lookup rather
+   * than a cooldown -- isLastDayOfMonth + the exact local-hour match
+   * already confines this to one calendar day, so the guard only needs
+   * to rule out firing twice within that day's several hourly runs.
+   */
+  @Cron(gameplayRules.notificationScheduler.hourlyCronExpression)
+  async sendMonthEndCatchUpReminders(): Promise<void> {
+    try {
+      const { monthEndCatchUpReminderLocalHour } = gameplayRules.notificationScheduler;
+      const now = new Date();
+
+      const users = await this.prisma.user.findMany({
+        where: { timezone: { not: null }, deletedAt: null },
+        select: { id: true, timezone: true },
+      });
+
+      for (const user of users) {
+        if (playerLocalHour(user.timezone, now) !== monthEndCatchUpReminderLocalHour) continue;
+
+        const today = playerLocalDate(user.timezone, now);
+        if (!isLastDayOfMonth(today)) continue;
+
+        const last = await this.lastNotificationOfType(user.id, 'MONTH_END_CATCH_UP');
+        if (last && playerLocalDate(user.timezone, last.createdAt) === today) continue; // already sent today
+
+        const monthPrefix = today.slice(0, 7); // "YYYY-MM"
+        const dayOfMonth = Number(today.slice(8, 10));
+
+        const activeDays = await this.prisma.questAttempt.findMany({
+          where: { userId: user.id, localDate: { startsWith: monthPrefix } },
+          select: { localDate: true },
+          distinct: ['localDate'],
+        });
+        const missedDays = dayOfMonth - activeDays.length;
+        if (missedDays <= 0) continue; // played every day this month -- nothing to catch up on
+
+        this.notifications.notifyFireAndForget(
+          user.id,
+          'MONTH_END_CATCH_UP',
+          'Last chance to catch up this month',
+          `You missed ${missedDays} day${missedDays === 1 ? '' : 's'} this month -- catch up before midnight, or they're gone for good.`,
+          { data: { missedDays }, deepLink: 'wordquest://catch-up' },
+        );
+      }
+    } catch (err) {
+      this.logger.warn(`sendMonthEndCatchUpReminders failed: ${err}`);
     }
   }
 

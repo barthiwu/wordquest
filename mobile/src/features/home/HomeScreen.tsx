@@ -227,6 +227,15 @@ export function HomeScreen({ navigation }: Props) {
         </Text>
         {progression && (
           <View style={styles.pillRow}>
+            <Pressable
+              style={styles.iconPill}
+              onPress={() => navigation.navigate('CatchUpCalendar')}
+              accessibilityRole="button"
+              accessibilityLabel={t('catchUp:homeLinkLabel')}
+              hitSlop={8}
+            >
+              <Ionicons name="calendar-outline" size={16} color={colors.inkMuted} />
+            </Pressable>
             <View style={[styles.pill, streakSafeToday && styles.pillGlow]}>
               <Ionicons
                 name="flame"
@@ -365,16 +374,6 @@ export function HomeScreen({ navigation }: Props) {
         playedToday={progression?.playedToday ?? false}
       />
 
-      <Pressable
-        style={styles.catchUpLink}
-        onPress={() => navigation.navigate('CatchUpCalendar')}
-        accessibilityRole="button"
-        accessibilityLabel={t('catchUp:homeLinkLabel')}
-      >
-        <Ionicons name="calendar-outline" size={16} color={colors.arcaneSoft} />
-        <Text style={styles.catchUpLinkText}>{t('catchUp:homeLinkLabel')}</Text>
-      </Pressable>
-
       <ClanRankCard
         colors={colors}
         viewer={clanViewer}
@@ -494,6 +493,14 @@ function createStyles(colors: ThemeColors, topInset: number) {
       shadowOffset: { width: 0, height: 0 },
     },
     pillText: { fontSize: typography.scale.sm, fontWeight: '700' },
+    iconPill: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.pill,
+      width: 30,
+      height: 30,
+    },
     error: { color: colors.danger, fontSize: typography.scale.sm },
     chapterCard: {
       borderRadius: radius.lg,
@@ -565,14 +572,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       paddingVertical: spacing.xs,
     },
     chapterButtonText: { color: '#0B2914', fontSize: typography.scale.xs, fontWeight: '700' },
-    catchUpLink: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: spacing.xs,
-      paddingVertical: spacing.xs,
-    },
-    catchUpLinkText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
     questButton: {
       backgroundColor: colors.arcane,
       borderRadius: radius.md,

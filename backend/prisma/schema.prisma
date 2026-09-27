@@ -149,6 +149,12 @@ model User {
   analyticsEvents          AnalyticsEvent[]
   arcadeGameSessions       ArcadeGameSession[]
   wordDuelPlayerStates     WordDuelPlayerState[]
+  // Friends (2026-09, Barth) -- see the Friendship/Block models near the
+  // end of this file for the full design notes.
+  friendshipsSent          Friendship[]              @relation("FriendshipRequester")
+  friendshipsReceived      Friendship[]              @relation("FriendshipAddressee")
+  blocksSent               Block[]                   @relation("BlockBlocker")
+  blocksReceived           Block[]                   @relation("BlockBlocked")
 
   @@index([clanId])
   @@map("users")
@@ -1186,6 +1192,13 @@ enum NotificationType {
   // decide whether to extend the streak) and it's one of the player-local
   // evening checkpoints -- see notificationScheduler.streakAtRiskLocalHours.
   STREAK_AT_RISK
+  // Fires once, on the last local calendar day of the month, for a
+  // player who has at least one missed day left to review on the
+  // catch-up calendar before it rolls out of view (2026-09, Barth --
+  // the calendar never shows a past month, so this is the one warning
+  // before that window closes). See NotificationSchedulerService.
+  // sendMonthEndCatchUpReminders.
+  MONTH_END_CATCH_UP
 }
 
 // A notification is always written here first (in-app history/inbox),
@@ -1720,4 +1733,59 @@ model WordDuelAnswer {
   @@unique([playerStateId, wordIndex])
   @@index([matchId])
   @@map("word_duel_answers")
+}
+
+// ── Friends & Blocking (2026-09, Barth: "add friends using usernames...
+// Add Friend, Block") ─────────────────────────────────────────────────
+// Backs the Friend Rank leaderboard and the avatar-tap Profile/Add
+// Friend/Block popup in Word Duel and Boss Battle. Product decisions
+// confirmed with Barth: a friend request needs the other player to
+// accept (not an instant one-way add), and Block is a full, mutual
+// block -- removes any existing friendship, hides each player from the
+// other's username search, and (see WordDuelService's matchmaking
+// query) the two can never be paired again.
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+}
+
+// One directed row per request. requesterId sent it; addresseeId is who
+// it was sent to. Becomes a live (mutual) friendship once accepted --
+// FriendsService reads status alongside "does either direction have a
+// row for this pair" rather than the schema enforcing symmetry, since a
+// duplicate/reverse request (B requesting A while A -> B is already
+// PENDING or ACCEPTED) needs a query either way to detect.
+model Friendship {
+  id          String           @id @default(uuid())
+  requesterId String
+  requester   User             @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String
+  addressee   User             @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  respondedAt DateTime?
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@index([requesterId, status])
+  @@map("friendships")
+}
+
+// One-directional record: blockerId blocked blockedId. The row itself
+// only records who initiated the block, but its EFFECT is always
+// checked from both directions (FriendsService.isBlockedEitherWay) --
+// friend requests, username search results, and Word Duel matchmaking
+// all treat A-blocked-B and B-blocked-A identically.
+model Block {
+  id        String   @id @default(uuid())
+  blockerId String
+  blocker   User     @relation("BlockBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId String
+  blocked   User     @relation("BlockBlocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+  @@index([blockedId])
+  @@map("blocks")
 }

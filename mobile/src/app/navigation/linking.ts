@@ -36,6 +36,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
       SkillRadar: 'skill-radar',
       Notifications: 'notifications',
       CalibrationResult: 'calibration-result',
+      CatchUpCalendar: 'catch-up',
       Main: {
         screens: {
           Home: 'home',

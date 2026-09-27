@@ -27,6 +27,9 @@ const CATEGORY_BY_TYPE: Record<NotificationType, PreferenceCategory> = {
   // above -- not a spaced-repetition/learning nudge (learningRemindersEnabled)
   // or a congratulatory progress push (progressEnabled).
   STREAK_AT_RISK: 'dailyQuestsEnabled',
+  // Same category as STREAK_AT_RISK -- also a "go play" nudge, just scoped
+  // to the whole month's catch-up window instead of today's quest.
+  MONTH_END_CATCH_UP: 'dailyQuestsEnabled',
 };
 
 const DEFAULT_PREFERENCE = {

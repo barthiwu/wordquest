@@ -33,6 +33,14 @@ describe('LeaderboardsService', () => {
     },
     user: {
       findUniqueOrThrow: jest.fn(),
+      findMany: jest.fn(),
+    },
+    friendship: {
+      findMany: jest.fn(),
+    },
+    bossBattlePlayer: {
+      groupBy: jest.fn(),
+      aggregate: jest.fn(),
     },
   };
 
@@ -159,6 +167,104 @@ describe('LeaderboardsService', () => {
 
       expect(result.entries[0].clanName).toBe('Ember Vale');
       expect(result.entries[1].clanName).toBeNull();
+    });
+  });
+
+  describe('getFriends', () => {
+    it('ranks the viewer together with their accepted friends only', async () => {
+      prismaMock.friendship.findMany.mockResolvedValueOnce([
+        { requesterId: 'u1', addresseeId: 'u2' },
+        { requesterId: 'u3', addresseeId: 'u1' },
+      ]);
+      prismaMock.userProgression.findMany.mockResolvedValueOnce([
+        progressionRow({ userId: 'u2', username: 'Bo', totalXp: 900 }),
+        progressionRow({ userId: 'u1', username: 'Me', totalXp: 500 }),
+        progressionRow({ userId: 'u3', username: 'Cy', totalXp: 100 }),
+      ]);
+
+      const result = await service.getFriends('u1');
+
+      expect(prismaMock.userProgression.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { userId: { in: ['u1', 'u2', 'u3'] } } }),
+      );
+      expect(result.entries.map((e) => e.userId)).toEqual(['u2', 'u1', 'u3']);
+      expect(result.viewer).toMatchObject({ userId: 'u1', rank: 2 });
+    });
+
+    it('includes the viewer alone at rank 1 when they have no friends yet', async () => {
+      prismaMock.friendship.findMany.mockResolvedValueOnce([]);
+      prismaMock.userProgression.findMany.mockResolvedValueOnce([
+        progressionRow({ userId: 'u1', username: 'Me', totalXp: 42 }),
+      ]);
+
+      const result = await service.getFriends('u1');
+
+      expect(result.entries).toHaveLength(1);
+      expect(result.viewer).toMatchObject({ userId: 'u1', rank: 1 });
+    });
+  });
+
+  describe('getBossBattle', () => {
+    it('ranks players by summed Boss Battle rewardXp, descending', async () => {
+      prismaMock.bossBattlePlayer.groupBy
+        .mockResolvedValueOnce([
+          { userId: 'u2', _sum: { rewardXp: 500 } },
+          { userId: 'u1', _sum: { rewardXp: 200 } },
+        ])
+        .mockResolvedValueOnce([{ userId: 'u2', _sum: { rewardXp: 500 } }]); // "ahead" query for viewer
+      prismaMock.user.findMany.mockResolvedValueOnce([
+        { id: 'u2', username: 'Bo', clan: null, countryCode: null },
+        { id: 'u1', username: 'Me', clan: null, countryCode: null },
+      ]);
+      prismaMock.bossBattlePlayer.aggregate.mockResolvedValueOnce({ _sum: { rewardXp: 200 } });
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({
+        username: 'Me',
+        clan: null,
+        countryCode: null,
+      });
+
+      const result = await service.getBossBattle('u1');
+
+      expect(result.entries).toEqual([
+        {
+          rank: 1,
+          userId: 'u2',
+          username: 'Bo',
+          clanName: null,
+          countryCode: null,
+          level: 0,
+          totalXp: 500,
+        },
+        {
+          rank: 2,
+          userId: 'u1',
+          username: 'Me',
+          clanName: null,
+          countryCode: null,
+          level: 0,
+          totalXp: 200,
+        },
+      ]);
+      expect(result.viewer).toMatchObject({ userId: 'u1', rank: 2, totalXp: 200 });
+    });
+
+    it("gives a player who has never played Boss Battle a rank of 1 + everyone who's ahead of their zero total", async () => {
+      prismaMock.bossBattlePlayer.groupBy
+        .mockResolvedValueOnce([{ userId: 'u2', _sum: { rewardXp: 500 } }])
+        .mockResolvedValueOnce([{ userId: 'u2', _sum: { rewardXp: 500 } }]);
+      prismaMock.user.findMany.mockResolvedValueOnce([
+        { id: 'u2', username: 'Bo', clan: null, countryCode: null },
+      ]);
+      prismaMock.bossBattlePlayer.aggregate.mockResolvedValueOnce({ _sum: { rewardXp: null } });
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({
+        username: 'Newbie',
+        clan: null,
+        countryCode: null,
+      });
+
+      const result = await service.getBossBattle('u1');
+
+      expect(result.viewer).toMatchObject({ userId: 'u1', rank: 2, totalXp: 0 });
     });
   });
 

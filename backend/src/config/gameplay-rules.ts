@@ -206,13 +206,33 @@ export const gameplayRules = {
       third: { xp: 1000, glyphs: 3 },
       participation: { xp: 200, glyphs: 0 }, // 4th place and below
     },
-    // How long a group stays open to new joins before it's sealed and its
-    // shared word sequence is generated (V1 Remaining Systems Spec §13:
-    // every player in a group gets the SAME words in the SAME order).
-    sharedSequenceLength: 20,
+    // The group's shared word sequence length (V1 Remaining Systems Spec
+    // §13: every player in a group gets the SAME words in the SAME
+    // order) -- ALSO doubles as the hard per-player guess cap (Barth,
+    // Sept 2026: "30mins, 30 guesses (not unlimited)"). A player who
+    // answers every word in the sequence is done -- boss-battle.service.ts
+    // no longer wraps back around to word 0 once this is exhausted (that
+    // wraparound was a real bug Barth hit in testing: "the boss battle
+    // returned to the start of the words again after I played some").
+    sharedSequenceLength: 30,
     // Same reasoning as SCRAMBLE_QUEST_CONFIG.MIN_WORD_LENGTH (Boss
     // Battle's letter-reveal clues need enough letters to work with).
     minWordLength: 5,
+    // Barth, Sept 2026: the battle event window is still a full hour
+    // (battle-schedule.ts's nextBattleWindow), but no single player gets
+    // the whole hour to answer -- each gets up to this long from the
+    // moment THEY joined, same as everyone else, whether they joined at
+    // the top of the hour or with 28 minutes left on the clock. See
+    // battle-schedule.ts's playerDeadline: a player's real deadline is
+    // min(joinedAt + this, the battle's own scheduledEndUtc) -- so a
+    // latecomer who joins at 6:32 for a 6:00-7:00 battle still only gets
+    // until 7:00 (28 minutes), never a fresh 30 minutes past the event's
+    // own end. Whichever runs out first for a given player -- their own
+    // 30 minutes, their 30 guesses (sharedSequenceLength above), or the
+    // event's own hour -- ends THEIR run; the group's ranking/rewards
+    // still wait for the full hour so nobody is scored against players
+    // who effectively had less time.
+    perPlayerDurationMs: 30 * 60 * 1000,
     // How often the auto-finalization sweep runs (BossBattleFinalizerService)
     // — a battle concludes on this schedule even if no client ever calls
     // an endpoint for it (spec §13's "must conclude automatically").
@@ -443,6 +463,15 @@ export const gameplayRules = {
     // local hour matching exactly and the scheduler itself only runs
     // hourly.
     streakAtRiskLocalHours: [18, 21, 23],
+    // MONTH_END_CATCH_UP (2026-09, Barth): the catch-up calendar only
+    // ever shows the player's CURRENT local month -- no browsing back to
+    // a prior month, no way to catch up on it once the month rolls over
+    // -- so this is the one nudge to review before that window closes.
+    // Fires once, on the local calendar date that is the last day of
+    // the player's local month (see common/timezone.ts's
+    // isLastDayOfMonth), at this fixed local hour, and only when they
+    // actually have at least one missed day this month to review.
+    monthEndCatchUpReminderLocalHour: 17,
   },
 } as const;
 
