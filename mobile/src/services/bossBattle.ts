@@ -11,8 +11,25 @@ export interface UpcomingBattle {
 
 export interface BattleChallengeView {
   groupId: string;
-  /** ISO timestamp — server-authoritative; render a countdown from it, never decide anything from it client-side. */
+  /**
+   * ISO timestamp — server-authoritative; render a countdown from it,
+   * never decide anything from it client-side. This is THIS PLAYER's
+   * own deadline, not necessarily the group's full-hour end — a player
+   * who joined partway through the hour has a nearer cutoff than that.
+   */
   battleEndsAt: string;
+  /**
+   * True when THIS PLAYER's own battle is already over — their guesses
+   * are used up, their personal time window elapsed, or the group's
+   * battle window itself ended. Every other field is a meaningless
+   * placeholder when this is true; route straight to the "battle over"
+   * state without reading them.
+   */
+  battleEnded: boolean;
+  /** How many of this player's questions they've already answered — for a "7 of 30" progress readout. */
+  questionsAnswered: number;
+  /** The hard per-player guess cap. */
+  maxQuestions: number;
   displayPattern: string;
   missingIndexes: number[];
   wordLength: number;

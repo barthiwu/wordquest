@@ -7,7 +7,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -32,12 +31,22 @@ import { useAuthStore } from '@/state/authStore';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { AliBubble } from '@/components/AliBubble';
+import { LetterBoxInput } from '@/components/LetterBoxInput';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BossBattle'>;
 
-type Phase = 'loading' | 'upcoming' | 'joining' | 'active' | 'feedback' | 'ended' | 'error';
+type Phase =
+  'loading' | 'upcoming' | 'joining' | 'waitingRoom' | 'active' | 'feedback' | 'ended' | 'error';
+
+// How long the friendly "you're in, get ready" transition holds before
+// revealing the first challenge -- Barth, Sept 2026: "it should have a
+// bit of waiting room also". Joining itself stays fully asynchronous
+// (each player gets their own 30-minute clock from the moment they
+// join) -- this is UI polish on that instant join, not a real lobby, so
+// it's deliberately short.
+const WAITING_ROOM_MS = 1800;
 
 interface Feedback {
   isCorrect: boolean;
@@ -77,6 +86,12 @@ export function BossBattleScreen({ navigation }: Props) {
   const [aliBubble, setAliBubble] = useState<{ id: number; message: string } | null>(null);
   const aliBubbleCounter = useRef(0);
   const [now, setNow] = useState(() => Date.now());
+  const waitingRoomTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (waitingRoomTimeout.current) clearTimeout(waitingRoomTimeout.current);
+    };
+  }, []);
   const [history, setHistory] = useState<PassportBossBattleResult[]>([]);
   // Fetched once the battle ends, for the Hero Ring results screen —
   // Boss Battle's own submit/feedback loop only ever tracks the current
@@ -162,7 +177,28 @@ export function BossBattleScreen({ navigation }: Props) {
     try {
       const view = await joinBattle(accessToken);
       setChallenge(view);
-      setPhase('active');
+      if (view.battleEnded) {
+        // Resumed players whose window/guesses were already exhausted
+        // since they last had the app open -- same "ended" destination
+        // onSubmit already uses for a mid-play ending, no waiting room.
+        setPhase('ended');
+        return;
+      }
+      // A truly fresh join (nothing answered yet) gets a brief, friendly
+      // "you're in" moment before the first challenge appears. A
+      // RESUMED battle (app reopened mid-play) skips straight to
+      // 'active' -- questionsAnswered === 0 is a reliable signal here:
+      // the backend only ever returns that on a brand-new player row
+      // (see joinBattle/claimGroupSlot in boss-battle.service.ts), never
+      // on a resume, which always carries the player's real progress.
+      if (view.questionsAnswered === 0) {
+        setPhase('waitingRoom');
+        waitingRoomTimeout.current = setTimeout(() => {
+          setPhase('active');
+        }, WAITING_ROOM_MS);
+      } else {
+        setPhase('active');
+      }
     } catch (err) {
       if (err instanceof ApiError && err.status === 400) setErrorMessage(err.message);
       setPhase('error');
@@ -212,6 +248,10 @@ export function BossBattleScreen({ navigation }: Props) {
         <Text style={styles.error}>{errorMessage}</Text>
       </View>
     );
+  }
+
+  if (phase === 'waitingRoom') {
+    return <WaitingRoom colors={colors} styles={styles} t={t} />;
   }
 
   if (phase === 'upcoming' && upcoming) {
@@ -319,7 +359,15 @@ export function BossBattleScreen({ navigation }: Props) {
           />
         )}
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.progressLabel}>{t('progressLabel')}</Text>
+          <View style={styles.progressRow}>
+            <Text style={styles.progressLabel}>{t('progressLabel')}</Text>
+            <Text style={styles.progressCount}>
+              {t('progressCount', {
+                answered: challenge.questionsAnswered,
+                total: challenge.maxQuestions,
+              })}
+            </Text>
+          </View>
           <View style={styles.clueCard}>
             <LinearGradient
               colors={[colors.glyph, colors.arcane]}
@@ -334,15 +382,13 @@ export function BossBattleScreen({ navigation }: Props) {
 
           {phase === 'active' && (
             <>
-              <TextInput
-                style={styles.input}
+              <LetterBoxInput
                 value={answer}
                 onChangeText={setAnswer}
-                placeholder={t('answerPlaceholder')}
-                placeholderTextColor={colors.inkMuted}
-                autoCapitalize="none"
-                autoCorrect={false}
+                length={challenge.wordLength}
+                colors={colors}
                 accessibilityLabel={t('yourAnswerLabel')}
+                onSubmitEditing={onSubmit}
               />
               <Pressable
                 style={[styles.button, !answer.trim() && styles.buttonDisabled]}
@@ -390,6 +436,60 @@ export function BossBattleScreen({ navigation }: Props) {
   }
 
   return null;
+}
+
+/**
+ * The brief "you're in, get ready" beat between tapping "Join battle"
+ * and the first challenge appearing (Barth, Sept 2026: "it should have
+ * a bit of waiting room also, so people join and they all proceed to
+ * the game at once"). Joining stays fully asynchronous under the hood
+ * (each player's own 30-minute clock starts the moment THEY join) --
+ * this is purely a friendly transition, not a real lobby, so it reuses
+ * this screen's own "Boss Battle" kicker styling and pulsing-glow
+ * language (see SiegeRing below) rather than a synchronized wait.
+ */
+function WaitingRoom({
+  colors,
+  styles,
+  t,
+}: {
+  colors: ThemeColors;
+  styles: ReturnType<typeof createStyles>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const pulse = useRef(new Animated.Value(0.6)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 650,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(pulse, {
+          toValue: 0.6,
+          duration: 650,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+
+  return (
+    <View style={styles.centered}>
+      <Text style={styles.siegeKicker}>{t('kicker')}</Text>
+      <Animated.View style={[styles.waitingRoomBadge, { opacity: pulse }]}>
+        <Ionicons name="shield-checkmark" size={44} color={colors.glyph} />
+      </Animated.View>
+      <Text style={styles.title}>{t('waitingRoomTitle')}</Text>
+      <Text style={styles.siegeSubtitle}>{t('waitingRoomSubtitle')}</Text>
+    </View>
+  );
 }
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -691,10 +791,20 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontSize: typography.scale.xl,
       fontWeight: typography.display.weight,
     },
+    progressRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
     progressLabel: {
       color: colors.inkMuted,
       fontSize: typography.scale.sm,
       textTransform: 'uppercase',
+      fontWeight: '700',
+    },
+    progressCount: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.sm,
       fontWeight: '700',
     },
     clueCard: {
@@ -702,6 +812,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
       borderRadius: radius.lg,
       overflow: 'hidden',
       padding: spacing.lg,
+      alignItems: 'center',
       gap: spacing.xs,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 10 },
@@ -716,21 +827,23 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontWeight: '700',
       textTransform: 'uppercase',
     },
-    definition: { color: colors.ink, fontSize: typography.scale.md },
+    definition: { color: colors.ink, fontSize: typography.scale.md, textAlign: 'center' },
     pattern: {
       color: colors.ink,
       fontSize: typography.scale.lg,
       fontWeight: '700',
       letterSpacing: 4,
+      textAlign: 'center',
     },
-    input: {
-      backgroundColor: colors.surface,
-      borderRadius: radius.md,
+    waitingRoomBadge: {
+      width: 88,
+      height: 88,
+      borderRadius: 44,
+      backgroundColor: 'rgba(139, 92, 246, 0.16)',
       borderWidth: 1,
-      borderColor: colors.border,
-      color: colors.ink,
-      fontSize: typography.scale.md,
-      padding: spacing.md,
+      borderColor: 'rgba(139, 92, 246, 0.4)',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     button: {
       backgroundColor: colors.arcane,

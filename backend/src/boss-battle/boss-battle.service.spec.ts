@@ -187,6 +187,7 @@ describe('BossBattleService', () => {
         currentWordId: 'w1',
         currentDisplayPattern: 'R _ S I L I E N T',
         currentMissingIndexes: [1],
+        joinedAt: utc(2026, 8, 16, 17, 30),
         group: { id: 'g1', sharedWordIds: ['w1', 'w2'] },
       });
       prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
@@ -195,6 +196,76 @@ describe('BossBattleService', () => {
 
       expect(prismaMock.bossBattlePlayer.create).not.toHaveBeenCalled();
       expect(view.displayPattern).toBe('R _ S I L I E N T');
+    });
+
+    it("returns the ended shape directly, without touching word or mastery lookups, when a resumed player's own 30-minute window has already elapsed", async () => {
+      // Battle is still LIVE for the group (17:00-18:00, "now" 17:35), but
+      // this player joined at 17:00 so their own window closed at 17:30.
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 17, 35));
+      prismaMock.bossBattle.findUnique.mockResolvedValueOnce(battle);
+      prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce({ level: 10 });
+      prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce({
+        id: 'p1',
+        userId: 'u1',
+        groupId: 'g1',
+        questionIndex: 5,
+        currentWordId: 'w1',
+        currentDisplayPattern: 'R _ S I L I E N T',
+        currentMissingIndexes: [1],
+        joinedAt: utc(2026, 8, 16, 17, 0),
+        group: { id: 'g1', sharedWordIds: ['w1', 'w2', 'w3', 'w4', 'w5', 'w6'] },
+      });
+
+      const view = await service.joinBattle('u1');
+
+      expect(view).toEqual({
+        groupId: 'g1',
+        battleEndsAt: utc(2026, 8, 16, 17, 30).toISOString(),
+        battleEnded: true,
+        questionsAnswered: 5,
+        maxQuestions: 6,
+        displayPattern: '',
+        missingIndexes: [],
+        wordLength: 0,
+        definition: '',
+        partOfSpeech: '',
+      });
+      // The stale in-flight challenge is cleared directly...
+      expect(prismaMock.bossBattlePlayer.update).toHaveBeenCalledWith({
+        where: { id: 'p1' },
+        data: { currentWordId: null, currentDisplayPattern: null, currentMissingIndexes: [] },
+      });
+      // ...and nothing about word content or mastery is ever looked up for
+      // an already-ended player.
+      expect(prismaMock.word.findUniqueOrThrow).not.toHaveBeenCalled();
+      expect(masteryMock.getLevel).not.toHaveBeenCalled();
+    });
+
+    it("returns the ended shape directly when a resumed player has already exhausted the group's shared word sequence, even though their personal window has not elapsed", async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 17, 10));
+      prismaMock.bossBattle.findUnique.mockResolvedValueOnce(battle);
+      prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce({ level: 10 });
+      prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce({
+        id: 'p1',
+        userId: 'u1',
+        groupId: 'g1',
+        questionIndex: 2,
+        currentWordId: null,
+        currentDisplayPattern: null,
+        currentMissingIndexes: [],
+        joinedAt: utc(2026, 8, 16, 17, 5), // 5 minutes ago -- personal window nowhere near up
+        group: { id: 'g1', sharedWordIds: ['w1', 'w2'] }, // questionIndex 2 >= length 2 -> exhausted
+      });
+
+      const view = await service.joinBattle('u1');
+
+      expect(view.battleEnded).toBe(true);
+      expect(view.questionsAnswered).toBe(2);
+      expect(view.maxQuestions).toBe(2);
+      // No currentWordId was set on this row, so there's nothing to clear.
+      expect(prismaMock.bossBattlePlayer.update).not.toHaveBeenCalled();
+      expect(prismaMock.word.findUniqueOrThrow).not.toHaveBeenCalled();
+      expect(masteryMock.getLevel).not.toHaveBeenCalled();
     });
 
     it('joins an existing open group rather than always creating a new one', async () => {
@@ -345,6 +416,9 @@ describe('BossBattleService', () => {
       expect(view.definition).toBe(greetingWord.definition);
       expect(view.wordLength).toBe(9);
       expect(view.battleEndsAt).toBe(battle.scheduledEndUtc.toISOString());
+      expect(view.battleEnded).toBe(false);
+      expect(view.questionsAnswered).toBe(0);
+      expect(view.maxQuestions).toBe(2); // sharedWordIds.length for this group
     });
 
     it("assigns the group's shared word at the player's current question index, not a fresh pick", async () => {
@@ -446,6 +520,12 @@ describe('BossBattleService', () => {
       currentWord: greetingWord,
       currentDisplayPattern: 'R _ S I L I E N T',
       currentMissingIndexes: [1],
+      // Exactly 30 minutes (perPlayerDurationMs) before the battle's own
+      // scheduledEndUtc (18:00), matching most of this block's "now" of
+      // 17:30 -- gives every test here room before playerDeadline (personal
+      // window) is reached, while the dedicated personal-deadline tests
+      // below override joinedAt to actually exercise that path.
+      joinedAt: utc(2026, 8, 16, 17, 30),
       group: { id: 'g1', status: 'LIVE', battle, sharedWordIds: ['w1', 'w2', 'w3'] },
     };
 
@@ -621,19 +701,73 @@ describe('BossBattleService', () => {
       });
     });
 
-    it('wraps back to the start of the shared sequence once every shared word has been used', async () => {
+    it("ends this player's battle once they exhaust the shared sequence -- never wraps back to word 0 (Barth bugfix, Sept 2026), and does not finalize the group while its own clock still has time left", async () => {
       jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 17, 30));
       prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce({
         ...player,
         questionIndex: 2, // last index of a 3-word sharedWordIds ['w1','w2','w3']
       });
       prismaMock.bossBattlePlayer.update.mockResolvedValueOnce({ ...player, questionIndex: 2 });
-      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
 
-      await service.submitAnswer('u1', 'resilient');
+      const result = await service.submitAnswer('u1', 'resilient');
 
-      // (2 + 1) % 3 === 0 -> wraps back to sharedWordIds[0] = 'w1'.
-      expect(prismaMock.word.findUniqueOrThrow).toHaveBeenCalledWith({ where: { id: 'w1' } });
+      expect(result.battleEnded).toBe(true);
+      expect(result.nextChallenge).toBeNull();
+      // Never wraps back to sharedWordIds[0] = 'w1' -- no next-challenge
+      // word lookup happens at all once the sequence is exhausted.
+      expect(prismaMock.word.findUniqueOrThrow).not.toHaveBeenCalled();
+      // The player's own in-flight challenge is cleared...
+      expect(prismaMock.bossBattlePlayer.update).toHaveBeenCalledWith({
+        where: { id: 'p1' },
+        data: { currentWordId: null, currentDisplayPattern: null, currentMissingIndexes: [] },
+      });
+      // ...but the GROUP's own clock (ends 18:00, "now" is 17:30) still has
+      // plenty of time left -- this one player finishing their 30 words
+      // must NOT rank/reward/lock the whole group while others may still
+      // be mid-battle (the finalization-timing architectural fix).
+      expect(prismaMock.bossBattleGroup.updateMany).not.toHaveBeenCalled();
+    });
+
+    it("ends the answer without scoring it, and without finalizing the group, once this player's own personal time window has elapsed even though the group is still LIVE", async () => {
+      // Group's battle runs 17:00-18:00 and is still LIVE at 17:35. This
+      // player joined right at 17:00, so their own 30-minute window
+      // (perPlayerDurationMs) closed at 17:30 -- five minutes ago.
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 17, 35));
+      prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce({
+        ...player,
+        joinedAt: utc(2026, 8, 16, 17, 0),
+      });
+
+      const result = await service.submitAnswer('u1', 'resilient');
+
+      expect(result).toEqual({
+        isCorrect: false,
+        correctAnswer: expect.any(String),
+        exampleSentence: expect.any(String),
+        xpAwarded: 0,
+        battleXp: player.battleXp,
+        battleEnded: true,
+        nextChallenge: null,
+        aliQuickReaction: null,
+      });
+      // Not scored at all -- no mastery record, no event log, no XP.
+      expect(masteryMock.recordAnswer).not.toHaveBeenCalled();
+      expect(prismaMock.bossBattleEvent.create).not.toHaveBeenCalled();
+      const answerXpCalls = progressionMock.awardXp.mock.calls.filter(
+        (c) => c[2] === 'BOSS_BATTLE_ANSWER',
+      );
+      expect(answerXpCalls).toHaveLength(0);
+      // Handled entirely outside the scoring transaction...
+      expect(prismaMock.$transaction).not.toHaveBeenCalled();
+      // ...and the group's own clock still has time left, so this
+      // player's early personal cutoff must not finalize it for everyone
+      // else still playing.
+      expect(prismaMock.bossBattleGroup.updateMany).not.toHaveBeenCalled();
+      // The player's in-flight challenge is cleared directly.
+      expect(prismaMock.bossBattlePlayer.update).toHaveBeenCalledWith({
+        where: { id: 'p1' },
+        data: { currentWordId: null, currentDisplayPattern: null, currentMissingIndexes: [] },
+      });
     });
 
     it('ends the battle and finalizes the group once the clock passes the end time mid-answer', async () => {
@@ -654,6 +788,16 @@ describe('BossBattleService', () => {
 
       expect(result.battleEnded).toBe(true);
       expect(result.nextChallenge).toBeNull();
+      // The GROUP's own clock ending (as opposed to this player's personal
+      // window or word count) is the one case that finalizes -- confirm
+      // finalizeGroupIfNeeded's atomic FINALIZING claim actually ran.
+      expect(prismaMock.bossBattleGroup.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: expect.objectContaining({ id: 'g1' }) }),
+      );
+      expect(prismaMock.bossBattleGroup.update).toHaveBeenCalledWith({
+        where: { id: 'g1' },
+        data: { status: 'COMPLETED' },
+      });
     });
 
     it('rejects further answers once the battle has already ended, without awarding XP', async () => {
@@ -1077,26 +1221,49 @@ describe('BossBattleService', () => {
         },
       });
       prismaMock.bossBattleGroup.updateMany.mockResolvedValueOnce({ count: 1 });
-      prismaMock.bossBattlePlayer.findMany.mockResolvedValueOnce([
-        {
-          id: 'p1',
-          userId: 'winner',
-          battleXp: 90,
-          correctAnswers: 6,
-          incorrectAnswers: 0,
-          lastXpAt: null,
-          finalRank: null,
-        },
-        {
-          id: 'p2',
-          userId: 'runnerUp',
-          battleXp: 30,
-          correctAnswers: 2,
-          incorrectAnswers: 0,
-          lastXpAt: null,
-          finalRank: null,
-        },
-      ]);
+      prismaMock.bossBattlePlayer.findMany
+        .mockResolvedValueOnce([
+          {
+            id: 'p1',
+            userId: 'winner',
+            battleXp: 90,
+            correctAnswers: 6,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: null,
+          },
+          {
+            id: 'p2',
+            userId: 'runnerUp',
+            battleXp: 30,
+            correctAnswers: 2,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: null,
+          },
+        ]) // finalize's internal query
+        .mockResolvedValueOnce([
+          {
+            id: 'p1',
+            userId: 'winner',
+            battleXp: 90,
+            correctAnswers: 6,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: 1,
+            user: { id: 'winner', username: 'Winner' },
+          },
+          {
+            id: 'p2',
+            userId: 'runnerUp',
+            battleXp: 30,
+            correctAnswers: 2,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: 2,
+            user: { id: 'runnerUp', username: 'RunnerUp' },
+          },
+        ]); // leaderboard query after finalizing
 
       await service.getMyGroupLeaderboard('winner');
 
@@ -1124,17 +1291,30 @@ describe('BossBattleService', () => {
         },
       });
       prismaMock.bossBattleGroup.updateMany.mockResolvedValueOnce({ count: 1 });
-      prismaMock.bossBattlePlayer.findMany.mockResolvedValueOnce([
-        {
-          id: 'p1',
-          userId: 'u1',
-          battleXp: 90,
-          correctAnswers: 6,
-          incorrectAnswers: 0,
-          lastXpAt: null,
-          finalRank: null,
-        },
-      ]);
+      prismaMock.bossBattlePlayer.findMany
+        .mockResolvedValueOnce([
+          {
+            id: 'p1',
+            userId: 'u1',
+            battleXp: 90,
+            correctAnswers: 6,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: null,
+          },
+        ]) // finalize's internal query
+        .mockResolvedValueOnce([
+          {
+            id: 'p1',
+            userId: 'u1',
+            battleXp: 90,
+            correctAnswers: 6,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: 1,
+            user: { id: 'u1', username: 'Ada' },
+          },
+        ]); // leaderboard query after finalizing
 
       await service.getMyGroupLeaderboard('u1');
 
@@ -1161,26 +1341,49 @@ describe('BossBattleService', () => {
         },
       });
       prismaMock.bossBattleGroup.updateMany.mockResolvedValueOnce({ count: 1 });
-      prismaMock.bossBattlePlayer.findMany.mockResolvedValueOnce([
-        {
-          id: 'p1',
-          userId: 'winner',
-          battleXp: 90,
-          correctAnswers: 6,
-          incorrectAnswers: 0,
-          lastXpAt: null,
-          finalRank: null,
-        },
-        {
-          id: 'p2',
-          userId: 'runnerUp',
-          battleXp: 30,
-          correctAnswers: 2,
-          incorrectAnswers: 0,
-          lastXpAt: null,
-          finalRank: null,
-        },
-      ]);
+      prismaMock.bossBattlePlayer.findMany
+        .mockResolvedValueOnce([
+          {
+            id: 'p1',
+            userId: 'winner',
+            battleXp: 90,
+            correctAnswers: 6,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: null,
+          },
+          {
+            id: 'p2',
+            userId: 'runnerUp',
+            battleXp: 30,
+            correctAnswers: 2,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: null,
+          },
+        ]) // finalize's internal query
+        .mockResolvedValueOnce([
+          {
+            id: 'p1',
+            userId: 'winner',
+            battleXp: 90,
+            correctAnswers: 6,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: 1,
+            user: { id: 'winner', username: 'Winner' },
+          },
+          {
+            id: 'p2',
+            userId: 'runnerUp',
+            battleXp: 30,
+            correctAnswers: 2,
+            incorrectAnswers: 0,
+            lastXpAt: null,
+            finalRank: 2,
+            user: { id: 'runnerUp', username: 'RunnerUp' },
+          },
+        ]); // leaderboard query after finalizing
       prismaMock.userProgression.update.mockResolvedValue({ journeyStage: 2 });
 
       await service.getMyGroupLeaderboard('winner');
@@ -1278,6 +1481,7 @@ describe('BossBattleService', () => {
         currentWordId: 'w-colour',
         currentDisplayPattern: 'C _ L O U R',
         currentMissingIndexes: [1],
+        joinedAt: utc(2026, 8, 16, 17, 30),
         group: { id: 'g1', sharedWordIds: ['w-colour', 'w2'] },
       };
 
@@ -1319,6 +1523,7 @@ describe('BossBattleService', () => {
         currentWord: colourBattleWord,
         currentDisplayPattern: 'C _ L O U R',
         currentMissingIndexes: [1],
+        joinedAt: utc(2026, 8, 16, 17, 30),
         group: { id: 'g1', status: 'LIVE', battle, sharedWordIds: ['w-colour', 'w2', 'w3'] },
       };
 

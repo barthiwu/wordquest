@@ -16,7 +16,12 @@ import { AliService } from '../ali/ali.service';
 import { NotificationService } from '../notifications/notification.service';
 import { generateOmissionChallenge } from '../vocabulary/omission-engine';
 import { gameplayRules, bossBattleRewardForRank } from '../config/gameplay-rules';
-import { deriveStatus, nextBattleWindow, type BossBattleStatus } from './battle-schedule';
+import {
+  deriveStatus,
+  nextBattleWindow,
+  playerDeadline,
+  type BossBattleStatus,
+} from './battle-schedule';
 import { isUniqueConstraintError } from '../common/prisma-errors';
 import { IdempotencyService } from '../idempotency/idempotency.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
@@ -34,8 +39,27 @@ class GroupFullRaceError extends Error {}
 
 export interface BattleChallengeView {
   groupId: string;
-  /** ISO timestamp — server-authoritative; the client uses this only to render a countdown, never to decide anything itself (spec §4/§21). */
+  /**
+   * ISO timestamp — server-authoritative; the client uses this only to
+   * render a countdown, never to decide anything itself (spec §4/§21).
+   * THIS PLAYER's own deadline (battle-schedule.ts's playerDeadline),
+   * not necessarily the group's full-hour scheduledEndUtc — a player
+   * who joined partway through the hour has a nearer cutoff than that,
+   * and this is always the real one that applies to them.
+   */
   battleEndsAt: string;
+  /**
+   * True when THIS PLAYER's own battle is already over — their 30
+   * guesses are used up, their personal time window elapsed, or the
+   * group's battle window itself ended. Every other field is a
+   * meaningless placeholder when this is true; the client should route
+   * straight to its "battle over" state without reading them.
+   */
+  battleEnded: boolean;
+  /** How many of this player's questions they've already answered — for a "7 of 30" progress readout. */
+  questionsAnswered: number;
+  /** The hard per-player guess cap (gameplayRules.bossBattle.sharedSequenceLength). */
+  maxQuestions: number;
   displayPattern: string;
   missingIndexes: number[];
   wordLength: number;
@@ -178,12 +202,48 @@ export class BossBattleService {
     });
     const variant = await resolveEnglishVariant(this.prisma, userId);
     if (existing) {
-      return this.buildChallengeView(existing, existing.group, battle.scheduledEndUtc, variant);
+      // Resuming (app reopened, or a re-fetch of the current challenge) —
+      // the player's OWN window may have quietly run out since they were
+      // last active, even though the group's battle is still LIVE for
+      // everyone else. Re-derive that here rather than trusting whatever
+      // stale currentWordId is still sitting on the row.
+      const deadline = playerDeadline(
+        existing.joinedAt,
+        battle.scheduledEndUtc,
+        gameplayRules.bossBattle.perPlayerDurationMs,
+      );
+      const sequenceExhausted = existing.questionIndex >= existing.group.sharedWordIds.length;
+      if (now.getTime() >= deadline.getTime() || sequenceExhausted) {
+        if (existing.currentWordId) {
+          await this.prisma.bossBattlePlayer.update({
+            where: { id: existing.id },
+            data: { currentWordId: null, currentDisplayPattern: null, currentMissingIndexes: [] },
+          });
+        }
+        return {
+          groupId: existing.groupId,
+          battleEndsAt: deadline.toISOString(),
+          battleEnded: true,
+          questionsAnswered: Math.min(existing.questionIndex, existing.group.sharedWordIds.length),
+          maxQuestions: existing.group.sharedWordIds.length,
+          displayPattern: '',
+          missingIndexes: [],
+          wordLength: 0,
+          definition: '',
+          partOfSpeech: '',
+        };
+      }
+      return this.buildChallengeView(existing, existing.group, deadline, variant);
     }
 
     const { group, player } = await this.claimGroupSlot(battle.id, userId);
     this.analytics.track(userId, 'boss_battle_joined', { battleId: battle.id, groupId: group.id });
-    return this.buildChallengeView(player, group, battle.scheduledEndUtc, variant);
+    const freshDeadline = playerDeadline(
+      now,
+      battle.scheduledEndUtc,
+      gameplayRules.bossBattle.perPlayerDurationMs,
+    );
+    return this.buildChallengeView(player, group, freshDeadline, variant);
   }
 
   /**
@@ -265,7 +325,40 @@ export class BossBattleService {
     const rendered = renderWord(player.currentWord, variant);
 
     if (deriveStatus(battle.scheduledStartUtc, battle.scheduledEndUtc, now) !== 'LIVE') {
+      // The GROUP's own hour is up — this is the one case that finalizes
+      // (ranks + rewards everyone), since nobody in the group can play
+      // any further either way.
       await this.finalizeGroupIfNeeded(player.group);
+      return {
+        isCorrect: false,
+        correctAnswer: rendered.text,
+        exampleSentence: rendered.sentence,
+        xpAwarded: 0,
+        battleXp: player.battleXp,
+        battleEnded: true,
+        nextChallenge: null,
+        aliQuickReaction: null,
+      };
+    }
+
+    // THIS PLAYER's own window may be up even though the group's hour
+    // isn't (Barth, Sept 2026: 30 minutes per player, capped by the
+    // group's own end). Deliberately NOT scored — same "no grace answer
+    // past the deadline" rule the group-level check above already
+    // applies — and deliberately does NOT finalize the group: other
+    // players may still be mid-battle, and ranking/rewards stay keyed to
+    // the group's real end so nobody is scored against players who
+    // effectively got less time.
+    const personalDeadline = playerDeadline(
+      player.joinedAt,
+      battle.scheduledEndUtc,
+      gameplayRules.bossBattle.perPlayerDurationMs,
+    );
+    if (now.getTime() >= personalDeadline.getTime()) {
+      await this.prisma.bossBattlePlayer.update({
+        where: { id: player.id },
+        data: { currentWordId: null, currentDisplayPattern: null, currentMissingIndexes: [] },
+      });
       return {
         isCorrect: false,
         correctAnswer: rendered.text,
@@ -287,7 +380,7 @@ export class BossBattleService {
       : gameplayRules.bossBattle.perIncorrectAnswer;
     const aliQuickReaction = quickAliReaction(isCorrect);
 
-    const { updatedPlayer, nextChallenge } = await this.prisma.$transaction(
+    const { updatedPlayer, nextChallenge, groupStillLive } = await this.prisma.$transaction(
       async (tx: Prisma.TransactionClient) => {
         // Compare-and-swap claim (V21 §5 "duplicate submission
         // protection"): scoped to the exact currentWordId this request
@@ -342,16 +435,36 @@ export class BossBattleService {
 
         // Re-check the clock inside the transaction too — a request that
         // started just before the hour ends could finish just after it.
-        const stillLive =
-          deriveStatus(battle.scheduledStartUtc, battle.scheduledEndUtc, new Date()) === 'LIVE';
+        const txNow = new Date();
+        const groupStillLiveInTx =
+          deriveStatus(battle.scheduledStartUtc, battle.scheduledEndUtc, txNow) === 'LIVE';
+        const personalTimeUpInTx =
+          txNow.getTime() >=
+          playerDeadline(
+            player.joinedAt,
+            battle.scheduledEndUtc,
+            gameplayRules.bossBattle.perPlayerDurationMs,
+          ).getTime();
+        // The word just answered was at index `updated.questionIndex` (this
+        // update doesn't touch that column) — so `+ 1` is how many of this
+        // player's questions are now answered. Once that reaches the shared
+        // sequence's length, they're done: no more wrapping back to word 0
+        // (Barth, Sept 2026 bugfix — see assignNextChallenge's doc comment).
+        const sequenceExhaustedInTx =
+          updated.questionIndex + 1 >= player.group.sharedWordIds.length;
+        const playerDone = !groupStillLiveInTx || personalTimeUpInTx || sequenceExhaustedInTx;
 
-        let result: { updatedPlayer: typeof updated; nextChallenge: BattleChallengeView | null };
-        if (!stillLive) {
+        let result: {
+          updatedPlayer: typeof updated;
+          nextChallenge: BattleChallengeView | null;
+          groupStillLive: boolean;
+        };
+        if (playerDone) {
           await tx.bossBattlePlayer.update({
             where: { id: player.id },
             data: { currentWordId: null, currentDisplayPattern: null, currentMissingIndexes: [] },
           });
-          result = { updatedPlayer: updated, nextChallenge: null };
+          result = { updatedPlayer: updated, nextChallenge: null, groupStillLive: groupStillLiveInTx };
         } else {
           const next = await this.assignNextChallenge(
             updated.id,
@@ -359,11 +472,11 @@ export class BossBattleService {
             player.groupId,
             player.group.sharedWordIds,
             updated.questionIndex + 1,
-            battle.scheduledEndUtc,
+            personalDeadline,
             tx,
             variant,
           );
-          result = { updatedPlayer: updated, nextChallenge: next };
+          result = { updatedPlayer: updated, nextChallenge: next, groupStillLive: groupStillLiveInTx };
         }
 
         // Recorded from INSIDE this same transaction — a crash between
@@ -411,7 +524,11 @@ export class BossBattleService {
       { maxWait: 10_000, timeout: 10_000 },
     );
 
-    if (!nextChallenge) {
+    if (!groupStillLive) {
+      // Only the group's own hour ending finalizes (ranks + rewards
+      // everyone) — a player finishing early on their own time or guess
+      // cap must NOT trigger this while the group is still LIVE for
+      // others (see the doc comment above).
       await this.finalizeGroupIfNeeded(player.group);
     }
 
@@ -609,6 +726,9 @@ export class BossBattleService {
       return {
         groupId: player.groupId,
         battleEndsAt: battleEndsAt.toISOString(),
+        battleEnded: false,
+        questionsAnswered: player.questionIndex,
+        maxQuestions: group.sharedWordIds.length,
         displayPattern: player.currentDisplayPattern,
         missingIndexes: player.currentMissingIndexes,
         wordLength: rendered.text.length,
@@ -631,13 +751,16 @@ export class BossBattleService {
   /**
    * Assigns the word at `sharedWordIds[questionIndex]` — NOT a fresh
    * pickWordsForQuest call — so every player in the group sees the same
-   * word at the same question index (spec §13). Wraps around via modulo
-   * if a player exhausts the whole shared sequence before the battle's
-   * hour is up, so fast/accurate players keep playing rather than
-   * hitting a dead end. The omission PATTERN (which letters are
-   * blanked) still varies per player by their own mastery of that
-   * word — same personalization Daily Quest already applies — only the
-   * underlying word tested is guaranteed identical for everyone.
+   * word at the same question index (spec §13). Every caller is
+   * responsible for confirming `questionIndex < sharedWordIds.length`
+   * before calling this — a player who has exhausted the shared
+   * sequence is DONE, not wrapped back around to word 0 (that
+   * wraparound was a real bug Barth hit in testing: "the boss battle
+   * returned to the start of the words again after I played some" —
+   * Sept 2026). The omission PATTERN (which letters are blanked) still
+   * varies per player by their own mastery of that word — same
+   * personalization Daily Quest already applies — only the underlying
+   * word tested is guaranteed identical for everyone.
    */
   private async assignNextChallenge(
     playerId: string,
@@ -649,7 +772,7 @@ export class BossBattleService {
     db: Db,
     variant: 'US' | 'UK' | null,
   ): Promise<BattleChallengeView> {
-    const wordId = sharedWordIds[questionIndex % sharedWordIds.length];
+    const wordId = sharedWordIds[questionIndex];
     const word = await db.word.findUniqueOrThrow({ where: { id: wordId } });
     const masteryLevel = await this.mastery.getLevel(userId, wordId);
     const rendered = renderWord(word, variant);
@@ -673,6 +796,9 @@ export class BossBattleService {
     return {
       groupId,
       battleEndsAt: battleEndsAt.toISOString(),
+      battleEnded: false,
+      questionsAnswered: questionIndex,
+      maxQuestions: sharedWordIds.length,
       displayPattern: challenge.displayPattern,
       missingIndexes: challenge.missingIndexes,
       wordLength: rendered.text.length,

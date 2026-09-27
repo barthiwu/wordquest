@@ -43,6 +43,24 @@ export function isoWeekId(date: Date): string {
 }
 
 /**
+ * A single player's own personal deadline within a battle (Barth, Sept
+ * 2026): "each player will have 30mins from 6pm to 7pm... Even if a
+ * person joins by 6:32pm, they have from then till 7pm." So a player's
+ * real cutoff is `joinedAt + perPlayerDurationMs`, capped so it can
+ * never run past the battle's own scheduled end -- a player joining
+ * with 28 minutes left on the clock gets those 28 minutes, not a fresh
+ * 30 that would outlive the event itself.
+ */
+export function playerDeadline(
+  joinedAt: Date,
+  battleScheduledEndUtc: Date,
+  perPlayerDurationMs: number,
+): Date {
+  const personalEnd = joinedAt.getTime() + perPlayerDurationMs;
+  return new Date(Math.min(personalEnd, battleScheduledEndUtc.getTime()));
+}
+
+/**
  * Status is always computed fresh from server UTC time, never trusted
  * from a stored flag — spec §4/§21: the authoritative clock decides
  * everything, and that applies just as much to OUR server process as to
