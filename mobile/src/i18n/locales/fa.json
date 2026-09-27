@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "چالش زمان‌دار هفتگی در برابر همه"
   },
   "completeIt": {
-    "genericError": "اکنون امکان دسترسی به Complete It نیست."
+    "genericError": "اکنون امکان دسترسی به Complete It نیست.",
+    "hintFormat": "(راهنمایی: {{definition}})"
   },
   "wordDuel": {
     "genericError": "اکنون امکان دسترسی به Word Duel نیست.",

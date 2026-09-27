@@ -203,7 +203,9 @@ export function CompleteItScreen({ navigation }: Props) {
         <View style={styles.puzzleCard}>
           <Text style={styles.sentence}>{challenge.sentenceWithBlank}</Text>
           <Text style={styles.partOfSpeech}>{challenge.partOfSpeech}</Text>
-          <Text style={styles.definition}>{challenge.definition}</Text>
+          <Text style={styles.definition}>
+            {t('completeIt:hintFormat', { definition: challenge.definition })}
+          </Text>
         </View>
 
         {phase === 'active' && (
@@ -354,7 +356,12 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontWeight: '700',
       textTransform: 'uppercase',
     },
-    definition: { color: colors.inkMuted, fontSize: typography.scale.sm, textAlign: 'center' },
+    definition: {
+      color: colors.glyph,
+      fontSize: typography.scale.sm,
+      fontStyle: 'italic',
+      textAlign: 'center',
+    },
     input: {
       backgroundColor: colors.surface,
       borderRadius: radius.md,

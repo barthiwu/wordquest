@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "每周限时挑战，所有人同场竞技"
   },
   "completeIt": {
-    "genericError": "暂时无法连接到 Complete It。"
+    "genericError": "暂时无法连接到 Complete It。",
+    "hintFormat": "（提示：{{definition}}）"
   },
   "wordDuel": {
     "genericError": "暂时无法连接到 Word Duel。",

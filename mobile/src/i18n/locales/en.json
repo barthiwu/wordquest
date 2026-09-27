@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "Weekly timed challenge against everyone"
   },
   "completeIt": {
-    "genericError": "Could not reach Complete It right now."
+    "genericError": "Could not reach Complete It right now.",
+    "hintFormat": "(hint: {{definition}})"
   },
   "wordDuel": {
     "genericError": "Could not reach Word Duel right now.",

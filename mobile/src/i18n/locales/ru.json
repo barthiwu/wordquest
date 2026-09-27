@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "Еженедельное соревнование на время против всех"
   },
   "completeIt": {
-    "genericError": "Не удалось подключиться к Complete It."
+    "genericError": "Не удалось подключиться к Complete It.",
+    "hintFormat": "(подсказка: {{definition}})"
   },
   "wordDuel": {
     "genericError": "Не удалось подключиться к Word Duel.",

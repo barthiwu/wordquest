@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "सभी के खिलाफ साप्ताहिक समय-सीमा चुनौती"
   },
   "completeIt": {
-    "genericError": "अभी Complete It से संपर्क नहीं हो सका।"
+    "genericError": "अभी Complete It से संपर्क नहीं हो सका।",
+    "hintFormat": "(संकेत: {{definition}})"
   },
   "wordDuel": {
     "genericError": "अभी Word Duel से संपर्क नहीं हो सका।",

@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "Défi hebdomadaire chronométré contre tout le monde"
   },
   "completeIt": {
-    "genericError": "Impossible d'accéder à Complete It pour le moment."
+    "genericError": "Impossible d'accéder à Complete It pour le moment.",
+    "hintFormat": "(indice : {{definition}})"
   },
   "wordDuel": {
     "genericError": "Impossible d'accéder à Word Duel pour le moment.",

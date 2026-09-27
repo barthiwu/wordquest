@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "تحدٍّ أسبوعي محدد بوقت ضد الجميع"
   },
   "completeIt": {
-    "genericError": "تعذّر الوصول إلى Complete It حاليًا."
+    "genericError": "تعذّر الوصول إلى Complete It حاليًا.",
+    "hintFormat": "(تلميح: {{definition}})"
   },
   "wordDuel": {
     "genericError": "تعذّر الوصول إلى Word Duel حاليًا.",

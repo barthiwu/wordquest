@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "Desafío semanal cronometrado contra todos"
   },
   "completeIt": {
-    "genericError": "No se pudo conectar con Complete It en este momento."
+    "genericError": "No se pudo conectar con Complete It en este momento.",
+    "hintFormat": "(pista: {{definition}})"
   },
   "wordDuel": {
     "genericError": "No se pudo conectar con Word Duel en este momento.",

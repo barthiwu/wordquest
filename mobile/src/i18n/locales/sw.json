@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "Changamoto ya kila wiki yenye muda dhidi ya kila mtu"
   },
   "completeIt": {
-    "genericError": "Imeshindwa kufikia Complete It kwa sasa."
+    "genericError": "Imeshindwa kufikia Complete It kwa sasa.",
+    "hintFormat": "(kidokezo: {{definition}})"
   },
   "wordDuel": {
     "genericError": "Imeshindwa kufikia Word Duel kwa sasa.",

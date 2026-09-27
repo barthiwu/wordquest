@@ -829,7 +829,8 @@
     "bossBattleSubtitle": "Wöchentliche Zeit-Challenge gegen alle"
   },
   "completeIt": {
-    "genericError": "Complete It konnte momentan nicht erreicht werden."
+    "genericError": "Complete It konnte momentan nicht erreicht werden.",
+    "hintFormat": "(Hinweis: {{definition}})"
   },
   "wordDuel": {
     "genericError": "Word Duel konnte momentan nicht erreicht werden.",
