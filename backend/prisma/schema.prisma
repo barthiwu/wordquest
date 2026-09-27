@@ -134,6 +134,8 @@ model User {
   reportsFiled             Report[]                  @relation("ReportsFiled")
   reportsReviewed          Report[]                  @relation("ReportsReviewed")
   analyticsEvents          AnalyticsEvent[]
+  arcadeGameSessions       ArcadeGameSession[]
+  wordDuelPlayerStates     WordDuelPlayerState[]
 
   @@index([clanId])
   @@map("users")
@@ -358,6 +360,8 @@ model Word {
   wordInTheWildSubmissions WordInTheWildSubmission[]
   bossBattlePlayers        BossBattlePlayer[]
   bossBattleEvents         BossBattleEvent[]
+  arcadeAnswers            ArcadeAnswer[]
+  wordDuelAnswers          WordDuelAnswer[]
 
   @@index([baseDifficulty])
   @@index([cefrLevel])
@@ -1424,4 +1428,201 @@ model Report {
   @@index([status, createdAt])
   @@index([targetType, targetId])
   @@map("reports")
+}
+
+
+// ── Arcade (WordQuest Arcade — ScrambleQuest, Word Duel, Complete It) ──
+//
+// Arcade is a side-game area, separate from Daily Quest/Boss Battle.
+// Game-local streaks here (ArcadeGameSession.currentStreak,
+// WordDuelPlayerState.currentStreak) are independent per game and never
+// touch UserProgression.currentStreak — the ONLY writer for account XP,
+// Glyphs, levels, and the main daily-activity streak is
+// ProgressionService (awardXp/recordDailyActivity), called by the
+// Arcade services after each server-validated answer. Arcade streaks
+// are session-scoped by design (2026-09 product decision) — they do not
+// persist across app restarts, unlike UserProgression's streak fields.
+
+enum ArcadeGame {
+  SCRAMBLE_QUEST
+  WORD_DUEL
+  COMPLETE_IT
+}
+
+enum ArcadeSessionStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+// A single-player Arcade session (ScrambleQuest or Complete It). Word
+// Duel is NOT an ArcadeGameSession — it's a two-player match, modeled
+// separately below (WordDuelMatch) since it has no single "owner" and
+// needs its own lifecycle (matchmaking, reconnect, a shared word
+// sequence both players answer against).
+model ArcadeGameSession {
+  id     String     @id @default(uuid())
+  userId String
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game   ArcadeGame
+
+  status ArcadeSessionStatus @default(ACTIVE)
+
+  // Session-local only — never read by ProgressionService, never shown
+  // as the player's "main" streak. Resets to 0 every new session by
+  // construction (a session is never resumed once ended).
+  currentStreak Int @default(0)
+  longestStreak Int @default(0)
+
+  wordsTotal      Int // session length at start time (config snapshot, e.g. 20 for ScrambleQuest) — not a live config read, so a mid-flight config change can't corrupt an in-progress session
+  totalXpAwarded  Int @default(0)
+
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  answers ArcadeAnswer[]
+
+  @@index([userId, game])
+  @@index([status])
+  @@map("arcade_game_sessions")
+}
+
+// One answer within an ArcadeGameSession (ScrambleQuest or Complete It).
+// wordIndex is the answer's position within the session (0-based) — the
+// @@unique on [sessionId, wordIndex] is the idempotency guard from spec
+// §9/§11: a retried submission for the same position in the same
+// session cannot create a second row / award XP twice.
+model ArcadeAnswer {
+  id        String            @id @default(uuid())
+  sessionId String
+  session   ArcadeGameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  wordIndex Int
+  wordId    String
+  word      Word              @relation(fields: [wordId], references: [id])
+
+  submittedAnswer String
+  isCorrect       Boolean
+  hintsUsed       Int     @default(0)
+  timedOut        Boolean @default(false) // ScrambleQuest 30s timer expiry counts as a miss (spec §5)
+
+  // Full audit trail for the reward calculation (spec §9) — every factor
+  // that fed Final XP = Base × Speed × Hint × Streak is persisted, not
+  // just the result, so a disputed/odd XP value can be reconstructed
+  // without guessing which modifiers applied.
+  baseXp          Int
+  speedModifier   Float
+  hintModifier    Float
+  streakModifier  Float
+  finalXpAwarded  Int
+  streakBefore    Int
+  streakAfter     Int
+  responseTimeMs  Int?
+
+  answeredAt DateTime @default(now())
+
+  @@unique([sessionId, wordIndex])
+  @@index([sessionId])
+  @@map("arcade_answers")
+}
+
+enum WordDuelMatchStatus {
+  WAITING // in matchmaking queue, no opponent yet
+  ACTIVE
+  COMPLETED
+  ABANDONED // e.g. matchmaking timeout with no opponent found, or both players disconnect
+}
+
+// A two-player real-time Word Duel match. wordIds is the server-chosen,
+// server-ordered word sequence both players race through independently
+// (spec §6: "both players receive the same target word... but neither
+// receives the target answer" — the array holds IDs only, resolved to
+// full Word rows server-side per question, never sent to clients ahead
+// of resolution). endsAt is the authoritative server deadline — the
+// ONLY thing that ends a match; client clocks are never trusted (§6,
+// §11).
+model WordDuelMatch {
+  id     String              @id @default(uuid())
+  status WordDuelMatchStatus @default(WAITING)
+
+  wordIds String[] // ordered target-word sequence for this match, chosen at match start
+
+  startedAt   DateTime?
+  endsAt      DateTime? // set when status -> ACTIVE; server-authoritative match end
+  completedAt DateTime?
+
+  winnerId       String?
+  // Populated only when both players' final XP is equal — records which
+  // rule actually decided it (spec §6's required tiebreaker), so a
+  // disputed result is auditable rather than "the code did something."
+  tieBreakReason String?
+
+  players WordDuelPlayerState[]
+  answers WordDuelAnswer[]
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@map("word_duel_matches")
+}
+
+// One player's state within one WordDuelMatch. A match always has
+// exactly two of these once ACTIVE. disconnectedAt/reconnectedAt track
+// the reconnect/resync requirement from spec §6 without needing a
+// separate presence system.
+model WordDuelPlayerState {
+  id      String        @id @default(uuid())
+  matchId String
+  match   WordDuelMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  totalXp       Int @default(0)
+  currentStreak Int @default(0) // session/match-scoped only, same isolation rule as ArcadeGameSession
+  longestStreak Int @default(0)
+  correctCount  Int @default(0) // used ahead of totalXp in the tiebreak rule (spec §6, product decision 2026-09)
+
+  joinedAt       DateTime  @default(now())
+  disconnectedAt DateTime?
+  reconnectedAt  DateTime?
+
+  answers WordDuelAnswer[]
+
+  @@unique([matchId, userId])
+  @@index([userId])
+  @@map("word_duel_player_states")
+}
+
+// One player's answer to one word in a match. wordIndex is that
+// player's position in WordDuelMatch.wordIds (players progress
+// independently per spec §6, so each player has their own current
+// index). @@unique([playerStateId, wordIndex]) is the idempotency/
+// duplicate-submission guard (spec §9/§11) — mirrors ArcadeAnswer's
+// [sessionId, wordIndex] guard.
+model WordDuelAnswer {
+  id             String              @id @default(uuid())
+  matchId        String
+  match          WordDuelMatch       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  playerStateId  String
+  playerState    WordDuelPlayerState @relation(fields: [playerStateId], references: [id], onDelete: Cascade)
+  wordIndex      Int
+  wordId         String
+  word           Word                @relation(fields: [wordId], references: [id])
+
+  submittedAnswer String
+  isCorrect       Boolean
+  cluesRevealed   Int     @default(0) // progressive clue count shown before this player locked in
+
+  baseXp         Int
+  speedModifier  Float
+  streakModifier Float
+  finalXpAwarded Int
+  streakBefore   Int
+  streakAfter    Int
+  responseTimeMs Int?
+
+  answeredAt DateTime @default(now())
+
+  @@unique([playerStateId, wordIndex])
+  @@index([matchId])
+  @@map("word_duel_answers")
 }

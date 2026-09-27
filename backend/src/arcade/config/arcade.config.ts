@@ -1,0 +1,120 @@
+import { WordDifficulty } from '@prisma/client';
+
+/**
+ * Centralized Arcade scoring/config constants (spec §17: "Centralize all
+ * scoring constants and formulas"). Every Arcade service reads from here —
+ * nothing below should ever be duplicated or re-declared elsewhere.
+ *
+ * Formula (spec §4): Final XP = Base XP × Speed Modifier × Hint Modifier ×
+ * Streak Modifier, rounded to the nearest integer at the end (single
+ * rounding point — see RewardEngineService.calculate).
+ */
+
+/** Base XP by word difficulty, before any modifiers (spec §4). */
+export const ARCADE_BASE_XP: Record<WordDifficulty, number> = {
+  [WordDifficulty.BEGINNER]: 30,
+  [WordDifficulty.INTERMEDIATE]: 40,
+  [WordDifficulty.ADVANCED]: 50,
+};
+
+/**
+ * Speed modifier tiers (2026-09 product decision — spec left exact
+ * thresholds undefined). Bucketed by how much of the time limit was used:
+ * first third = fast, middle third = normal, final third (or timeout,
+ * handled separately as a miss) = slow.
+ */
+export const ARCADE_SPEED_MODIFIER = {
+  FAST: 1.2, // answered within the first third of the time limit
+  NORMAL: 1.0, // middle third
+  SLOW: 0.9, // final third
+} as const;
+
+/**
+ * Given elapsed time and the time limit for this question, return the
+ * speed modifier. Used identically by ScrambleQuest, Complete It, and Word
+ * Duel so "fast" means the same thing everywhere (spec §4: "one
+ * centralized, configurable speed modifier").
+ */
+export function speedModifierFor(
+  responseTimeMs: number,
+  timeLimitMs: number,
+): number {
+  if (timeLimitMs <= 0) return ARCADE_SPEED_MODIFIER.NORMAL;
+  const fraction = responseTimeMs / timeLimitMs;
+  if (fraction <= 1 / 3) return ARCADE_SPEED_MODIFIER.FAST;
+  if (fraction <= 2 / 3) return ARCADE_SPEED_MODIFIER.NORMAL;
+  return ARCADE_SPEED_MODIFIER.SLOW;
+}
+
+/** Each hint multiplies that answer's XP by this factor; hints compound
+ * multiplicatively (spec §4/§5: "multiple hints compound"), e.g. 2 hints =
+ * 0.85² ≈ 0.7225. */
+export const ARCADE_HINT_PENALTY_PER_HINT = 0.85;
+
+export function hintModifierFor(hintsUsed: number): number {
+  return Math.pow(ARCADE_HINT_PENALTY_PER_HINT, Math.max(0, hintsUsed));
+}
+
+/** Streak bonus: +10% per streak step, capped at +100% (streak 10+) —
+ * spec §4: "1 streak = +10%, 2 = +20%, ... 10 = +100%. Cap at +100% after
+ * 10." streakBefore is the streak count BEFORE this answer (so the first
+ * correct answer in a row, streakBefore=0, gets the base 1.0 modifier —
+ * the bonus applies to the streak the player is extending, not the one
+ * they're about to reach). */
+export const ARCADE_STREAK_BONUS_PER_STEP = 0.1;
+export const ARCADE_STREAK_BONUS_CAP_STEPS = 10;
+
+export function streakModifierFor(streakBeforeThisAnswer: number): number {
+  const steps = Math.min(
+    Math.max(0, streakBeforeThisAnswer),
+    ARCADE_STREAK_BONUS_CAP_STEPS,
+  );
+  return 1 + steps * ARCADE_STREAK_BONUS_PER_STEP;
+}
+
+// ── ScrambleQuest ─────────────────────────────────────────────────────
+export const SCRAMBLE_QUEST_CONFIG = {
+  TIMER_SECONDS: 30,
+  MAX_HINTS_PER_WORD: 3, // each reveals the next letter, left to right
+  WORDS_PER_SESSION: 20,
+} as const;
+
+// ── Complete It ────────────────────────────────────────────────────────
+export const COMPLETE_IT_CONFIG = {
+  HINTS_ENABLED: false, // 2026-09 decision: no hints in V1
+  WORDS_PER_SESSION: 20,
+} as const;
+
+// ── Word Duel ──────────────────────────────────────────────────────────
+export const WORD_DUEL_CONFIG = {
+  MATCH_DURATION_MINUTES: 5,
+  MATCHMAKING_TIMEOUT_SECONDS: 30, // spec §6 recommended 3-5 min range; 2026-09 decision: 5 min
+  WRONG_ANSWER_LOCKOUT_MS: 0, // 2026-09 decision: streak reset only, no extra lockout
+} as const;
+
+/**
+ * Whether Arcade play counts toward the player's existing daily-activity
+ * streak (UserProgression.currentStreak via ProgressionService.
+ * recordDailyActivity). 2026-09 product decision: YES — this deliberately
+ * overrides the spec's own §16 default suggestion ("No requirement to
+ * play Arcade for Daily Quest progression"). Read by each Arcade game
+ * service after a session/match completes.
+ */
+export const ARCADE_COUNTS_TOWARD_DAILY_STREAK = true;
+
+/**
+ * Whether Arcade wins award Glyphs in addition to XP. 2026-09 decision:
+ * NO — XP only in V1, to avoid opening a second Glyph-economy surface
+ * before launch (spec §16: "No separate Arcade account-level economy").
+ */
+export const ARCADE_AWARDS_GLYPHS = false;
+
+/**
+ * Word Duel tiebreak rule (spec §6 requires a deterministic tiebreaker).
+ * 2026-09 decision: most correct answers wins; if still tied, earliest
+ * timestamp at which the player reached their final total XP wins. See
+ * WordDuelService.resolveMatch for the implementation and
+ * WordDuelMatch.tieBreakReason for the audit trail.
+ */
+export const WORD_DUEL_TIEBREAK_DESCRIPTION =
+  'most_correct_answers_then_earliest_final_score';
