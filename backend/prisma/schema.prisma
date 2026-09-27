@@ -583,7 +583,6 @@ model QuestAttempt {
 
   challengeAttempts ChallengeAttempt[]
 
-  @@index([userId, status])
   // One attempt per player per quest per local day (10,000-Word Adaptive
   // Distribution spec §19, "daily quest locking"): startTimedQuest reads
   // this via an atomic create-or-fetch so two concurrent requests (a
@@ -592,6 +591,7 @@ model QuestAttempt {
   // silently winning a race and the other's being discarded after already
   // incrementing global exposure counts for words nobody actually saw.
   @@unique([userId, questId, localDate])
+  @@index([userId, status])
   @@map("quest_attempts")
 }
 
@@ -1001,18 +1001,18 @@ enum QuestCardRarity {
 // separate column that would only ever apply to one of the three source
 // types.
 model QuestCard {
-  id                        String          @id @default(uuid())
-  userId                    String
-  user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  source                    QuestCardSource
-  sourceEventId             String // journey stage key, BossBattleGroup id, or AchievementUnlock id, depending on `source`
-  title                     String
-  category                  String? // the Achievement's category, when source = ACHIEVEMENT
-  playerUsernameSnapshot    String // the public username at creation time -- captured (not live-joined) so a later username change doesn't rewrite this card's history; see users.username's doc comment for why this is the username, not the real displayName
-  artwork                   String? // asset key — resolved client-side to real art; null renders a category-default frame
-  rarity                    QuestCardRarity @default(COMMON)
-  journeyStageKey           String? // the Journey stage in effect when this card was earned, for display context
-  earnedAt                  DateTime        @default(now())
+  id                     String          @id @default(uuid())
+  userId                 String
+  user                   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source                 QuestCardSource
+  sourceEventId          String // journey stage key, BossBattleGroup id, or AchievementUnlock id, depending on `source`
+  title                  String
+  category               String? // the Achievement's category, when source = ACHIEVEMENT
+  playerUsernameSnapshot String // the public username at creation time -- captured (not live-joined) so a later username change doesn't rewrite this card's history; see users.username's doc comment for why this is the username, not the real displayName
+  artwork                String? // asset key — resolved client-side to real art; null renders a category-default frame
+  rarity                 QuestCardRarity @default(COMMON)
+  journeyStageKey        String? // the Journey stage in effect when this card was earned, for display context
+  earnedAt               DateTime        @default(now())
 
   // Quest Cards Finalization (V19 Stabilization Spec §8): a player picks
   // a bounded subset of their cards to feature on their profile.
@@ -1430,7 +1430,6 @@ model Report {
   @@map("reports")
 }
 
-
 // ── Arcade (WordQuest Arcade — ScrambleQuest, Word Duel, Complete It) ──
 //
 // Arcade is a side-game area, separate from Daily Quest/Boss Battle.
@@ -1474,8 +1473,38 @@ model ArcadeGameSession {
   currentStreak Int @default(0)
   longestStreak Int @default(0)
 
-  wordsTotal      Int // session length at start time (config snapshot, e.g. 20 for ScrambleQuest) — not a live config read, so a mid-flight config change can't corrupt an in-progress session
-  totalXpAwarded  Int @default(0)
+  wordsTotal     Int // session length at start time (config snapshot, e.g. 20 for ScrambleQuest) — not a live config read, so a mid-flight config change can't corrupt an in-progress session
+  totalXpAwarded Int @default(0)
+
+  // Phase 2 addition (discovered building ScrambleQuestService — the
+  // Phase 1 shape had nowhere to remember a session's word sequence or
+  // in-flight progress). Mirrors WordDuelMatch.wordIds below: the full
+  // sequence is picked once, at session start, via
+  // ArcadeChallengeService.pickChallenges, so a given index always
+  // refers to the same word for this session's lifetime — the
+  // ArcadeAnswer idempotency guard on [sessionId, wordIndex] depends on
+  // that stability.
+  wordIds String[]
+
+  // The next word the player hasn't answered yet — 0-based index into
+  // wordIds. Also the atomic compare-and-swap key for answer
+  // submission (mirrors QuestsService.claimStageTransition): an answer
+  // request is only honored if currentIndex still matches the index it
+  // read, so a race loser gets a clean conflict instead of a duplicate
+  // award.
+  currentIndex Int @default(0)
+
+  // Server-authoritative clock for the CURRENT word only (spec §10:
+  // "Use server timestamps/deadlines for timing") — reset every time
+  // currentIndex advances. responseTimeMs for an answer is always
+  // Date.now() - currentWordStartedAt, never a client-reported value.
+  currentWordStartedAt DateTime @default(now())
+
+  // Hints spent on the CURRENT word only — reset every time
+  // currentIndex advances. Tracked server-side (never client-submitted)
+  // so a submitted answer's hint penalty can't be forged (spec §11:
+  // "Never trust client-submitted ... hints").
+  currentWordHintsUsed Int @default(0)
 
   startedAt DateTime  @default(now())
   endedAt   DateTime?
@@ -1509,14 +1538,14 @@ model ArcadeAnswer {
   // that fed Final XP = Base × Speed × Hint × Streak is persisted, not
   // just the result, so a disputed/odd XP value can be reconstructed
   // without guessing which modifiers applied.
-  baseXp          Int
-  speedModifier   Float
-  hintModifier    Float
-  streakModifier  Float
-  finalXpAwarded  Int
-  streakBefore    Int
-  streakAfter     Int
-  responseTimeMs  Int?
+  baseXp         Int
+  speedModifier  Float
+  hintModifier   Float
+  streakModifier Float
+  finalXpAwarded Int
+  streakBefore   Int
+  streakAfter    Int
+  responseTimeMs Int?
 
   answeredAt DateTime @default(now())
 
@@ -1599,14 +1628,14 @@ model WordDuelPlayerState {
 // duplicate-submission guard (spec §9/§11) — mirrors ArcadeAnswer's
 // [sessionId, wordIndex] guard.
 model WordDuelAnswer {
-  id             String              @id @default(uuid())
-  matchId        String
-  match          WordDuelMatch       @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  playerStateId  String
-  playerState    WordDuelPlayerState @relation(fields: [playerStateId], references: [id], onDelete: Cascade)
-  wordIndex      Int
-  wordId         String
-  word           Word                @relation(fields: [wordId], references: [id])
+  id            String              @id @default(uuid())
+  matchId       String
+  match         WordDuelMatch       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  playerStateId String
+  playerState   WordDuelPlayerState @relation(fields: [playerStateId], references: [id], onDelete: Cascade)
+  wordIndex     Int
+  wordId        String
+  word          Word                @relation(fields: [wordId], references: [id])
 
   submittedAnswer String
   isCorrect       Boolean
