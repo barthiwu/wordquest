@@ -17,6 +17,8 @@ import {
   WORD_DUEL_CONFIG,
   WORD_DUEL_TIEBREAK_DESCRIPTION,
 } from '../config/arcade.config';
+import { renderWord } from '../../vocabulary/english-variant';
+import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant';
 
 /** Client-safe view of the opponent's progress — score only, never their
  * current word or answers (spec §6/§8). */
@@ -205,6 +207,8 @@ export class WordDuelService {
   ): Promise<WordDuelAnswerResult> {
     const playerState = await this.loadActivePlayerState(userId, matchId);
     const word = await this.currentWord(playerState);
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
 
     // Server-authoritative timing (spec §6/§11) — always computed from
     // the server-recorded currentWordStartedAt, never a client-reported
@@ -212,7 +216,13 @@ export class WordDuelService {
     // WORD_TIME_REFERENCE_SECONDS's doc comment) — only the match-wide
     // endsAt cuts a player off, checked by finalizeIfNeeded below.
     const responseTimeMs = Date.now() - playerState.currentWordStartedAt.getTime();
-    const isCorrect = normalizeAnswer(rawAnswer) === word.normalizedWord;
+    // Compared against the RENDERED (variant-aware) form -- a US-
+    // preference player answering "color" must be marked correct for a
+    // word whose UK-authored answer is "colour" (2026-09 fairness
+    // feature). Both players in a match are matched on the same
+    // underlying Word row/id regardless of spelling variant, so this is
+    // the only change multiplayer fairness needed here.
+    const isCorrect = normalizeAnswer(rawAnswer) === rendered.normalizedText;
 
     const streakBefore = playerState.currentStreak;
     const streakAfter = nextStreak(streakBefore, { isCorrect, timedOut: false });
@@ -234,7 +244,12 @@ export class WordDuelService {
       });
     }
 
-    const maxClues = this.maxCluesFor(word.word);
+    // Clue count depends on the rendered word's own length (e.g.
+    // "colour" is 6 letters, its US form "color" is 5) -- must match
+    // whatever buildStateView showed this player while they were
+    // answering, or the "never reveal the final letter" cap could be
+    // off by one relative to what they actually saw.
+    const maxClues = this.maxCluesFor(rendered.text);
     const cluesRevealed = this.computeCluesRevealed(playerState.currentWordStartedAt, maxClues);
     const wordIndex = playerState.currentIndex;
 
@@ -304,7 +319,7 @@ export class WordDuelService {
 
     return {
       isCorrect,
-      correctAnswer: word.word,
+      correctAnswer: rendered.text,
       xpAwarded: reward.finalXp,
       currentStreak: streakAfter,
       longestStreak: newLongestStreak,
@@ -483,10 +498,18 @@ export class WordDuelService {
       const word = await this.prisma.word.findUniqueOrThrow({
         where: { id: playerState.match.wordIds[playerState.currentIndex] },
       });
-      const maxClues = this.maxCluesFor(word.word);
+      // Resolved from playerState.userId, THIS player's own id -- the
+      // opponent may have a different preference and sees their own
+      // buildStateView call rendered by theirs. Both players are always
+      // clued on the same underlying Word row (2026-09 fairness
+      // feature; see submitAnswer's own note), just possibly spelled
+      // differently.
+      const variant = await resolveEnglishVariant(this.prisma, playerState.userId);
+      const rendered = renderWord(word, variant);
+      const maxClues = this.maxCluesFor(rendered.text);
       const cluesRevealed = this.computeCluesRevealed(playerState.currentWordStartedAt, maxClues);
       current = {
-        displayHint: this.buildDisplayHint(word.word, cluesRevealed),
+        displayHint: this.buildDisplayHint(rendered.text, cluesRevealed),
         cluesRevealed,
         maxClues,
       };

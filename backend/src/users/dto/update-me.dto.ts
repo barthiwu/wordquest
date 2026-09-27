@@ -1,4 +1,13 @@
-import { IsBoolean, IsEnum, IsOptional, IsString, IsUUID, Length, Matches } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsIn,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+  Matches,
+} from 'class-validator';
 import { USERNAME_REGEX } from '../users.service';
 
 export enum LearningGoalDto {
@@ -60,4 +69,9 @@ export class UpdateMeDto {
   @IsOptional()
   @IsBoolean()
   completeOnboarding?: boolean;
+
+  /** US/UK spelling preference (2026-09 fairness feature) — see RegisterDto.englishVariant's doc comment; settable here too so a player can change their mind later from Settings. */
+  @IsOptional()
+  @IsIn(['US', 'UK'])
+  englishVariant?: 'US' | 'UK';
 }

@@ -88,6 +88,7 @@ export class AuthService {
       displayName: dto.displayName,
       countryCode: dto.countryCode,
       dateOfBirth,
+      englishVariant: dto.englishVariant,
     });
 
     // Fire-and-forget, same reasoning as ALI's reactFireAndForget — a

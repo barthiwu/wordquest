@@ -129,6 +129,33 @@ describe('AuthService', () => {
     expect(prismaMock.refreshToken.create).toHaveBeenCalled();
   });
 
+  it("register() passes the sign-up screen's US/UK preference through to UsersService.create (2026-09 fairness feature)", async () => {
+    await service.register({
+      email: 'ada@example.com',
+      password: 'Sup3rSecret',
+      displayName: 'Ada',
+      dateOfBirth: '2000-01-01',
+      englishVariant: 'US',
+    });
+
+    expect(usersMock.create).toHaveBeenCalledWith(
+      expect.objectContaining({ englishVariant: 'US' }),
+    );
+  });
+
+  it('register() passes englishVariant through as undefined when the sign-up screen was skipped, never a guessed default', async () => {
+    await service.register({
+      email: 'ada@example.com',
+      password: 'Sup3rSecret',
+      displayName: 'Ada',
+      dateOfBirth: '2000-01-01',
+    });
+
+    expect(usersMock.create).toHaveBeenCalledWith(
+      expect.objectContaining({ englishVariant: undefined }),
+    );
+  });
+
   it('register() rejects a date of birth under the minimum age (COPPA)', async () => {
     const dobUnderMinimum = new Date();
     dobUnderMinimum.setUTCFullYear(dobUnderMinimum.getUTCFullYear() - 12);

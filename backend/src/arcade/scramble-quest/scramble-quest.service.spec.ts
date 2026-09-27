@@ -22,6 +22,17 @@ describe('ScrambleQuestService', () => {
     baseDifficulty: 'BEGINNER',
   };
 
+  // 'Colour'/'Color' differ both in spelling and in letter count (6 vs
+  // 5) so a wrong-variant render is impossible to miss in an assertion.
+  const colourWord = {
+    id: 'w-colour',
+    word: 'Colour',
+    normalizedWord: 'colour',
+    baseDifficulty: 'BEGINNER',
+    wordUS: 'Color',
+    normalizedWordUS: 'color',
+  };
+
   const baseSession = () => ({
     id: 's1',
     userId: 'u1',
@@ -53,6 +64,9 @@ describe('ScrambleQuestService', () => {
     word: {
       findUniqueOrThrow: jest.fn().mockResolvedValue(trainWord),
     },
+    user: {
+      findUnique: jest.fn(),
+    },
     $transaction: jest.fn((callback: (tx: any) => unknown): unknown => callback(prismaMock)),
   };
 
@@ -70,6 +84,7 @@ describe('ScrambleQuestService', () => {
     prismaMock.arcadeGameSession.update.mockResolvedValue({});
     prismaMock.arcadeGameSession.updateMany.mockResolvedValue({ count: 1 });
     prismaMock.word.findUniqueOrThrow.mockResolvedValue(trainWord);
+    prismaMock.user.findUnique.mockResolvedValue({ englishVariant: null });
     progressionMock.awardXp.mockResolvedValue(undefined);
     progressionMock.recordDailyActivity.mockResolvedValue({ currentStreak: 1 });
 
@@ -304,6 +319,103 @@ describe('ScrambleQuestService', () => {
           data: expect.objectContaining({ status: 'COMPLETED' }),
         }),
       );
+    });
+  });
+
+  describe('US/UK spelling-variant rendering (2026-09 fairness feature)', () => {
+    it('scrambles and sizes the puzzle to the US spelling for a US-preference player', async () => {
+      prismaMock.user.findUnique.mockResolvedValue({ englishVariant: 'US' });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValue(colourWord);
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
+      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: colourWord }]);
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({
+        ...baseSession(),
+        wordsTotal: 1,
+        wordIds: ['w-colour'],
+      });
+
+      const view = await service.start('u1');
+
+      expect(view.wordLength).toBe('Color'.length);
+      expect(view.scrambledLetters.split('').sort().join('')).toBe(
+        'Color'.split('').sort().join(''),
+      );
+    });
+
+    it('falls back to the UK spelling and its own letter count for a player with no preference recorded', async () => {
+      prismaMock.word.findUniqueOrThrow.mockResolvedValue(colourWord);
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
+      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: colourWord }]);
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({
+        ...baseSession(),
+        wordsTotal: 1,
+        wordIds: ['w-colour'],
+      });
+
+      const view = await service.start('u1'); // englishVariant: null (beforeEach default)
+
+      expect(view.wordLength).toBe('Colour'.length);
+      expect(view.scrambledLetters.split('').sort().join('')).toBe(
+        'Colour'.split('').sort().join(''),
+      );
+    });
+
+    it("reveals a hint letter from the player's own rendered spelling", async () => {
+      prismaMock.user.findUnique.mockResolvedValue({ englishVariant: 'US' });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValue(colourWord);
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        wordIds: ['w-colour', 'w2', 'w3'],
+      });
+
+      const hint = await service.requestHint('u1', 's1');
+
+      expect('color'[hint.position]).toBe(hint.letter);
+      expect(hint.hintsRemaining).toBe(service['maxHintsFor']('color') - 1);
+    });
+
+    it('accepts the US spelling as correct for a US-preference player and reports it back as the correct answer', async () => {
+      prismaMock.user.findUnique.mockResolvedValue({ englishVariant: 'US' });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValue(colourWord);
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        wordIds: ['w-colour', 'w2', 'w3'],
+      });
+      rewardEngineMock.calculate.mockReturnValueOnce({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+      prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
+        ...baseSession(),
+        wordIds: ['w-colour', 'w2', 'w3'],
+        currentIndex: 1,
+      });
+
+      const result = await service.submitAnswer('u1', 's1', 'color');
+
+      expect(result.isCorrect).toBe(true);
+      expect(result.correctAnswer).toBe('Color');
+    });
+
+    it('rejects the US spelling for a player who defaults to UK (no preference recorded)', async () => {
+      prismaMock.word.findUniqueOrThrow.mockResolvedValue(colourWord);
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        wordIds: ['w-colour', 'w2', 'w3'],
+      });
+      prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
+        ...baseSession(),
+        wordIds: ['w-colour', 'w2', 'w3'],
+        currentIndex: 1,
+      });
+
+      const result = await service.submitAnswer('u1', 's1', 'color');
+
+      expect(result.isCorrect).toBe(false);
+      expect(result.correctAnswer).toBe('Colour');
     });
   });
 });

@@ -162,6 +162,18 @@ describe('UsersService', () => {
         data: { displayName: 'Grace H.' },
       });
     });
+
+    it('updates englishVariant on its own (2026-09 fairness feature) -- lets a player change their US/UK spelling preference later from Settings', async () => {
+      prismaMock.user.update.mockResolvedValueOnce({ id: 'u1', englishVariant: 'US' });
+
+      await service.updateProfile('u1', { englishVariant: 'US' });
+
+      expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 'u1' },
+        data: { englishVariant: 'US' },
+      });
+    });
   });
 
   describe('isUsernameAvailable', () => {

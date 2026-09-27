@@ -30,6 +30,8 @@ import { averageScoreDimensions } from '../common/score-average';
 import { AliService, type AliResponse } from '../ali/ali.service';
 import { quickAliReaction } from '../ali/ali-quick-reactions';
 import { AnalyticsService } from '../analytics/analytics.service';
+import { renderWord } from '../vocabulary/english-variant';
+import { resolveEnglishVariant } from '../vocabulary/resolve-english-variant';
 
 /** Either the real PrismaService or the `tx` handle inside a $transaction callback — same query surface either way. */
 type Db = PrismaService | Prisma.TransactionClient;
@@ -282,14 +284,22 @@ export class QuestsService {
       select: { questId: true, status: true, xpAwarded: true, glyphAwarded: true },
     });
     const attemptByQuestId = new Map(
-      attempts.map((a: { questId: string; status: string; xpAwarded: number; glyphAwarded: number }) => [
-        a.questId,
-        a,
-      ]),
+      attempts.map(
+        (a: { questId: string; status: string; xpAwarded: number; glyphAwarded: number }) => [
+          a.questId,
+          a,
+        ],
+      ),
     );
 
     const questSummaries: TodayQuestWindowSummary[] = quests.map(
-      (q: { id: string; key: string; title: string; windowStartHour: number | null; windowEndHour: number | null }) => {
+      (q: {
+        id: string;
+        key: string;
+        title: string;
+        windowStartHour: number | null;
+        windowEndHour: number | null;
+      }) => {
         const attempt = attemptByQuestId.get(q.id);
         const completed = attempt?.status === 'COMPLETED';
         return {
@@ -429,7 +439,13 @@ export class QuestsService {
     // losing race's pick must never reach here).
     await this.words.recordGlobalExposure(wordIds);
 
-    return this.buildChallengeView(attempt.id, userId, attempt.wordIds, attempt.currentIndex, 'GUESSING');
+    return this.buildChallengeView(
+      attempt.id,
+      userId,
+      attempt.wordIds,
+      attempt.currentIndex,
+      'GUESSING',
+    );
   }
 
   /**
@@ -472,23 +488,23 @@ export class QuestsService {
       where: { userId, localDate },
       select: { wordIds: true },
     });
-    const wordIds = Array.from(
-      new Set(attempts.flatMap((a: { wordIds: string[] }) => a.wordIds)),
-    );
+    const wordIds = Array.from(new Set(attempts.flatMap((a: { wordIds: string[] }) => a.wordIds)));
     if (wordIds.length === 0) {
       throw new NotFoundException(`No Quest activity found for ${localDate}.`);
     }
 
     const words = await this.prisma.word.findMany({ where: { id: { in: wordIds } } });
     const wordById = new Map(words.map((w) => [w.id, w]));
+    const variant = await resolveEnglishVariant(this.prisma, userId);
 
     const catchUpWords: CatchUpWordChallenge[] = [];
     for (const wordId of wordIds) {
       const word = wordById.get(wordId);
       if (!word) continue; // deactivated/removed since — skip rather than fail the whole day
       const masteryLevel = await this.mastery.getLevel(userId, wordId);
+      const rendered = renderWord(word, variant);
       const challenge = generateOmissionChallenge({
-        word: word.word,
+        word: rendered.text,
         baseDifficulty: word.baseDifficulty,
         masteryLevel,
       });
@@ -496,7 +512,7 @@ export class QuestsService {
         wordId,
         displayPattern: challenge.displayPattern,
         missingIndexes: challenge.missingIndexes,
-        wordLength: word.length,
+        wordLength: rendered.text.length,
         definition: word.definition,
         partOfSpeech: word.partOfSpeech,
       });
@@ -513,12 +529,15 @@ export class QuestsService {
    * answering what you missed."
    */
   async checkHistoryAnswer(
+    userId: string,
     wordId: string,
     rawAnswer: string,
   ): Promise<{ correct: boolean; correctWord: string }> {
     const word = await this.prisma.word.findUniqueOrThrow({ where: { id: wordId } });
-    const correct = rawAnswer.trim().toLowerCase() === word.normalizedWord;
-    return { correct, correctWord: word.word };
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
+    const correct = rawAnswer.trim().toLowerCase() === rendered.normalizedText;
+    return { correct, correctWord: rendered.text };
   }
 
   async submitAnswer(
@@ -537,6 +556,8 @@ export class QuestsService {
 
     const wordId = attempt.wordIds[attempt.currentIndex];
     const word = await this.prisma.word.findUniqueOrThrow({ where: { id: wordId } });
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
 
     // Server-authoritative 2-minute Guess timer (V1 Final Systems Spec
     // §3.3) — elapsed time is always computed from the server-recorded
@@ -553,7 +574,7 @@ export class QuestsService {
       return {
         isCorrect: false,
         timedOut: true,
-        correctAnswer: word.word,
+        correctAnswer: rendered.text,
         xpAwarded: 0,
         masteryLevel: await this.mastery.getLevel(userId, wordId),
         understanding: null,
@@ -563,7 +584,10 @@ export class QuestsService {
 
     // Compare against the precomputed normalizedWord (spec §19: case-
     // insensitive, whitespace-normalized), not the raw display word.
-    const isCorrect = this.normalize(rawAnswer) === word.normalizedWord;
+    // Compared against the RENDERED (variant-aware) form -- a US-
+    // preference player typing the US spelling must be marked correct
+    // (2026-09 fairness feature).
+    const isCorrect = this.normalize(rawAnswer) === rendered.normalizedText;
 
     if (!isCorrect) {
       // "Unlimited attempts until timeout" (spec §3.3) — a wrong guess
@@ -592,7 +616,7 @@ export class QuestsService {
       return {
         isCorrect: false,
         timedOut: false,
-        correctAnswer: word.word,
+        correctAnswer: rendered.text,
         xpAwarded: 0,
         masteryLevel: await this.mastery.getLevel(userId, wordId),
         understanding: null,
@@ -657,17 +681,17 @@ export class QuestsService {
     return {
       isCorrect: true,
       timedOut: false,
-      correctAnswer: word.word,
+      correctAnswer: rendered.text,
       xpAwarded: answerXp,
       masteryLevel,
       understanding: {
-        word: word.word,
+        word: rendered.text,
         definition: word.definition,
         partOfSpeech: word.partOfSpeech,
         pronunciation: word.pronunciation,
         phoneticRepresentation: word.phoneticRepresentation,
         synonyms: word.synonyms,
-        exampleSentence: word.exampleSentence,
+        exampleSentence: rendered.sentence,
       },
       aliQuickReaction: quickAliReaction(true),
     };
@@ -700,11 +724,23 @@ export class QuestsService {
     const attempt = await this.loadInProgressAttempt(userId, questAttemptId, 'SENTENCE');
     const [word, player] = await Promise.all([
       this.prisma.word.findUniqueOrThrow({ where: { id: attempt.wordIds[attempt.currentIndex] } }),
-      this.prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
+      // Selects englishVariant alongside nativeLanguage so this doesn't
+      // need a second prisma.user.findUnique call just to resolve the
+      // player's spelling preference -- same null-coalescing logic as
+      // resolveEnglishVariant, just inlined since the row is already
+      // in hand.
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { nativeLanguage: true, englishVariant: true },
+      }),
     ]);
+    // The player is asked to use the SAME spelling they were just shown
+    // at the Understanding stage (2026-09 fairness feature) -- never the
+    // UK headword for a US-preference player.
+    const rendered = renderWord(word, player?.englishVariant ?? null);
 
     const evaluation = await this.sentenceEvaluation.evaluate(
-      word.word,
+      rendered.text,
       word.definition,
       word.partOfSpeech,
       sentence,
@@ -768,11 +804,22 @@ export class QuestsService {
 
     const [word, player] = await Promise.all([
       this.prisma.word.findUniqueOrThrow({ where: { id: attempt.wordIds[attempt.currentIndex] } }),
-      this.prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
+      // Selects englishVariant alongside nativeLanguage so this doesn't
+      // need a second prisma.user.findUnique call just to resolve the
+      // player's spelling preference -- same null-coalescing logic as
+      // resolveEnglishVariant, just inlined since the row is already
+      // in hand.
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { nativeLanguage: true, englishVariant: true },
+      }),
     ]);
+    // Same reasoning as submitSentence above -- the player writes about
+    // the spelling they were actually shown.
+    const rendered = renderWord(word, player?.englishVariant ?? null);
 
     const evaluation = await this.paragraphEvaluation.evaluate(
-      word.word,
+      rendered.text,
       word.definition,
       word.partOfSpeech,
       paragraph,
@@ -861,130 +908,132 @@ export class QuestsService {
   async completeWord(userId: string, questAttemptId: string): Promise<WordCompletionResult> {
     const attempt = await this.loadInProgressAttempt(userId, questAttemptId, 'OPTIONAL_WILD');
 
-    const { result, aliContext } = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      const quest = await tx.quest.findUniqueOrThrow({ where: { id: attempt.questId } });
-      const correctCount = await tx.challengeAttempt.count({
-        where: { questAttemptId: attempt.id, isCorrect: true },
-      });
+    const { result, aliContext } = await this.prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const quest = await tx.quest.findUniqueOrThrow({ where: { id: attempt.questId } });
+        const correctCount = await tx.challengeAttempt.count({
+          where: { questAttemptId: attempt.id, isCorrect: true },
+        });
 
-      // Claim the completion first — before any award/streak/achievement
-      // side effects — so a race loser (two concurrent completeWord calls
-      // for the same attempt) aborts cleanly instead of double-awarding.
-      await this.claimStageTransition(tx, attempt.id, 'OPTIONAL_WILD', {
-        status: 'COMPLETED',
-        wordStage: 'WORD_COMPLETE',
-        completedAt: new Date(),
-        xpAwarded: { increment: quest.baseXp },
-        glyphAwarded: { increment: quest.baseGlyphs },
-      });
+        // Claim the completion first — before any award/streak/achievement
+        // side effects — so a race loser (two concurrent completeWord calls
+        // for the same attempt) aborts cleanly instead of double-awarding.
+        await this.claimStageTransition(tx, attempt.id, 'OPTIONAL_WILD', {
+          status: 'COMPLETED',
+          wordStage: 'WORD_COMPLETE',
+          completedAt: new Date(),
+          xpAwarded: { increment: quest.baseXp },
+          glyphAwarded: { increment: quest.baseGlyphs },
+        });
 
-      await this.progression.awardXp(
-        userId,
-        quest.baseXp,
-        'QUEST_COMPLETION',
-        'quests',
-        attempt.id,
-        tx,
-      );
-      await this.progression.awardGlyphs(
-        userId,
-        quest.baseGlyphs,
-        'QUEST_COMPLETION',
-        'quests',
-        attempt.id,
-        tx,
-      );
-      const { currentStreak } = await this.progression.recordDailyActivity(userId, tx);
+        await this.progression.awardXp(
+          userId,
+          quest.baseXp,
+          'QUEST_COMPLETION',
+          'quests',
+          attempt.id,
+          tx,
+        );
+        await this.progression.awardGlyphs(
+          userId,
+          quest.baseGlyphs,
+          'QUEST_COMPLETION',
+          'quests',
+          attempt.id,
+          tx,
+        );
+        const { currentStreak } = await this.progression.recordDailyActivity(userId, tx);
 
-      // Checked AFTER the attempt's own status is written to COMPLETED
-      // above — checkIndependentLearning walks the player's most recent
-      // completed QuestAttempt rows to measure the current independent
-      // streak, and this quest wouldn't be in that window yet (or would
-      // wrongly end the streak instead of extending it) if it ran before
-      // this quest's own completion was persisted.
-      await this.achievements.checkConsistency(userId, currentStreak, tx);
-      await this.achievements.checkIndependentLearning(userId, tx);
+        // Checked AFTER the attempt's own status is written to COMPLETED
+        // above — checkIndependentLearning walks the player's most recent
+        // completed QuestAttempt rows to measure the current independent
+        // streak, and this quest wouldn't be in that window yet (or would
+        // wrongly end the streak instead of extending it) if it ran before
+        // this quest's own completion was persisted.
+        await this.achievements.checkConsistency(userId, currentStreak, tx);
+        await this.achievements.checkIndependentLearning(userId, tx);
 
-      // The skill-area path to MASTERED (Correction & Completion Spec
-      // §2) — evaluated only now that the full word cycle is genuinely
-      // finished, using whatever Sentence/Paragraph actually scored.
-      // Empty/missing score objects (a stage that was somehow skipped)
-      // safely fail evaluateWordCycleCompletion's own "did every
-      // dimension clear 75%" check rather than needing a separate guard
-      // here.
-      const wordId = attempt.wordIds[attempt.currentIndex];
-      const sentenceScores = (attempt.sentenceScores as Record<string, number> | null) ?? {};
-      const paragraphScores = (attempt.paragraphScores as Record<string, number> | null) ?? {};
-      await this.mastery.evaluateWordCycleCompletion(
-        userId,
-        wordId,
-        sentenceScores,
-        paragraphScores,
-        tx,
-      );
+        // The skill-area path to MASTERED (Correction & Completion Spec
+        // §2) — evaluated only now that the full word cycle is genuinely
+        // finished, using whatever Sentence/Paragraph actually scored.
+        // Empty/missing score objects (a stage that was somehow skipped)
+        // safely fail evaluateWordCycleCompletion's own "did every
+        // dimension clear 75%" check rather than needing a separate guard
+        // here.
+        const wordId = attempt.wordIds[attempt.currentIndex];
+        const sentenceScores = (attempt.sentenceScores as Record<string, number> | null) ?? {};
+        const paragraphScores = (attempt.paragraphScores as Record<string, number> | null) ?? {};
+        await this.mastery.evaluateWordCycleCompletion(
+          userId,
+          wordId,
+          sentenceScores,
+          paragraphScores,
+          tx,
+        );
 
-      // Adaptive AI Learning Engine (V1 Remaining Systems Spec §1) — every
-      // completed word feeds the rolling performance aggregates and, for
-      // the first 3 words, the Initial Calibration flow. Guess-stage
-      // signal is read straight off the counters this same attempt
-      // already recorded — a clean guess is zero wrong attempts, elapsed
-      // time is measured from the challenge's own start instant.
-      // Sentence/Paragraph scores reuse the exact same per-cycle average
-      // Mastery just computed above (Correction & Completion Spec §6:
-      // "connect all available learning signals" — previously these two
-      // AI-scored stages never reached the Learning Profile at all).
-      const elapsedSeconds = attempt.guessStartedAt
-        ? Math.max(0, (Date.now() - attempt.guessStartedAt.getTime()) / 1000)
-        : 0;
-      const { calibrationJustCompleted } = await this.learningProfile.recordWordCompletion(
-        userId,
-        {
-          cleanGuess: attempt.wrongAttempts === 0,
-          hintsUsed: attempt.hintsUsed,
-          maxHints: gameplayRules.guessStage.maxHints,
-          elapsedSeconds,
-          sentenceScore: averageScoreDimensions(sentenceScores),
-          paragraphScore: averageScoreDimensions(paragraphScores),
-        },
-        tx,
-      );
+        // Adaptive AI Learning Engine (V1 Remaining Systems Spec §1) — every
+        // completed word feeds the rolling performance aggregates and, for
+        // the first 3 words, the Initial Calibration flow. Guess-stage
+        // signal is read straight off the counters this same attempt
+        // already recorded — a clean guess is zero wrong attempts, elapsed
+        // time is measured from the challenge's own start instant.
+        // Sentence/Paragraph scores reuse the exact same per-cycle average
+        // Mastery just computed above (Correction & Completion Spec §6:
+        // "connect all available learning signals" — previously these two
+        // AI-scored stages never reached the Learning Profile at all).
+        const elapsedSeconds = attempt.guessStartedAt
+          ? Math.max(0, (Date.now() - attempt.guessStartedAt.getTime()) / 1000)
+          : 0;
+        const { calibrationJustCompleted } = await this.learningProfile.recordWordCompletion(
+          userId,
+          {
+            cleanGuess: attempt.wrongAttempts === 0,
+            hintsUsed: attempt.hintsUsed,
+            maxHints: gameplayRules.guessStage.maxHints,
+            elapsedSeconds,
+            sentenceScore: averageScoreDimensions(sentenceScores),
+            paragraphScore: averageScoreDimensions(paragraphScores),
+          },
+          tx,
+        );
 
-      // V20 Beta Release Checklist §10: ALI must react to Quest
-      // completion. This is the quest's actual completion point (the
-      // attempt is marked COMPLETED above) — every other authoritative
-      // event (Mastery, Journey, Achievements, Boss Battle) already
-      // fires ALI from its own service; Quest completion was the one
-      // gap, since QuestsService never held an AliService reference
-      // before. V23: this is now awaited (below, outside the
-      // transaction) instead of fire-and-forget, because
-      // QuestCompleteScreen actually shows the player what ALI says
-      // before they leave — every other ALI trigger stays
-      // fire-and-forget since nothing waits on those.
-      const wordRow = await tx.word.findUnique({ where: { id: wordId }, select: { word: true } });
-      const progressionRow = await tx.userProgression.findUnique({
-        where: { userId },
-        select: { journeyStage: true },
-      });
+        // V20 Beta Release Checklist §10: ALI must react to Quest
+        // completion. This is the quest's actual completion point (the
+        // attempt is marked COMPLETED above) — every other authoritative
+        // event (Mastery, Journey, Achievements, Boss Battle) already
+        // fires ALI from its own service; Quest completion was the one
+        // gap, since QuestsService never held an AliService reference
+        // before. V23: this is now awaited (below, outside the
+        // transaction) instead of fire-and-forget, because
+        // QuestCompleteScreen actually shows the player what ALI says
+        // before they leave — every other ALI trigger stays
+        // fire-and-forget since nothing waits on those.
+        const wordRow = await tx.word.findUnique({ where: { id: wordId }, select: { word: true } });
+        const progressionRow = await tx.userProgression.findUnique({
+          where: { userId },
+          select: { journeyStage: true },
+        });
 
-      return {
-        result: {
-          xpAwarded: quest.baseXp,
-          glyphAwarded: quest.baseGlyphs,
-          correctCount,
-          totalCount: attempt.wordIds.length,
-          calibrationJustCompleted,
-        },
-        aliContext: {
-          journeyStage: progressionRow?.journeyStage ?? 0,
-          context: {
-            word: wordRow?.word,
+        return {
+          result: {
             xpAwarded: quest.baseXp,
             glyphAwarded: quest.baseGlyphs,
-            currentStreak,
+            correctCount,
+            totalCount: attempt.wordIds.length,
+            calibrationJustCompleted,
           },
-        },
-      };
-    });
+          aliContext: {
+            journeyStage: progressionRow?.journeyStage ?? 0,
+            context: {
+              word: wordRow?.word,
+              xpAwarded: quest.baseXp,
+              glyphAwarded: quest.baseGlyphs,
+              currentStreak,
+            },
+          },
+        };
+      },
+    );
 
     this.analytics.track(userId, 'quest_completed', {
       questId: attempt.questId,
@@ -1102,15 +1151,19 @@ export class QuestsService {
 
     const word = await this.prisma.word.findUniqueOrThrow({
       where: { id: attempt.wordIds[attempt.currentIndex] },
-      select: { normalizedWord: true },
     });
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
 
     const sortedMissing = [...attempt.currentMissingIndexes].sort((a, b) => a - b);
     const indexToReveal = sortedMissing[0];
     const remainingMissing = sortedMissing.slice(1);
 
     const patternChars = (attempt.currentDisplayPattern ?? '').split(' ');
-    patternChars[indexToReveal] = word.normalizedWord[indexToReveal].toUpperCase();
+    // Revealed from the RENDERED (variant-aware) spelling -- the pattern
+    // itself was generated from it too (see buildChallengeView), so the
+    // indexes line up (2026-09 fairness feature).
+    patternChars[indexToReveal] = rendered.normalizedText[indexToReveal].toUpperCase();
     const newDisplayPattern = patternChars.join(' ');
 
     const updated = await this.prisma.questAttempt.update({
@@ -1196,9 +1249,11 @@ export class QuestsService {
     const wordId = wordIds[wordIndex];
     const word = await db.word.findUniqueOrThrow({ where: { id: wordId } });
     const masteryLevel = await this.mastery.getLevel(userId, wordId);
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
 
     const challenge = generateOmissionChallenge({
-      word: word.word,
+      word: rendered.text,
       baseDifficulty: word.baseDifficulty,
       masteryLevel,
     });
@@ -1218,20 +1273,20 @@ export class QuestsService {
       wordCount: wordIds.length,
       displayPattern: challenge.displayPattern,
       missingIndexes: challenge.missingIndexes,
-      wordLength: word.length,
+      wordLength: rendered.text.length,
       definition: word.definition,
       partOfSpeech: word.partOfSpeech,
       understanding:
         wordStage === 'GUESSING'
           ? null
           : {
-              word: word.word,
+              word: rendered.text,
               definition: word.definition,
               partOfSpeech: word.partOfSpeech,
               pronunciation: word.pronunciation,
               phoneticRepresentation: word.phoneticRepresentation,
               synonyms: word.synonyms,
-              exampleSentence: word.exampleSentence,
+              exampleSentence: rendered.sentence,
             },
     };
   }

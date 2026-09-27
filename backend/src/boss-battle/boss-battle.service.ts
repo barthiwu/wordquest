@@ -23,6 +23,8 @@ import { QuestCardService } from '../quest-card/quest-card.service';
 import { JOURNEY_STAGES } from '../config/journey-stages';
 import { quickAliReaction } from '../ali/ali-quick-reactions';
 import { AnalyticsService } from '../analytics/analytics.service';
+import { renderWord } from '../vocabulary/english-variant';
+import { resolveEnglishVariant } from '../vocabulary/resolve-english-variant';
 
 type Db = PrismaService | Prisma.TransactionClient;
 const GROUP_SIZE = 20;
@@ -174,13 +176,14 @@ export class BossBattleService {
       where: { userId, group: { battleId: battle.id } },
       include: { group: true },
     });
+    const variant = await resolveEnglishVariant(this.prisma, userId);
     if (existing) {
-      return this.buildChallengeView(existing, existing.group, battle.scheduledEndUtc);
+      return this.buildChallengeView(existing, existing.group, battle.scheduledEndUtc, variant);
     }
 
     const { group, player } = await this.claimGroupSlot(battle.id, userId);
     this.analytics.track(userId, 'boss_battle_joined', { battleId: battle.id, groupId: group.id });
-    return this.buildChallengeView(player, group, battle.scheduledEndUtc);
+    return this.buildChallengeView(player, group, battle.scheduledEndUtc, variant);
   }
 
   /**
@@ -258,13 +261,15 @@ export class BossBattleService {
 
     const battle = player.group.battle;
     const now = new Date();
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(player.currentWord, variant);
 
     if (deriveStatus(battle.scheduledStartUtc, battle.scheduledEndUtc, now) !== 'LIVE') {
       await this.finalizeGroupIfNeeded(player.group);
       return {
         isCorrect: false,
-        correctAnswer: player.currentWord.word,
-        exampleSentence: player.currentWord.exampleSentence,
+        correctAnswer: rendered.text,
+        exampleSentence: rendered.sentence,
         xpAwarded: 0,
         battleXp: player.battleXp,
         battleEnded: true,
@@ -273,7 +278,10 @@ export class BossBattleService {
       };
     }
 
-    const isCorrect = this.normalize(rawAnswer) === player.currentWord.normalizedWord;
+    // Compared against the RENDERED (variant-aware) form — a US-preference
+    // player typing the US spelling for a word whose headword is UK must
+    // be marked correct (2026-09 fairness feature).
+    const isCorrect = this.normalize(rawAnswer) === rendered.normalizedText;
     const answerXp = isCorrect
       ? gameplayRules.bossBattle.perCorrectAnswer
       : gameplayRules.bossBattle.perIncorrectAnswer;
@@ -353,6 +361,7 @@ export class BossBattleService {
             updated.questionIndex + 1,
             battle.scheduledEndUtc,
             tx,
+            variant,
           );
           result = { updatedPlayer: updated, nextChallenge: next };
         }
@@ -369,8 +378,8 @@ export class BossBattleService {
           'boss-battle.submitAnswer',
           {
             isCorrect,
-            correctAnswer: player.currentWord!.word,
-            exampleSentence: player.currentWord!.exampleSentence,
+            correctAnswer: rendered.text,
+            exampleSentence: rendered.sentence,
             xpAwarded: answerXp,
             battleXp: result.updatedPlayer.battleXp,
             battleEnded: !result.nextChallenge,
@@ -408,8 +417,8 @@ export class BossBattleService {
 
     return {
       isCorrect,
-      correctAnswer: player.currentWord.word,
-      exampleSentence: player.currentWord.exampleSentence,
+      correctAnswer: rendered.text,
+      exampleSentence: rendered.sentence,
       xpAwarded: answerXp,
       battleXp: updatedPlayer.battleXp,
       battleEnded: !nextChallenge,
@@ -590,17 +599,19 @@ export class BossBattleService {
     },
     group: { sharedWordIds: string[] },
     battleEndsAt: Date,
+    variant: 'US' | 'UK' | null,
   ): Promise<BattleChallengeView> {
     if (player.currentWordId && player.currentDisplayPattern) {
       const word = await this.prisma.word.findUniqueOrThrow({
         where: { id: player.currentWordId },
       });
+      const rendered = renderWord(word, variant);
       return {
         groupId: player.groupId,
         battleEndsAt: battleEndsAt.toISOString(),
         displayPattern: player.currentDisplayPattern,
         missingIndexes: player.currentMissingIndexes,
-        wordLength: word.length,
+        wordLength: rendered.text.length,
         definition: word.definition,
         partOfSpeech: word.partOfSpeech,
       };
@@ -613,6 +624,7 @@ export class BossBattleService {
       player.questionIndex,
       battleEndsAt,
       this.prisma,
+      variant,
     );
   }
 
@@ -635,13 +647,15 @@ export class BossBattleService {
     questionIndex: number,
     battleEndsAt: Date,
     db: Db,
+    variant: 'US' | 'UK' | null,
   ): Promise<BattleChallengeView> {
     const wordId = sharedWordIds[questionIndex % sharedWordIds.length];
     const word = await db.word.findUniqueOrThrow({ where: { id: wordId } });
     const masteryLevel = await this.mastery.getLevel(userId, wordId);
+    const rendered = renderWord(word, variant);
 
     const challenge = generateOmissionChallenge({
-      word: word.word,
+      word: rendered.text,
       baseDifficulty: word.baseDifficulty,
       masteryLevel,
     });
@@ -661,7 +675,7 @@ export class BossBattleService {
       battleEndsAt: battleEndsAt.toISOString(),
       displayPattern: challenge.displayPattern,
       missingIndexes: challenge.missingIndexes,
-      wordLength: word.length,
+      wordLength: rendered.text.length,
       definition: word.definition,
       partOfSpeech: word.partOfSpeech,
     };

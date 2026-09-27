@@ -123,6 +123,21 @@ describe('QuestsService', () => {
     exampleSentence: 'She gave a warm greeting.',
     baseDifficulty: 'BEGINNER',
   };
+  // 'Colour'/'Color' differ both in spelling and in letter count (6 vs
+  // 5) so a wrong-variant render is impossible to miss in an assertion.
+  const colourWord = {
+    id: 'w-colour',
+    word: 'Colour',
+    normalizedWord: 'colour',
+    length: 6,
+    definition: 'a property of light',
+    partOfSpeech: 'noun',
+    exampleSentence: 'The colour was striking.',
+    baseDifficulty: 'BEGINNER',
+    wordUS: 'Color',
+    normalizedWordUS: 'color',
+    exampleSentenceUS: 'The color was striking.',
+  };
   const farewellWord = {
     id: 'w2',
     word: 'farewell',
@@ -381,7 +396,12 @@ describe('QuestsService', () => {
 
       await service.startTimedQuest('u1', 'morning-quest', '2026-08-14', 8);
 
-      expect(wordsMock.pickWordsForQuest).toHaveBeenCalledWith('u1', 7, [], gameplayRules.quest.minWordLength);
+      expect(wordsMock.pickWordsForQuest).toHaveBeenCalledWith(
+        'u1',
+        7,
+        [],
+        gameplayRules.quest.minWordLength,
+      );
     });
 
     it('falls back to the configured default word count when quest.wordCount is unset', async () => {
@@ -477,7 +497,7 @@ describe('QuestsService', () => {
     });
 
     describe('Global Word Distribution + daily quest locking (10,000-Word Adaptive Distribution spec §18/§19)', () => {
-      it('records global exposure for a freshly created attempt\'s words', async () => {
+      it("records global exposure for a freshly created attempt's words", async () => {
         prismaMock.quest.findUnique.mockResolvedValueOnce({
           id: 'q1',
           isActive: true,
@@ -581,7 +601,7 @@ describe('QuestsService', () => {
         );
       });
 
-      it('deduplicates words across the day\'s quest windows and builds a fresh Guess challenge for each, at current mastery', async () => {
+      it("deduplicates words across the day's quest windows and builds a fresh Guess challenge for each, at current mastery", async () => {
         prismaMock.questAttempt.findMany.mockResolvedValueOnce([
           { wordIds: ['w1', 'w2'] },
           { wordIds: ['w2'] }, // same word reappearing in another window -- must not duplicate
@@ -617,7 +637,7 @@ describe('QuestsService', () => {
       it('reports a correct answer and never touches Mastery/XP/global exposure', async () => {
         prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
 
-        const result = await service.checkHistoryAnswer('w1', 'Greeting');
+        const result = await service.checkHistoryAnswer('u1', 'w1', 'Greeting');
 
         expect(result).toEqual({ correct: true, correctWord: 'greeting' });
         expect(masteryMock.recordAnswer).not.toHaveBeenCalled();
@@ -628,7 +648,7 @@ describe('QuestsService', () => {
       it('reports an incorrect answer', async () => {
         prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
 
-        const result = await service.checkHistoryAnswer('w1', 'nope');
+        const result = await service.checkHistoryAnswer('u1', 'w1', 'nope');
 
         expect(result).toEqual({ correct: false, correctWord: 'greeting' });
       });
@@ -668,9 +688,27 @@ describe('QuestsService', () => {
   describe('getTodaySummary', () => {
     it('reports each active quest window as completed/in-progress/neither, from real QuestAttempt rows for the given localDate', async () => {
       prismaMock.quest.findMany.mockResolvedValueOnce([
-        { id: 'q-morning', key: 'morning-quest', title: 'Morning Quest', windowStartHour: 0, windowEndHour: 11 },
-        { id: 'q-noon', key: 'noon-quest', title: 'Noon Quest', windowStartHour: 12, windowEndHour: 15 },
-        { id: 'q-evening', key: 'evening-quest', title: 'Evening Quest', windowStartHour: 16, windowEndHour: 23 },
+        {
+          id: 'q-morning',
+          key: 'morning-quest',
+          title: 'Morning Quest',
+          windowStartHour: 0,
+          windowEndHour: 11,
+        },
+        {
+          id: 'q-noon',
+          key: 'noon-quest',
+          title: 'Noon Quest',
+          windowStartHour: 12,
+          windowEndHour: 15,
+        },
+        {
+          id: 'q-evening',
+          key: 'evening-quest',
+          title: 'Evening Quest',
+          windowStartHour: 16,
+          windowEndHour: 23,
+        },
       ]);
       prismaMock.questAttempt.findMany.mockResolvedValueOnce([
         { questId: 'q-morning', status: 'COMPLETED', xpAwarded: 145, glyphAwarded: 3 },
@@ -729,7 +767,13 @@ describe('QuestsService', () => {
 
     it('never invents completion — no attempts today means completedCount 0', async () => {
       prismaMock.quest.findMany.mockResolvedValueOnce([
-        { id: 'q-morning', key: 'morning-quest', title: 'Morning Quest', windowStartHour: 0, windowEndHour: 11 },
+        {
+          id: 'q-morning',
+          key: 'morning-quest',
+          title: 'Morning Quest',
+          windowStartHour: 0,
+          windowEndHour: 11,
+        },
       ]);
       prismaMock.questAttempt.findMany.mockResolvedValueOnce([]);
 
@@ -1836,6 +1880,236 @@ describe('QuestsService', () => {
       expect(result.displayPattern).toBe('G R E _ T I N G');
       expect(result.missingIndexes).toEqual([3]);
       expect(result.lettersRevealed).toBe(1);
+    });
+  });
+
+  describe('US/UK spelling-variant rendering (2026-09 fairness feature)', () => {
+    it('sizes a fresh challenge to the US spelling for a US-preference player', async () => {
+      prismaMock.quest.findUnique.mockResolvedValueOnce({
+        id: 'q1',
+        isActive: true,
+        wordCount: 1,
+        windowStartHour: null,
+        windowEndHour: null,
+      });
+      prismaMock.questAttempt.findFirst.mockResolvedValueOnce({
+        id: 'a1',
+        wordIds: ['w-colour'],
+        currentIndex: 0,
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
+
+      const view = await service.startTimedQuest('u1', 'morning-quest', '2026-08-14', 8);
+
+      expect(view.wordLength).toBe('Color'.length);
+    });
+
+    it('falls back to the UK spelling and its own letter count for a player with no preference recorded', async () => {
+      prismaMock.quest.findUnique.mockResolvedValueOnce({
+        id: 'q1',
+        isActive: true,
+        wordCount: 1,
+        windowStartHour: null,
+        windowEndHour: null,
+      });
+      prismaMock.questAttempt.findFirst.mockResolvedValueOnce({
+        id: 'a1',
+        wordIds: ['w-colour'],
+        currentIndex: 0,
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      // englishVariant: null -- the prismaMock.user default set at the top of this file.
+
+      const view = await service.startTimedQuest('u1', 'morning-quest', '2026-08-14', 8);
+
+      expect(view.wordLength).toBe('Colour'.length);
+    });
+
+    it('accepts the US spelling as correct for a US-preference player and reports it back as the correct answer', async () => {
+      const guessStartedAt = new Date('2026-08-14T10:00:00.000Z');
+      jest.useFakeTimers().setSystemTime(new Date(guessStartedAt.getTime() + 5_000));
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({
+        id: 'a1',
+        userId: 'u1',
+        questId: 'q1',
+        status: 'IN_PROGRESS',
+        wordStage: 'GUESSING',
+        currentIndex: 0,
+        wordIds: ['w-colour'],
+        currentDisplayPattern: 'C _ L O R',
+        currentMissingIndexes: [1],
+        guessStartedAt,
+        wrongAttempts: 0,
+        hintsUsed: 0,
+        synonymsUsed: 0,
+        lettersRevealed: 0,
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
+      masteryMock.recordAnswer.mockResolvedValueOnce({ level: 'RECOGNIZING', justMastered: false });
+
+      const result = await service.submitAnswer('u1', 'a1', 'color');
+
+      expect(result.isCorrect).toBe(true);
+      expect(result.correctAnswer).toBe('Color');
+      expect(result.understanding?.word).toBe('Color');
+      expect(result.understanding?.exampleSentence).toBe('The color was striking.');
+      jest.useRealTimers();
+    });
+
+    it('rejects the US spelling for a player who defaults to UK (no preference recorded)', async () => {
+      const guessStartedAt = new Date('2026-08-14T10:00:00.000Z');
+      jest.useFakeTimers().setSystemTime(new Date(guessStartedAt.getTime() + 5_000));
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({
+        id: 'a1',
+        userId: 'u1',
+        questId: 'q1',
+        status: 'IN_PROGRESS',
+        wordStage: 'GUESSING',
+        currentIndex: 0,
+        wordIds: ['w-colour'],
+        currentDisplayPattern: 'C _ L O U R',
+        currentMissingIndexes: [1],
+        guessStartedAt,
+        wrongAttempts: 0,
+        hintsUsed: 0,
+        synonymsUsed: 0,
+        lettersRevealed: 0,
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      // englishVariant: null -- the prismaMock.user default set at the top of this file.
+
+      const result = await service.submitAnswer('u1', 'a1', 'color');
+
+      expect(result.isCorrect).toBe(false);
+      expect(result.correctAnswer).toBe('Colour');
+      jest.useRealTimers();
+    });
+
+    it("reveals a letter from the player's own rendered spelling", async () => {
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({
+        wordStage: 'GUESSING',
+        id: 'a1',
+        userId: 'u1',
+        status: 'IN_PROGRESS',
+        currentIndex: 0,
+        wordIds: ['w-colour'],
+        currentDisplayPattern: 'C _ L O R',
+        currentMissingIndexes: [1],
+        lettersRevealed: 0,
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
+      prismaMock.questAttempt.update.mockResolvedValueOnce({
+        currentDisplayPattern: 'C O L O R',
+        currentMissingIndexes: [],
+        lettersRevealed: 1,
+      });
+
+      const result = await service.requestLetterReveal('u1', 'a1');
+
+      expect(result.displayPattern).toBe('C O L O R');
+      expect(prismaMock.questAttempt.update).toHaveBeenCalledWith({
+        where: { id: 'a1' },
+        data: {
+          lettersRevealed: { increment: 1 },
+          currentDisplayPattern: 'C O L O R',
+          currentMissingIndexes: [],
+        },
+      });
+    });
+
+    it('sends the US spelling to the sentence evaluator for a US-preference player', async () => {
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({
+        id: 'a1',
+        userId: 'u1',
+        status: 'IN_PROGRESS',
+        wordStage: 'SENTENCE',
+        currentIndex: 0,
+        wordIds: ['w-colour'],
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      prismaMock.user.findUnique.mockResolvedValueOnce({
+        nativeLanguage: null,
+        englishVariant: 'US',
+      });
+      sentenceEvaluationMock.evaluate.mockResolvedValueOnce({
+        scores: { grammar: 80, vocabulary: 90, context: 70, naturalness: 60, clarity: 100 },
+        xpAwarded: 1000,
+        confidence: 0.9,
+        whatWentWell: 'Good.',
+        whatNeedsImprovement: 'Fine.',
+        betterVersion: null,
+        nextAction: 'Keep going.',
+      });
+
+      await service.submitSentence('u1', 'a1', 'I wore my favorite color today.');
+
+      expect(sentenceEvaluationMock.evaluate).toHaveBeenCalledWith(
+        'Color',
+        colourWord.definition,
+        colourWord.partOfSpeech,
+        'I wore my favorite color today.',
+        null,
+      );
+    });
+
+    it('sends the US spelling to the paragraph evaluator for a US-preference player', async () => {
+      const thirtyWordParagraph = Array.from({ length: 30 }, (_, i) => `word${i}`).join(' ');
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({
+        id: 'a1',
+        userId: 'u1',
+        status: 'IN_PROGRESS',
+        wordStage: 'PARAGRAPH',
+        currentIndex: 0,
+        wordIds: ['w-colour'],
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      prismaMock.user.findUnique.mockResolvedValueOnce({
+        nativeLanguage: null,
+        englishVariant: 'US',
+      });
+      paragraphEvaluationMock.evaluate.mockResolvedValueOnce({
+        scores: { grammar: 80, vocabulary: 90, structure: 70, flow: 60, context: 100 },
+        xpAwarded: 1400,
+        confidence: 0.9,
+        estimatedProficiency: 'B1',
+        whatWentWell: 'Good.',
+        whatNeedsImprovement: 'Fine.',
+        suggestedRevision: null,
+        nextAction: 'Keep going.',
+      });
+
+      await service.submitParagraph('u1', 'a1', thirtyWordParagraph);
+
+      expect(paragraphEvaluationMock.evaluate).toHaveBeenCalledWith(
+        'Color',
+        colourWord.definition,
+        colourWord.partOfSpeech,
+        thirtyWordParagraph,
+        null,
+      );
+    });
+
+    it('sizes the catch-up replay to the US spelling for a US-preference player', async () => {
+      prismaMock.questAttempt.findMany.mockResolvedValueOnce([{ wordIds: ['w-colour'] }]);
+      prismaMock.word.findMany.mockResolvedValueOnce([colourWord]);
+      masteryMock.getLevel.mockResolvedValueOnce('NEW');
+      prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
+
+      const result = await service.getHistoryForDate('u1', '2026-09-20', '2026-09-24');
+
+      expect(result.words[0].wordLength).toBe('Color'.length);
+    });
+
+    it('accepts the US spelling as correct in the catch-up replay for a US-preference player', async () => {
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
+
+      const result = await service.checkHistoryAnswer('u1', 'w-colour', 'color');
+
+      expect(result).toEqual({ correct: true, correctWord: 'Color' });
     });
   });
 });

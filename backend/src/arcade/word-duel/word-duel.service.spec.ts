@@ -71,6 +71,14 @@ interface FakeWord {
   word: string;
   normalizedWord: string;
   baseDifficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  // US/UK spelling-variant fields (2026-09 fairness feature) -- optional
+  // because most fixtures in this file don't need a distinct US form;
+  // renderWord() falls back to the UK word/normalizedWord/exampleSentence
+  // fields whenever these are absent, exactly like the real Word model.
+  exampleSentence?: string;
+  wordUS?: string | null;
+  normalizedWordUS?: string | null;
+  exampleSentenceUS?: string | null;
 }
 
 function makeStore() {
@@ -78,6 +86,10 @@ function makeStore() {
   const playerStates = new Map<string, FakePlayerState>();
   const answers: FakeAnswer[] = [];
   const words = new Map<string, FakeWord>();
+  // englishVariant preference per userId -- absent means "never set",
+  // which resolveEnglishVariant treats identically to null (UK
+  // fallback), matching production's nullable-column behavior.
+  const users = new Map<string, 'US' | 'UK' | null>();
   let matchSeq = 0;
   let playerStateSeq = 0;
   let answerSeq = 0;
@@ -226,6 +238,13 @@ function makeStore() {
     }),
   };
 
+  const user = {
+    findUnique: jest.fn((args: any) => {
+      const variant = users.has(args.where.id) ? users.get(args.where.id)! : null;
+      return { englishVariant: variant };
+    }),
+  };
+
   const wordDuelAnswer = {
     create: jest.fn((args: any) => {
       const dup = answers.find(
@@ -251,9 +270,11 @@ function makeStore() {
     playerStates,
     answers,
     words,
+    users,
     wordDuelMatch,
     wordDuelPlayerState,
     word,
+    user,
     wordDuelAnswer,
   };
 }
@@ -278,6 +299,7 @@ describe('WordDuelService', () => {
       wordDuelPlayerState: store.wordDuelPlayerState,
       wordDuelAnswer: store.wordDuelAnswer,
       word: store.word,
+      user: store.user,
       $transaction: jest.fn((callback: (tx: any) => unknown) => callback(prismaMock)),
     };
     progressionMock.awardXp.mockResolvedValue(undefined);
@@ -699,6 +721,113 @@ describe('WordDuelService', () => {
       const match = store.matches.get('m1')!;
       expect(match.tieBreakReason).toBe(WORD_DUEL_TIEBREAK_DESCRIPTION);
       expect(match.winnerId).toBe('u2'); // reached their final total earlier
+    });
+  });
+
+  describe('US/UK spelling-variant rendering (2026-09 fairness feature)', () => {
+    // 'Colour'/'Color' differ both in spelling and in letter count (6 vs
+    // 5), so a wrong-variant hint length is impossible to miss.
+    beforeEach(() => {
+      store.words.set('w-colour', {
+        id: 'w-colour',
+        word: 'Colour',
+        normalizedWord: 'colour',
+        baseDifficulty: 'BEGINNER',
+        wordUS: 'Color',
+        normalizedWordUS: 'color',
+      });
+    });
+
+    const seedColourMatch = () => {
+      store.matches.set('m1', {
+        id: 'm1',
+        status: 'ACTIVE',
+        wordIds: ['w-colour'],
+        startedAt: new Date(),
+        endsAt: new Date(Date.now() + 60_000),
+        completedAt: null,
+        winnerId: null,
+        tieBreakReason: null,
+        createdAt: new Date(),
+      });
+      for (const [id, userId] of [
+        ['ps1', 'u1'],
+        ['ps2', 'u2'],
+      ] as const) {
+        store.playerStates.set(id, {
+          id,
+          matchId: 'm1',
+          userId,
+          totalXp: 0,
+          currentStreak: 0,
+          longestStreak: 0,
+          correctCount: 0,
+          currentIndex: 0,
+          currentWordStartedAt: new Date(),
+          joinedAt: new Date(),
+          disconnectedAt: null,
+          reconnectedAt: null,
+        });
+      }
+    };
+
+    it('shows a US-preference player a hint sized to the US spelling', async () => {
+      seedColourMatch();
+      store.users.set('u1', 'US');
+
+      const view = await service.getState('u1', 'm1');
+
+      expect(view.current?.displayHint).toBe('_ _ _ _ _'); // 'color' -- 5 letters
+    });
+
+    it('falls back to the UK spelling for a player with no preference recorded', async () => {
+      seedColourMatch();
+      // u2 is never added to store.users -- exercises the null/UK-fallback default.
+
+      const view = await service.getState('u2', 'm1');
+
+      expect(view.current?.displayHint).toBe('_ _ _ _ _ _'); // 'colour' -- 6 letters
+    });
+
+    it('lets two players on the same match see the identical underlying word in their own spelling at once', async () => {
+      seedColourMatch();
+      store.users.set('u1', 'US');
+      store.users.set('u2', 'UK');
+
+      const [usView, ukView] = await Promise.all([
+        service.getState('u1', 'm1'),
+        service.getState('u2', 'm1'),
+      ]);
+
+      expect(usView.current?.displayHint).toBe('_ _ _ _ _'); // color
+      expect(ukView.current?.displayHint).toBe('_ _ _ _ _ _'); // colour
+    });
+
+    it('accepts the US spelling as correct for a US-preference player and reports it back as the correct answer', async () => {
+      seedColourMatch();
+      store.users.set('u1', 'US');
+      rewardEngineMock.calculate.mockReturnValue({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+
+      const result = await service.submitAnswer('u1', 'm1', 'color');
+
+      expect(result.isCorrect).toBe(true);
+      expect(result.correctAnswer).toBe('Color');
+    });
+
+    it('rejects the US spelling for a player who defaults to UK (no preference recorded)', async () => {
+      seedColourMatch();
+      // u2 has no recorded preference -- UK fallback.
+
+      const result = await service.submitAnswer('u2', 'm1', 'color');
+
+      expect(result.isCorrect).toBe(false);
+      expect(result.correctAnswer).toBe('Colour');
     });
   });
 });

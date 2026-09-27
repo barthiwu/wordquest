@@ -55,6 +55,13 @@ describe('CompleteItService', () => {
     word: {
       findUniqueOrThrow: jest.fn().mockResolvedValue(trainWord),
     },
+    user: {
+      // englishVariant preference lookup (2026-09 US/UK fairness
+      // feature) -- defaults to "no preference recorded" so every
+      // existing test in this file keeps exercising the UK path
+      // unchanged unless it explicitly overrides this.
+      findUnique: jest.fn().mockResolvedValue({ englishVariant: null }),
+    },
     $transaction: jest.fn((callback: (tx: any) => unknown): unknown => callback(prismaMock)),
   };
 
@@ -72,6 +79,7 @@ describe('CompleteItService', () => {
     prismaMock.arcadeGameSession.update.mockResolvedValue({});
     prismaMock.arcadeGameSession.updateMany.mockResolvedValue({ count: 1 });
     prismaMock.word.findUniqueOrThrow.mockResolvedValue(trainWord);
+    prismaMock.user.findUnique.mockResolvedValue({ englishVariant: null });
     progressionMock.awardXp.mockResolvedValue(undefined);
     progressionMock.recordDailyActivity.mockResolvedValue({ currentStreak: 1 });
 
@@ -98,7 +106,13 @@ describe('CompleteItService', () => {
 
       const view = await service.start('u1');
 
-      expect(challengesMock.pickChallenges).toHaveBeenCalledWith('u1', 20, [], 3);
+      expect(challengesMock.pickChallenges).toHaveBeenCalledWith(
+        'u1',
+        20,
+        [],
+        3,
+        expect.any(Function),
+      );
       expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
         data: expect.objectContaining({ userId: 'u1', game: 'COMPLETE_IT', wordsTotal: 2 }),
       });
@@ -107,11 +121,17 @@ describe('CompleteItService', () => {
       expect(view.wordIndex).toBe(0);
     });
 
-    it('filters out words whose example sentence does not actually contain the word', async () => {
+    it('passes ArcadeChallengeService a quality filter that rejects bad sentences, and trusts its filtered result as-is', async () => {
+      // Quality filtering now happens INSIDE pickChallenges (it has to,
+      // so it can over-fetch/backfill -- see challenge.service.ts) --
+      // start() no longer re-filters the array pickChallenges hands
+      // back. This test checks both halves: the filter function passed
+      // in actually discriminates good sentences from bad/terse ones,
+      // and start() takes pickChallenges's returned set (already
+      // filtered) at face value.
       prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
       challengesMock.pickChallenges.mockResolvedValueOnce([
-        { word: { id: 'w1', word: 'train', exampleSentence: 'I need to train every day.' } },
-        { word: { id: 'w2', word: 'humid', exampleSentence: 'This sentence forgot its word.' } },
+        { word: { id: 'w1', word: 'train', exampleSentence: 'I need to train every single day.' } },
       ]);
       prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
 
@@ -120,6 +140,26 @@ describe('CompleteItService', () => {
       expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
         data: expect.objectContaining({ wordsTotal: 1, wordIds: ['w1'] }),
       });
+
+      const qualityFilter = challengesMock.pickChallenges.mock.calls[0][4];
+      // Contains the word AND reads like a real sentence -- passes.
+      expect(
+        qualityFilter({
+          word: { word: 'train', exampleSentence: 'I need to train every single day.' },
+        }),
+      ).toBe(true);
+      // Doesn't contain the word at all -- fails.
+      expect(
+        qualityFilter({
+          word: { word: 'humid', exampleSentence: 'This sentence forgot its own word.' },
+        }),
+      ).toBe(false);
+      // Contains the word but is a terse WordNet-style fragment, not a
+      // real sentence -- fails (this is the "not an everyday use of
+      // English" case Barth reported).
+      expect(
+        qualityFilter({ word: { word: 'tenderize', exampleSentence: 'Tenderize meat.' } }),
+      ).toBe(false);
     });
 
     it('resumes an active session whose current-word timer has not expired', async () => {
@@ -149,18 +189,16 @@ describe('CompleteItService', () => {
       expect(challengesMock.pickChallenges).toHaveBeenCalled();
     });
 
-    it('throws BadRequestException when no words are available at all', async () => {
+    it('throws BadRequestException when pickChallenges returns no usable words', async () => {
+      // pickChallenges (see challenge.service.spec.ts) already applies
+      // Complete It's quality filter internally and over-fetches/
+      // backfills before giving up -- by the time it returns [], there
+      // was genuinely nothing usable left in the eligible pool. This
+      // covers both "no words at all" and "everything failed the
+      // quality filter", since start() can't tell those apart and
+      // doesn't need to -- either way there's nothing to start with.
       prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
       challengesMock.pickChallenges.mockResolvedValueOnce([]);
-
-      await expect(service.start('u1')).rejects.toThrow(BadRequestException);
-    });
-
-    it('throws BadRequestException when no picked word survives the blankable filter', async () => {
-      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
-      challengesMock.pickChallenges.mockResolvedValueOnce([
-        { word: { id: 'w1', word: 'train', exampleSentence: 'This sentence forgot its word.' } },
-      ]);
 
       await expect(service.start('u1')).rejects.toThrow(BadRequestException);
     });
@@ -301,6 +339,86 @@ describe('CompleteItService', () => {
           data: expect.objectContaining({ status: 'COMPLETED' }),
         }),
       );
+    });
+  });
+
+  describe('US/UK spelling-variant rendering (2026-09 fairness feature)', () => {
+    const colourWord = {
+      id: 'w1',
+      word: 'Colour',
+      normalizedWord: 'colour',
+      exampleSentence: 'The colour of the theatre was a favourite topic.',
+      definition: 'a property perceived by the eye',
+      partOfSpeech: 'noun',
+      baseDifficulty: 'BEGINNER',
+      wordUS: 'Color',
+      normalizedWordUS: 'color',
+      exampleSentenceUS: 'The color of the theater was a favorite topic.',
+    };
+
+    it('blanks the US spelling, sized to the US word length, for a US-preference player', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
+      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: colourWord }]);
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+
+      const view = await service.start('u1');
+
+      expect(view.sentenceWithBlank).toBe('The _____ of the theater was a favorite topic.');
+      expect(view.wordLength).toBe('color'.length);
+    });
+
+    it('still blanks the UK spelling for a player with no preference recorded', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: null });
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
+      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: colourWord }]);
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+
+      const view = await service.start('u1');
+
+      expect(view.sentenceWithBlank).toBe('The ______ of the theatre was a favourite topic.');
+      expect(view.wordLength).toBe('colour'.length);
+    });
+
+    it('accepts the US spelling as correct, and reports it as the correct answer, for a US-preference player', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(baseSession());
+      prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 1,
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      rewardEngineMock.calculate.mockReturnValueOnce({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+
+      const result = await service.submitAnswer('u1', 's1', 'color');
+
+      expect(result.isCorrect).toBe(true);
+      expect(result.correctAnswer).toBe('Color');
+    });
+
+    it('rejects the US spelling as incorrect for a player with no preference recorded (UK default)', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: null });
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(baseSession());
+      prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 1,
+      });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+      prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
+
+      const result = await service.submitAnswer('u1', 's1', 'color');
+
+      expect(result.isCorrect).toBe(false);
+      expect(result.correctAnswer).toBe('Colour');
     });
   });
 });

@@ -15,6 +15,8 @@ import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
 import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, SCRAMBLE_QUEST_CONFIG } from '../config/arcade.config';
 import { hintRevealOrder, scrambleWord } from './scramble.util';
+import { renderWord } from '../../vocabulary/english-variant';
+import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant';
 
 /** Client-safe view of the player's current ScrambleQuest word — the
  * scrambled letters, never the target word (spec §5/§8). */
@@ -114,12 +116,13 @@ export class ScrambleQuestService {
     const existing = await this.prisma.arcadeGameSession.findFirst({
       where: { userId, game: 'SCRAMBLE_QUEST', status: 'ACTIVE' },
     });
+    const variant = await resolveEnglishVariant(this.prisma, userId);
 
     if (existing) {
       const deadlineMs =
         existing.currentWordStartedAt.getTime() + SCRAMBLE_QUEST_CONFIG.TIMER_SECONDS * 1000;
       if (Date.now() < deadlineMs) {
-        return this.buildChallengeView(existing);
+        return this.buildChallengeView(existing, variant);
       }
       await this.prisma.arcadeGameSession.update({
         where: { id: existing.id },
@@ -146,7 +149,7 @@ export class ScrambleQuestService {
       },
     });
 
-    return this.buildChallengeView(session);
+    return this.buildChallengeView(session, variant);
   }
 
   /**
@@ -158,7 +161,9 @@ export class ScrambleQuestService {
   async requestHint(userId: string, sessionId: string): Promise<ScrambleQuestHintResult> {
     const session = await this.loadActiveSession(userId, sessionId);
     const word = await this.currentWord(session);
-    const maxHintsForWord = this.maxHintsFor(word.word);
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
+    const maxHintsForWord = this.maxHintsFor(rendered.text);
 
     if (session.currentWordHintsUsed >= maxHintsForWord) {
       throw new BadRequestException(`No hints remaining (max ${maxHintsForWord}).`);
@@ -176,13 +181,19 @@ export class ScrambleQuestService {
     }
 
     // The Nth hint reveals a randomized (but deterministic-per-session)
-    // position, not simply the Nth letter — see hintRevealOrder().
+    // position, not simply the Nth letter — see hintRevealOrder(). Uses
+    // the RENDERED (variant-aware) spelling so the revealed letter
+    // always matches what this player actually sees on screen (2026-09
+    // fairness feature).
     const hintsUsedNow = session.currentWordHintsUsed + 1;
-    const revealOrder = hintRevealOrder(word.word, `${session.id}:${session.currentIndex}:hints`);
+    const revealOrder = hintRevealOrder(
+      rendered.text,
+      `${session.id}:${session.currentIndex}:hints`,
+    );
     const position = revealOrder[session.currentWordHintsUsed];
     return {
       position,
-      letter: word.word[position],
+      letter: rendered.text[position],
       hintsRemaining: maxHintsForWord - hintsUsedNow,
     };
   }
@@ -194,6 +205,8 @@ export class ScrambleQuestService {
   ): Promise<ScrambleQuestAnswerResult> {
     const session = await this.loadActiveSession(userId, sessionId);
     const word = await this.currentWord(session);
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
 
     // Server-authoritative timing (spec §10/§11) — always computed from
     // the server-recorded currentWordStartedAt, never a client-reported
@@ -201,7 +214,10 @@ export class ScrambleQuestService {
     const responseTimeMs = Date.now() - session.currentWordStartedAt.getTime();
     const timeLimitMs = SCRAMBLE_QUEST_CONFIG.TIMER_SECONDS * 1000;
     const timedOut = responseTimeMs > timeLimitMs;
-    const isCorrect = !timedOut && normalizeAnswer(rawAnswer) === word.normalizedWord;
+    // Compared against the RENDERED (variant-aware) form — a US-preference
+    // player typing "color" for a word whose UK headword is "colour"
+    // must be marked correct (2026-09 fairness feature).
+    const isCorrect = !timedOut && normalizeAnswer(rawAnswer) === rendered.normalizedText;
 
     const streakBefore = session.currentStreak;
     const streakAfter = nextStreak(streakBefore, { isCorrect, timedOut });
@@ -307,13 +323,13 @@ export class ScrambleQuestService {
       const refreshed = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { id: sessionId },
       });
-      nextChallenge = await this.buildChallengeView(refreshed);
+      nextChallenge = await this.buildChallengeView(refreshed, variant);
     }
 
     return {
       isCorrect,
       timedOut,
-      correctAnswer: word.word,
+      correctAnswer: rendered.text,
       xpAwarded: reward.finalXp,
       currentStreak: streakAfter,
       longestStreak: newLongestStreak,
@@ -359,21 +375,26 @@ export class ScrambleQuestService {
 
   private async buildChallengeView(
     session: ArcadeGameSessionRow,
+    variant: 'US' | 'UK' | null,
   ): Promise<ScrambleQuestChallengeView> {
     const word = await this.currentWord(session);
-    const maxHintsForWord = this.maxHintsFor(word.word);
-    const revealOrder = hintRevealOrder(word.word, `${session.id}:${session.currentIndex}:hints`);
+    const rendered = renderWord(word, variant);
+    const maxHintsForWord = this.maxHintsFor(rendered.text);
+    const revealOrder = hintRevealOrder(
+      rendered.text,
+      `${session.id}:${session.currentIndex}:hints`,
+    );
     const revealedLetters = revealOrder.slice(0, session.currentWordHintsUsed).map((position) => ({
       position,
-      letter: word.word[position],
+      letter: rendered.text[position],
     }));
 
     return {
       sessionId: session.id,
       wordIndex: session.currentIndex,
       wordsTotal: session.wordsTotal,
-      scrambledLetters: scrambleWord(word.word, `${session.id}:${session.currentIndex}`),
-      wordLength: word.word.length,
+      scrambledLetters: scrambleWord(rendered.text, `${session.id}:${session.currentIndex}`),
+      wordLength: rendered.text.length,
       definition: word.definition,
       synonyms: word.synonyms,
       timeLimitSeconds: SCRAMBLE_QUEST_CONFIG.TIMER_SECONDS,

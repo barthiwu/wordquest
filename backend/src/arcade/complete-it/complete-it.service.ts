@@ -14,7 +14,9 @@ import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
 import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, COMPLETE_IT_CONFIG } from '../config/arcade.config';
-import { blankSentence } from './complete-it.util';
+import { blankSentence, isCompleteItSentenceUsable } from './complete-it.util';
+import { renderWord } from '../../vocabulary/english-variant';
+import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant';
 
 /** Client-safe view of the player's current Complete It word — the
  * word's own example sentence with the target word blanked out, never
@@ -85,20 +87,23 @@ export class CompleteItService {
    * Starts a new session, or resumes one already in progress as long as
    * the current word's server-side timer hasn't already run out (same
    * pattern as ScrambleQuestService.start). The word pool is filtered
-   * to sentences that actually contain their own word — see
-   * blankSentence's doc comment — so buildChallengeView never has to
-   * handle the "couldn't blank it" case mid-session.
+   * to sentences that both contain their own word AND read like a real
+   * sentence — see isCompleteItSentenceUsable's doc comment — so
+   * buildChallengeView never has to handle the "couldn't blank it"
+   * case mid-session, and players never land on an unwinnable fragment.
    */
   async start(userId: string): Promise<CompleteItChallengeView> {
     const existing = await this.prisma.arcadeGameSession.findFirst({
       where: { userId, game: 'COMPLETE_IT', status: 'ACTIVE' },
     });
 
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+
     if (existing) {
       const deadlineMs =
         existing.currentWordStartedAt.getTime() + COMPLETE_IT_CONFIG.TIMER_SECONDS * 1000;
       if (Date.now() < deadlineMs) {
-        return this.buildChallengeView(existing);
+        return this.buildChallengeView(existing, variant);
       }
       await this.prisma.arcadeGameSession.update({
         where: { id: existing.id },
@@ -106,14 +111,21 @@ export class CompleteItService {
       });
     }
 
-    const picked = await this.challenges.pickChallenges(
+    // The quality filter (isCompleteItSentenceUsable) is passed straight
+    // into pickChallenges rather than applied after the fact -- it
+    // rejects a meaningful fraction of the corpus (see complete-it.util
+    // .ts's doc comment), so pickChallenges over-fetches and backfills
+    // internally until it actually has WORDS_PER_SESSION usable words
+    // (or the eligible pool runs out). Filtering after a single fixed-
+    // size pick, the old approach, is what let sessions quietly ship
+    // far fewer words than WORDS_PER_SESSION whenever the pick happened
+    // to land on a lot of weak sentences.
+    const blankable = await this.challenges.pickChallenges(
       userId,
       COMPLETE_IT_CONFIG.WORDS_PER_SESSION,
       [],
       COMPLETE_IT_CONFIG.MIN_WORD_LENGTH,
-    );
-    const blankable = picked.filter(
-      (c) => blankSentence(c.word.exampleSentence, c.word.word).found,
+      (c) => isCompleteItSentenceUsable(c.word.exampleSentence, c.word.word),
     );
     if (blankable.length === 0) {
       throw new BadRequestException('No words are available for Complete It right now.');
@@ -128,7 +140,7 @@ export class CompleteItService {
       },
     });
 
-    return this.buildChallengeView(session);
+    return this.buildChallengeView(session, variant);
   }
 
   async submitAnswer(
@@ -138,6 +150,8 @@ export class CompleteItService {
   ): Promise<CompleteItAnswerResult> {
     const session = await this.loadActiveSession(userId, sessionId);
     const word = await this.currentWord(session);
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
 
     // Server-authoritative timing (spec §10/§11) — always computed from
     // the server-recorded currentWordStartedAt, never a client-reported
@@ -145,7 +159,11 @@ export class CompleteItService {
     const responseTimeMs = Date.now() - session.currentWordStartedAt.getTime();
     const timeLimitMs = COMPLETE_IT_CONFIG.TIMER_SECONDS * 1000;
     const timedOut = responseTimeMs > timeLimitMs;
-    const isCorrect = !timedOut && normalizeAnswer(rawAnswer) === word.normalizedWord;
+    // Compared against the RENDERED (variant-aware) normalized form, not
+    // word.normalizedWord directly -- a US-preference player who typed
+    // "color" must be marked correct for a word whose UK-authored
+    // answer is "colour" (2026-09 fairness feature).
+    const isCorrect = !timedOut && normalizeAnswer(rawAnswer) === rendered.normalizedText;
 
     const streakBefore = session.currentStreak;
     const streakAfter = nextStreak(streakBefore, { isCorrect, timedOut });
@@ -245,13 +263,13 @@ export class CompleteItService {
       const refreshed = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { id: sessionId },
       });
-      nextChallenge = await this.buildChallengeView(refreshed);
+      nextChallenge = await this.buildChallengeView(refreshed, variant);
     }
 
     return {
       isCorrect,
       timedOut,
-      correctAnswer: word.word,
+      correctAnswer: rendered.text,
       xpAwarded: reward.finalXp,
       currentStreak: streakAfter,
       longestStreak: newLongestStreak,
@@ -286,14 +304,19 @@ export class CompleteItService {
 
   private async buildChallengeView(
     session: ArcadeGameSessionRow,
+    variant: 'US' | 'UK' | null,
   ): Promise<CompleteItChallengeView> {
     const word = await this.currentWord(session);
+    const rendered = renderWord(word, variant);
     // Guaranteed found:true — start() only ever puts blankable words
-    // into wordIds. If this were ever false it'd mean a data change
-    // happened after the session started, which nothing in this app
-    // does; falling back to the unblanked sentence would leak the
-    // answer, so this deliberately does NOT have a silent fallback.
-    const { sentenceWithBlank } = blankSentence(word.exampleSentence, word.word);
+    // into wordIds (checked against the UK original; toUsSentence never
+    // changes word count, see isCompleteItSentenceUsable's own note in
+    // start(), so this holds for the rendered variant too). If this
+    // were ever false it'd mean a data change happened after the
+    // session started, which nothing in this app does; falling back to
+    // the unblanked sentence would leak the answer, so this
+    // deliberately does NOT have a silent fallback.
+    const { sentenceWithBlank } = blankSentence(rendered.sentence, rendered.text);
 
     return {
       sessionId: session.id,
@@ -302,7 +325,10 @@ export class CompleteItService {
       sentenceWithBlank,
       definition: word.definition,
       partOfSpeech: word.partOfSpeech,
-      wordLength: word.word.length,
+      // The rendered variant's own length, not word.word.length -- the
+      // blank has to match what's actually on screen (e.g. "colour"
+      // blanks to 6 underscores but its US form "color" blanks to 5).
+      wordLength: rendered.text.length,
       timeLimitSeconds: COMPLETE_IT_CONFIG.TIMER_SECONDS,
       deadlineAt: new Date(
         session.currentWordStartedAt.getTime() + COMPLETE_IT_CONFIG.TIMER_SECONDS * 1000,

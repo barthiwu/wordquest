@@ -50,6 +50,11 @@ describe('BossBattleService', () => {
     bossBattleEvent: { create: jest.fn().mockResolvedValue({}) },
     userProgression: { findUniqueOrThrow: jest.fn(), update: jest.fn().mockResolvedValue({}) },
     word: { findUniqueOrThrow: jest.fn() },
+    // Defaults every player to the UK-fallback (no preference recorded) so
+    // every existing test in this file keeps exercising the pre-variant
+    // behavior unchanged; the dedicated describe block below overrides
+    // this per test to exercise the US/UK-specific paths.
+    user: { findUnique: jest.fn().mockResolvedValue({ englishVariant: null }) },
     // findOrCreateOpenGroup queries the triggering user's own in-progress
     // quest attempts for excludeWordIds (V21 §3) — empty by default so
     // pickWordsForQuest gets called with excludeWordIds: [] unless a test
@@ -87,6 +92,22 @@ describe('BossBattleService', () => {
     partOfSpeech: 'adjective',
     exampleSentence: 'She was resilient after the setback.',
     baseDifficulty: 'INTERMEDIATE',
+  };
+
+  // 'Colour'/'Color' differ both in spelling and in letter count (6 vs
+  // 5) so a wrong-variant render is impossible to miss in an assertion.
+  const colourBattleWord = {
+    id: 'w-colour',
+    word: 'Colour',
+    normalizedWord: 'colour',
+    length: 6,
+    definition: 'a property of light',
+    partOfSpeech: 'noun',
+    exampleSentence: 'The colour was striking.',
+    baseDifficulty: 'BEGINNER',
+    wordUS: 'Color',
+    normalizedWordUS: 'color',
+    exampleSentenceUS: 'The color was striking.',
   };
 
   beforeEach(async () => {
@@ -1237,6 +1258,97 @@ describe('BossBattleService', () => {
       prismaMock.bossBattleGroup.findMany.mockResolvedValueOnce([]);
       await service.autoFinalizeEndedBattles();
       expect(prismaMock.bossBattleGroup.updateMany).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('US/UK spelling-variant rendering (2026-09 fairness feature)', () => {
+    const battle = {
+      id: 'b1',
+      weekId: '2026-W33',
+      scheduledStartUtc: utc(2026, 8, 16, 17),
+      scheduledEndUtc: utc(2026, 8, 16, 18),
+    };
+
+    describe('joinBattle (resumed challenge)', () => {
+      const resumedPlayer = {
+        id: 'p1',
+        userId: 'u1',
+        groupId: 'g1',
+        questionIndex: 0,
+        currentWordId: 'w-colour',
+        currentDisplayPattern: 'C _ L O U R',
+        currentMissingIndexes: [1],
+        group: { id: 'g1', sharedWordIds: ['w-colour', 'w2'] },
+      };
+
+      it('sizes the resumed challenge to the US spelling for a US-preference player', async () => {
+        jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 17, 30));
+        prismaMock.bossBattle.findUnique.mockResolvedValueOnce(battle);
+        prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce({ level: 10 });
+        prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce(resumedPlayer);
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourBattleWord);
+        prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
+
+        const view = await service.joinBattle('u1');
+
+        expect(view.wordLength).toBe('Color'.length);
+      });
+
+      it('falls back to the UK spelling and its own letter count for a player with no preference recorded', async () => {
+        jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 17, 30));
+        prismaMock.bossBattle.findUnique.mockResolvedValueOnce(battle);
+        prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce({ level: 10 });
+        prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce(resumedPlayer);
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourBattleWord);
+        // englishVariant: null -- the prismaMock.user default set at the top of this file.
+
+        const view = await service.joinBattle('u1');
+
+        expect(view.wordLength).toBe('Colour'.length);
+      });
+    });
+
+    describe('submitAnswer', () => {
+      const colourPlayer = {
+        id: 'p1',
+        userId: 'u1',
+        groupId: 'g1',
+        battleXp: 0,
+        questionIndex: 0,
+        currentWordId: 'w-colour',
+        currentWord: colourBattleWord,
+        currentDisplayPattern: 'C _ L O U R',
+        currentMissingIndexes: [1],
+        group: { id: 'g1', status: 'LIVE', battle, sharedWordIds: ['w-colour', 'w2', 'w3'] },
+      };
+
+      it('accepts the US spelling as correct for a US-preference player and reports it back as the correct answer', async () => {
+        jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 17, 30));
+        prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce(colourPlayer);
+        prismaMock.bossBattlePlayer.update.mockResolvedValueOnce({ ...colourPlayer, battleXp: 45 });
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord); // next-challenge word, unrelated to this assertion
+        prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
+
+        const result = await service.submitAnswer('u1', 'color');
+
+        expect(result.isCorrect).toBe(true);
+        expect(result.correctAnswer).toBe('Color');
+        expect(result.exampleSentence).toBe('The color was striking.');
+      });
+
+      it('rejects the US spelling for a player who defaults to UK (no preference recorded)', async () => {
+        jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 17, 30));
+        prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce(colourPlayer);
+        prismaMock.bossBattlePlayer.update.mockResolvedValueOnce({ ...colourPlayer });
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord); // next-challenge word, unrelated to this assertion
+        // englishVariant: null -- the prismaMock.user default set at the top of this file.
+
+        const result = await service.submitAnswer('u1', 'color');
+
+        expect(result.isCorrect).toBe(false);
+        expect(result.correctAnswer).toBe('Colour');
+        expect(result.exampleSentence).toBe('The colour was striking.');
+      });
     });
   });
 });

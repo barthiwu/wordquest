@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { UsersService } from './users.service';
 import { UpdateMeDto } from './dto/update-me.dto';
@@ -29,6 +40,7 @@ export class UsersController {
       countryCode: user.countryCode,
       nativeLanguage: user.nativeLanguage,
       targetLanguage: user.targetLanguage,
+      englishVariant: user.englishVariant,
       timezone: user.timezone,
       learningGoal: user.learningGoal,
       onboardingCompletedAt: user.onboardingCompletedAt,
@@ -72,7 +84,10 @@ export class UsersController {
    * a read against an arbitrary candidate string, not a resource.
    */
   @Get('username-availability')
-  async usernameAvailability(@CurrentUserId() userId: string, @Query('username') username?: string) {
+  async usernameAvailability(
+    @CurrentUserId() userId: string,
+    @Query('username') username?: string,
+  ) {
     if (!username) return { available: false };
     return { available: await this.users.isUsernameAvailable(username, userId) };
   }
@@ -87,6 +102,7 @@ export class UsersController {
       countryCode: updated.countryCode,
       nativeLanguage: updated.nativeLanguage,
       targetLanguage: updated.targetLanguage,
+      englishVariant: updated.englishVariant,
       timezone: updated.timezone,
       learningGoal: updated.learningGoal,
       onboardingCompletedAt: updated.onboardingCompletedAt,

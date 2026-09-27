@@ -50,6 +50,8 @@ export interface CreateUserInput {
   clanId?: string;
   /** Age gate (COPPA) — already validated as 13+ by AuthService.register before this is ever called. */
   dateOfBirth: Date;
+  /** US/UK spelling preference, collected on sign-up (2026-09 fairness feature) — see RegisterDto.englishVariant's doc comment. */
+  englishVariant?: 'US' | 'UK';
 }
 
 /**
@@ -109,6 +111,7 @@ export class UsersService {
             countryCode: input.countryCode,
             clanId: input.clanId,
             dateOfBirth: input.dateOfBirth,
+            englishVariant: input.englishVariant,
             // Every new player starts with a real progression row, not a
             // lazily-created one — avoids null-checks scattered across every
             // module that reads XP/streak/journey state.
@@ -214,6 +217,8 @@ export class UsersService {
       learningGoal?: LearningGoal;
       clanId?: string;
       completeOnboarding?: boolean;
+      /** US/UK spelling preference (2026-09 fairness feature) — settable later from Settings, same as nativeLanguage/targetLanguage. */
+      englishVariant?: 'US' | 'UK';
     },
   ) {
     // The DTO only format-checks length; this is the real gate — reject
@@ -251,6 +256,7 @@ export class UsersService {
           ...(input.countryCode !== undefined && { countryCode: input.countryCode }),
           ...(input.nativeLanguage !== undefined && { nativeLanguage: input.nativeLanguage }),
           ...(input.targetLanguage !== undefined && { targetLanguage: input.targetLanguage }),
+          ...(input.englishVariant !== undefined && { englishVariant: input.englishVariant }),
           ...(input.timezone !== undefined && { timezone: input.timezone }),
           ...(input.learningGoal !== undefined && { learningGoal: input.learningGoal }),
           ...(input.clanId !== undefined && { clanId: input.clanId }),

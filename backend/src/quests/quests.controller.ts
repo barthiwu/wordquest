@@ -79,8 +79,8 @@ export class QuestsController {
 
   @Post('history/check')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
-  checkHistoryAnswer(@Body() dto: CheckHistoryAnswerDto) {
-    return this.quests.checkHistoryAnswer(dto.wordId, dto.answer);
+  checkHistoryAnswer(@CurrentUserId() userId: string, @Body() dto: CheckHistoryAnswerDto) {
+    return this.quests.checkHistoryAnswer(userId, dto.wordId, dto.answer);
   }
 
   @Post('attempts/:attemptId/answer')
