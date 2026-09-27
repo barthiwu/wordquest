@@ -6,6 +6,7 @@ import { ArcadeChallengeService } from '../challenge.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { ProgressionService } from '../../progression/progression.service';
 import { FriendsService } from '../../friends/friends.service';
+import { AliService } from '../../ali/ali.service';
 import { WORD_DUEL_CONFIG, WORD_DUEL_TIEBREAK_DESCRIPTION } from '../config/arcade.config';
 
 /**
@@ -295,6 +296,10 @@ describe('WordDuelService', () => {
     areBlocked: jest.fn().mockResolvedValue(false),
     getPublicIdentity: jest.fn().mockResolvedValue(null),
   };
+  const aliMock = {
+    react: jest.fn(),
+    listReactionsSince: jest.fn().mockResolvedValue([]),
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -311,6 +316,8 @@ describe('WordDuelService', () => {
     progressionMock.recordDailyActivity.mockResolvedValue({ currentStreak: 1 });
     friendsMock.areBlocked.mockReset().mockResolvedValue(false);
     friendsMock.getPublicIdentity.mockReset().mockResolvedValue(null);
+    aliMock.react.mockReset();
+    aliMock.listReactionsSince.mockReset().mockResolvedValue([]);
 
     store.words.set('w1', {
       id: 'w1',
@@ -333,6 +340,7 @@ describe('WordDuelService', () => {
         { provide: RewardEngineService, useValue: rewardEngineMock },
         { provide: ProgressionService, useValue: progressionMock },
         { provide: FriendsService, useValue: friendsMock },
+        { provide: AliService, useValue: aliMock },
       ],
     }).compile();
     service = moduleRef.get(WordDuelService);
@@ -728,6 +736,62 @@ describe('WordDuelService', () => {
       expect(result.state.result).not.toBeNull();
       expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u1');
       expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u2');
+    });
+
+    it('reads back a STREAK_MILESTONE and any deferred reactions once the match completes (task #99 follow-up)', async () => {
+      seedActiveMatch({ wordIds: ['w1'], endsAt: new Date(Date.now() - 1_000) });
+      rewardEngineMock.calculate.mockReturnValue({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+      aliMock.listReactionsSince.mockResolvedValueOnce([
+        {
+          text: 'Seven days!',
+          recommendation: null,
+          eventType: 'STREAK_MILESTONE',
+          createdAt: new Date().toISOString(),
+          expression: 'PROUD',
+          pose: 'APPROVING_NOD',
+          intensity: 3,
+          priority: 3,
+          durationMs: 2500,
+        },
+        {
+          text: 'Level 5!',
+          recommendation: null,
+          eventType: 'LEVEL_UP',
+          createdAt: new Date().toISOString(),
+          expression: 'EXCITED',
+          pose: 'CELEBRATORY_HOP',
+          intensity: 4,
+          priority: 4,
+          durationMs: 3000,
+        },
+      ]);
+
+      const result = await service.submitAnswer('u1', 'm1', 'train');
+
+      expect(aliMock.listReactionsSince).toHaveBeenCalledWith(
+        'u1',
+        store.matches.get('m1')!.startedAt,
+        expect.arrayContaining(['STREAK_MILESTONE', 'LEVEL_UP', 'JOURNEY_COMPLETION']),
+      );
+      expect(result.state.streakReaction?.text).toBe('Seven days!');
+      expect(result.state.deferredAliReactions).toHaveLength(1);
+      expect(result.state.deferredAliReactions[0].text).toBe('Level 5!');
+    });
+
+    it('leaves streakReaction/deferredAliReactions empty while the match is still ACTIVE', async () => {
+      seedActiveMatch();
+
+      const view = await service.getState('u1', 'm1');
+
+      expect(view.streakReaction).toBeNull();
+      expect(view.deferredAliReactions).toEqual([]);
+      expect(aliMock.listReactionsSince).not.toHaveBeenCalled();
     });
 
     it('breaks a tie in correctCount by whoever reached their final total earliest', async () => {
