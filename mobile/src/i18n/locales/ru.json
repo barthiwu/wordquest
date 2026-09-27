@@ -805,6 +805,8 @@
     "incorrectFeedback": "Не совсем.",
     "timedOutFeedback": "Время вышло!",
     "revealPrefix": "Слово было",
+    "meaningButton": "Значение и синонимы",
+    "synonymsListLabel": "Синонимы: {{list}}",
     "continue": "Продолжить",
     "exit": "Выйти",
     "sessionCompleteTitle": "Сессия завершена!",

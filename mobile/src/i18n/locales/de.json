@@ -805,6 +805,8 @@
     "incorrectFeedback": "Nicht ganz.",
     "timedOutFeedback": "Zeit abgelaufen!",
     "revealPrefix": "Das Wort war",
+    "meaningButton": "Bedeutung & Synonyme",
+    "synonymsListLabel": "Synonyme: {{list}}",
     "continue": "Weiter",
     "exit": "Verlassen",
     "sessionCompleteTitle": "Runde beendet!",

@@ -47,6 +47,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   const [challenge, setChallenge] = useState<ScrambleQuestChallenge | null>(null);
   const [answer, setAnswer] = useState('');
   const [feedback, setFeedback] = useState<ScrambleQuestAnswerResult | null>(null);
+  const [showMeaning, setShowMeaning] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const autoSubmittedRef = useRef(false);
 
@@ -91,6 +92,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   const handleSubmit = async (submittedAnswer: string) => {
     if (!accessToken || !challenge || phase === 'submitting') return;
     setPhase('submitting');
+    setShowMeaning(false);
     try {
       const result = await submitScrambleAnswer(accessToken, challenge.sessionId, submittedAnswer);
       setFeedback(result);
@@ -288,6 +290,25 @@ export function ScrambleQuestScreen({ navigation }: Props) {
               </Text>
             )}
             <Pressable
+              style={styles.meaningButton}
+              onPress={() => setShowMeaning((v) => !v)}
+              accessibilityRole="button"
+              accessibilityLabel={t('meaningButton')}
+            >
+              <Text style={styles.meaningButtonText}>{t('meaningButton')}</Text>
+            </Pressable>
+            {showMeaning && (
+              <View style={styles.meaningCard}>
+                <Text style={styles.meaningPartOfSpeech}>{feedback.meaning.partOfSpeech}</Text>
+                <Text style={styles.meaningDefinition}>{feedback.meaning.definition}</Text>
+                {feedback.meaning.synonyms.length > 0 && (
+                  <Text style={styles.meaningSynonyms}>
+                    {t('synonymsListLabel', { list: feedback.meaning.synonyms.join(', ') })}
+                  </Text>
+                )}
+              </View>
+            )}
+            <Pressable
               style={styles.button}
               onPress={handleContinue}
               accessibilityRole="button"
@@ -421,6 +442,28 @@ function createStyles(colors: ThemeColors, topInset: number) {
       borderColor: colors.arcaneSoft,
     },
     hintButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
+    meaningButton: {
+      borderRadius: radius.md,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    meaningButtonText: { color: colors.inkMuted, fontSize: typography.scale.sm, fontWeight: '700' },
+    meaningCard: {
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      gap: spacing.xs,
+    },
+    meaningPartOfSpeech: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+    },
+    meaningDefinition: { color: colors.ink, fontSize: typography.scale.sm },
+    meaningSynonyms: { color: colors.inkMuted, fontSize: typography.scale.xs },
     feedbackBar: { gap: spacing.sm },
     feedbackText: { fontSize: typography.scale.md, fontWeight: '700' },
     revealText: { color: colors.inkMuted, fontSize: typography.scale.sm },

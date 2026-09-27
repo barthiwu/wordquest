@@ -25,6 +25,15 @@ export interface ScrambleQuestHint {
   hintsRemaining: number;
 }
 
+/** A completed word's meaning — populated only once the word has been
+ * answered (correct, wrong, or timed out), never while it's still the
+ * active puzzle. */
+export interface ScrambleQuestWordMeaning {
+  definition: string;
+  partOfSpeech: string;
+  synonyms: string[];
+}
+
 export interface ScrambleQuestAnswerResult {
   isCorrect: boolean;
   timedOut: boolean;
@@ -37,6 +46,7 @@ export interface ScrambleQuestAnswerResult {
   correctCount: number;
   wordsTotal: number;
   nextChallenge: ScrambleQuestChallenge | null;
+  meaning: ScrambleQuestWordMeaning;
 }
 
 /** Starts a new session, or resumes one already in progress. */

@@ -805,6 +805,8 @@
     "incorrectFeedback": "No es correcto.",
     "timedOutFeedback": "¡Se acabó el tiempo!",
     "revealPrefix": "La palabra era",
+    "meaningButton": "Significado y sinónimos",
+    "synonymsListLabel": "Sinónimos: {{list}}",
     "continue": "Continuar",
     "exit": "Salir",
     "sessionCompleteTitle": "¡Sesión completada!",

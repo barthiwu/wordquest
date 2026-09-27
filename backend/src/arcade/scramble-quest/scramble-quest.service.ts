@@ -45,6 +45,16 @@ export interface ScrambleQuestHintResult {
   hintsRemaining: number;
 }
 
+/** A completed word's meaning, surfaced only after it's been answered —
+ * never while it's still the active puzzle (spec convention shared with
+ * DailyQuest's UnderstandingContent: don't give the answer away before
+ * the player has actually guessed it). */
+export interface ScrambleQuestWordMeaning {
+  definition: string;
+  partOfSpeech: string;
+  synonyms: string[];
+}
+
 export interface ScrambleQuestAnswerResult {
   isCorrect: boolean;
   timedOut: boolean;
@@ -57,6 +67,11 @@ export interface ScrambleQuestAnswerResult {
   correctCount: number;
   wordsTotal: number;
   nextChallenge: ScrambleQuestChallengeView | null;
+  /** This word's definition/part-of-speech/synonyms — populated once
+   * it's been answered (correct, wrong, or timed out). The client
+   * shows it behind an opt-in "Meaning & synonyms" card, not
+   * automatically. */
+  meaning: ScrambleQuestWordMeaning;
 }
 
 type ArcadeGameSessionRow = Prisma.ArcadeGameSessionGetPayload<Record<string, never>>;
@@ -291,6 +306,11 @@ export class ScrambleQuestService {
       correctCount,
       wordsTotal: session.wordsTotal,
       nextChallenge,
+      meaning: {
+        definition: word.definition,
+        partOfSpeech: word.partOfSpeech,
+        synonyms: word.synonyms,
+      },
     };
   }
 

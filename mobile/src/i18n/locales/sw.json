@@ -805,6 +805,8 @@
     "incorrectFeedback": "Si sahihi kabisa.",
     "timedOutFeedback": "Muda umeisha!",
     "revealPrefix": "Neno lilikuwa",
+    "meaningButton": "Maana na visawe",
+    "synonymsListLabel": "Visawe: {{list}}",
     "continue": "Endelea",
     "exit": "Ondoka",
     "sessionCompleteTitle": "Kipindi kimekamilika!",

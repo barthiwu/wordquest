@@ -805,6 +805,8 @@
     "incorrectFeedback": "Pas tout à fait.",
     "timedOutFeedback": "Temps écoulé !",
     "revealPrefix": "Le mot était",
+    "meaningButton": "Signification et synonymes",
+    "synonymsListLabel": "Synonymes : {{list}}",
     "continue": "Continuer",
     "exit": "Quitter",
     "sessionCompleteTitle": "Session terminée !",

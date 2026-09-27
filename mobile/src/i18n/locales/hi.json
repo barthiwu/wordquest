@@ -805,6 +805,8 @@
     "incorrectFeedback": "बिल्कुल सही नहीं।",
     "timedOutFeedback": "समय समाप्त!",
     "revealPrefix": "शब्द था",
+    "meaningButton": "अर्थ और पर्यायवाची",
+    "synonymsListLabel": "पर्यायवाची: {{list}}",
     "continue": "जारी रखें",
     "exit": "बाहर निकलें",
     "sessionCompleteTitle": "सेशन पूरा हुआ!",
