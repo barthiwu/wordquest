@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "Impossible d'accéder à Complete It pour le moment."
+  },
+  "wordDuel": {
+    "genericError": "Impossible d'accéder à Word Duel pour le moment.",
+    "waitingTitle": "Recherche d'un adversaire…",
+    "waitingSubtitle": "Patientez — ça ne devrait pas être long.",
+    "noOpponentTitle": "Aucun adversaire trouvé",
+    "noOpponentSubtitle": "Personne n'était disponible pour un duel en ce moment.",
+    "tryAgain": "Réessayer",
+    "waitingForOpponentTitle": "Vous avez terminé !",
+    "waitingForOpponentSubtitle": "En attente de la fin du match…",
+    "matchTimeLabel": "Temps restant",
+    "youLabel": "Vous",
+    "opponentLabel": "Adversaire",
+    "correctCountLabel": "{{count}} correctes",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "{{revealed}}/{{max}} indices révélés",
+    "answerPlaceholder": "Tapez le mot...",
+    "yourAnswerLabel": "Votre réponse",
+    "submit": "Valider",
+    "correctFeedback": "Correct ! +{{xp}} XP",
+    "incorrectFeedback": "Pas tout à fait — {{answer}}",
+    "resultWinTitle": "Vous avez gagné !",
+    "resultLoseTitle": "Vous avez perdu",
+    "resultDrawTitle": "Match nul",
+    "resultYouSummary": "Vous : {{correct}} correctes, {{xp}} XP",
+    "resultOpponentSummary": "Adversaire : {{correct}} correctes, {{xp}} XP",
+    "resultTiebreakNote": "Départagé — le plus de bonnes réponses, puis le plus rapide à atteindre son score final.",
+    "playAgain": "Rejouer"
   }
 }

@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "Complete It konnte momentan nicht erreicht werden."
+  },
+  "wordDuel": {
+    "genericError": "Word Duel konnte momentan nicht erreicht werden.",
+    "waitingTitle": "Gegner wird gesucht…",
+    "waitingSubtitle": "Einen Moment — das dauert nicht lange.",
+    "noOpponentTitle": "Kein Gegner gefunden",
+    "noOpponentSubtitle": "Gerade war niemand für ein Duell verfügbar.",
+    "tryAgain": "Erneut versuchen",
+    "waitingForOpponentTitle": "Du bist fertig!",
+    "waitingForOpponentSubtitle": "Warten auf das Ende des Matches…",
+    "matchTimeLabel": "Verbleibende Zeit",
+    "youLabel": "Du",
+    "opponentLabel": "Gegner",
+    "correctCountLabel": "{{count}} richtig",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "{{revealed}}/{{max}} Hinweise aufgedeckt",
+    "answerPlaceholder": "Wort eingeben...",
+    "yourAnswerLabel": "Deine Antwort",
+    "submit": "Absenden",
+    "correctFeedback": "Richtig! +{{xp}} XP",
+    "incorrectFeedback": "Nicht ganz — {{answer}}",
+    "resultWinTitle": "Du hast gewonnen!",
+    "resultLoseTitle": "Du hast verloren",
+    "resultDrawTitle": "Unentschieden",
+    "resultYouSummary": "Du: {{correct}} richtig, {{xp}} XP",
+    "resultOpponentSummary": "Gegner: {{correct}} richtig, {{xp}} XP",
+    "resultTiebreakNote": "Per Stichentscheid — meiste richtige Antworten, dann wer sein Endergebnis zuerst erreicht hat.",
+    "playAgain": "Nochmal spielen"
   }
 }

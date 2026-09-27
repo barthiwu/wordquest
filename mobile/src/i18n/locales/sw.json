@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "Imeshindwa kufikia Complete It kwa sasa."
+  },
+  "wordDuel": {
+    "genericError": "Imeshindwa kufikia Word Duel kwa sasa.",
+    "waitingTitle": "Inatafuta mpinzani…",
+    "waitingSubtitle": "Subiri kidogo — haitachukua muda mrefu.",
+    "noOpponentTitle": "Hakuna mpinzani aliyepatikana",
+    "noOpponentSubtitle": "Hakuna aliyekuwepo kwa mchezo wa mashindano sasa hivi.",
+    "tryAgain": "Jaribu Tena",
+    "waitingForOpponentTitle": "Umemaliza maneno yako yote!",
+    "waitingForOpponentSubtitle": "Inasubiri mechi imalizike…",
+    "matchTimeLabel": "Muda uliobaki",
+    "youLabel": "Wewe",
+    "opponentLabel": "Mpinzani",
+    "correctCountLabel": "{{count}} sahihi",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "Vidokezo {{revealed}}/{{max}} vimefunuliwa",
+    "answerPlaceholder": "Andika neno...",
+    "yourAnswerLabel": "Jibu lako",
+    "submit": "Tuma",
+    "correctFeedback": "Sahihi! +{{xp}} XP",
+    "incorrectFeedback": "Sio sahihi kabisa — {{answer}}",
+    "resultWinTitle": "Umeshinda!",
+    "resultLoseTitle": "Umeshindwa",
+    "resultDrawTitle": "Sare",
+    "resultYouSummary": "Wewe: {{correct}} sahihi, {{xp}} XP",
+    "resultOpponentSummary": "Mpinzani: {{correct}} sahihi, {{xp}} XP",
+    "resultTiebreakNote": "Imeamuliwa kwa kuvunja sare — majibu mengi sahihi zaidi, kisha aliyefika haraka zaidi kwenye alama yake ya mwisho.",
+    "playAgain": "Cheza tena"
   }
 }

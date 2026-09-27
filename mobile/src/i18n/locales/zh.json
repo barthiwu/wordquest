@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "暂时无法连接到 Complete It。"
+  },
+  "wordDuel": {
+    "genericError": "暂时无法连接到 Word Duel。",
+    "waitingTitle": "正在寻找对手…",
+    "waitingSubtitle": "请稍候——不会太久。",
+    "noOpponentTitle": "未找到对手",
+    "noOpponentSubtitle": "现在没有人可以对战。",
+    "tryAgain": "重试",
+    "waitingForOpponentTitle": "你已全部完成！",
+    "waitingForOpponentSubtitle": "正在等待比赛结束…",
+    "matchTimeLabel": "剩余时间",
+    "youLabel": "你",
+    "opponentLabel": "对手",
+    "correctCountLabel": "{{count}} 个正确",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "已揭示 {{revealed}}/{{max}} 个提示",
+    "answerPlaceholder": "输入单词...",
+    "yourAnswerLabel": "你的答案",
+    "submit": "提交",
+    "correctFeedback": "正确！+{{xp}} XP",
+    "incorrectFeedback": "不太对——{{answer}}",
+    "resultWinTitle": "你赢了！",
+    "resultLoseTitle": "你输了",
+    "resultDrawTitle": "平局",
+    "resultYouSummary": "你：{{correct}} 个正确，{{xp}} XP",
+    "resultOpponentSummary": "对手：{{correct}} 个正确，{{xp}} XP",
+    "resultTiebreakNote": "通过决胜规则判定——正确数更多者胜，若仍相同则以更快达到最终得分者胜。",
+    "playAgain": "再玩一次"
   }
 }

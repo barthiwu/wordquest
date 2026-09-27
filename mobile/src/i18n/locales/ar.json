@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "تعذّر الوصول إلى Complete It حاليًا."
+  },
+  "wordDuel": {
+    "genericError": "تعذّر الوصول إلى Word Duel حاليًا.",
+    "waitingTitle": "جارٍ البحث عن خصم…",
+    "waitingSubtitle": "يرجى الانتظار قليلًا — لن يستغرق الأمر طويلًا.",
+    "noOpponentTitle": "لم يتم العثور على خصم",
+    "noOpponentSubtitle": "لم يكن أحد متاحًا للمبارزة الآن.",
+    "tryAgain": "المحاولة مجددًا",
+    "waitingForOpponentTitle": "لقد أنهيت كلماتك!",
+    "waitingForOpponentSubtitle": "في انتظار انتهاء المباراة…",
+    "matchTimeLabel": "الوقت المتبقي",
+    "youLabel": "أنت",
+    "opponentLabel": "الخصم",
+    "correctCountLabel": "{{count}} إجابة صحيحة",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "تم كشف {{revealed}}/{{max}} من التلميحات",
+    "answerPlaceholder": "اكتب الكلمة...",
+    "yourAnswerLabel": "إجابتك",
+    "submit": "إرسال",
+    "correctFeedback": "إجابة صحيحة! +{{xp}} XP",
+    "incorrectFeedback": "ليست صحيحة تمامًا — {{answer}}",
+    "resultWinTitle": "لقد فزت!",
+    "resultLoseTitle": "لقد خسرت",
+    "resultDrawTitle": "تعادل",
+    "resultYouSummary": "أنت: {{correct}} إجابة صحيحة، {{xp}} XP",
+    "resultOpponentSummary": "الخصم: {{correct}} إجابة صحيحة، {{xp}} XP",
+    "resultTiebreakNote": "تم الحسم بكسر التعادل — أكثر الإجابات الصحيحة، ثم الأسرع في بلوغ نتيجته النهائية.",
+    "playAgain": "العب مرة أخرى"
   }
 }

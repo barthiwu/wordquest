@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "اکنون امکان دسترسی به Complete It نیست."
+  },
+  "wordDuel": {
+    "genericError": "اکنون امکان دسترسی به Word Duel نیست.",
+    "waitingTitle": "در حال جستجوی حریف…",
+    "waitingSubtitle": "کمی صبر کنید — زیاد طول نمی‌کشد.",
+    "noOpponentTitle": "حریفی یافت نشد",
+    "noOpponentSubtitle": "در حال حاضر کسی برای مبارزه در دسترس نبود.",
+    "tryAgain": "تلاش دوباره",
+    "waitingForOpponentTitle": "شما کارتان تمام شد!",
+    "waitingForOpponentSubtitle": "در انتظار پایان مسابقه…",
+    "matchTimeLabel": "زمان باقی‌مانده",
+    "youLabel": "شما",
+    "opponentLabel": "حریف",
+    "correctCountLabel": "{{count}} درست",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "{{revealed}}/{{max}} سرنخ آشکار شد",
+    "answerPlaceholder": "کلمه را تایپ کنید...",
+    "yourAnswerLabel": "پاسخ شما",
+    "submit": "ارسال",
+    "correctFeedback": "درست! +{{xp}} XP",
+    "incorrectFeedback": "دقیقاً درست نیست — {{answer}}",
+    "resultWinTitle": "شما بردید!",
+    "resultLoseTitle": "شما باختید",
+    "resultDrawTitle": "مساوی",
+    "resultYouSummary": "شما: {{correct}} درست، {{xp}} XP",
+    "resultOpponentSummary": "حریف: {{correct}} درست، {{xp}} XP",
+    "resultTiebreakNote": "با قانون تساوی‌شکن تعیین شد — بیشترین پاسخ درست، سپس سریع‌ترین رسیدن به امتیاز نهایی.",
+    "playAgain": "دوباره بازی کن"
   }
 }

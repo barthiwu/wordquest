@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "Could not reach Complete It right now."
+  },
+  "wordDuel": {
+    "genericError": "Could not reach Word Duel right now.",
+    "waitingTitle": "Finding an opponent…",
+    "waitingSubtitle": "Hang tight — this won't take long.",
+    "noOpponentTitle": "No opponent found",
+    "noOpponentSubtitle": "Nobody was available to duel right now.",
+    "tryAgain": "Try Again",
+    "waitingForOpponentTitle": "You're all done!",
+    "waitingForOpponentSubtitle": "Waiting for the match to finish…",
+    "matchTimeLabel": "Time left",
+    "youLabel": "You",
+    "opponentLabel": "Opponent",
+    "correctCountLabel": "{{count}} correct",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "{{revealed}}/{{max}} clues revealed",
+    "answerPlaceholder": "Type the word...",
+    "yourAnswerLabel": "Your answer",
+    "submit": "Submit",
+    "correctFeedback": "Correct! +{{xp}} XP",
+    "incorrectFeedback": "Not quite — {{answer}}",
+    "resultWinTitle": "You won!",
+    "resultLoseTitle": "You lost",
+    "resultDrawTitle": "It's a draw",
+    "resultYouSummary": "You: {{correct}} correct, {{xp}} XP",
+    "resultOpponentSummary": "Opponent: {{correct}} correct, {{xp}} XP",
+    "resultTiebreakNote": "Decided by a tiebreak — most correct answers, then fastest to your final score.",
+    "playAgain": "Play again"
   }
 }

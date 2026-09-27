@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "Не удалось подключиться к Complete It."
+  },
+  "wordDuel": {
+    "genericError": "Не удалось подключиться к Word Duel.",
+    "waitingTitle": "Поиск соперника…",
+    "waitingSubtitle": "Подождите немного — это не займёт много времени.",
+    "noOpponentTitle": "Соперник не найден",
+    "noOpponentSubtitle": "Сейчас никто не был доступен для дуэли.",
+    "tryAgain": "Повторить попытку",
+    "waitingForOpponentTitle": "Вы всё выполнили!",
+    "waitingForOpponentSubtitle": "Ожидание окончания матча…",
+    "matchTimeLabel": "Осталось времени",
+    "youLabel": "Вы",
+    "opponentLabel": "Соперник",
+    "correctCountLabel": "{{count}} верно",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "Открыто подсказок: {{revealed}}/{{max}}",
+    "answerPlaceholder": "Введите слово...",
+    "yourAnswerLabel": "Ваш ответ",
+    "submit": "Отправить",
+    "correctFeedback": "Верно! +{{xp}} XP",
+    "incorrectFeedback": "Не совсем — {{answer}}",
+    "resultWinTitle": "Вы победили!",
+    "resultLoseTitle": "Вы проиграли",
+    "resultDrawTitle": "Ничья",
+    "resultYouSummary": "Вы: {{correct}} верно, {{xp}} XP",
+    "resultOpponentSummary": "Соперник: {{correct}} верно, {{xp}} XP",
+    "resultTiebreakNote": "Решено по правилу ничьей — больше верных ответов, затем кто быстрее достиг своего итогового счёта.",
+    "playAgain": "Играть снова"
   }
 }

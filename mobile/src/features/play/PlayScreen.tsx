@@ -255,9 +255,9 @@ export function PlayScreen({ navigation }: Props) {
       <GameRow
         title={t('arcade:wordDuelTitle')}
         subtitle={t('arcade:wordDuelSubtitle')}
-        cta={t('arcade:comingSoon')}
-        enabled={false}
-        onPress={() => {}}
+        cta={t('arcade:play')}
+        enabled
+        onPress={() => navigation.navigate('WordDuel')}
         styles={styles}
       />
       <GameRow

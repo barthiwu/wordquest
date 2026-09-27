@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "Não foi possível acessar o Complete It agora."
+  },
+  "wordDuel": {
+    "genericError": "Não foi possível acessar o Word Duel agora.",
+    "waitingTitle": "Procurando um adversário…",
+    "waitingSubtitle": "Aguarde um instante — não deve demorar.",
+    "noOpponentTitle": "Nenhum adversário encontrado",
+    "noOpponentSubtitle": "Ninguém estava disponível para duelar agora.",
+    "tryAgain": "Tentar novamente",
+    "waitingForOpponentTitle": "Você terminou!",
+    "waitingForOpponentSubtitle": "Aguardando o fim da partida…",
+    "matchTimeLabel": "Tempo restante",
+    "youLabel": "Você",
+    "opponentLabel": "Adversário",
+    "correctCountLabel": "{{count}} corretas",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "{{revealed}}/{{max}} dicas reveladas",
+    "answerPlaceholder": "Digite a palavra...",
+    "yourAnswerLabel": "Sua resposta",
+    "submit": "Enviar",
+    "correctFeedback": "Correto! +{{xp}} XP",
+    "incorrectFeedback": "Não foi dessa vez — {{answer}}",
+    "resultWinTitle": "Você venceu!",
+    "resultLoseTitle": "Você perdeu",
+    "resultDrawTitle": "Empate",
+    "resultYouSummary": "Você: {{correct}} corretas, {{xp}} XP",
+    "resultOpponentSummary": "Adversário: {{correct}} corretas, {{xp}} XP",
+    "resultTiebreakNote": "Decidido por desempate — mais respostas corretas, depois quem chegou primeiro à pontuação final.",
+    "playAgain": "Jogar novamente"
   }
 }

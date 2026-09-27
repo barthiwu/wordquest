@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "अभी Complete It से संपर्क नहीं हो सका।"
+  },
+  "wordDuel": {
+    "genericError": "अभी Word Duel से संपर्क नहीं हो सका।",
+    "waitingTitle": "प्रतिद्वंद्वी खोजा जा रहा है…",
+    "waitingSubtitle": "थोड़ा इंतज़ार करें — इसमें ज़्यादा समय नहीं लगेगा।",
+    "noOpponentTitle": "कोई प्रतिद्वंद्वी नहीं मिला",
+    "noOpponentSubtitle": "अभी द्वंद्व के लिए कोई उपलब्ध नहीं था।",
+    "tryAgain": "फिर से कोशिश करें",
+    "waitingForOpponentTitle": "आपके सभी शब्द पूरे हो गए!",
+    "waitingForOpponentSubtitle": "मैच खत्म होने का इंतज़ार है…",
+    "matchTimeLabel": "शेष समय",
+    "youLabel": "आप",
+    "opponentLabel": "प्रतिद्वंद्वी",
+    "correctCountLabel": "{{count}} सही",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "{{revealed}}/{{max}} संकेत उजागर",
+    "answerPlaceholder": "शब्द लिखें...",
+    "yourAnswerLabel": "आपका उत्तर",
+    "submit": "सबमिट करें",
+    "correctFeedback": "सही! +{{xp}} XP",
+    "incorrectFeedback": "बिल्कुल सही नहीं — {{answer}}",
+    "resultWinTitle": "आप जीत गए!",
+    "resultLoseTitle": "आप हार गए",
+    "resultDrawTitle": "बराबरी",
+    "resultYouSummary": "आप: {{correct}} सही, {{xp}} XP",
+    "resultOpponentSummary": "प्रतिद्वंद्वी: {{correct}} सही, {{xp}} XP",
+    "resultTiebreakNote": "टाईब्रेक से तय — सबसे ज़्यादा सही उत्तर, फिर अपने अंतिम स्कोर तक सबसे तेज़ पहुँचने वाला।",
+    "playAgain": "फिर से खेलें"
   }
 }

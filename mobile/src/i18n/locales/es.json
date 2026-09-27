@@ -828,5 +828,33 @@
   },
   "completeIt": {
     "genericError": "No se pudo conectar con Complete It en este momento."
+  },
+  "wordDuel": {
+    "genericError": "No se pudo conectar con Word Duel en este momento.",
+    "waitingTitle": "Buscando un oponente…",
+    "waitingSubtitle": "Un momento — no debería tardar mucho.",
+    "noOpponentTitle": "No se encontró oponente",
+    "noOpponentSubtitle": "Nadie estaba disponible para un duelo ahora mismo.",
+    "tryAgain": "Intentar de nuevo",
+    "waitingForOpponentTitle": "¡Ya terminaste!",
+    "waitingForOpponentSubtitle": "Esperando a que termine la partida…",
+    "matchTimeLabel": "Tiempo restante",
+    "youLabel": "Tú",
+    "opponentLabel": "Oponente",
+    "correctCountLabel": "{{count}} correctas",
+    "xpLabel": "{{xp}} XP",
+    "clueProgressLabel": "{{revealed}}/{{max}} pistas reveladas",
+    "answerPlaceholder": "Escribe la palabra...",
+    "yourAnswerLabel": "Tu respuesta",
+    "submit": "Enviar",
+    "correctFeedback": "¡Correcto! +{{xp}} XP",
+    "incorrectFeedback": "No es correcto — {{answer}}",
+    "resultWinTitle": "¡Ganaste!",
+    "resultLoseTitle": "Perdiste",
+    "resultDrawTitle": "Empate",
+    "resultYouSummary": "Tú: {{correct}} correctas, {{xp}} XP",
+    "resultOpponentSummary": "Oponente: {{correct}} correctas, {{xp}} XP",
+    "resultTiebreakNote": "Decidido por desempate — más respuestas correctas, luego quien llegó primero a su puntaje final.",
+    "playAgain": "Jugar de nuevo"
   }
 }

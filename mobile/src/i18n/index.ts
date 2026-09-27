@@ -76,6 +76,7 @@ export const NAMESPACES = [
   'scrambleQuest',
   'play',
   'completeIt',
+  'wordDuel',
 ] as const;
 
 export type Namespace = (typeof NAMESPACES)[number];
