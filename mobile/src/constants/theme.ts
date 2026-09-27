@@ -30,6 +30,16 @@ export interface ThemeColors {
   danger: string;
   glyph: string;
   border: string;
+  /** Countdown-ring track color (CompleteIt/WordDuel/ScrambleQuest's
+   * CountdownRing). Deliberately its own token, not a reuse of `border`:
+   * `border` is tuned as a warm, low-contrast hairline for card edges,
+   * which put it in the same warm hue family as `danger`'s red and
+   * made the ring's urgent-red arc "fade off" into its own track
+   * instead of popping (Barth, Sept 2026 design pass). `ringTrack` is a
+   * neutral tint of `ink` instead -- hue-distant from both `danger`
+   * red and the calm `arcaneSoft` purple arc, so the ring reads clearly
+   * in either state. */
+  ringTrack: string;
 }
 
 export const darkColors: ThemeColors = {
@@ -54,6 +64,10 @@ export const darkColors: ThemeColors = {
   glyph: '#F4C542',
 
   border: '#332D6B',
+  // ink (#F4F1E8) blended ~22% over background (#12102A) -- a neutral
+  // slate rather than another indigo, so the ring track reads distinct
+  // from both the calm arcaneSoft arc and the urgent danger-red one.
+  ringTrack: '#444254',
 } as const;
 
 /**
@@ -106,6 +120,13 @@ export const lightColors: ThemeColors = {
   // ~33% sat -- a border, not a new color) to ~2.7-3:1, in line with
   // WCAG 1.4.11's 3:1 guidance for UI component boundaries.
   border: '#A79354',
+
+  // ink (#1E1B33) blended ~22% over background (#F7F3E9) -- a neutral
+  // warm-gray, deliberately NOT `border`'s olive-gold: that hue sits too
+  // close to `danger`'s red for the countdown ring's urgent arc to read
+  // as an alarm against it. A hue-neutral track makes both the calm
+  // (arcaneSoft) and urgent (danger) arc colors pop against it.
+  ringTrack: '#C8C4C1',
 } as const;
 
 /** Default/fallback palette for screens not yet wired to the theme

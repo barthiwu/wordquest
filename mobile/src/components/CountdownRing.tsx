@@ -89,7 +89,14 @@ export function CountdownRing({
   return (
     <View style={[styles.wrap, { width: size, height: size }]}>
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={styles.svg}>
-        <Circle cx={center} cy={center} r={radius} fill="none" stroke={colors.border} strokeWidth={strokeWidth} />
+        <Circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          stroke={colors.ringTrack}
+          strokeWidth={strokeWidth}
+        />
         <AnimatedCircle
           cx={center}
           cy={center}
@@ -108,7 +115,11 @@ export function CountdownRing({
       <View style={styles.center}>
         <Text
           style={[
-            { color: colors.ink, fontSize: typography.scale.xl, fontWeight: typography.display.weight },
+            {
+              color: colors.ink,
+              fontSize: typography.scale.xl,
+              fontWeight: typography.display.weight,
+            },
             urgent && { color: colors.danger },
           ]}
         >
