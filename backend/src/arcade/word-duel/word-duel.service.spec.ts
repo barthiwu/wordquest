@@ -320,6 +320,8 @@ describe('WordDuelService', () => {
       expect(challengesMock.pickChallenges).toHaveBeenCalledWith(
         'u1',
         WORD_DUEL_CONFIG.WORDS_PER_MATCH,
+        [],
+        WORD_DUEL_CONFIG.MIN_WORD_LENGTH,
       );
       expect(view.status).toBe('WAITING');
       expect(view.wordsTotal).toBe(2);

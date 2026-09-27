@@ -381,7 +381,7 @@ describe('QuestsService', () => {
 
       await service.startTimedQuest('u1', 'morning-quest', '2026-08-14', 8);
 
-      expect(wordsMock.pickWordsForQuest).toHaveBeenCalledWith('u1', 7, []);
+      expect(wordsMock.pickWordsForQuest).toHaveBeenCalledWith('u1', 7, [], gameplayRules.quest.minWordLength);
     });
 
     it('falls back to the configured default word count when quest.wordCount is unset', async () => {
@@ -408,6 +408,7 @@ describe('QuestsService', () => {
         'u1',
         gameplayRules.quest.defaultWordCount,
         [],
+        gameplayRules.quest.minWordLength,
       );
     });
 
@@ -439,11 +440,12 @@ describe('QuestsService', () => {
         where: { userId: 'u1', status: 'IN_PROGRESS' },
         select: { wordIds: true },
       });
-      expect(wordsMock.pickWordsForQuest).toHaveBeenCalledWith('u1', 5, [
-        'pending-1',
-        'pending-2',
-        'pending-3',
-      ]);
+      expect(wordsMock.pickWordsForQuest).toHaveBeenCalledWith(
+        'u1',
+        5,
+        ['pending-1', 'pending-2', 'pending-3'],
+        gameplayRules.quest.minWordLength,
+      );
     });
 
     it('looks up mastery level for the word before generating the challenge, and persists the shown pattern', async () => {

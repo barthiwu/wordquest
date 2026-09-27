@@ -109,6 +109,8 @@ export class CompleteItService {
     const picked = await this.challenges.pickChallenges(
       userId,
       COMPLETE_IT_CONFIG.WORDS_PER_SESSION,
+      [],
+      COMPLETE_IT_CONFIG.MIN_WORD_LENGTH,
     );
     const blankable = picked.filter(
       (c) => blankSentence(c.word.exampleSentence, c.word.word).found,

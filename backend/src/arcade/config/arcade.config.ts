@@ -71,6 +71,12 @@ export const SCRAMBLE_QUEST_CONFIG = {
   TIMER_SECONDS: 30,
   MAX_HINTS_PER_WORD: 3, // each reveals the next letter, left to right
   WORDS_PER_SESSION: 20,
+  // 2026-09 decision (Vocabulary Vault short-word expansion): a scrambled
+  // 3-4 letter word gives almost no puzzle at all (e.g. "cat" scrambled
+  // is still trivially "cat" or "tac"), so ScrambleQuest floors at 5
+  // letters even though the vault now goes down to 3 (Complete It's own
+  // floor -- see COMPLETE_IT_CONFIG.MIN_WORD_LENGTH).
+  MIN_WORD_LENGTH: 5,
 } as const;
 
 // ── Complete It ────────────────────────────────────────────────────────
@@ -85,6 +91,12 @@ export const COMPLETE_IT_CONFIG = {
   TIMER_SECONDS: 45,
   HINTS_ENABLED: false, // 2026-09 decision: no hints in V1
   WORDS_PER_SESSION: 20,
+  // 2026-09 decision: the one Arcade game that reaches all the way down
+  // to the vault's actual floor -- a blanked-out short word ("_at") is
+  // still a real puzzle even at 3 letters, unlike ScrambleQuest/Word
+  // Duel/Boss Battle's letter-reveal mechanics, which need more letters
+  // to work with (their own MIN_WORD_LENGTH is 5).
+  MIN_WORD_LENGTH: 3,
 } as const;
 
 // ── Word Duel ──────────────────────────────────────────────────────────
@@ -118,6 +130,10 @@ export const WORD_DUEL_CONFIG = {
   // `timedOut` column, unlike ArcadeAnswer: a word Duel player is only
   // ever cut off by the match-wide endsAt, never a per-word deadline).
   WORD_TIME_REFERENCE_SECONDS: 20,
+  // Same reasoning as SCRAMBLE_QUEST_CONFIG.MIN_WORD_LENGTH -- Word
+  // Duel's progressive letter-clues need enough letters to be worth
+  // revealing one at a time.
+  MIN_WORD_LENGTH: 5,
 } as const;
 
 /**

@@ -389,6 +389,7 @@ export class QuestsService {
       userId,
       quest.wordCount || gameplayRules.quest.defaultWordCount,
       excludeWordIds,
+      gameplayRules.quest.minWordLength,
     );
 
     let attempt;

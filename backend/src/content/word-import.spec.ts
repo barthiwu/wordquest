@@ -44,23 +44,23 @@ describe('parseWordRecords', () => {
     expect(result.errors[0].reason).toContain('baseDifficulty');
   });
 
-  it('rejects a word shorter than the 7-letter minimum (spec §2), continuing past it', () => {
+  it('rejects a word shorter than the 3-letter minimum (spec §2, as lowered for the Vocabulary Vault short-word expansion), continuing past it', () => {
     const result = parseWordRecords([
-      { ...validRecord, word: 'cat' },
+      { ...validRecord, word: 'ok' },
       { ...validRecord, word: 'Beautiful' },
     ]);
     expect(result.rows).toHaveLength(1);
     expect(result.rows[0].word).toBe('Beautiful');
     expect(result.errors).toHaveLength(1);
-    expect(result.errors[0]).toEqual({ line: 2, reason: '"cat" is only 3 letters — minimum is 7' });
+    expect(result.errors[0]).toEqual({ line: 2, reason: '"ok" is only 2 letters — minimum is 3' });
   });
 
   it(`accepts a word exactly at the ${MIN_WORD_LENGTH}-letter minimum`, () => {
-    const sevenLetters = 'thought';
-    expect(sevenLetters).toHaveLength(MIN_WORD_LENGTH);
-    const result = parseWordRecords([{ ...validRecord, word: sevenLetters }]);
+    const threeLetters = 'cat';
+    expect(threeLetters).toHaveLength(MIN_WORD_LENGTH);
+    const result = parseWordRecords([{ ...validRecord, word: threeLetters }]);
     expect(result.errors).toHaveLength(0);
-    expect(result.rows[0].word).toBe(sevenLetters);
+    expect(result.rows[0].word).toBe(threeLetters);
   });
 
   it.each(['definition', 'partOfSpeech', 'exampleSentence'])(
@@ -101,8 +101,8 @@ describe('parseWordRecords', () => {
 
   it('reports the correct 1-based CSV line number for each row (header is line 1)', () => {
     const result = parseWordRecords([
-      { ...validRecord, word: 'cat' },
-      { ...validRecord, word: 'dog' },
+      { ...validRecord, word: 'ok' },
+      { ...validRecord, word: 'hi' },
     ]);
     expect(result.errors[0].line).toBe(2);
     expect(result.errors[1].line).toBe(3);
@@ -175,7 +175,7 @@ describe('parseWordRecords', () => {
   it('processes independent rows even when one has an error', () => {
     const result = parseWordRecords([
       { ...validRecord, word: 'Beautiful' },
-      { ...validRecord, word: 'cat' }, // too short
+      { ...validRecord, word: 'ok' }, // too short
       { ...validRecord, word: 'Excellent' },
     ]);
     expect(result.rows.map((r) => r.word)).toEqual(['Beautiful', 'Excellent']);

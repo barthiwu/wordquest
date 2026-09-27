@@ -125,6 +125,11 @@ export class WordsService {
     userId: string,
     count: number,
     excludeWordIds: string[] = [],
+    // Floor on Word.length -- callers pass their own mode's minimum
+    // (Daily Quest: 7, ScrambleQuest/Word Duel/Boss Battle: 5, Complete
+    // It: 3 -- see each config's MIN_WORD_LENGTH). Undefined means no
+    // floor at all, for any caller that hasn't been updated.
+    minLength?: number,
   ): Promise<string[]> {
     const masteries = await this.prisma.mastery.findMany({
       where: { userId },
@@ -173,10 +178,10 @@ export class WordsService {
 
     const defaultExcludedWordIds = [...masteredWordIds, ...recentlyShownWordIds];
 
-    let pool: RankableWord[] = await this.fetchActivePool([
-      ...defaultExcludedWordIds,
-      ...excludeWordIds,
-    ]);
+    let pool: RankableWord[] = await this.fetchActivePool(
+      [...defaultExcludedWordIds, ...excludeWordIds],
+      minLength,
+    );
 
     // Progressively relax the exclusions rather than ever returning an
     // empty quest — repetition beats a dead end, same reasoning as the
@@ -187,10 +192,10 @@ export class WordsService {
     // active pool once literally everything is mastered or too-recently
     // shown.
     if (pool.length === 0 && excludeWordIds.length > 0) {
-      pool = await this.fetchActivePool(defaultExcludedWordIds);
+      pool = await this.fetchActivePool(defaultExcludedWordIds, minLength);
     }
     if (pool.length === 0) {
-      pool = await this.fetchActivePool([]);
+      pool = await this.fetchActivePool([], minLength);
     }
 
     if (pool.length <= count) {
@@ -209,9 +214,16 @@ export class WordsService {
     return this.sample(ranked.slice(0, topSliceSize), count).map((w) => w.id);
   }
 
-  private async fetchActivePool(excludeIds: string[]): Promise<RankableWord[]> {
+  private async fetchActivePool(
+    excludeIds: string[],
+    minLength?: number,
+  ): Promise<RankableWord[]> {
     return this.prisma.word.findMany({
-      where: { isActive: true, ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}) },
+      where: {
+        isActive: true,
+        ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}),
+        ...(minLength != null ? { length: { gte: minLength } } : {}),
+      },
       select: {
         id: true,
         cefrLevel: true,

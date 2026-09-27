@@ -169,7 +169,12 @@ export class WordDuelService {
     }
 
     // No opponent available right now — become player 1 of a fresh match.
-    const picked = await this.challenges.pickChallenges(userId, WORD_DUEL_CONFIG.WORDS_PER_MATCH);
+    const picked = await this.challenges.pickChallenges(
+      userId,
+      WORD_DUEL_CONFIG.WORDS_PER_MATCH,
+      [],
+      WORD_DUEL_CONFIG.MIN_WORD_LENGTH,
+    );
     if (picked.length === 0) {
       throw new BadRequestException('No words are available for Word Duel right now.');
     }

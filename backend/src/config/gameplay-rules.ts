@@ -106,6 +106,12 @@ export const gameplayRules = {
     // Volume 1&2 spec §3: "one word per quest period," not a batch.
     defaultWordCount: 1,
     multipleChoiceOptionCount: 4,
+    // 2026-09 decision (Vocabulary Vault short-word expansion): Daily
+    // Quest keeps the vault's original 7+-letter floor -- it's the
+    // flagship, deliberately-harder mode; the new 3-6 letter words
+    // added to the vault are for Complete It/ScrambleQuest/Word
+    // Duel/Boss Battle only (see each's own MIN_WORD_LENGTH).
+    minWordLength: 7,
   },
   /**
    * The Guess stage's XP economy — V1 Final Systems Spec §3.3. This
@@ -204,6 +210,9 @@ export const gameplayRules = {
     // shared word sequence is generated (V1 Remaining Systems Spec §13:
     // every player in a group gets the SAME words in the SAME order).
     sharedSequenceLength: 20,
+    // Same reasoning as SCRAMBLE_QUEST_CONFIG.MIN_WORD_LENGTH (Boss
+    // Battle's letter-reveal clues need enough letters to work with).
+    minWordLength: 5,
     // How often the auto-finalization sweep runs (BossBattleFinalizerService)
     // — a battle concludes on this schedule even if no client ever calls
     // an endpoint for it (spec §13's "must conclude automatically").

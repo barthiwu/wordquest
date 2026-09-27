@@ -31,8 +31,19 @@ export interface WordImportParseResult {
   errors: WordImportError[];
 }
 
-/** Vocabulary Engine spec §2: minimum word length. */
-export const MIN_WORD_LENGTH = 7;
+/**
+ * Vocabulary Engine spec §2 originally set this at 7 -- Daily Quest's
+ * own floor, and the only floor there was while the vault was 100%
+ * 7+-letter words. The 2026-09 Vocabulary Vault short-word expansion
+ * added a 3-6 letter batch for Complete It/ScrambleQuest/Word
+ * Duel/Boss Battle, each of which enforces its own higher floor at
+ * QUERY time instead (see arcade/config/arcade.config.ts's
+ * MIN_WORD_LENGTH per game, gameplayRules.quest.minWordLength,
+ * gameplayRules.bossBattle.minWordLength) -- so this constant is now
+ * just the absolute floor for anything ever entering the vault at all,
+ * not any one game's floor.
+ */
+export const MIN_WORD_LENGTH = 3;
 
 const VALID_DIFFICULTIES = new Set<WordDifficulty>(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']);
 // baseDifficulty is no longer a hard-required *column* — a file may omit it

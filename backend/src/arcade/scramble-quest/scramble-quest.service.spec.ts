@@ -95,7 +95,7 @@ describe('ScrambleQuestService', () => {
 
       const view = await service.start('u1');
 
-      expect(challengesMock.pickChallenges).toHaveBeenCalledWith('u1', 20);
+      expect(challengesMock.pickChallenges).toHaveBeenCalledWith('u1', 20, [], 5);
       expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
         data: expect.objectContaining({ userId: 'u1', game: 'SCRAMBLE_QUEST', wordsTotal: 2 }),
       });

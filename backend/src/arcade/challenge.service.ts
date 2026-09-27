@@ -44,8 +44,17 @@ export class ArcadeChallengeService {
     userId: string,
     count: number,
     excludeWordIds: string[] = [],
+    // Forwarded straight to WordsService.pickWordsForQuest -- each Arcade
+    // game passes its own config's MIN_WORD_LENGTH (see
+    // arcade/config/arcade.config.ts); undefined means no floor.
+    minLength?: number,
   ): Promise<ArcadeChallenge[]> {
-    const wordIds = await this.wordsService.pickWordsForQuest(userId, count, excludeWordIds);
+    const wordIds = await this.wordsService.pickWordsForQuest(
+      userId,
+      count,
+      excludeWordIds,
+      minLength,
+    );
 
     const words = await this.prisma.word.findMany({
       where: { id: { in: wordIds } },

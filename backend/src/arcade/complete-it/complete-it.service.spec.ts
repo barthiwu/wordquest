@@ -98,7 +98,7 @@ describe('CompleteItService', () => {
 
       const view = await service.start('u1');
 
-      expect(challengesMock.pickChallenges).toHaveBeenCalledWith('u1', 20);
+      expect(challengesMock.pickChallenges).toHaveBeenCalledWith('u1', 20, [], 3);
       expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
         data: expect.objectContaining({ userId: 'u1', game: 'COMPLETE_IT', wordsTotal: 2 }),
       });
