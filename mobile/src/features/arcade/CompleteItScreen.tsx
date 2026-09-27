@@ -6,8 +6,10 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  Vibration,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -20,12 +22,19 @@ import {
 } from '@/services/completeIt';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
+import { CountdownRing } from '@/components/CountdownRing';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CompleteIt'>;
 
 type Phase = 'loading' | 'active' | 'submitting' | 'feedback' | 'complete' | 'error';
+
+/** Same "Bold Modern" design-canvas language ScrambleQuest shipped
+ * (Sept 2026 review) -- gold accents, glowing countdown ring, elevated
+ * card -- applied here for visual consistency across Arcade (Barth:
+ * "Let's do same for the Complete It, and the Word Duel"). */
+const URGENT_THRESHOLD_SECONDS = 10;
 
 /**
  * Complete It (spec §5 sibling of ScrambleQuest) — the player sees the
@@ -52,6 +61,7 @@ export function CompleteItScreen({ navigation }: Props) {
   const [feedback, setFeedback] = useState<CompleteItAnswerResult | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const autoSubmittedRef = useRef(false);
+  const lastVibratedSecondRef = useRef<number | null>(null);
 
   const load = useCallback(async () => {
     if (!accessToken) return;
@@ -61,6 +71,7 @@ export function CompleteItScreen({ navigation }: Props) {
       setChallenge(view);
       setAnswer('');
       autoSubmittedRef.current = false;
+      lastVibratedSecondRef.current = null;
       setPhase('active');
     } catch {
       setPhase('error');
@@ -80,6 +91,10 @@ export function CompleteItScreen({ navigation }: Props) {
         Math.ceil((new Date(challenge.deadlineAt).getTime() - Date.now()) / 1000),
       );
       setRemainingSeconds(secondsLeft);
+      if (secondsLeft <= URGENT_THRESHOLD_SECONDS && lastVibratedSecondRef.current !== secondsLeft) {
+        lastVibratedSecondRef.current = secondsLeft;
+        Vibration.vibrate(80);
+      }
       if (secondsLeft <= 0 && !autoSubmittedRef.current) {
         autoSubmittedRef.current = true;
         handleSubmit(answer);
@@ -194,13 +209,20 @@ export function CompleteItScreen({ navigation }: Props) {
           </View>
         </View>
 
-        <View style={styles.timerRow}>
-          <Text style={[styles.timerText, remainingSeconds <= 10 && styles.timerTextUrgent]}>
-            {remainingSeconds}s
-          </Text>
-        </View>
+        <CountdownRing
+          remainingSeconds={remainingSeconds}
+          totalSeconds={challenge.timeLimitSeconds}
+          colors={colors}
+          urgentThresholdSeconds={URGENT_THRESHOLD_SECONDS}
+        />
 
         <View style={styles.puzzleCard}>
+          <LinearGradient
+            colors={[colors.glyph, colors.arcane]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.puzzleCardAccentBar}
+          />
           <Text style={styles.sentence}>{challenge.sentenceWithBlank}</Text>
           <Text style={styles.partOfSpeech}>{challenge.partOfSpeech}</Text>
           <Text style={styles.definition}>
@@ -322,28 +344,28 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontWeight: '700',
     },
     streakPill: {
-      backgroundColor: colors.surfaceRaised,
+      backgroundColor: colors.surface,
       borderRadius: radius.pill,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.xs,
+      borderWidth: 1,
+      borderColor: colors.glyph,
     },
     streakPillText: { color: colors.glyph, fontSize: typography.scale.sm, fontWeight: '700' },
-    timerRow: { alignItems: 'center' },
-    timerText: {
-      color: colors.ink,
-      fontSize: typography.scale.xxl,
-      fontWeight: typography.display.weight,
-    },
-    timerTextUrgent: { color: colors.danger },
     puzzleCard: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.surfaceRaised,
       borderRadius: radius.lg,
-      borderWidth: 1,
-      borderColor: colors.border,
+      overflow: 'hidden',
       padding: spacing.lg,
       alignItems: 'center',
       gap: spacing.sm,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.35,
+      shadowRadius: 18,
+      elevation: 8,
     },
+    puzzleCardAccentBar: { position: 'absolute', top: 0, left: 0, right: 0, height: 5 },
     sentence: {
       color: colors.ink,
       fontSize: typography.scale.lg,
@@ -373,9 +395,14 @@ function createStyles(colors: ThemeColors, topInset: number) {
     },
     button: {
       backgroundColor: colors.arcane,
-      borderRadius: radius.md,
+      borderRadius: radius.pill,
       paddingVertical: spacing.md,
       alignItems: 'center',
+      shadowColor: colors.arcane,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.4,
+      shadowRadius: 14,
+      elevation: 4,
     },
     buttonDisabled: { opacity: 0.4 },
     buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },

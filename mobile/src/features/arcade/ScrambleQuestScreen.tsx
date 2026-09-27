@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Animated,
-  Easing,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,7 +10,6 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Circle } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -26,6 +23,7 @@ import {
 } from '@/services/scrambleQuest';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
+import { CountdownRing } from '@/components/CountdownRing';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -42,8 +40,6 @@ type Phase = 'loading' | 'active' | 'submitting' | 'feedback' | 'complete' | 'er
  * added mid-Xcode-signing-session; Vibration ships now with zero new
  * native deps and no rebuild. */
 const URGENT_THRESHOLD_SECONDS = 10;
-const RING_RADIUS = 52;
-const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 /**
  * ScrambleQuest (spec §5) — one word at a time, 30s server-authoritative
@@ -243,11 +239,11 @@ export function ScrambleQuestScreen({ navigation }: Props) {
           </View>
         </View>
 
-        <PuzzleTimerRing
+        <CountdownRing
           remainingSeconds={remainingSeconds}
-          timeLimitSeconds={challenge.timeLimitSeconds}
+          totalSeconds={challenge.timeLimitSeconds}
           colors={colors}
-          styles={styles}
+          urgentThresholdSeconds={URGENT_THRESHOLD_SECONDS}
         />
 
         <View style={styles.puzzleCard}>
@@ -381,89 +377,6 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   );
 }
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-
-/**
- * "Bold Modern" design canvas review, Sept 2026 (Barth: "the flat plain
- * timer text doesn't feel like a game"). Same glowing-ring pattern as
- * Boss Battle's SiegeRing, adapted for a race against a 30s word timer
- * instead of a countdown-to-start: the ring drains as a real fraction of
- * timeLimitSeconds — full ring the moment a fresh word starts, down to a
- * sliver right before the deadline (Barth, Sept 2026: "when it is on
- * 1sec, the ring itself should also show it that it is a tiny dot
- * left") — and only turns danger-red + starts pulsing once inside the
- * urgent window, so a calm ring reads as "plenty of time left" the rest
- * of the run.
- */
-function PuzzleTimerRing({
-  remainingSeconds,
-  timeLimitSeconds,
-  colors,
-  styles,
-}: {
-  remainingSeconds: number;
-  timeLimitSeconds: number;
-  colors: ThemeColors;
-  styles: ReturnType<typeof createStyles>;
-}) {
-  const urgent = remainingSeconds <= URGENT_THRESHOLD_SECONDS;
-  const pulse = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    if (!urgent) {
-      pulse.setValue(1);
-      return undefined;
-    }
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, {
-          toValue: 0.45,
-          duration: 450,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(pulse, {
-          toValue: 1,
-          duration: 450,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-      ]),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [urgent, pulse]);
-
-  const progress = timeLimitSeconds > 0 ? Math.min(1, Math.max(0, remainingSeconds / timeLimitSeconds)) : 0;
-  const dashoffset = RING_CIRCUMFERENCE * (1 - progress);
-  const ringColor = urgent ? colors.danger : colors.arcaneSoft;
-
-  return (
-    <View style={styles.ringWrap}>
-      <Svg width={116} height={116} viewBox="0 0 116 116" style={styles.ringSvg}>
-        <Circle cx={58} cy={58} r={RING_RADIUS} fill="none" stroke={colors.border} strokeWidth={8} />
-        <AnimatedCircle
-          cx={58}
-          cy={58}
-          r={RING_RADIUS}
-          fill="none"
-          stroke={ringColor}
-          strokeWidth={8}
-          strokeLinecap="round"
-          strokeDasharray={RING_CIRCUMFERENCE}
-          strokeDashoffset={dashoffset}
-          opacity={pulse}
-          rotation={-90}
-          origin="58, 58"
-        />
-      </Svg>
-      <View style={styles.ringCenter}>
-        <Text style={[styles.timerText, urgent && styles.timerTextUrgent]}>{remainingSeconds}s</Text>
-      </View>
-    </View>
-  );
-}
-
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
     flexFill: { flex: 1 },
@@ -520,21 +433,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       borderColor: colors.glyph,
     },
     streakPillText: { color: colors.glyph, fontSize: typography.scale.sm, fontWeight: '700' },
-    ringWrap: {
-      alignSelf: 'center',
-      width: 116,
-      height: 116,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    ringSvg: { position: 'absolute' },
-    ringCenter: { alignItems: 'center', justifyContent: 'center' },
-    timerText: {
-      color: colors.ink,
-      fontSize: typography.scale.xl,
-      fontWeight: typography.display.weight,
-    },
-    timerTextUrgent: { color: colors.danger },
     puzzleCard: {
       backgroundColor: colors.surfaceRaised,
       borderRadius: radius.lg,

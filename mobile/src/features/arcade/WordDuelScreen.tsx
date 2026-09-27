@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -21,6 +22,7 @@ import {
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
+import { CountdownRing } from '@/components/CountdownRing';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -39,6 +41,16 @@ const POLL_INTERVAL_MS = 2000;
  * a duel doesn't pause for the player to hit "Continue" the way
  * ScrambleQuest does, since the opponent isn't waiting either. */
 const FEEDBACK_DISPLAY_MS = 1400;
+/** Mirrors backend WORD_DUEL_CONFIG.MATCH_DURATION_MINUTES -- the match
+ * clock only ever gives this screen an absolute deadline (matchEndsAt),
+ * not a total duration or start time, so the countdown ring's "how much
+ * of the match is left" fraction needs its own denominator. If the API
+ * ever adds a match-duration/started-at field, prefer that over this. */
+const MATCH_DURATION_SECONDS = 5 * 60;
+/** Same "Bold Modern" design-canvas language ScrambleQuest/Complete It
+ * use -- kept at 30s here (not the usual 10s) since a 5-minute match
+ * clock needs a longer runway to feel like a real warning. */
+const URGENT_THRESHOLD_SECONDS = 30;
 
 interface Feedback {
   isCorrect: boolean;
@@ -273,16 +285,20 @@ export function WordDuelScreen({ navigation }: Props) {
         <BackButton onPress={() => navigation.goBack()} />
 
         {state.matchEndsAt && (
-          <View style={styles.timerRow}>
+          <>
             <Text style={styles.timerLabel}>{t('matchTimeLabel')}</Text>
-            <Text style={[styles.timerText, remainingSeconds <= 30 && styles.timerTextUrgent]}>
-              {minutes}:{String(seconds).padStart(2, '0')}
-            </Text>
-          </View>
+            <CountdownRing
+              remainingSeconds={remainingSeconds}
+              totalSeconds={MATCH_DURATION_SECONDS}
+              colors={colors}
+              urgentThresholdSeconds={URGENT_THRESHOLD_SECONDS}
+              label={`${minutes}:${String(seconds).padStart(2, '0')}`}
+            />
+          </>
         )}
 
         <View style={styles.scoreRow}>
-          <View style={styles.scoreCard}>
+          <View style={[styles.scoreCard, styles.scoreCardSelf]}>
             <Text style={styles.scoreLabel}>{t('youLabel')}</Text>
             <Text style={styles.scoreValue}>
               {t('correctCountLabel', { count: state.correctCount })}
@@ -301,6 +317,12 @@ export function WordDuelScreen({ navigation }: Props) {
         {state.current ? (
           <>
             <View style={styles.puzzleCard}>
+              <LinearGradient
+                colors={[colors.glyph, colors.arcane]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.puzzleCardAccentBar}
+              />
               <Text style={styles.displayHint}>{state.current.displayHint.toUpperCase()}</Text>
               <Text style={styles.clueProgress}>
                 {t('clueProgressLabel', {
@@ -400,19 +422,13 @@ function createStyles(colors: ThemeColors, topInset: number) {
     subtitle: { color: colors.inkMuted, fontSize: typography.scale.sm, textAlign: 'center' },
     summaryLine: { color: colors.ink, fontSize: typography.scale.md, textAlign: 'center' },
     tiebreakNote: { color: colors.inkMuted, fontSize: typography.scale.xs, textAlign: 'center' },
-    timerRow: { alignItems: 'center' },
     timerLabel: {
       color: colors.inkMuted,
       fontSize: typography.scale.xs,
       textTransform: 'uppercase',
       fontWeight: '700',
+      textAlign: 'center',
     },
-    timerText: {
-      color: colors.ink,
-      fontSize: typography.scale.xxl,
-      fontWeight: typography.display.weight,
-    },
-    timerTextUrgent: { color: colors.danger },
     scoreRow: { flexDirection: 'row', gap: spacing.md },
     scoreCard: {
       flex: 1,
@@ -424,6 +440,10 @@ function createStyles(colors: ThemeColors, topInset: number) {
       alignItems: 'center',
       gap: 2,
     },
+    // The player's own score card only -- same gold-outline language as
+    // the streak pill in ScrambleQuest/Complete It, so "you" is visually
+    // distinct from the opponent's card at a glance.
+    scoreCardSelf: { borderColor: colors.glyph },
     scoreLabel: {
       color: colors.inkMuted,
       fontSize: typography.scale.xs,
@@ -433,14 +453,19 @@ function createStyles(colors: ThemeColors, topInset: number) {
     scoreValue: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
     scoreXp: { color: colors.glyph, fontSize: typography.scale.xs },
     puzzleCard: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.surfaceRaised,
       borderRadius: radius.lg,
-      borderWidth: 1,
-      borderColor: colors.border,
+      overflow: 'hidden',
       padding: spacing.lg,
       alignItems: 'center',
       gap: spacing.sm,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.35,
+      shadowRadius: 18,
+      elevation: 8,
     },
+    puzzleCardAccentBar: { position: 'absolute', top: 0, left: 0, right: 0, height: 5 },
     displayHint: {
       color: colors.ink,
       fontSize: typography.scale.xl,
@@ -459,9 +484,14 @@ function createStyles(colors: ThemeColors, topInset: number) {
     },
     button: {
       backgroundColor: colors.arcane,
-      borderRadius: radius.md,
+      borderRadius: radius.pill,
       paddingVertical: spacing.md,
       alignItems: 'center',
+      shadowColor: colors.arcane,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.4,
+      shadowRadius: 14,
+      elevation: 4,
     },
     buttonDisabled: { opacity: 0.4 },
     buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },

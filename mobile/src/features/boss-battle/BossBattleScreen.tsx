@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -274,6 +275,12 @@ export function BossBattleScreen({ navigation }: Props) {
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.progressLabel}>{t('progressLabel')}</Text>
           <View style={styles.clueCard}>
+            <LinearGradient
+              colors={[colors.glyph, colors.arcane]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.clueCardAccentBar}
+            />
             <Text style={styles.partOfSpeech}>{challenge.partOfSpeech}</Text>
             <Text style={styles.definition}>{challenge.definition}</Text>
             <Text style={styles.pattern}>{challenge.displayPattern}</Text>
@@ -645,13 +652,18 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontWeight: '700',
     },
     clueCard: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.surfaceRaised,
       borderRadius: radius.lg,
-      borderWidth: 1,
-      borderColor: colors.border,
+      overflow: 'hidden',
       padding: spacing.lg,
       gap: spacing.xs,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.35,
+      shadowRadius: 18,
+      elevation: 8,
     },
+    clueCardAccentBar: { position: 'absolute', top: 0, left: 0, right: 0, height: 5 },
     partOfSpeech: {
       color: colors.arcaneSoft,
       fontSize: typography.scale.xs,
@@ -676,9 +688,14 @@ function createStyles(colors: ThemeColors, topInset: number) {
     },
     button: {
       backgroundColor: colors.arcane,
-      borderRadius: radius.md,
+      borderRadius: radius.pill,
       paddingVertical: spacing.md,
       alignItems: 'center',
+      shadowColor: colors.arcane,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.4,
+      shadowRadius: 14,
+      elevation: 4,
     },
     buttonDisabled: { opacity: 0.4 },
     buttonText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
