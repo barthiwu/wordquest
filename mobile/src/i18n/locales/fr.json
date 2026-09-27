@@ -282,7 +282,8 @@
     "practiceEmpty": "Répondez à votre premier mot de Quête pour commencer cette liste.",
     "masterChallenge": "Défi du Maître",
     "bossBattle": "Combat de Boss",
-    "ali": "ALI"
+    "ali": "ALI",
+    "arcade": "WordQuest Arcade"
   },
   "settings": {
     "language": {
@@ -774,5 +775,42 @@
     "ageRestriction": {
       "title": "Restriction d’âge"
     }
+  },
+  "arcade": {
+    "genericError": "Impossible de charger l'Arcade pour le moment.",
+    "title": "WordQuest Arcade",
+    "subtitle": "Des mini-jeux pour te détendre entre les quêtes",
+    "play": "Jouer",
+    "comingSoon": "Bientôt disponible",
+    "scrambleQuestTitle": "ScrambleQuest",
+    "scrambleQuestSubtitle": "Remets les lettres du mot dans l'ordre avant la fin du temps",
+    "wordDuelTitle": "Duel de mots",
+    "wordDuelSubtitle": "Affronte un autre joueur avec des indices progressifs",
+    "completeItTitle": "Complète-le",
+    "completeItSubtitle": "Trouve le mot manquant"
+  },
+  "scrambleQuest": {
+    "genericError": "Impossible de joindre ScrambleQuest pour le moment.",
+    "title": "ScrambleQuest",
+    "streakLabel": "Série",
+    "progressLabel": "{{current}} / {{total}}",
+    "hintButton": "Indice",
+    "hintsRemainingLabel": "{{count}} restant(s)",
+    "noHintsRemaining": "Plus d'indices",
+    "answerPlaceholder": "Tape le mot...",
+    "yourAnswerLabel": "Ta réponse",
+    "submit": "Valider",
+    "correctFeedback": "Correct ! +{{xp}} XP",
+    "incorrectFeedback": "Pas tout à fait.",
+    "timedOutFeedback": "Temps écoulé !",
+    "revealPrefix": "Le mot était",
+    "continue": "Continuer",
+    "exit": "Quitter",
+    "sessionCompleteTitle": "Session terminée !",
+    "sessionXpEarned": "{{xp}} XP gagnés",
+    "sessionCorrectSummary": "{{correct}} sur {{total}} correctes",
+    "sessionLongestStreak": "Plus longue série : {{streak}}",
+    "playAgain": "Rejouer",
+    "backToArcade": "Retour à l'Arcade"
   }
 }

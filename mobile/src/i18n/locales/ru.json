@@ -282,7 +282,8 @@
     "practiceEmpty": "Ответьте на первое слово Похода, чтобы начать этот список.",
     "masterChallenge": "Испытание Мастера",
     "bossBattle": "Битва с боссом",
-    "ali": "ALI"
+    "ali": "ALI",
+    "arcade": "WordQuest Аркада"
   },
   "settings": {
     "language": {
@@ -774,5 +775,42 @@
     "ageRestriction": {
       "title": "Возрастное ограничение"
     }
+  },
+  "arcade": {
+    "genericError": "Не удалось загрузить Аркаду.",
+    "title": "WordQuest Аркада",
+    "subtitle": "Дополнительные мини-игры для отдыха между квестами",
+    "play": "Играть",
+    "comingSoon": "Скоро",
+    "scrambleQuestTitle": "ScrambleQuest",
+    "scrambleQuestSubtitle": "Соберите слово из букв, пока не закончилось время",
+    "wordDuelTitle": "Словесная дуэль",
+    "wordDuelSubtitle": "Соревнуйтесь с другим игроком, используя подсказки",
+    "completeItTitle": "Заполни слово",
+    "completeItSubtitle": "Впишите пропущенное слово"
+  },
+  "scrambleQuest": {
+    "genericError": "Не удалось подключиться к ScrambleQuest.",
+    "title": "ScrambleQuest",
+    "streakLabel": "Серия",
+    "progressLabel": "{{current}} / {{total}}",
+    "hintButton": "Подсказка",
+    "hintsRemainingLabel": "Осталось {{count}}",
+    "noHintsRemaining": "Подсказки закончились",
+    "answerPlaceholder": "Введите слово...",
+    "yourAnswerLabel": "Ваш ответ",
+    "submit": "Отправить",
+    "correctFeedback": "Правильно! +{{xp}} XP",
+    "incorrectFeedback": "Не совсем.",
+    "timedOutFeedback": "Время вышло!",
+    "revealPrefix": "Слово было",
+    "continue": "Продолжить",
+    "exit": "Выйти",
+    "sessionCompleteTitle": "Сессия завершена!",
+    "sessionXpEarned": "Получено {{xp}} XP",
+    "sessionCorrectSummary": "{{correct}} из {{total}} правильно",
+    "sessionLongestStreak": "Самая длинная серия: {{streak}}",
+    "playAgain": "Играть снова",
+    "backToArcade": "Назад в Аркаду"
   }
 }

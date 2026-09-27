@@ -282,7 +282,8 @@
     "practiceEmpty": "أجب على أول كلمة مغامرة لبدء بناء هذه القائمة.",
     "masterChallenge": "تحدي الماستر",
     "bossBattle": "معركة الزعيم",
-    "ali": "ALI"
+    "ali": "ALI",
+    "arcade": "WordQuest Arcade"
   },
   "settings": {
     "language": {
@@ -774,5 +775,42 @@
     "ageRestriction": {
       "title": "قيود العمر"
     }
+  },
+  "arcade": {
+    "genericError": "تعذّر تحميل الأركيد حاليًا.",
+    "title": "WordQuest Arcade",
+    "subtitle": "ألعاب جانبية اختيارية لوقت الفراغ بين المهام",
+    "play": "لعب",
+    "comingSoon": "قريبًا",
+    "scrambleQuestTitle": "ScrambleQuest",
+    "scrambleQuestSubtitle": "أعد ترتيب حروف الكلمة قبل انتهاء الوقت",
+    "wordDuelTitle": "مواجهة الكلمات",
+    "wordDuelSubtitle": "تنافس مع لاعب آخر باستخدام تلميحات متتالية",
+    "completeItTitle": "أكملها",
+    "completeItSubtitle": "أكمل الكلمة الناقصة"
+  },
+  "scrambleQuest": {
+    "genericError": "تعذّر الوصول إلى ScrambleQuest حاليًا.",
+    "title": "ScrambleQuest",
+    "streakLabel": "التتالي",
+    "progressLabel": "{{current}} / {{total}}",
+    "hintButton": "تلميح",
+    "hintsRemainingLabel": "{{count}} متبقٍّ",
+    "noHintsRemaining": "لا توجد تلميحات متبقية",
+    "answerPlaceholder": "اكتب الكلمة...",
+    "yourAnswerLabel": "إجابتك",
+    "submit": "إرسال",
+    "correctFeedback": "صحيح! +{{xp}} XP",
+    "incorrectFeedback": "ليس تمامًا.",
+    "timedOutFeedback": "انتهى الوقت!",
+    "revealPrefix": "كانت الكلمة",
+    "continue": "استمرار",
+    "exit": "خروج",
+    "sessionCompleteTitle": "اكتملت الجلسة!",
+    "sessionXpEarned": "{{xp}} XP مكتسبة",
+    "sessionCorrectSummary": "{{correct}} من {{total}} صحيحة",
+    "sessionLongestStreak": "أطول تتالٍ: {{streak}}",
+    "playAgain": "اللعب مرة أخرى",
+    "backToArcade": "العودة إلى الأركيد"
   }
 }

@@ -282,7 +282,8 @@
     "practiceEmpty": "Responda sua primeira palavra de Jornada para começar essa lista.",
     "masterChallenge": "Desafio Mestre",
     "bossBattle": "Batalha do Chefe",
-    "ali": "ALI"
+    "ali": "ALI",
+    "arcade": "WordQuest Arcade"
   },
   "settings": {
     "language": {
@@ -774,5 +775,42 @@
     "ageRestriction": {
       "title": "Restrição de Idade"
     }
+  },
+  "arcade": {
+    "genericError": "Não foi possível carregar o Arcade agora.",
+    "title": "WordQuest Arcade",
+    "subtitle": "Minijogos opcionais para os intervalos entre as missões",
+    "play": "Jogar",
+    "comingSoon": "Em breve",
+    "scrambleQuestTitle": "ScrambleQuest",
+    "scrambleQuestSubtitle": "Desembaralhe as letras da palavra antes que o tempo acabe",
+    "wordDuelTitle": "Duelo de Palavras",
+    "wordDuelSubtitle": "Compita com outro jogador usando dicas progressivas",
+    "completeItTitle": "Complete a Palavra",
+    "completeItSubtitle": "Complete a palavra que falta"
+  },
+  "scrambleQuest": {
+    "genericError": "Não foi possível conectar ao ScrambleQuest agora.",
+    "title": "ScrambleQuest",
+    "streakLabel": "Sequência",
+    "progressLabel": "{{current}} / {{total}}",
+    "hintButton": "Dica",
+    "hintsRemainingLabel": "{{count}} restante(s)",
+    "noHintsRemaining": "Sem dicas restantes",
+    "answerPlaceholder": "Digite a palavra...",
+    "yourAnswerLabel": "Sua resposta",
+    "submit": "Enviar",
+    "correctFeedback": "Correto! +{{xp}} XP",
+    "incorrectFeedback": "Não foi essa.",
+    "timedOutFeedback": "Tempo esgotado!",
+    "revealPrefix": "A palavra era",
+    "continue": "Continuar",
+    "exit": "Sair",
+    "sessionCompleteTitle": "Sessão concluída!",
+    "sessionXpEarned": "{{xp}} XP ganhos",
+    "sessionCorrectSummary": "{{correct}} de {{total}} corretas",
+    "sessionLongestStreak": "Maior sequência: {{streak}}",
+    "playAgain": "Jogar novamente",
+    "backToArcade": "Voltar ao Arcade"
   }
 }

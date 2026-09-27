@@ -282,7 +282,8 @@
     "practiceEmpty": "Jibu neno lako la kwanza la Safari ili kuanza orodha hii.",
     "masterChallenge": "Changamoto ya Bingwa",
     "bossBattle": "Vita vya Boss",
-    "ali": "ALI"
+    "ali": "ALI",
+    "arcade": "WordQuest Arcade"
   },
   "settings": {
     "language": {
@@ -774,5 +775,42 @@
     "ageRestriction": {
       "title": "Kikomo cha Umri"
     }
+  },
+  "arcade": {
+    "genericError": "Imeshindwa kupakia Arcade kwa sasa.",
+    "title": "WordQuest Arcade",
+    "subtitle": "Michezo midogo ya hiari kwa muda wa mapumziko kati ya majukumu",
+    "play": "Cheza",
+    "comingSoon": "Inakuja hivi karibuni",
+    "scrambleQuestTitle": "ScrambleQuest",
+    "scrambleQuestSubtitle": "Panga upya herufi za neno kabla muda haujaisha",
+    "wordDuelTitle": "Duwa la Maneno",
+    "wordDuelSubtitle": "Shindana na mchezaji mwingine kwa kutumia vidokezo vinavyoendelea",
+    "completeItTitle": "Kamilisha",
+    "completeItSubtitle": "Jaza neno lililokosekana"
+  },
+  "scrambleQuest": {
+    "genericError": "Imeshindwa kuunganishwa na ScrambleQuest kwa sasa.",
+    "title": "ScrambleQuest",
+    "streakLabel": "Mfululizo",
+    "progressLabel": "{{current}} / {{total}}",
+    "hintButton": "Kidokezo",
+    "hintsRemainingLabel": "{{count}} zilizosalia",
+    "noHintsRemaining": "Hakuna vidokezo vilivyosalia",
+    "answerPlaceholder": "Andika neno...",
+    "yourAnswerLabel": "Jibu lako",
+    "submit": "Tuma",
+    "correctFeedback": "Sahihi! +{{xp}} XP",
+    "incorrectFeedback": "Si sahihi kabisa.",
+    "timedOutFeedback": "Muda umeisha!",
+    "revealPrefix": "Neno lilikuwa",
+    "continue": "Endelea",
+    "exit": "Ondoka",
+    "sessionCompleteTitle": "Kipindi kimekamilika!",
+    "sessionXpEarned": "Umepata {{xp}} XP",
+    "sessionCorrectSummary": "{{correct}} kati ya {{total}} sahihi",
+    "sessionLongestStreak": "Mfululizo mrefu zaidi: {{streak}}",
+    "playAgain": "Cheza tena",
+    "backToArcade": "Rudi kwenye Arcade"
   }
 }

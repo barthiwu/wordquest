@@ -282,7 +282,8 @@
     "practiceEmpty": "यह सूची बनाना शुरू करने के लिए अपना पहला खोज शब्द हल करें।",
     "masterChallenge": "मास्टर चुनौती",
     "bossBattle": "बॉस बैटल",
-    "ali": "ALI"
+    "ali": "ALI",
+    "arcade": "WordQuest आर्केड"
   },
   "settings": {
     "language": {
@@ -774,5 +775,42 @@
     "ageRestriction": {
       "title": "आयु सीमा"
     }
+  },
+  "arcade": {
+    "genericError": "अभी आर्केड लोड नहीं हो सका।",
+    "title": "WordQuest आर्केड",
+    "subtitle": "क्वेस्ट के बीच खाली समय के लिए वैकल्पिक मिनी-गेम्स",
+    "play": "खेलें",
+    "comingSoon": "जल्द आ रहा है",
+    "scrambleQuestTitle": "ScrambleQuest",
+    "scrambleQuestSubtitle": "समय समाप्त होने से पहले शब्द के अक्षरों को सही क्रम में लगाएं",
+    "wordDuelTitle": "वर्ड ड्यूल",
+    "wordDuelSubtitle": "क्रमिक संकेतों के साथ किसी अन्य खिलाड़ी से मुकाबला करें",
+    "completeItTitle": "इसे पूरा करें",
+    "completeItSubtitle": "छूटे हुए शब्द को भरें"
+  },
+  "scrambleQuest": {
+    "genericError": "अभी ScrambleQuest से संपर्क नहीं हो सका।",
+    "title": "ScrambleQuest",
+    "streakLabel": "स्ट्रीक",
+    "progressLabel": "{{current}} / {{total}}",
+    "hintButton": "संकेत",
+    "hintsRemainingLabel": "{{count}} शेष",
+    "noHintsRemaining": "कोई संकेत शेष नहीं",
+    "answerPlaceholder": "शब्द टाइप करें...",
+    "yourAnswerLabel": "आपका उत्तर",
+    "submit": "जमा करें",
+    "correctFeedback": "सही! +{{xp}} XP",
+    "incorrectFeedback": "बिल्कुल सही नहीं।",
+    "timedOutFeedback": "समय समाप्त!",
+    "revealPrefix": "शब्द था",
+    "continue": "जारी रखें",
+    "exit": "बाहर निकलें",
+    "sessionCompleteTitle": "सेशन पूरा हुआ!",
+    "sessionXpEarned": "{{xp}} XP मिले",
+    "sessionCorrectSummary": "{{total}} में से {{correct}} सही",
+    "sessionLongestStreak": "सबसे लंबी स्ट्रीक: {{streak}}",
+    "playAgain": "फिर से खेलें",
+    "backToArcade": "आर्केड पर वापस जाएं"
   }
 }

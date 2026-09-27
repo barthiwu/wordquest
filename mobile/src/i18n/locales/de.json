@@ -282,7 +282,8 @@
     "practiceEmpty": "Beantworte dein erstes Quest-Wort, um diese Liste aufzubauen.",
     "masterChallenge": "Meister-Herausforderung",
     "bossBattle": "Bosskampf",
-    "ali": "ALI"
+    "ali": "ALI",
+    "arcade": "WordQuest Arcade"
   },
   "settings": {
     "language": {
@@ -774,5 +775,42 @@
     "ageRestriction": {
       "title": "Altersbeschränkung"
     }
+  },
+  "arcade": {
+    "genericError": "Die Arcade konnte momentan nicht geladen werden.",
+    "title": "WordQuest Arcade",
+    "subtitle": "Optionale Minispiele für zwischendurch",
+    "play": "Spielen",
+    "comingSoon": "Demnächst verfügbar",
+    "scrambleQuestTitle": "ScrambleQuest",
+    "scrambleQuestSubtitle": "Bring die Buchstaben in die richtige Reihenfolge, bevor die Zeit abläuft",
+    "wordDuelTitle": "Wortduell",
+    "wordDuelSubtitle": "Tritt gegen einen anderen Spieler mit fortschreitenden Hinweisen an",
+    "completeItTitle": "Vervollständige es",
+    "completeItSubtitle": "Ergänze das fehlende Wort"
+  },
+  "scrambleQuest": {
+    "genericError": "ScrambleQuest ist momentan nicht erreichbar.",
+    "title": "ScrambleQuest",
+    "streakLabel": "Serie",
+    "progressLabel": "{{current}} / {{total}}",
+    "hintButton": "Hinweis",
+    "hintsRemainingLabel": "Noch {{count}}",
+    "noHintsRemaining": "Keine Hinweise mehr",
+    "answerPlaceholder": "Gib das Wort ein...",
+    "yourAnswerLabel": "Deine Antwort",
+    "submit": "Absenden",
+    "correctFeedback": "Richtig! +{{xp}} XP",
+    "incorrectFeedback": "Nicht ganz.",
+    "timedOutFeedback": "Zeit abgelaufen!",
+    "revealPrefix": "Das Wort war",
+    "continue": "Weiter",
+    "exit": "Verlassen",
+    "sessionCompleteTitle": "Runde beendet!",
+    "sessionXpEarned": "{{xp}} XP verdient",
+    "sessionCorrectSummary": "{{correct}} von {{total}} richtig",
+    "sessionLongestStreak": "Längste Serie: {{streak}}",
+    "playAgain": "Nochmal spielen",
+    "backToArcade": "Zurück zur Arcade"
   }
 }

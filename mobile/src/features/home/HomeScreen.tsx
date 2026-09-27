@@ -317,6 +317,14 @@ export function HomeScreen({ navigation }: Props) {
         </Pressable>
         <Pressable
           style={styles.linkButton}
+          onPress={() => navigation.navigate('Arcade')}
+          accessibilityRole="button"
+          accessibilityLabel={t('arcade')}
+        >
+          <Text style={styles.linkButtonText}>{t('arcade')}</Text>
+        </Pressable>
+        <Pressable
+          style={styles.linkButton}
           onPress={() => navigation.navigate('Ali')}
           accessibilityRole="button"
           accessibilityLabel={t('ali')}

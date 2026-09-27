@@ -282,7 +282,8 @@
     "practiceEmpty": "به اولین واژه ماجرایتان پاسخ دهید تا این فهرست آغاز شود.",
     "masterChallenge": "چالش استاد",
     "bossBattle": "نبرد با رئیس",
-    "ali": "ALI"
+    "ali": "ALI",
+    "arcade": "WordQuest Arcade"
   },
   "settings": {
     "language": {
@@ -774,5 +775,42 @@
     "ageRestriction": {
       "title": "محدودیت سنی"
     }
+  },
+  "arcade": {
+    "genericError": "اکنون امکان بارگذاری آرکید نیست.",
+    "title": "WordQuest Arcade",
+    "subtitle": "بازی‌های فرعی اختیاری برای اوقات استراحت بین کوئست‌ها",
+    "play": "بازی",
+    "comingSoon": "به‌زودی",
+    "scrambleQuestTitle": "ScrambleQuest",
+    "scrambleQuestSubtitle": "پیش از پایان زمان، حروف کلمه را به ترتیب درست بچینید",
+    "wordDuelTitle": "دوئل کلمات",
+    "wordDuelSubtitle": "با استفاده از سرنخ‌های پیش‌رونده با بازیکن دیگری رقابت کنید",
+    "completeItTitle": "کامل کن",
+    "completeItSubtitle": "کلمه ناقص را کامل کنید"
+  },
+  "scrambleQuest": {
+    "genericError": "اکنون امکان اتصال به ScrambleQuest نیست.",
+    "title": "ScrambleQuest",
+    "streakLabel": "پیاپی",
+    "progressLabel": "{{current}} / {{total}}",
+    "hintButton": "راهنما",
+    "hintsRemainingLabel": "{{count}} باقی‌مانده",
+    "noHintsRemaining": "راهنمایی باقی نمانده",
+    "answerPlaceholder": "کلمه را تایپ کنید...",
+    "yourAnswerLabel": "پاسخ شما",
+    "submit": "ارسال",
+    "correctFeedback": "درست! +{{xp}} XP",
+    "incorrectFeedback": "کاملاً درست نیست.",
+    "timedOutFeedback": "زمان به پایان رسید!",
+    "revealPrefix": "کلمه این بود:",
+    "continue": "ادامه",
+    "exit": "خروج",
+    "sessionCompleteTitle": "جلسه به پایان رسید!",
+    "sessionXpEarned": "{{xp}} XP کسب شد",
+    "sessionCorrectSummary": "{{correct}} از {{total}} درست",
+    "sessionLongestStreak": "طولانی‌ترین پیاپی: {{streak}}",
+    "playAgain": "دوباره بازی کن",
+    "backToArcade": "بازگشت به آرکید"
   }
 }

@@ -282,7 +282,8 @@
     "practiceEmpty": "回答你的第一个任务单词，开始建立这个列表。",
     "masterChallenge": "大师挑战",
     "bossBattle": "Boss 战斗",
-    "ali": "ALI"
+    "ali": "ALI",
+    "arcade": "WordQuest 街机厅"
   },
   "settings": {
     "language": {
@@ -774,5 +775,42 @@
     "ageRestriction": {
       "title": "年龄限制"
     }
+  },
+  "arcade": {
+    "genericError": "暂时无法加载街机厅。",
+    "title": "WordQuest 街机厅",
+    "subtitle": "任务之余的休闲小游戏",
+    "play": "开始游戏",
+    "comingSoon": "即将推出",
+    "scrambleQuestTitle": "ScrambleQuest",
+    "scrambleQuestSubtitle": "在时间耗尽前重新排列出正确的单词",
+    "wordDuelTitle": "单词对决",
+    "wordDuelSubtitle": "通过逐步提示与其他玩家对战",
+    "completeItTitle": "补全单词",
+    "completeItSubtitle": "填写缺失的单词"
+  },
+  "scrambleQuest": {
+    "genericError": "暂时无法连接 ScrambleQuest。",
+    "title": "ScrambleQuest",
+    "streakLabel": "连续正确",
+    "progressLabel": "{{current}} / {{total}}",
+    "hintButton": "提示",
+    "hintsRemainingLabel": "剩余 {{count}} 次",
+    "noHintsRemaining": "没有更多提示了",
+    "answerPlaceholder": "输入这个单词...",
+    "yourAnswerLabel": "你的答案",
+    "submit": "提交",
+    "correctFeedback": "正确！+{{xp}} XP",
+    "incorrectFeedback": "不太对。",
+    "timedOutFeedback": "时间到！",
+    "revealPrefix": "正确答案是",
+    "continue": "继续",
+    "exit": "退出",
+    "sessionCompleteTitle": "本轮完成！",
+    "sessionXpEarned": "获得 {{xp}} XP",
+    "sessionCorrectSummary": "{{total}} 题中答对 {{correct}} 题",
+    "sessionLongestStreak": "最长连续正确：{{streak}}",
+    "playAgain": "再玩一次",
+    "backToArcade": "返回街机厅"
   }
 }
