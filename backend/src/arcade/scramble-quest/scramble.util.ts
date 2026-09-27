@@ -88,3 +88,25 @@ export function hintRevealOrder(word: string, seed: string): number[] {
   }
   return eligible;
 }
+
+/**
+ * Deterministic, seeded shuffle of a caller-supplied index list -- same
+ * seeded-RNG idea as hintRevealOrder above (randomized order,
+ * reproducible for a given seed so re-deriving it twice agrees), just
+ * over indexes the caller already knows rather than deriving eligible
+ * ones from a word's length. hintRevealOrder assumes "every letter but
+ * the last" is eligible, which fits ScrambleQuest/Complete It (the
+ * whole word starts hidden); Daily Quest's letter-reveal
+ * (quests.service.ts) instead starts from a mastery-dependent SUBSET of
+ * the word (the omission engine's blanks) that's already been decided
+ * elsewhere, so it shuffles that subset directly with this instead.
+ */
+export function shuffleIndexes(indexes: number[], seed: string): number[] {
+  const shuffled = [...indexes];
+  const rng = makeRng(seedFromString(seed));
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}

@@ -24,6 +24,7 @@ import {
   type MissionView,
 } from '../word-in-the-wild/word-in-the-wild.service';
 import { generateOmissionChallenge } from '../vocabulary/omission-engine';
+import { shuffleIndexes } from '../arcade/scramble-quest/scramble.util';
 import { gameplayRules, computeGuessXp } from '../config/gameplay-rules';
 import { LearningProfileService } from '../learning-profile/learning-profile.service';
 import { averageScoreDimensions } from '../common/score-average';
@@ -166,6 +167,9 @@ export interface LetterRevealResult {
   displayPattern: string;
   missingIndexes: number[];
   lettersRevealed: number;
+  /** How many more reveals this word has left before hitting
+   * maxLetterRevealsFor's cap -- see that method's doc comment. */
+  lettersRevealRemaining: number;
 }
 
 export interface SentenceResult {
@@ -1157,17 +1161,50 @@ export class QuestsService {
   }
 
   /**
-   * Reveals exactly one more of the currently-blanked letters, chosen as
-   * the lowest remaining missing index (deterministic — not random — so
-   * repeated requests behave predictably and are easy to test). Bounded
-   * naturally by how many letters are still blanked; no separate
-   * configured maximum the way hints/synonyms have one.
+   * Caps how many of a word's blanked letters requestLetterReveal will
+   * hand over: letterRevealPercentageOfMissing (60%, same figure as
+   * Complete It's own hint cap) of however many letters the challenge
+   * actually started with blanked -- NOT the word's full length, since
+   * the omission engine already blanks only a mastery-dependent subset
+   * (a MASTERED word might have just 2-3 blanks to begin with). Same
+   * "never give away the very last one" floor Complete It's
+   * maxHintsFor uses, so a 1-blank word allows zero reveals rather than
+   * letting a single hint finish it outright. Bug report, Barth Sept
+   * 2026: "some questions were missing just 3 letters, and the hint was
+   * also 3, meaning they would get it all on the hints."
+   */
+  private maxLetterRevealsFor(originalMissingCount: number): number {
+    const { letterRevealPercentageOfMissing } = gameplayRules.guessStage;
+    const percentageCap = Math.round(originalMissingCount * letterRevealPercentageOfMissing);
+    return Math.min(percentageCap, Math.max(0, originalMissingCount - 1));
+  }
+
+  /**
+   * Reveals exactly one more of the currently-blanked letters, capped at
+   * maxLetterRevealsFor and picked via a seeded shuffle rather than
+   * always the lowest remaining index (2026-09 fix -- the old
+   * lowest-index-first order was fully predictable AND uncapped, so
+   * spamming reveal on a lightly-blanked word just handed over the
+   * whole answer left to right). The seed mixes in how many letters
+   * have already been revealed this word, so each call reshuffles
+   * differently while still being reproducible for a given attempt
+   * state -- same seeded-RNG approach ScrambleQuest/Complete It's
+   * hintRevealOrder uses, adapted for an already-known subset of
+   * positions via shuffleIndexes.
    */
   async requestLetterReveal(userId: string, questAttemptId: string): Promise<LetterRevealResult> {
     const attempt = await this.loadInProgressAttempt(userId, questAttemptId, 'GUESSING');
 
     if (attempt.currentMissingIndexes.length === 0) {
       throw new BadRequestException('No blanked letters remain to reveal.');
+    }
+
+    const originalMissingCount = attempt.lettersRevealed + attempt.currentMissingIndexes.length;
+    const maxLetterReveals = this.maxLetterRevealsFor(originalMissingCount);
+    if (attempt.lettersRevealed >= maxLetterReveals) {
+      throw new BadRequestException(
+        `No more letters can be revealed for this word (max ${maxLetterReveals}).`,
+      );
     }
 
     const word = await this.prisma.word.findUniqueOrThrow({
@@ -1177,8 +1214,12 @@ export class QuestsService {
     const rendered = renderWord(word, variant);
 
     const sortedMissing = [...attempt.currentMissingIndexes].sort((a, b) => a - b);
-    const indexToReveal = sortedMissing[0];
-    const remainingMissing = sortedMissing.slice(1);
+    const shuffledMissing = shuffleIndexes(
+      sortedMissing,
+      `${attempt.id}:${attempt.lettersRevealed}`,
+    );
+    const indexToReveal = shuffledMissing[0];
+    const remainingMissing = sortedMissing.filter((index) => index !== indexToReveal);
 
     const patternChars = (attempt.currentDisplayPattern ?? '').split(' ');
     // Revealed from the RENDERED (variant-aware) spelling -- the pattern
@@ -1200,6 +1241,7 @@ export class QuestsService {
       displayPattern: updated.currentDisplayPattern!,
       missingIndexes: updated.currentMissingIndexes,
       lettersRevealed: updated.lettersRevealed,
+      lettersRevealRemaining: Math.max(0, maxLetterReveals - updated.lettersRevealed),
     };
   }
 

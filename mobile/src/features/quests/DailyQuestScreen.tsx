@@ -211,6 +211,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   // AffordanceChip's doc comment for why we never guess at these.
   const [hintsRemaining, setHintsRemaining] = useState<number | undefined>(undefined);
   const [synonymsRemaining, setSynonymsRemaining] = useState<number | undefined>(undefined);
+  const [revealRemaining, setRevealRemaining] = useState<number | undefined>(undefined);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [synonymsUsed, setSynonymsUsed] = useState(0);
   const [sentenceText, setSentenceText] = useState('');
@@ -441,14 +442,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   };
 
   const onRevealLetter = async () => {
-    if (
-      !accessToken ||
-      !attemptId ||
-      revealLoading ||
-      !challenge ||
-      challenge.missingIndexes.length === 0
-    )
-      return;
+    if (!accessToken || !attemptId || revealLoading || !challenge || revealRemaining === 0) return;
     setRevealLoading(true);
     try {
       const result = await requestLetterReveal(accessToken, attemptId);
@@ -461,6 +455,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
             }
           : prev,
       );
+      setRevealRemaining(result.lettersRevealRemaining);
     } catch {
       // Non-critical affordance — same reasoning as onHint.
     } finally {
@@ -793,7 +788,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
                   exhaustedLabel={t('revealLetterExhausted')}
                   onPress={onRevealLetter}
                   loading={revealLoading}
-                  remaining={challenge.missingIndexes.length}
+                  remaining={revealRemaining}
                 />
               </View>
               {hint && (

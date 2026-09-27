@@ -136,6 +136,16 @@ export const gameplayRules = {
     synonymPenalty: 100,
     maxSynonyms: 2,
     letterRevealPenalty: 150,
+    // Bug report, Barth Sept 2026: "some questions were missing just 3
+    // letters, and the hint was also 3, meaning they would get it all
+    // on the hints." Reveal-a-letter had no cap of its own (unlike
+    // hintsUsed/synonymsUsed above) -- this is that cap, same idea and
+    // same 60% figure as Complete It's COMPLETE_IT_CONFIG.HINT_PERCENTAGE_OF_WORD_LENGTH,
+    // just scoped to however many letters THIS word's challenge
+    // actually started with blanked (a mastery-dependent subset, not
+    // the whole word) rather than the word's full length. See
+    // QuestsService.maxLetterRevealsFor.
+    letterRevealPercentageOfMissing: 0.6,
     noHintBonus: 500,
     timeBonusBands: [
       { maxElapsedSeconds: 24, bonus: 750 },

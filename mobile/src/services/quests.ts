@@ -72,6 +72,10 @@ export interface LetterRevealResult {
   displayPattern: string;
   missingIndexes: number[];
   lettersRevealed: number;
+  /** How many more reveals this word has left before hitting its cap
+   * (60% of however many letters it started with blanked) -- mirrors
+   * hintsRemaining/synonymsRemaining above. */
+  lettersRevealRemaining: number;
 }
 
 export interface SentenceScores {

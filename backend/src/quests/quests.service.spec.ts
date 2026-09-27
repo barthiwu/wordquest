@@ -1865,7 +1865,7 @@ describe('QuestsService', () => {
       await expect(service.requestLetterReveal('u1', 'a1')).rejects.toThrow(BadRequestException);
     });
 
-    it('reveals the lowest remaining missing index deterministically', async () => {
+    it('reveals exactly one of the still-missing indexes (order no longer lowest-first -- 2026-09 fix)', async () => {
       prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...openAttempt });
       prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce({ normalizedWord: 'greeting' });
       prismaMock.questAttempt.update.mockResolvedValueOnce({
@@ -1876,17 +1876,37 @@ describe('QuestsService', () => {
 
       const result = await service.requestLetterReveal('u1', 'a1');
 
-      expect(prismaMock.questAttempt.update).toHaveBeenCalledWith({
-        where: { id: 'a1' },
-        data: {
-          lettersRevealed: { increment: 1 },
-          currentDisplayPattern: 'G R E _ T I N G',
-          currentMissingIndexes: [3],
-        },
-      });
+      // openAttempt has 2 blanks ([2, 3]) -- maxLetterRevealsFor(2) is 1
+      // (round(0.6*2)=1, floor caps at 2-1=1), so exactly one reveal is
+      // allowed and WHICH of the two gets picked is randomized (seeded
+      // shuffleIndexes, not always the lowest -- see requestLetterReveal's
+      // own doc comment for why).
+      const call = prismaMock.questAttempt.update.mock.calls[0][0];
+      expect(call.where).toEqual({ id: 'a1' });
+      expect(call.data.lettersRevealed).toEqual({ increment: 1 });
+      expect(['G R E _ T I N G', 'G R _ E T I N G']).toContain(call.data.currentDisplayPattern);
+      expect(call.data.currentMissingIndexes).toEqual(
+        call.data.currentDisplayPattern === 'G R E _ T I N G' ? [3] : [2],
+      );
       expect(result.displayPattern).toBe('G R E _ T I N G');
       expect(result.missingIndexes).toEqual([3]);
       expect(result.lettersRevealed).toBe(1);
+    });
+
+    it("caps reveals at 60% of the word's original blank count, even with blanks still remaining (Barth bug report, Sept 2026)", async () => {
+      // 3 original blanks (2 already revealed, 1 still missing) --
+      // maxLetterRevealsFor(3) is round(0.6*3)=2, so a word that started
+      // with only 3 blanks allows just 2 reveals, never all 3 (the exact
+      // "3 missing, 3 hints, hints alone finished the word" bug).
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({
+        ...openAttempt,
+        currentDisplayPattern: 'G R E _ T I N G',
+        currentMissingIndexes: [3],
+        lettersRevealed: 2,
+      });
+
+      await expect(service.requestLetterReveal('u1', 'a1')).rejects.toThrow(BadRequestException);
+      expect(prismaMock.questAttempt.update).not.toHaveBeenCalled();
     });
   });
 
@@ -1995,6 +2015,10 @@ describe('QuestsService', () => {
     });
 
     it("reveals a letter from the player's own rendered spelling", async () => {
+      // Two blanks (both landing on "Color"'s two 'o's, indexes 1 and 3)
+      // so maxLetterRevealsFor(2) still allows one reveal -- a single
+      // blank would now be capped to zero reveals (see the cap tests
+      // above), which isn't what this test is checking.
       prismaMock.questAttempt.findUnique.mockResolvedValueOnce({
         wordStage: 'GUESSING',
         id: 'a1',
@@ -2002,8 +2026,8 @@ describe('QuestsService', () => {
         status: 'IN_PROGRESS',
         currentIndex: 0,
         wordIds: ['w-colour'],
-        currentDisplayPattern: 'C _ L O R',
-        currentMissingIndexes: [1],
+        currentDisplayPattern: 'C _ L _ R',
+        currentMissingIndexes: [1, 3],
         lettersRevealed: 0,
       });
       prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
@@ -2017,14 +2041,16 @@ describe('QuestsService', () => {
       const result = await service.requestLetterReveal('u1', 'a1');
 
       expect(result.displayPattern).toBe('C O L O R');
-      expect(prismaMock.questAttempt.update).toHaveBeenCalledWith({
-        where: { id: 'a1' },
-        data: {
-          lettersRevealed: { increment: 1 },
-          currentDisplayPattern: 'C O L O R',
-          currentMissingIndexes: [],
-        },
-      });
+      const call = prismaMock.questAttempt.update.mock.calls[0][0];
+      expect(call.where).toEqual({ id: 'a1' });
+      expect(call.data.lettersRevealed).toEqual({ increment: 1 });
+      // Both blanked positions are 'o' in the US rendering, so whichever
+      // one the seeded shuffle picks, the revealed letter itself must
+      // still come from the correctly variant-rendered spelling.
+      expect(['C O L _ R', 'C _ L O R']).toContain(call.data.currentDisplayPattern);
+      expect(call.data.currentMissingIndexes).toEqual(
+        call.data.currentDisplayPattern === 'C O L _ R' ? [3] : [1],
+      );
     });
 
     it('sends the US spelling to the sentence evaluator for a US-preference player', async () => {
