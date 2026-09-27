@@ -6,17 +6,28 @@ import { CurrentUserId } from '../auth/decorators/current-user.decorator';
 
 /**
  * GET /api/v1/arcade/last-played — read-only "what did this player most
- * recently finish in Arcade" lookup, across all three games. They live
- * in two different tables (ScrambleQuest/Complete It share
+ * recently PLAY in Arcade" lookup, across all three games. They live in
+ * two different tables (ScrambleQuest/Complete It share
  * ArcadeGameSession; Word Duel has its own WordDuelMatch/
  * WordDuelPlayerState, since it's two-player), so this reads both and
- * takes whichever finished more recently.
+ * takes whichever started more recently.
  *
- * Home's "Play <Game> again" card is the only consumer (Barth, Sept
- * 2026: prompt the player back into whatever they last played) — never
- * a step in scoring, rewards, or the daily streak, so this stays a
- * plain read next to ProgressionController rather than living inside
- * any one game's own service.
+ * Deliberately keyed on STARTED, not completed (Barth, Sept 2026: "the
+ * game remembers to update that home screen arcade container to the
+ * game the player last clicked/started") — an earlier version of this
+ * endpoint only counted finished sessions, which silently ignored any
+ * game the player started but didn't finish (most visibly Word Duel: a
+ * match only reaches COMPLETED once BOTH players finish, so a match
+ * that's still in progress, or where the opponent never finishes,
+ * would never show up here at all even though the player very much
+ * did play it). Reading startedAt/createdAt instead means clicking
+ * into a game is what updates the Home card, regardless of how far the
+ * player got.
+ *
+ * Home's "Play <Game> again" card is the only consumer — never a step
+ * in scoring, rewards, or the daily streak, so this stays a plain read
+ * next to ProgressionController rather than living inside any one
+ * game's own service.
  */
 @Controller('arcade')
 @UseGuards(JwtAuthGuard)
@@ -29,22 +40,20 @@ export class ArcadeStatusController {
   ): Promise<{ game: ArcadeGame; playedAt: string } | null> {
     const [session, duelMatch] = await Promise.all([
       this.prisma.arcadeGameSession.findFirst({
-        where: { userId, status: 'COMPLETED', endedAt: { not: null } },
-        orderBy: { endedAt: 'desc' },
-        select: { game: true, endedAt: true },
+        where: { userId },
+        orderBy: { startedAt: 'desc' },
+        select: { game: true, startedAt: true },
       }),
       this.prisma.wordDuelMatch.findFirst({
-        where: { status: 'COMPLETED', players: { some: { userId } } },
-        orderBy: { completedAt: 'desc' },
-        select: { completedAt: true },
+        where: { players: { some: { userId } } },
+        orderBy: { createdAt: 'desc' },
+        select: { createdAt: true },
       }),
     ]);
 
     const candidates: { game: ArcadeGame; playedAt: Date }[] = [];
-    if (session?.endedAt) candidates.push({ game: session.game, playedAt: session.endedAt });
-    if (duelMatch?.completedAt) {
-      candidates.push({ game: 'WORD_DUEL', playedAt: duelMatch.completedAt });
-    }
+    if (session) candidates.push({ game: session.game, playedAt: session.startedAt });
+    if (duelMatch) candidates.push({ game: 'WORD_DUEL', playedAt: duelMatch.createdAt });
 
     if (candidates.length === 0) return null;
     candidates.sort((a, b) => b.playedAt.getTime() - a.playedAt.getTime());

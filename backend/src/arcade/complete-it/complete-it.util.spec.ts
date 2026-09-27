@@ -1,4 +1,4 @@
-import { blankSentence } from './complete-it.util';
+import { blankSentence, isCompleteItSentenceUsable } from './complete-it.util';
 
 describe('blankSentence', () => {
   it('blanks a plain occurrence of the word', () => {
@@ -40,5 +40,31 @@ describe('blankSentence', () => {
     const result = blankSentence("Don't forget the apostrophe.", "Don't");
     expect(result.found).toBe(true);
     expect(result.sentenceWithBlank).toBe('_____ forget the apostrophe.');
+  });
+});
+
+describe('isCompleteItSentenceUsable', () => {
+  it('accepts a sentence that contains the word and reads like real prose', () => {
+    expect(isCompleteItSentenceUsable('I need to train every single day.', 'train')).toBe(true);
+  });
+
+  it('rejects a sentence that does not contain the word at all', () => {
+    expect(isCompleteItSentenceUsable('This sentence forgot its own word.', 'compassion')).toBe(
+      false,
+    );
+  });
+
+  it('rejects a terse WordNet-style fragment even though it contains the word', () => {
+    expect(isCompleteItSentenceUsable('Tenderize meat.', 'tenderize')).toBe(false);
+  });
+
+  it('accepts a sentence right at the minimum word-count floor', () => {
+    // Exactly MIN_SENTENCE_WORDS (6) words.
+    expect(isCompleteItSentenceUsable('The humid air felt very heavy.', 'humid')).toBe(true);
+  });
+
+  it('rejects a sentence one word short of the floor', () => {
+    // 5 words.
+    expect(isCompleteItSentenceUsable('The humid air felt heavy.', 'humid')).toBe(false);
   });
 });
