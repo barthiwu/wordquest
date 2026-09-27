@@ -124,6 +124,24 @@
       "composite": "Composite",
       "wordUsage": "Emploi du mot",
       "coherence": "Cohérence"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "Rejoins un Combat de Boss pour être classé",
+      "inviteTitle": "Rejoins le combat",
+      "inviteSubtitle": "Rejoins un Combat de Boss pour être classé",
+      "eyebrow": "Classement Combat de Boss",
+      "lifetime": "Total cumulé",
+      "cardLabel": "Classement Combat de Boss, rang {{rank}}",
+      "viewLeaderboard": "Voir le classement"
+    },
+    "friendRankCard": {
+      "inviteLabel": "Ajoute des amis pour être classé",
+      "inviteTitle": "Progressez ensemble",
+      "inviteSubtitle": "Ajoute des amis pour comparer votre progression",
+      "eyebrow": "Classement entre amis",
+      "amongFriends": "Entre amis",
+      "cardLabel": "Classement entre amis, rang {{rank}}",
+      "viewLeaderboard": "Voir le classement"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "Impossible de charger le classement.",
     "you": "Toi",
     "xpValue": "{{xp}} XP",
-    "levelLabel": "Niv {{level}}"
+    "levelLabel": "Niv {{level}}",
+    "tabFriend": "Amis",
+    "tabBossBattle": "Combat de Boss",
+    "unavailableFriend": "Impossible de charger le classement entre amis.",
+    "unavailableBossBattle": "Impossible de charger le classement du Combat de Boss.",
+    "emptyFriend": "Ajoute des amis pour voir ton classement.",
+    "emptyBossBattle": "Personne n'est encore classé au Combat de Boss."
   },
   "bossBattle": {
     "genericError": "Impossible de joindre le Combat de Boss pour le moment.",
@@ -403,7 +427,10 @@
       "final": "Final",
       "emptyGroup": "Personne n’a encore répondu à un défi dans ce groupe.",
       "rewardSuffix": " · +{{xp}} XP, +{{glyphs}} Glyphes"
-    }
+    },
+    "progressCount": "{{answered}} sur {{total}}",
+    "waitingRoomTitle": "Tu es prêt !",
+    "waitingRoomSubtitle": "Prépare-toi…"
   },
   "masterChallenge": {
     "loadError": "Impossible de charger le Défi du Maître.",
@@ -481,7 +508,9 @@
     "notificationsTitle": "Notifications",
     "notificationsBody": "Ta boîte de réception et tes préférences de rappels.",
     "settingsTitle": "Paramètres",
-    "settingsBody": "Compte, vérification et session"
+    "settingsBody": "Compte, vérification et session",
+    "friendsTitle": "Amis",
+    "friendsBody": "Ajoute des amis et suis leur activité"
   },
   "wordMastery": {
     "loadError": "Impossible de charger tes mots.",
@@ -619,7 +648,13 @@
     "continue": "Continuer",
     "completeTitle": "Rattrapage terminé !",
     "completeSubtitle": "Vous avez trouvé {{count}} mot(s) sur {{total}} du {{date}}.",
-    "backToCalendar": "Retour au calendrier"
+    "backToCalendar": "Retour au calendrier",
+    "calendarLegendPlayed": "Joué",
+    "calendarLegendMissed": "Manqué",
+    "calendarLegendUnavailable": "Pas encore",
+    "calendarMissedSummary_one": "Tu as manqué {{count}} jour ce mois-ci — touche un jour vert pour te rattraper.",
+    "calendarMissedSummary_other": "Tu as manqué {{count}} jours ce mois-ci — touche un jour vert pour te rattraper.",
+    "calendarNoneMissed": "Tu as joué tous les jours ce mois-ci."
   },
   "wordInTheWild": {
     "title": "Mot dans la nature",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "Adversaire : {{correct}} correctes, {{xp}} XP",
     "resultTiebreakNote": "Départagé — le plus de bonnes réponses, puis le plus rapide à atteindre son score final.",
     "playAgain": "Rejouer"
+  },
+  "friends": {
+    "popup": {
+      "profile": "Profil",
+      "addFriend": "Ajouter en ami",
+      "requestSent": "Demande envoyée",
+      "friends": "Amis",
+      "respondToRequest": "Répondre à la demande",
+      "block": "Bloquer",
+      "unblock": "Débloquer",
+      "avatarLabel": "Ouvrir les options de {{username}}",
+      "addFriendSentTitle": "Demande d'ami envoyée",
+      "addFriendSentMessage": "{{username}} verra ta demande dans sa liste d'amis.",
+      "addFriendErrorTitle": "Impossible d'envoyer la demande",
+      "nowFriendsTitle": "Vous êtes maintenant amis",
+      "nowFriendsMessage": "{{username}} t'avait déjà envoyé une demande — vous êtes maintenant amis.",
+      "blockConfirmTitle": "Bloquer {{username}} ?",
+      "blockConfirmMessage": "Cette personne ne pourra plus t'ajouter en ami, te défier en Duel de mots, ni te trouver dans la recherche. Tu peux la débloquer à tout moment depuis son profil.",
+      "blockConfirmBlock": "Bloquer",
+      "blockErrorTitle": "Impossible de bloquer ce joueur"
+    },
+    "profile": {
+      "genericError": "Impossible de charger ce profil.",
+      "youLabel": "C'est toi",
+      "levelStatLabel": "Niveau",
+      "streakStatLabel": "Série de jours",
+      "clanLabel": "Clan : {{clanName}}",
+      "noClan": "Pas encore de clan",
+      "joinedLabel": "Inscrit le {{date}}",
+      "acceptRequest": "Accepter",
+      "declineRequest": "Refuser",
+      "unfriend": "Retirer des amis",
+      "unfriendConfirmTitle": "Retirer {{username}} de tes amis ?",
+      "unfriendConfirmMessage": "Tu pourras lui envoyer une nouvelle demande plus tard.",
+      "unfriendConfirmUnfriend": "Retirer",
+      "unfriendErrorTitle": "Impossible de retirer ce joueur",
+      "unblockErrorTitle": "Impossible de débloquer ce joueur"
+    },
+    "list": {
+      "title": "Amis",
+      "searchPlaceholder": "Rechercher par nom d'utilisateur",
+      "searchButton": "Rechercher",
+      "searchNoResults": "Aucun joueur trouvé avec ce nom d'utilisateur.",
+      "genericError": "Impossible de charger Amis pour le moment.",
+      "incomingRequestsTitle": "Demandes",
+      "outgoingRequestsTitle": "Envoyées",
+      "myFriendsTitle": "Mes amis",
+      "emptyFriends": "Ajoute des amis pour les voir ici.",
+      "accept": "Accepter",
+      "decline": "Refuser",
+      "add": "Ajouter",
+      "pending": "En attente",
+      "acceptErrorTitle": "Impossible d'accepter la demande",
+      "declineErrorTitle": "Impossible de refuser la demande"
+    }
   }
 }

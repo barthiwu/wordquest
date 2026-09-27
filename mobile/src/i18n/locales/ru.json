@@ -124,6 +124,24 @@
       "composite": "Итог",
       "wordUsage": "Использование слова",
       "coherence": "Связность"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "Присоединитесь к Битве с боссом, чтобы попасть в рейтинг",
+      "inviteTitle": "Вступайте в бой",
+      "inviteSubtitle": "Присоединитесь к Битве с боссом, чтобы попасть в рейтинг",
+      "eyebrow": "Рейтинг Битвы с боссом",
+      "lifetime": "За всё время",
+      "cardLabel": "Рейтинг Битвы с боссом, место {{rank}}",
+      "viewLeaderboard": "Смотреть рейтинг"
+    },
+    "friendRankCard": {
+      "inviteLabel": "Добавьте друзей, чтобы попасть в рейтинг",
+      "inviteTitle": "Растите в рейтинге вместе",
+      "inviteSubtitle": "Добавьте друзей, чтобы сравнивать прогресс",
+      "eyebrow": "Рейтинг друзей",
+      "amongFriends": "Среди друзей",
+      "cardLabel": "Рейтинг друзей, место {{rank}}",
+      "viewLeaderboard": "Смотреть рейтинг"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "Не удалось загрузить таблицу лидеров.",
     "you": "Вы",
     "xpValue": "{{xp}} XP",
-    "levelLabel": "Ур. {{level}}"
+    "levelLabel": "Ур. {{level}}",
+    "tabFriend": "Друзья",
+    "tabBossBattle": "Битва с боссом",
+    "unavailableFriend": "Не удалось загрузить рейтинг друзей.",
+    "unavailableBossBattle": "Не удалось загрузить рейтинг Битвы с боссом.",
+    "emptyFriend": "Добавьте друзей, чтобы увидеть свой рейтинг.",
+    "emptyBossBattle": "Пока никто не попал в рейтинг Битвы с боссом."
   },
   "bossBattle": {
     "genericError": "Не удалось подключиться к Битве с боссом.",
@@ -403,7 +427,10 @@
       "final": "Итог",
       "emptyGroup": "В этой группе пока никто не отвечал на задания.",
       "rewardSuffix": " · +{{xp}} XP, +{{glyphs}} Глифов"
-    }
+    },
+    "progressCount": "{{answered}} из {{total}}",
+    "waitingRoomTitle": "Вы в игре!",
+    "waitingRoomSubtitle": "Приготовьтесь…"
   },
   "masterChallenge": {
     "loadError": "Не удалось загрузить Испытание Мастера.",
@@ -481,7 +508,9 @@
     "notificationsTitle": "Уведомления",
     "notificationsBody": "Ваши входящие и настройки напоминаний.",
     "settingsTitle": "Настройки",
-    "settingsBody": "Аккаунт, подтверждение и сеанс"
+    "settingsBody": "Аккаунт, подтверждение и сеанс",
+    "friendsTitle": "Друзья",
+    "friendsBody": "Добавляйте друзей и следите за их активностью"
   },
   "wordMastery": {
     "loadError": "Не удалось загрузить ваши слова.",
@@ -619,7 +648,13 @@
     "continue": "Далее",
     "completeTitle": "Повторение завершено!",
     "completeSubtitle": "Вы правильно ответили на {{count}} из {{total}} слов за {{date}}.",
-    "backToCalendar": "Назад к календарю"
+    "backToCalendar": "Назад к календарю",
+    "calendarLegendPlayed": "Сыграно",
+    "calendarLegendMissed": "Пропущено",
+    "calendarLegendUnavailable": "Ещё нет",
+    "calendarMissedSummary_one": "В этом месяце вы пропустили {{count}} день — нажмите на зелёный день, чтобы наверстать.",
+    "calendarMissedSummary_other": "В этом месяце вы пропустили {{count}} дней — нажмите на зелёный день, чтобы наверстать.",
+    "calendarNoneMissed": "В этом месяце вы играли каждый день."
   },
   "wordInTheWild": {
     "title": "Слово в реальном мире",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "Соперник: {{correct}} верно, {{xp}} XP",
     "resultTiebreakNote": "Решено по правилу ничьей — больше верных ответов, затем кто быстрее достиг своего итогового счёта.",
     "playAgain": "Играть снова"
+  },
+  "friends": {
+    "popup": {
+      "profile": "Профиль",
+      "addFriend": "Добавить в друзья",
+      "requestSent": "Запрос отправлен",
+      "friends": "Друзья",
+      "respondToRequest": "Ответить на запрос",
+      "block": "Заблокировать",
+      "unblock": "Разблокировать",
+      "avatarLabel": "Открыть параметры {{username}}",
+      "addFriendSentTitle": "Запрос дружбы отправлен",
+      "addFriendSentMessage": "{{username}} увидит ваш запрос в списке друзей.",
+      "addFriendErrorTitle": "Не удалось отправить запрос",
+      "nowFriendsTitle": "Теперь вы друзья",
+      "nowFriendsMessage": "{{username}} уже отправил(а) вам запрос — теперь вы друзья.",
+      "blockConfirmTitle": "Заблокировать {{username}}?",
+      "blockConfirmMessage": "Этот игрок не сможет добавить вас в друзья, вызвать на Дуэль слов или найти вас в поиске. Вы можете разблокировать его в любой момент через профиль.",
+      "blockConfirmBlock": "Заблокировать",
+      "blockErrorTitle": "Не удалось заблокировать игрока"
+    },
+    "profile": {
+      "genericError": "Не удалось загрузить этот профиль.",
+      "youLabel": "Это вы",
+      "levelStatLabel": "Уровень",
+      "streakStatLabel": "Серия дней",
+      "clanLabel": "Клан: {{clanName}}",
+      "noClan": "Пока без клана",
+      "joinedLabel": "Присоединился(ась) {{date}}",
+      "acceptRequest": "Принять",
+      "declineRequest": "Отклонить",
+      "unfriend": "Удалить из друзей",
+      "unfriendConfirmTitle": "Удалить {{username}} из друзей?",
+      "unfriendConfirmMessage": "Вы сможете отправить новый запрос позже.",
+      "unfriendConfirmUnfriend": "Удалить",
+      "unfriendErrorTitle": "Не удалось удалить игрока из друзей",
+      "unblockErrorTitle": "Не удалось разблокировать игрока"
+    },
+    "list": {
+      "title": "Друзья",
+      "searchPlaceholder": "Поиск по имени пользователя",
+      "searchButton": "Найти",
+      "searchNoResults": "Игрок с таким именем пользователя не найден.",
+      "genericError": "Не удалось загрузить раздел «Друзья».",
+      "incomingRequestsTitle": "Запросы",
+      "outgoingRequestsTitle": "Отправленные",
+      "myFriendsTitle": "Мои друзья",
+      "emptyFriends": "Добавьте друзей, чтобы увидеть их здесь.",
+      "accept": "Принять",
+      "decline": "Отклонить",
+      "add": "Добавить",
+      "pending": "Ожидание",
+      "acceptErrorTitle": "Не удалось принять запрос",
+      "declineErrorTitle": "Не удалось отклонить запрос"
+    }
   }
 }

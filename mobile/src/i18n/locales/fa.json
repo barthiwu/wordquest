@@ -124,6 +124,24 @@
       "composite": "ترکیبی",
       "wordUsage": "کاربرد کلمه",
       "coherence": "انسجام"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "برای کسب رتبه به یک نبرد با رئیس بپیوندید",
+      "inviteTitle": "به نبرد بپیوندید",
+      "inviteSubtitle": "برای کسب رتبه به یک نبرد با رئیس بپیوندید",
+      "eyebrow": "رتبه نبرد با رئیس",
+      "lifetime": "مجموع کل",
+      "cardLabel": "رتبه نبرد با رئیس، رتبه {{rank}}",
+      "viewLeaderboard": "مشاهده جدول امتیازات"
+    },
+    "friendRankCard": {
+      "inviteLabel": "برای کسب رتبه دوستان اضافه کنید",
+      "inviteTitle": "با هم پیشرفت کنید",
+      "inviteSubtitle": "برای مقایسه پیشرفت خود دوستان اضافه کنید",
+      "eyebrow": "رتبه دوستان",
+      "amongFriends": "در میان دوستان",
+      "cardLabel": "رتبه دوستان، رتبه {{rank}}",
+      "viewLeaderboard": "مشاهده جدول امتیازات"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "بارگذاری جدول امتیازات ممکن نشد.",
     "you": "شما",
     "xpValue": "{{xp}} XP",
-    "levelLabel": "سطح {{level}}"
+    "levelLabel": "سطح {{level}}",
+    "tabFriend": "دوستان",
+    "tabBossBattle": "نبرد با رئیس",
+    "unavailableFriend": "بارگذاری جدول امتیازات دوستان ممکن نشد.",
+    "unavailableBossBattle": "بارگذاری جدول امتیازات نبرد با رئیس ممکن نشد.",
+    "emptyFriend": "برای مشاهده رتبه خود دوستانی اضافه کنید.",
+    "emptyBossBattle": "هنوز کسی در نبرد با رئیس رتبه‌بندی نشده است."
   },
   "bossBattle": {
     "genericError": "در حال حاضر امکان دسترسی به نبرد با رئیس وجود ندارد.",
@@ -403,7 +427,10 @@
       "final": "نهایی",
       "emptyGroup": "هنوز کسی در این گروه به چالشی پاسخ نداده است.",
       "rewardSuffix": " · +{{xp}} XP، +{{glyphs}} گلیف"
-    }
+    },
+    "progressCount": "{{answered}} از {{total}}",
+    "waitingRoomTitle": "شما وارد شدید!",
+    "waitingRoomSubtitle": "آماده شوید…"
   },
   "masterChallenge": {
     "loadError": "بارگذاری چالش استاد ممکن نشد.",
@@ -481,7 +508,9 @@
     "notificationsTitle": "اعلان‌ها",
     "notificationsBody": "صندوق پیام‌ها و تنظیمات یادآوری شما.",
     "settingsTitle": "تنظیمات",
-    "settingsBody": "حساب کاربری، تأیید هویت و نشست"
+    "settingsBody": "حساب کاربری، تأیید هویت و نشست",
+    "friendsTitle": "دوستان",
+    "friendsBody": "دوستان اضافه کنید و فعالیت آن‌ها را ببینید"
   },
   "wordMastery": {
     "loadError": "بارگذاری کلمات شما ممکن نشد.",
@@ -619,7 +648,13 @@
     "continue": "ادامه",
     "completeTitle": "جبران شد!",
     "completeSubtitle": "شما {{count}} از {{total}} کلمه‌ی {{date}} را درست پاسخ دادید.",
-    "backToCalendar": "بازگشت به تقویم"
+    "backToCalendar": "بازگشت به تقویم",
+    "calendarLegendPlayed": "انجام‌شده",
+    "calendarLegendMissed": "ازدست‌رفته",
+    "calendarLegendUnavailable": "هنوز نه",
+    "calendarMissedSummary_one": "شما {{count}} روز از این ماه را از دست داده‌اید — برای جبران، روی یک روز سبز ضربه بزنید.",
+    "calendarMissedSummary_other": "شما {{count}} روز از این ماه را از دست داده‌اید — برای جبران، روی یک روز سبز ضربه بزنید.",
+    "calendarNoneMissed": "شما تا این لحظه هر روز این ماه را بازی کرده‌اید."
   },
   "wordInTheWild": {
     "title": "کلمه در دنیای واقعی",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "حریف: {{correct}} درست، {{xp}} XP",
     "resultTiebreakNote": "با قانون تساوی‌شکن تعیین شد — بیشترین پاسخ درست، سپس سریع‌ترین رسیدن به امتیاز نهایی.",
     "playAgain": "دوباره بازی کن"
+  },
+  "friends": {
+    "popup": {
+      "profile": "نمایه",
+      "addFriend": "افزودن دوست",
+      "requestSent": "درخواست ارسال شد",
+      "friends": "دوستان",
+      "respondToRequest": "پاسخ به درخواست",
+      "block": "مسدود کردن",
+      "unblock": "رفع مسدودیت",
+      "avatarLabel": "باز کردن گزینه‌های {{username}}",
+      "addFriendSentTitle": "درخواست دوستی ارسال شد",
+      "addFriendSentMessage": "{{username}} درخواست شما را در فهرست دوستانش خواهد دید.",
+      "addFriendErrorTitle": "ارسال درخواست ممکن نشد",
+      "nowFriendsTitle": "اکنون دوست هستید",
+      "nowFriendsMessage": "{{username}} قبلاً برای شما درخواستی ارسال کرده بود — اکنون دوست هستید.",
+      "blockConfirmTitle": "{{username}} مسدود شود؟",
+      "blockConfirmMessage": "این فرد دیگر نمی‌تواند شما را به‌عنوان دوست اضافه کند، در نبرد کلمات به چالش بکشد یا در جستجو پیدا کند. هر زمان می‌توانید از طریق نمایه او مسدودیت را بردارید.",
+      "blockConfirmBlock": "مسدود کردن",
+      "blockErrorTitle": "مسدود کردن بازیکن ممکن نشد"
+    },
+    "profile": {
+      "genericError": "بارگذاری این نمایه ممکن نشد.",
+      "youLabel": "این شما هستید",
+      "levelStatLabel": "سطح",
+      "streakStatLabel": "روزهای پیاپی",
+      "clanLabel": "قبیله: {{clanName}}",
+      "noClan": "هنوز قبیله‌ای ندارد",
+      "joinedLabel": "تاریخ عضویت: {{date}}",
+      "acceptRequest": "پذیرفتن",
+      "declineRequest": "رد کردن",
+      "unfriend": "حذف دوست",
+      "unfriendConfirmTitle": "{{username}} از فهرست دوستان حذف شود؟",
+      "unfriendConfirmMessage": "بعداً می‌توانید درخواست دوستی جدیدی برایش ارسال کنید.",
+      "unfriendConfirmUnfriend": "حذف",
+      "unfriendErrorTitle": "حذف بازیکن ممکن نشد",
+      "unblockErrorTitle": "رفع مسدودیت بازیکن ممکن نشد"
+    },
+    "list": {
+      "title": "دوستان",
+      "searchPlaceholder": "جستجو بر اساس نام کاربری",
+      "searchButton": "جستجو",
+      "searchNoResults": "بازیکنی با این نام کاربری یافت نشد.",
+      "genericError": "در حال حاضر بارگذاری دوستان ممکن نشد.",
+      "incomingRequestsTitle": "درخواست‌ها",
+      "outgoingRequestsTitle": "ارسال‌شده",
+      "myFriendsTitle": "دوستان من",
+      "emptyFriends": "دوستان اضافه کنید تا اینجا نمایش داده شوند.",
+      "accept": "پذیرفتن",
+      "decline": "رد کردن",
+      "add": "افزودن",
+      "pending": "در انتظار",
+      "acceptErrorTitle": "پذیرفتن درخواست ممکن نشد",
+      "declineErrorTitle": "رد کردن درخواست ممکن نشد"
+    }
   }
 }

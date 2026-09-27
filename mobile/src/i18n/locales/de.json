@@ -124,6 +124,24 @@
       "composite": "Gesamt",
       "wordUsage": "Wortverwendung",
       "coherence": "Kohärenz"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "Tritt einem Boss-Kampf bei, um in die Rangliste zu kommen",
+      "inviteTitle": "Mach mit beim Kampf",
+      "inviteSubtitle": "Tritt einem Boss-Kampf bei, um in die Rangliste zu kommen",
+      "eyebrow": "Boss-Kampf-Rang",
+      "lifetime": "Gesamt",
+      "cardLabel": "Boss-Kampf-Rang, Platz {{rank}}",
+      "viewLeaderboard": "Rangliste ansehen"
+    },
+    "friendRankCard": {
+      "inviteLabel": "Füge Freunde hinzu, um in die Rangliste zu kommen",
+      "inviteTitle": "Gemeinsam aufsteigen",
+      "inviteSubtitle": "Füge Freunde hinzu, um deinen Fortschritt zu vergleichen",
+      "eyebrow": "Freundes-Rang",
+      "amongFriends": "Unter Freunden",
+      "cardLabel": "Freundes-Rang, Platz {{rank}}",
+      "viewLeaderboard": "Rangliste ansehen"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "Die Bestenliste konnte nicht geladen werden.",
     "you": "Du",
     "xpValue": "{{xp}} XP",
-    "levelLabel": "Lvl {{level}}"
+    "levelLabel": "Lvl {{level}}",
+    "tabFriend": "Freunde",
+    "tabBossBattle": "Boss-Kampf",
+    "unavailableFriend": "Die Freundes-Rangliste konnte nicht geladen werden.",
+    "unavailableBossBattle": "Die Boss-Kampf-Rangliste konnte nicht geladen werden.",
+    "emptyFriend": "Füge Freunde hinzu, um zu sehen, wie du abschneidest.",
+    "emptyBossBattle": "Noch niemand hat sich im Boss-Kampf platziert."
   },
   "bossBattle": {
     "genericError": "Der Bosskampf konnte gerade nicht erreicht werden.",
@@ -403,7 +427,10 @@
       "final": "Endstand",
       "emptyGroup": "In dieser Gruppe hat noch niemand eine Herausforderung beantwortet.",
       "rewardSuffix": " · +{{xp}} XP, +{{glyphs}} Glyphen"
-    }
+    },
+    "progressCount": "{{answered}} von {{total}}",
+    "waitingRoomTitle": "Du bist dabei!",
+    "waitingRoomSubtitle": "Mach dich bereit …"
   },
   "masterChallenge": {
     "loadError": "Die Meister-Herausforderung konnte nicht geladen werden.",
@@ -481,7 +508,9 @@
     "notificationsTitle": "Benachrichtigungen",
     "notificationsBody": "Dein Posteingang und deine Erinnerungseinstellungen.",
     "settingsTitle": "Einstellungen",
-    "settingsBody": "Konto, Verifizierung und Sitzung"
+    "settingsBody": "Konto, Verifizierung und Sitzung",
+    "friendsTitle": "Freunde",
+    "friendsBody": "Füge Freunde hinzu und sieh ihre Aktivität"
   },
   "wordMastery": {
     "loadError": "Deine Wörter konnten nicht geladen werden.",
@@ -619,7 +648,13 @@
     "continue": "Weiter",
     "completeTitle": "Nachgeholt!",
     "completeSubtitle": "Du hast {{count}} von {{total}} Wörtern vom {{date}} richtig.",
-    "backToCalendar": "Zurück zum Kalender"
+    "backToCalendar": "Zurück zum Kalender",
+    "calendarLegendPlayed": "Gespielt",
+    "calendarLegendMissed": "Verpasst",
+    "calendarLegendUnavailable": "Noch nicht",
+    "calendarMissedSummary_one": "Du hast {{count}} Tag in diesem Monat verpasst – tippe auf einen grünen Tag, um nachzuholen.",
+    "calendarMissedSummary_other": "Du hast {{count}} Tage in diesem Monat verpasst – tippe auf einen grünen Tag, um nachzuholen.",
+    "calendarNoneMissed": "Du hast diesen Monat bisher jeden Tag gespielt."
   },
   "wordInTheWild": {
     "title": "Wort in freier Wildbahn",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "Gegner: {{correct}} richtig, {{xp}} XP",
     "resultTiebreakNote": "Per Stichentscheid — meiste richtige Antworten, dann wer sein Endergebnis zuerst erreicht hat.",
     "playAgain": "Nochmal spielen"
+  },
+  "friends": {
+    "popup": {
+      "profile": "Profil",
+      "addFriend": "Freund hinzufügen",
+      "requestSent": "Anfrage gesendet",
+      "friends": "Befreundet",
+      "respondToRequest": "Auf Anfrage reagieren",
+      "block": "Blockieren",
+      "unblock": "Blockierung aufheben",
+      "avatarLabel": "Optionen für {{username}} öffnen",
+      "addFriendSentTitle": "Freundschaftsanfrage gesendet",
+      "addFriendSentMessage": "{{username}} sieht deine Anfrage in der Freundesliste.",
+      "addFriendErrorTitle": "Anfrage konnte nicht gesendet werden",
+      "nowFriendsTitle": "Ihr seid jetzt Freunde",
+      "nowFriendsMessage": "{{username}} hatte dir bereits eine Anfrage gesendet – ihr seid jetzt befreundet.",
+      "blockConfirmTitle": "{{username}} blockieren?",
+      "blockConfirmMessage": "Diese Person kann dich dann nicht mehr als Freund hinzufügen, dich bei Word Duel herausfordern oder dich in der Suche finden. Du kannst die Blockierung jederzeit über das Profil aufheben.",
+      "blockConfirmBlock": "Blockieren",
+      "blockErrorTitle": "Spieler konnte nicht blockiert werden"
+    },
+    "profile": {
+      "genericError": "Dieses Profil konnte nicht geladen werden.",
+      "youLabel": "Das bist du",
+      "levelStatLabel": "Level",
+      "streakStatLabel": "Tage-Serie",
+      "clanLabel": "Clan: {{clanName}}",
+      "noClan": "Noch kein Clan",
+      "joinedLabel": "Beigetreten am {{date}}",
+      "acceptRequest": "Annehmen",
+      "declineRequest": "Ablehnen",
+      "unfriend": "Entfreunden",
+      "unfriendConfirmTitle": "{{username}} entfreunden?",
+      "unfriendConfirmMessage": "Du kannst später eine neue Freundschaftsanfrage senden.",
+      "unfriendConfirmUnfriend": "Entfreunden",
+      "unfriendErrorTitle": "Spieler konnte nicht entfreundet werden",
+      "unblockErrorTitle": "Blockierung konnte nicht aufgehoben werden"
+    },
+    "list": {
+      "title": "Freunde",
+      "searchPlaceholder": "Nach Benutzernamen suchen",
+      "searchButton": "Suchen",
+      "searchNoResults": "Kein Spieler mit diesem Benutzernamen gefunden.",
+      "genericError": "Freunde konnten gerade nicht geladen werden.",
+      "incomingRequestsTitle": "Anfragen",
+      "outgoingRequestsTitle": "Gesendet",
+      "myFriendsTitle": "Meine Freunde",
+      "emptyFriends": "Füge Freunde hinzu, um sie hier zu sehen.",
+      "accept": "Annehmen",
+      "decline": "Ablehnen",
+      "add": "Hinzufügen",
+      "pending": "Ausstehend",
+      "acceptErrorTitle": "Anfrage konnte nicht angenommen werden",
+      "declineErrorTitle": "Anfrage konnte nicht abgelehnt werden"
+    }
   }
 }

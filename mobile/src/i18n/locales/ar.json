@@ -124,6 +124,24 @@
       "composite": "الإجمالي",
       "wordUsage": "استخدام الكلمة",
       "coherence": "الترابط"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "انضم إلى معركة زعيم لتحصل على ترتيب",
+      "inviteTitle": "انضم إلى المعركة",
+      "inviteSubtitle": "انضم إلى معركة زعيم لتحصل على ترتيب",
+      "eyebrow": "ترتيب معركة الزعيم",
+      "lifetime": "الإجمالي",
+      "cardLabel": "ترتيب معركة الزعيم، المركز {{rank}}",
+      "viewLeaderboard": "عرض لوحة المتصدرين"
+    },
+    "friendRankCard": {
+      "inviteLabel": "أضف أصدقاء لتحصل على ترتيب",
+      "inviteTitle": "ارتقيا في الترتيب معًا",
+      "inviteSubtitle": "أضف أصدقاء لمقارنة تقدمكم",
+      "eyebrow": "ترتيب الأصدقاء",
+      "amongFriends": "بين الأصدقاء",
+      "cardLabel": "ترتيب الأصدقاء، المركز {{rank}}",
+      "viewLeaderboard": "عرض لوحة المتصدرين"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "تعذّر تحميل لوحة المتصدرين.",
     "you": "أنت",
     "xpValue": "{{xp}} نقطة خبرة",
-    "levelLabel": "المستوى {{level}}"
+    "levelLabel": "المستوى {{level}}",
+    "tabFriend": "الأصدقاء",
+    "tabBossBattle": "معركة الزعيم",
+    "unavailableFriend": "تعذّر تحميل لوحة متصدري الأصدقاء.",
+    "unavailableBossBattle": "تعذّر تحميل لوحة متصدري معركة الزعيم.",
+    "emptyFriend": "أضف بعض الأصدقاء لترى ترتيبك.",
+    "emptyBossBattle": "لم يُدرج أحد بعد في ترتيب معركة الزعيم."
   },
   "bossBattle": {
     "genericError": "تعذّر الوصول إلى معركة الزعيم الآن.",
@@ -403,7 +427,10 @@
       "final": "نهائي",
       "emptyGroup": "لم يُجب أحد عن تحدٍّ في هذه المجموعة بعد.",
       "rewardSuffix": " · +{{xp}} نقطة خبرة، +{{glyphs}} رمز"
-    }
+    },
+    "progressCount": "{{answered}} من {{total}}",
+    "waitingRoomTitle": "لقد انضممت!",
+    "waitingRoomSubtitle": "استعد…"
   },
   "masterChallenge": {
     "loadError": "تعذّر تحميل تحدي الماستر.",
@@ -481,7 +508,9 @@
     "notificationsTitle": "الإشعارات",
     "notificationsBody": "صندوق الوارد وتفضيلات التذكير الخاصة بك.",
     "settingsTitle": "الإعدادات",
-    "settingsBody": "الحساب والتحقق والجلسة"
+    "settingsBody": "الحساب والتحقق والجلسة",
+    "friendsTitle": "الأصدقاء",
+    "friendsBody": "أضف أصدقاء وتابع نشاطهم"
   },
   "wordMastery": {
     "loadError": "تعذّر تحميل كلماتك.",
@@ -619,7 +648,13 @@
     "continue": "استمرار",
     "completeTitle": "تم التعويض!",
     "completeSubtitle": "أجبت بشكل صحيح على {{count}} من {{total}} كلمة من {{date}}.",
-    "backToCalendar": "العودة إلى التقويم"
+    "backToCalendar": "العودة إلى التقويم",
+    "calendarLegendPlayed": "تمت اللعبة",
+    "calendarLegendMissed": "فائت",
+    "calendarLegendUnavailable": "لم يحن بعد",
+    "calendarMissedSummary_one": "فاتك {{count}} يوم هذا الشهر — اضغط على يوم أخضر للتعويض.",
+    "calendarMissedSummary_other": "فاتك {{count}} أيام هذا الشهر — اضغط على يوم أخضر للتعويض.",
+    "calendarNoneMissed": "لقد لعبت كل يوم حتى الآن هذا الشهر."
   },
   "wordInTheWild": {
     "title": "كلمة في البرية",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "الخصم: {{correct}} إجابة صحيحة، {{xp}} XP",
     "resultTiebreakNote": "تم الحسم بكسر التعادل — أكثر الإجابات الصحيحة، ثم الأسرع في بلوغ نتيجته النهائية.",
     "playAgain": "العب مرة أخرى"
+  },
+  "friends": {
+    "popup": {
+      "profile": "الملف الشخصي",
+      "addFriend": "إضافة صديق",
+      "requestSent": "تم إرسال الطلب",
+      "friends": "أصدقاء",
+      "respondToRequest": "الرد على الطلب",
+      "block": "حظر",
+      "unblock": "إلغاء الحظر",
+      "avatarLabel": "فتح خيارات {{username}}",
+      "addFriendSentTitle": "تم إرسال طلب الصداقة",
+      "addFriendSentMessage": "سيرى {{username}} طلبك في قائمة أصدقائه.",
+      "addFriendErrorTitle": "تعذّر إرسال الطلب",
+      "nowFriendsTitle": "أصبحتما أصدقاء الآن",
+      "nowFriendsMessage": "كان {{username}} قد أرسل إليك طلبًا بالفعل — أصبحتما أصدقاء الآن.",
+      "blockConfirmTitle": "حظر {{username}}؟",
+      "blockConfirmMessage": "لن يتمكن هذا الشخص من إضافتك كصديق، أو تحديك في مبارزة الكلمات، أو إيجادك في البحث. يمكنك إلغاء الحظر في أي وقت من ملفه الشخصي.",
+      "blockConfirmBlock": "حظر",
+      "blockErrorTitle": "تعذّر حظر اللاعب"
+    },
+    "profile": {
+      "genericError": "تعذّر تحميل هذا الملف الشخصي.",
+      "youLabel": "هذا أنت",
+      "levelStatLabel": "المستوى",
+      "streakStatLabel": "سلسلة الأيام",
+      "clanLabel": "العشيرة: {{clanName}}",
+      "noClan": "لا توجد عشيرة بعد",
+      "joinedLabel": "انضم في {{date}}",
+      "acceptRequest": "قبول",
+      "declineRequest": "رفض",
+      "unfriend": "إلغاء الصداقة",
+      "unfriendConfirmTitle": "إلغاء صداقة {{username}}؟",
+      "unfriendConfirmMessage": "يمكنك إرسال طلب صداقة جديد لاحقًا.",
+      "unfriendConfirmUnfriend": "إلغاء الصداقة",
+      "unfriendErrorTitle": "تعذّر إلغاء صداقة هذا اللاعب",
+      "unblockErrorTitle": "تعذّر إلغاء حظر اللاعب"
+    },
+    "list": {
+      "title": "الأصدقاء",
+      "searchPlaceholder": "ابحث باسم المستخدم",
+      "searchButton": "بحث",
+      "searchNoResults": "لم يُعثر على لاعب بهذا اسم المستخدم.",
+      "genericError": "تعذّر تحميل قائمة الأصدقاء الآن.",
+      "incomingRequestsTitle": "الطلبات",
+      "outgoingRequestsTitle": "المُرسَلة",
+      "myFriendsTitle": "أصدقائي",
+      "emptyFriends": "أضف أصدقاء لتراهم هنا.",
+      "accept": "قبول",
+      "decline": "رفض",
+      "add": "إضافة",
+      "pending": "قيد الانتظار",
+      "acceptErrorTitle": "تعذّر قبول الطلب",
+      "declineErrorTitle": "تعذّر رفض الطلب"
+    }
   }
 }

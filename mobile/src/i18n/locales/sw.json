@@ -124,6 +124,24 @@
       "composite": "Jumla",
       "wordUsage": "Matumizi ya Neno",
       "coherence": "Mshikamano"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "Jiunge na Vita vya Boss ili upate cheo",
+      "inviteTitle": "Jiunge na mapambano",
+      "inviteSubtitle": "Jiunge na Vita vya Boss ili upate cheo",
+      "eyebrow": "Cheo cha Vita vya Boss",
+      "lifetime": "Jumla ya wakati wote",
+      "cardLabel": "Cheo cha Vita vya Boss, nafasi ya {{rank}}",
+      "viewLeaderboard": "Angalia Ubao wa Ushindi"
+    },
+    "friendRankCard": {
+      "inviteLabel": "Ongeza marafiki ili upate cheo",
+      "inviteTitle": "Pandeni vyeo pamoja",
+      "inviteSubtitle": "Ongeza marafiki ili kulinganisha maendeleo yenu",
+      "eyebrow": "Cheo cha Marafiki",
+      "amongFriends": "Miongoni mwa marafiki",
+      "cardLabel": "Cheo cha Marafiki, nafasi ya {{rank}}",
+      "viewLeaderboard": "Angalia Ubao wa Ushindi"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "Imeshindwa kupakia ubao wa viwango.",
     "you": "Wewe",
     "xpValue": "{{xp}} XP",
-    "levelLabel": "Kiw. {{level}}"
+    "levelLabel": "Kiw. {{level}}",
+    "tabFriend": "Marafiki",
+    "tabBossBattle": "Vita vya Boss",
+    "unavailableFriend": "Imeshindikana kupakia ubao wa ushindi wa marafiki.",
+    "unavailableBossBattle": "Imeshindikana kupakia ubao wa ushindi wa Vita vya Boss.",
+    "emptyFriend": "Ongeza marafiki ili uone cheo chako.",
+    "emptyBossBattle": "Hakuna aliyepata cheo bado katika Vita vya Boss."
   },
   "bossBattle": {
     "genericError": "Imeshindwa kufikia Vita vya Boss kwa sasa.",
@@ -403,7 +427,10 @@
       "final": "Mwisho",
       "emptyGroup": "Bado hakuna aliyejibu changamoto katika kikundi hiki.",
       "rewardSuffix": " · +{{xp}} XP, +{{glyphs}} Glyphs"
-    }
+    },
+    "progressCount": "{{answered}} kati ya {{total}}",
+    "waitingRoomTitle": "Umeshajiunga!",
+    "waitingRoomSubtitle": "Jitayarishe…"
   },
   "masterChallenge": {
     "loadError": "Imeshindwa kupakia Changamoto ya Bingwa.",
@@ -481,7 +508,9 @@
     "notificationsTitle": "Arifa",
     "notificationsBody": "Kikasha chako na mapendeleo ya vikumbusho.",
     "settingsTitle": "Mipangilio",
-    "settingsBody": "Akaunti, uthibitisho, na kipindi"
+    "settingsBody": "Akaunti, uthibitisho, na kipindi",
+    "friendsTitle": "Marafiki",
+    "friendsBody": "Ongeza marafiki na uone shughuli zao"
   },
   "wordMastery": {
     "loadError": "Imeshindwa kupakia maneno yako.",
@@ -619,7 +648,13 @@
     "continue": "Endelea",
     "completeTitle": "Umerekebisha!",
     "completeSubtitle": "Ulipata sahihi maneno {{count}} kati ya {{total}} ya {{date}}.",
-    "backToCalendar": "Rudi kwenye kalenda"
+    "backToCalendar": "Rudi kwenye kalenda",
+    "calendarLegendPlayed": "Umecheza",
+    "calendarLegendMissed": "Umekosa",
+    "calendarLegendUnavailable": "Bado",
+    "calendarMissedSummary_one": "Umekosa siku {{count}} mwezi huu — gusa siku ya kijani ili kupata mabadiliko.",
+    "calendarMissedSummary_other": "Umekosa siku {{count}} mwezi huu — gusa siku ya kijani ili kupata mabadiliko.",
+    "calendarNoneMissed": "Umecheza kila siku mwezi huu hadi sasa."
   },
   "wordInTheWild": {
     "title": "Neno Porini",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "Mpinzani: {{correct}} sahihi, {{xp}} XP",
     "resultTiebreakNote": "Imeamuliwa kwa kuvunja sare — majibu mengi sahihi zaidi, kisha aliyefika haraka zaidi kwenye alama yake ya mwisho.",
     "playAgain": "Cheza tena"
+  },
+  "friends": {
+    "popup": {
+      "profile": "Wasifu",
+      "addFriend": "Ongeza Rafiki",
+      "requestSent": "Ombi Limetumwa",
+      "friends": "Marafiki",
+      "respondToRequest": "Jibu Ombi",
+      "block": "Zuia",
+      "unblock": "Ondoa Kizuizi",
+      "avatarLabel": "Fungua chaguo za {{username}}",
+      "addFriendSentTitle": "Ombi la urafiki limetumwa",
+      "addFriendSentMessage": "{{username}} ataona ombi lako kwenye orodha yake ya marafiki.",
+      "addFriendErrorTitle": "Imeshindikana kutuma ombi",
+      "nowFriendsTitle": "Sasa ni marafiki",
+      "nowFriendsMessage": "{{username}} alikuwa tayari amekutumia ombi — sasa ni marafiki.",
+      "blockConfirmTitle": "Zuia {{username}}?",
+      "blockConfirmMessage": "Mtu huyu hataweza kukuongeza kama rafiki, kukupa changamoto kwenye Vita vya Maneno, au kukupata kwenye utafutaji. Unaweza kuondoa kizuizi wakati wowote kupitia wasifu wake.",
+      "blockConfirmBlock": "Zuia",
+      "blockErrorTitle": "Imeshindikana kumzuia mchezaji"
+    },
+    "profile": {
+      "genericError": "Imeshindikana kupakia wasifu huu.",
+      "youLabel": "Huyu ni wewe",
+      "levelStatLabel": "Kiwango",
+      "streakStatLabel": "Mfululizo wa siku",
+      "clanLabel": "Ukoo: {{clanName}}",
+      "noClan": "Bado hakuna ukoo",
+      "joinedLabel": "Alijiunga {{date}}",
+      "acceptRequest": "Kubali",
+      "declineRequest": "Kataa",
+      "unfriend": "Ondoa Urafiki",
+      "unfriendConfirmTitle": "Ondoa urafiki na {{username}}?",
+      "unfriendConfirmMessage": "Unaweza kumtumia ombi jipya la urafiki baadaye.",
+      "unfriendConfirmUnfriend": "Ondoa",
+      "unfriendErrorTitle": "Imeshindikana kuondoa urafiki na mchezaji",
+      "unblockErrorTitle": "Imeshindikana kuondoa kizuizi cha mchezaji"
+    },
+    "list": {
+      "title": "Marafiki",
+      "searchPlaceholder": "Tafuta kwa jina la mtumiaji",
+      "searchButton": "Tafuta",
+      "searchNoResults": "Hakuna mchezaji aliyepatikana kwa jina hilo la mtumiaji.",
+      "genericError": "Imeshindikana kupakia Marafiki kwa sasa.",
+      "incomingRequestsTitle": "Maombi",
+      "outgoingRequestsTitle": "Yaliyotumwa",
+      "myFriendsTitle": "Marafiki Zangu",
+      "emptyFriends": "Ongeza marafiki ili wawe hapa.",
+      "accept": "Kubali",
+      "decline": "Kataa",
+      "add": "Ongeza",
+      "pending": "Inasubiri",
+      "acceptErrorTitle": "Imeshindikana kukubali ombi",
+      "declineErrorTitle": "Imeshindikana kukataa ombi"
+    }
   }
 }

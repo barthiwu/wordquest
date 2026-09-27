@@ -124,6 +124,24 @@
       "composite": "समग्र",
       "wordUsage": "शब्द प्रयोग",
       "coherence": "सुसंगतता"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "रैंक पाने के लिए किसी बॉस बैटल में शामिल हों",
+      "inviteTitle": "लड़ाई में शामिल हों",
+      "inviteSubtitle": "रैंक पाने के लिए किसी बॉस बैटल में शामिल हों",
+      "eyebrow": "बॉस बैटल रैंक",
+      "lifetime": "कुल मिलाकर",
+      "cardLabel": "बॉस बैटल रैंक, स्थान {{rank}}",
+      "viewLeaderboard": "लीडरबोर्ड देखें"
+    },
+    "friendRankCard": {
+      "inviteLabel": "रैंक पाने के लिए दोस्त जोड़ें",
+      "inviteTitle": "साथ मिलकर रैंक बढ़ाएँ",
+      "inviteSubtitle": "अपनी प्रगति की तुलना करने के लिए दोस्त जोड़ें",
+      "eyebrow": "मित्र रैंक",
+      "amongFriends": "दोस्तों के बीच",
+      "cardLabel": "मित्र रैंक, स्थान {{rank}}",
+      "viewLeaderboard": "लीडरबोर्ड देखें"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "लीडरबोर्ड लोड नहीं हो सका।",
     "you": "आप",
     "xpValue": "{{xp}} XP",
-    "levelLabel": "लेवल {{level}}"
+    "levelLabel": "लेवल {{level}}",
+    "tabFriend": "मित्र",
+    "tabBossBattle": "बॉस बैटल",
+    "unavailableFriend": "मित्र लीडरबोर्ड लोड नहीं हो सका।",
+    "unavailableBossBattle": "बॉस बैटल लीडरबोर्ड लोड नहीं हो सका।",
+    "emptyFriend": "अपनी रैंक देखने के लिए कुछ दोस्त जोड़ें।",
+    "emptyBossBattle": "अभी तक बॉस बैटल में किसी ने रैंक नहीं बनाई है।"
   },
   "bossBattle": {
     "genericError": "अभी बॉस बैटल तक नहीं पहुंचा जा सका।",
@@ -403,7 +427,10 @@
       "final": "अंतिम",
       "emptyGroup": "इस ग्रुप में अभी तक किसी ने कोई चुनौती हल नहीं की है।",
       "rewardSuffix": " · +{{xp}} XP, +{{glyphs}} ग्लिफ्स"
-    }
+    },
+    "progressCount": "{{total}} में से {{answered}}",
+    "waitingRoomTitle": "आप शामिल हो गए हैं!",
+    "waitingRoomSubtitle": "तैयार हो जाइए…"
   },
   "masterChallenge": {
     "loadError": "मास्टर चुनौती लोड नहीं हो सकी।",
@@ -481,7 +508,9 @@
     "notificationsTitle": "सूचनाएं",
     "notificationsBody": "आपका इनबॉक्स और रिमाइंडर प्राथमिकताएं।",
     "settingsTitle": "सेटिंग्स",
-    "settingsBody": "खाता, सत्यापन और सत्र"
+    "settingsBody": "खाता, सत्यापन और सत्र",
+    "friendsTitle": "मित्र",
+    "friendsBody": "दोस्त जोड़ें और उनकी गतिविधि देखें"
   },
   "wordMastery": {
     "loadError": "आपके शब्द लोड नहीं हो सके।",
@@ -619,7 +648,13 @@
     "continue": "जारी रखें",
     "completeTitle": "दोहराव पूरा हुआ!",
     "completeSubtitle": "आपने {{date}} के {{total}} शब्दों में से {{count}} सही किए।",
-    "backToCalendar": "कैलेंडर पर वापस जाएं"
+    "backToCalendar": "कैलेंडर पर वापस जाएं",
+    "calendarLegendPlayed": "खेला गया",
+    "calendarLegendMissed": "छूट गया",
+    "calendarLegendUnavailable": "अभी नहीं",
+    "calendarMissedSummary_one": "आपने इस महीने {{count}} दिन मिस किया — पूरा करने के लिए किसी हरे दिन पर टैप करें।",
+    "calendarMissedSummary_other": "आपने इस महीने {{count}} दिन मिस किए — पूरा करने के लिए किसी हरे दिन पर टैप करें।",
+    "calendarNoneMissed": "आपने इस महीने अब तक हर दिन खेला है।"
   },
   "wordInTheWild": {
     "title": "असली दुनिया में शब्द",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "प्रतिद्वंद्वी: {{correct}} सही, {{xp}} XP",
     "resultTiebreakNote": "टाईब्रेक से तय — सबसे ज़्यादा सही उत्तर, फिर अपने अंतिम स्कोर तक सबसे तेज़ पहुँचने वाला।",
     "playAgain": "फिर से खेलें"
+  },
+  "friends": {
+    "popup": {
+      "profile": "प्रोफ़ाइल",
+      "addFriend": "मित्र जोड़ें",
+      "requestSent": "अनुरोध भेजा गया",
+      "friends": "मित्र",
+      "respondToRequest": "अनुरोध का जवाब दें",
+      "block": "ब्लॉक करें",
+      "unblock": "अनब्लॉक करें",
+      "avatarLabel": "{{username}} के विकल्प खोलें",
+      "addFriendSentTitle": "मित्र अनुरोध भेजा गया",
+      "addFriendSentMessage": "{{username}} अपनी मित्र सूची में आपका अनुरोध देखेगा/देखेगी।",
+      "addFriendErrorTitle": "अनुरोध नहीं भेजा जा सका",
+      "nowFriendsTitle": "अब आप मित्र हैं",
+      "nowFriendsMessage": "{{username}} पहले ही आपको अनुरोध भेज चुका/चुकी था/थी — अब आप मित्र हैं।",
+      "blockConfirmTitle": "{{username}} को ब्लॉक करें?",
+      "blockConfirmMessage": "वे आपको मित्र के रूप में नहीं जोड़ पाएँगे, वर्ड ड्यूल में चुनौती नहीं दे पाएँगे, और खोज में आपको नहीं ढूँढ पाएँगे। आप उनकी प्रोफ़ाइल से कभी भी अनब्लॉक कर सकते हैं।",
+      "blockConfirmBlock": "ब्लॉक करें",
+      "blockErrorTitle": "खिलाड़ी को ब्लॉक नहीं किया जा सका"
+    },
+    "profile": {
+      "genericError": "यह प्रोफ़ाइल लोड नहीं हो सकी।",
+      "youLabel": "यह आप हैं",
+      "levelStatLabel": "लेवल",
+      "streakStatLabel": "दिन की स्ट्रीक",
+      "clanLabel": "क्लैन: {{clanName}}",
+      "noClan": "अभी कोई क्लैन नहीं",
+      "joinedLabel": "{{date}} को जुड़े",
+      "acceptRequest": "स्वीकार करें",
+      "declineRequest": "अस्वीकार करें",
+      "unfriend": "मित्रता हटाएँ",
+      "unfriendConfirmTitle": "{{username}} को मित्र सूची से हटाएँ?",
+      "unfriendConfirmMessage": "आप बाद में उन्हें नया मित्र अनुरोध भेज सकते हैं।",
+      "unfriendConfirmUnfriend": "हटाएँ",
+      "unfriendErrorTitle": "खिलाड़ी को हटाया नहीं जा सका",
+      "unblockErrorTitle": "खिलाड़ी को अनब्लॉक नहीं किया जा सका"
+    },
+    "list": {
+      "title": "मित्र",
+      "searchPlaceholder": "यूज़रनेम से खोजें",
+      "searchButton": "खोजें",
+      "searchNoResults": "इस यूज़रनेम वाला कोई खिलाड़ी नहीं मिला।",
+      "genericError": "मित्र सूची अभी लोड नहीं हो सकी।",
+      "incomingRequestsTitle": "अनुरोध",
+      "outgoingRequestsTitle": "भेजे गए",
+      "myFriendsTitle": "मेरे मित्र",
+      "emptyFriends": "यहाँ देखने के लिए दोस्त जोड़ें।",
+      "accept": "स्वीकार करें",
+      "decline": "अस्वीकार करें",
+      "add": "जोड़ें",
+      "pending": "लंबित",
+      "acceptErrorTitle": "अनुरोध स्वीकार नहीं किया जा सका",
+      "declineErrorTitle": "अनुरोध अस्वीकार नहीं किया जा सका"
+    }
   }
 }

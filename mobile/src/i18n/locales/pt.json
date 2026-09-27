@@ -124,6 +124,24 @@
       "composite": "Geral",
       "wordUsage": "Uso da palavra",
       "coherence": "Coerência"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "Participe de uma Batalha contra o Chefe para entrar no ranking",
+      "inviteTitle": "Entre na luta",
+      "inviteSubtitle": "Participe de uma Batalha contra o Chefe para entrar no ranking",
+      "eyebrow": "Ranking da Batalha contra o Chefe",
+      "lifetime": "Total acumulado",
+      "cardLabel": "Ranking da Batalha contra o Chefe, posição {{rank}}",
+      "viewLeaderboard": "Ver ranking"
+    },
+    "friendRankCard": {
+      "inviteLabel": "Adicione amigos para entrar no ranking",
+      "inviteTitle": "Subam juntos no ranking",
+      "inviteSubtitle": "Adicione amigos para comparar seu progresso",
+      "eyebrow": "Ranking de amigos",
+      "amongFriends": "Entre amigos",
+      "cardLabel": "Ranking de amigos, posição {{rank}}",
+      "viewLeaderboard": "Ver ranking"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "Não foi possível carregar o ranking.",
     "you": "Você",
     "xpValue": "{{xp}} XP",
-    "levelLabel": "Nív. {{level}}"
+    "levelLabel": "Nív. {{level}}",
+    "tabFriend": "Amigos",
+    "tabBossBattle": "Batalha contra o Chefe",
+    "unavailableFriend": "Não foi possível carregar o ranking de amigos.",
+    "unavailableBossBattle": "Não foi possível carregar o ranking da Batalha contra o Chefe.",
+    "emptyFriend": "Adicione amigos para ver sua posição.",
+    "emptyBossBattle": "Ainda ninguém entrou no ranking da Batalha contra o Chefe."
   },
   "bossBattle": {
     "genericError": "Não foi possível acessar a Batalha do Chefe agora.",
@@ -403,7 +427,10 @@
       "final": "Final",
       "emptyGroup": "Ainda ninguém respondeu a um desafio neste grupo.",
       "rewardSuffix": " · +{{xp}} XP, +{{glyphs}} Glifos"
-    }
+    },
+    "progressCount": "{{answered}} de {{total}}",
+    "waitingRoomTitle": "Você está dentro!",
+    "waitingRoomSubtitle": "Prepare-se…"
   },
   "masterChallenge": {
     "loadError": "Não foi possível carregar o Desafio Mestre.",
@@ -481,7 +508,9 @@
     "notificationsTitle": "Notificações",
     "notificationsBody": "Sua caixa de entrada e preferências de lembretes.",
     "settingsTitle": "Configurações",
-    "settingsBody": "Conta, verificação e sessão"
+    "settingsBody": "Conta, verificação e sessão",
+    "friendsTitle": "Amigos",
+    "friendsBody": "Adicione amigos e veja a atividade deles"
   },
   "wordMastery": {
     "loadError": "Não foi possível carregar suas palavras.",
@@ -619,7 +648,13 @@
     "continue": "Continuar",
     "completeTitle": "Recuperado!",
     "completeSubtitle": "Você acertou {{count}} de {{total}} palavras de {{date}}.",
-    "backToCalendar": "Voltar ao calendário"
+    "backToCalendar": "Voltar ao calendário",
+    "calendarLegendPlayed": "Jogado",
+    "calendarLegendMissed": "Perdido",
+    "calendarLegendUnavailable": "Ainda não",
+    "calendarMissedSummary_one": "Você perdeu {{count}} dia neste mês — toque em um dia verde para recuperar.",
+    "calendarMissedSummary_other": "Você perdeu {{count}} dias neste mês — toque em um dia verde para recuperar.",
+    "calendarNoneMissed": "Você jogou todos os dias deste mês até agora."
   },
   "wordInTheWild": {
     "title": "Palavra à Solta",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "Adversário: {{correct}} corretas, {{xp}} XP",
     "resultTiebreakNote": "Decidido por desempate — mais respostas corretas, depois quem chegou primeiro à pontuação final.",
     "playAgain": "Jogar novamente"
+  },
+  "friends": {
+    "popup": {
+      "profile": "Perfil",
+      "addFriend": "Adicionar amigo",
+      "requestSent": "Solicitação enviada",
+      "friends": "Amigos",
+      "respondToRequest": "Responder à solicitação",
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "avatarLabel": "Abrir opções de {{username}}",
+      "addFriendSentTitle": "Solicitação de amizade enviada",
+      "addFriendSentMessage": "{{username}} verá sua solicitação na lista de amigos dele(a).",
+      "addFriendErrorTitle": "Não foi possível enviar a solicitação",
+      "nowFriendsTitle": "Agora vocês são amigos",
+      "nowFriendsMessage": "{{username}} já havia enviado uma solicitação para você — agora vocês são amigos.",
+      "blockConfirmTitle": "Bloquear {{username}}?",
+      "blockConfirmMessage": "Essa pessoa não poderá mais adicionar você como amigo, desafiar você no Duelo de Palavras nem encontrar você na busca. Você pode desbloquear a qualquer momento pelo perfil dela.",
+      "blockConfirmBlock": "Bloquear",
+      "blockErrorTitle": "Não foi possível bloquear o jogador"
+    },
+    "profile": {
+      "genericError": "Não foi possível carregar este perfil.",
+      "youLabel": "Este é você",
+      "levelStatLabel": "Nível",
+      "streakStatLabel": "Sequência de dias",
+      "clanLabel": "Clã: {{clanName}}",
+      "noClan": "Ainda sem clã",
+      "joinedLabel": "Entrou em {{date}}",
+      "acceptRequest": "Aceitar",
+      "declineRequest": "Recusar",
+      "unfriend": "Desfazer amizade",
+      "unfriendConfirmTitle": "Desfazer amizade com {{username}}?",
+      "unfriendConfirmMessage": "Você pode enviar uma nova solicitação mais tarde.",
+      "unfriendConfirmUnfriend": "Desfazer amizade",
+      "unfriendErrorTitle": "Não foi possível desfazer a amizade",
+      "unblockErrorTitle": "Não foi possível desbloquear o jogador"
+    },
+    "list": {
+      "title": "Amigos",
+      "searchPlaceholder": "Buscar por nome de usuário",
+      "searchButton": "Buscar",
+      "searchNoResults": "Nenhum jogador encontrado com esse nome de usuário.",
+      "genericError": "Não foi possível carregar Amigos no momento.",
+      "incomingRequestsTitle": "Solicitações",
+      "outgoingRequestsTitle": "Enviadas",
+      "myFriendsTitle": "Meus amigos",
+      "emptyFriends": "Adicione amigos para vê-los aqui.",
+      "accept": "Aceitar",
+      "decline": "Recusar",
+      "add": "Adicionar",
+      "pending": "Pendente",
+      "acceptErrorTitle": "Não foi possível aceitar a solicitação",
+      "declineErrorTitle": "Não foi possível recusar a solicitação"
+    }
   }
 }

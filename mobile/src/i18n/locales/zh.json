@@ -124,6 +124,24 @@
       "composite": "综合评分",
       "wordUsage": "词汇运用",
       "coherence": "连贯性"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "加入一场首领之战即可获得排名",
+      "inviteTitle": "加入战斗",
+      "inviteSubtitle": "加入一场首领之战即可获得排名",
+      "eyebrow": "首领之战排名",
+      "lifetime": "累计",
+      "cardLabel": "首领之战排名，第 {{rank}} 名",
+      "viewLeaderboard": "查看排行榜"
+    },
+    "friendRankCard": {
+      "inviteLabel": "添加好友即可获得排名",
+      "inviteTitle": "一起提升排名",
+      "inviteSubtitle": "添加好友以比较你们的进度",
+      "eyebrow": "好友排名",
+      "amongFriends": "好友之间",
+      "cardLabel": "好友排名，第 {{rank}} 名",
+      "viewLeaderboard": "查看排行榜"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "无法加载排行榜。",
     "you": "你",
     "xpValue": "{{xp}} XP",
-    "levelLabel": "Lv {{level}}"
+    "levelLabel": "Lv {{level}}",
+    "tabFriend": "好友",
+    "tabBossBattle": "首领之战",
+    "unavailableFriend": "无法加载好友排行榜。",
+    "unavailableBossBattle": "无法加载首领之战排行榜。",
+    "emptyFriend": "添加好友，查看你的排名。",
+    "emptyBossBattle": "目前还没有人在首领之战中上榜。"
   },
   "bossBattle": {
     "genericError": "目前无法连接到 Boss 战斗。",
@@ -403,7 +427,10 @@
       "final": "最终",
       "emptyGroup": "这个小组还没有人回答挑战。",
       "rewardSuffix": " · +{{xp}} XP,+{{glyphs}} 符文"
-    }
+    },
+    "progressCount": "{{answered}} / {{total}}",
+    "waitingRoomTitle": "你已加入！",
+    "waitingRoomSubtitle": "准备好……"
   },
   "masterChallenge": {
     "loadError": "无法加载大师挑战。",
@@ -481,7 +508,9 @@
     "notificationsTitle": "通知",
     "notificationsBody": "你的消息与提醒设置。",
     "settingsTitle": "设置",
-    "settingsBody": "账户、验证与登录状态"
+    "settingsBody": "账户、验证与登录状态",
+    "friendsTitle": "好友",
+    "friendsBody": "添加好友并查看他们的动态"
   },
   "wordMastery": {
     "loadError": "无法加载你的单词。",
@@ -619,7 +648,13 @@
     "continue": "继续",
     "completeTitle": "补学完成！",
     "completeSubtitle": "你在 {{date}} 的 {{total}} 个单词中答对了 {{count}} 个。",
-    "backToCalendar": "返回日历"
+    "backToCalendar": "返回日历",
+    "calendarLegendPlayed": "已完成",
+    "calendarLegendMissed": "已错过",
+    "calendarLegendUnavailable": "尚未到达",
+    "calendarMissedSummary_one": "你这个月错过了 {{count}} 天——点击绿色的日期来补上。",
+    "calendarMissedSummary_other": "你这个月错过了 {{count}} 天——点击绿色的日期来补上。",
+    "calendarNoneMissed": "这个月你每天都完成了任务。"
   },
   "wordInTheWild": {
     "title": "荒野寻词",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "对手：{{correct}} 个正确，{{xp}} XP",
     "resultTiebreakNote": "通过决胜规则判定——正确数更多者胜，若仍相同则以更快达到最终得分者胜。",
     "playAgain": "再玩一次"
+  },
+  "friends": {
+    "popup": {
+      "profile": "个人资料",
+      "addFriend": "添加好友",
+      "requestSent": "请求已发送",
+      "friends": "已是好友",
+      "respondToRequest": "回应请求",
+      "block": "屏蔽",
+      "unblock": "取消屏蔽",
+      "avatarLabel": "打开 {{username}} 的选项",
+      "addFriendSentTitle": "好友请求已发送",
+      "addFriendSentMessage": "{{username}} 会在好友列表中看到你的请求。",
+      "addFriendErrorTitle": "无法发送请求",
+      "nowFriendsTitle": "你们现在是好友了",
+      "nowFriendsMessage": "{{username}} 之前已经向你发送了请求——你们现在是好友了。",
+      "blockConfirmTitle": "屏蔽 {{username}}？",
+      "blockConfirmMessage": "对方将无法把你添加为好友、在单词对决中挑战你，也无法在搜索中找到你。你可以随时在对方的个人资料中取消屏蔽。",
+      "blockConfirmBlock": "屏蔽",
+      "blockErrorTitle": "无法屏蔽该玩家"
+    },
+    "profile": {
+      "genericError": "无法加载此个人资料。",
+      "youLabel": "这是你自己",
+      "levelStatLabel": "等级",
+      "streakStatLabel": "连续天数",
+      "clanLabel": "部落：{{clanName}}",
+      "noClan": "尚未加入部落",
+      "joinedLabel": "加入时间：{{date}}",
+      "acceptRequest": "接受",
+      "declineRequest": "拒绝",
+      "unfriend": "解除好友关系",
+      "unfriendConfirmTitle": "解除与 {{username}} 的好友关系？",
+      "unfriendConfirmMessage": "之后你可以重新发送好友请求。",
+      "unfriendConfirmUnfriend": "解除",
+      "unfriendErrorTitle": "无法解除好友关系",
+      "unblockErrorTitle": "无法取消屏蔽该玩家"
+    },
+    "list": {
+      "title": "好友",
+      "searchPlaceholder": "按用户名搜索",
+      "searchButton": "搜索",
+      "searchNoResults": "未找到该用户名对应的玩家。",
+      "genericError": "暂时无法加载好友。",
+      "incomingRequestsTitle": "请求",
+      "outgoingRequestsTitle": "已发送",
+      "myFriendsTitle": "我的好友",
+      "emptyFriends": "添加好友后会显示在这里。",
+      "accept": "接受",
+      "decline": "拒绝",
+      "add": "添加",
+      "pending": "待处理",
+      "acceptErrorTitle": "无法接受请求",
+      "declineErrorTitle": "无法拒绝请求"
+    }
   }
 }

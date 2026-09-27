@@ -124,6 +124,24 @@
       "composite": "Compuesto",
       "wordUsage": "Uso de palabras",
       "coherence": "Coherencia"
+    },
+    "bossBattleRankCard": {
+      "inviteLabel": "Únete a un Combate contra el Jefe para entrar en la clasificación",
+      "inviteTitle": "Únete a la batalla",
+      "inviteSubtitle": "Únete a un Combate contra el Jefe para entrar en la clasificación",
+      "eyebrow": "Clasificación de Combate contra el Jefe",
+      "lifetime": "Total histórico",
+      "cardLabel": "Clasificación de Combate contra el Jefe, puesto {{rank}}",
+      "viewLeaderboard": "Ver clasificación"
+    },
+    "friendRankCard": {
+      "inviteLabel": "Añade amigos para entrar en la clasificación",
+      "inviteTitle": "Progresad juntos",
+      "inviteSubtitle": "Añade amigos para comparar tu progreso",
+      "eyebrow": "Clasificación de amigos",
+      "amongFriends": "Entre amigos",
+      "cardLabel": "Clasificación de amigos, puesto {{rank}}",
+      "viewLeaderboard": "Ver clasificación"
     }
   },
   "welcome": {
@@ -364,7 +382,13 @@
     "genericError": "No se pudo cargar la clasificación.",
     "you": "Tú",
     "xpValue": "{{xp}} XP",
-    "levelLabel": "Nvl {{level}}"
+    "levelLabel": "Nvl {{level}}",
+    "tabFriend": "Amigos",
+    "tabBossBattle": "Combate contra el Jefe",
+    "unavailableFriend": "No se pudo cargar la clasificación de amigos.",
+    "unavailableBossBattle": "No se pudo cargar la clasificación del Combate contra el Jefe.",
+    "emptyFriend": "Añade amigos para ver tu posición.",
+    "emptyBossBattle": "Todavía nadie se ha clasificado en el Combate contra el Jefe."
   },
   "bossBattle": {
     "genericError": "No se pudo conectar con la Batalla Jefe en este momento.",
@@ -403,7 +427,10 @@
       "final": "Final",
       "emptyGroup": "Todavía nadie en este grupo ha respondido un desafío.",
       "rewardSuffix": " · +{{xp}} XP, +{{glyphs}} Glifos"
-    }
+    },
+    "progressCount": "{{answered}} de {{total}}",
+    "waitingRoomTitle": "¡Ya estás dentro!",
+    "waitingRoomSubtitle": "Prepárate…"
   },
   "masterChallenge": {
     "loadError": "No se pudo cargar el Desafío Maestro.",
@@ -481,7 +508,9 @@
     "notificationsTitle": "Notificaciones",
     "notificationsBody": "Tu bandeja de entrada y preferencias de recordatorios.",
     "settingsTitle": "Ajustes",
-    "settingsBody": "Cuenta, verificación y sesión"
+    "settingsBody": "Cuenta, verificación y sesión",
+    "friendsTitle": "Amigos",
+    "friendsBody": "Añade amigos y consulta su actividad"
   },
   "wordMastery": {
     "loadError": "No se pudieron cargar tus palabras.",
@@ -619,7 +648,13 @@
     "continue": "Continuar",
     "completeTitle": "¡Al día!",
     "completeSubtitle": "Acertaste {{count}} de {{total}} palabras del {{date}}.",
-    "backToCalendar": "Volver al calendario"
+    "backToCalendar": "Volver al calendario",
+    "calendarLegendPlayed": "Jugado",
+    "calendarLegendMissed": "Perdido",
+    "calendarLegendUnavailable": "Todavía no",
+    "calendarMissedSummary_one": "Te perdiste {{count}} día este mes; toca un día verde para ponerte al día.",
+    "calendarMissedSummary_other": "Te perdiste {{count}} días este mes; toca un día verde para ponerte al día.",
+    "calendarNoneMissed": "Has jugado todos los días de este mes hasta ahora."
   },
   "wordInTheWild": {
     "title": "Palabra en el Mundo",
@@ -891,5 +926,60 @@
     "resultOpponentSummary": "Oponente: {{correct}} correctas, {{xp}} XP",
     "resultTiebreakNote": "Decidido por desempate — más respuestas correctas, luego quien llegó primero a su puntaje final.",
     "playAgain": "Jugar de nuevo"
+  },
+  "friends": {
+    "popup": {
+      "profile": "Perfil",
+      "addFriend": "Añadir amigo",
+      "requestSent": "Solicitud enviada",
+      "friends": "Amigos",
+      "respondToRequest": "Responder a la solicitud",
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "avatarLabel": "Abrir las opciones de {{username}}",
+      "addFriendSentTitle": "Solicitud de amistad enviada",
+      "addFriendSentMessage": "{{username}} verá tu solicitud en su lista de amigos.",
+      "addFriendErrorTitle": "No se pudo enviar la solicitud",
+      "nowFriendsTitle": "Ahora sois amigos",
+      "nowFriendsMessage": "{{username}} ya te había enviado una solicitud: ahora sois amigos.",
+      "blockConfirmTitle": "¿Bloquear a {{username}}?",
+      "blockConfirmMessage": "Esta persona no podrá añadirte como amigo, desafiarte en Duelo de Palabras ni encontrarte en las búsquedas. Puedes desbloquearla en cualquier momento desde su perfil.",
+      "blockConfirmBlock": "Bloquear",
+      "blockErrorTitle": "No se pudo bloquear al jugador"
+    },
+    "profile": {
+      "genericError": "No se pudo cargar este perfil.",
+      "youLabel": "Eres tú",
+      "levelStatLabel": "Nivel",
+      "streakStatLabel": "Racha de días",
+      "clanLabel": "Clan: {{clanName}}",
+      "noClan": "Todavía sin clan",
+      "joinedLabel": "Se unió el {{date}}",
+      "acceptRequest": "Aceptar",
+      "declineRequest": "Rechazar",
+      "unfriend": "Eliminar amigo",
+      "unfriendConfirmTitle": "¿Eliminar a {{username}} de tus amigos?",
+      "unfriendConfirmMessage": "Podrás enviarle una nueva solicitud más adelante.",
+      "unfriendConfirmUnfriend": "Eliminar",
+      "unfriendErrorTitle": "No se pudo eliminar al jugador",
+      "unblockErrorTitle": "No se pudo desbloquear al jugador"
+    },
+    "list": {
+      "title": "Amigos",
+      "searchPlaceholder": "Buscar por nombre de usuario",
+      "searchButton": "Buscar",
+      "searchNoResults": "No se encontró ningún jugador con ese nombre de usuario.",
+      "genericError": "No se pudo cargar Amigos en este momento.",
+      "incomingRequestsTitle": "Solicitudes",
+      "outgoingRequestsTitle": "Enviadas",
+      "myFriendsTitle": "Mis amigos",
+      "emptyFriends": "Añade amigos para verlos aquí.",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "add": "Añadir",
+      "pending": "Pendiente",
+      "acceptErrorTitle": "No se pudo aceptar la solicitud",
+      "declineErrorTitle": "No se pudo rechazar la solicitud"
+    }
   }
 }
