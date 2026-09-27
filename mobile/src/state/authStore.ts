@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import type { AuthResult, AuthUser } from '@/services/auth';
-import { getMe } from '@/services/users';
 
 const ACCESS_TOKEN_KEY = 'wordquest.accessToken.v2';
 const REFRESH_TOKEN_KEY = 'wordquest.refreshToken.v2';
@@ -49,6 +48,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     // leaves `user` null, same as before this existed.
     if (accessToken) {
       try {
+        // Lazy/dynamic import, not a top-level one: services/users.ts pulls
+        // in services/apiClient.ts, which itself imports useAuthStore (to
+        // read tokens / clear the session on a failed refresh) -- a static
+        // import here would close that into a require cycle
+        // (authStore -> users -> apiClient -> authStore), which Metro warns
+        // about at bundle time. Deferring the require until hydrate() is
+        // actually called keeps the runtime behavior identical (this is
+        // still awaited before use) while breaking the cycle in the static
+        // module graph.
+        const { getMe } = await import('@/services/users');
         const user = await getMe(accessToken);
         set({ user });
       } catch {
