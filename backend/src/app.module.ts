@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ClansModule } from './clans/clans.module';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
+import { ArcadeModule } from './arcade/arcade.module';
 import { MasteryModule } from './mastery/mastery.module';
 import { ProgressionModule } from './progression/progression.module';
 import { QuestsModule } from './quests/quests.module';
@@ -59,6 +60,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     AuthModule,
     ClansModule,
     VocabularyModule,
+    ArcadeModule,
     MasteryModule,
     ProgressionModule,
     QuestsModule,
