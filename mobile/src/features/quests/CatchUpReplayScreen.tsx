@@ -49,6 +49,34 @@ function revealedFromPattern(displayPattern: string, missingIndexes: number[]): 
 }
 
 /**
+ * Reconstructs the full word from the player's typed characters (which
+ * only cover the still-editable, non-revealed positions -- see
+ * LetterBoxInput's `revealed` prop) plus the pre-revealed letters, so
+ * the server always receives a complete answer of the right length.
+ * Identical to CompleteItScreen/ScrambleQuestScreen's own helper of the
+ * same name -- this screen was missing it entirely (bug report, Barth
+ * Sept 2026: a correctly-typed answer on a partially-revealed word was
+ * marked wrong, because only the typed *blanks* were being sent to
+ * checkHistoryAnswer instead of the assembled full word; the shown
+ * "correct answer" then looked identical to what the player typed,
+ * since the letters they saw on screen — reveals plus their own
+ * correct typing — already spelled it).
+ */
+function mergeRevealedAnswer(
+  typed: string,
+  revealedLetters: RevealedLetter[],
+  length: number,
+): string {
+  const revealedMap = new Map(revealedLetters.map((r) => [r.position, r.letter]));
+  const editablePositions = Array.from({ length }, (_, i) => i).filter((i) => !revealedMap.has(i));
+  const letters = Array.from({ length }, (_, i) => revealedMap.get(i) ?? '');
+  editablePositions.forEach((position, editableIndex) => {
+    letters[position] = typed[editableIndex] ?? '';
+  });
+  return letters.join('');
+}
+
+/**
  * Catch-up replay (product request, Sept 2026 — "without it giving you
  * any new XP beyond just answering what you missed"): walks through
  * one past day's Guess words one at a time, purely for review. No
@@ -94,12 +122,16 @@ export function CatchUpReplayScreen({ route, navigation }: Props) {
   }, [load]);
 
   const current = view?.words[wordIndex] ?? null;
+  const revealed = current
+    ? revealedFromPattern(current.displayPattern, current.missingIndexes)
+    : [];
 
   const onSubmit = async () => {
     if (!accessToken || !current || !answer.trim() || phase === 'submitting') return;
     setPhase('submitting');
     try {
-      const result = await checkHistoryAnswer(accessToken, current.wordId, answer.trim());
+      const fullAnswer = mergeRevealedAnswer(answer.trim(), revealed, current.wordLength);
+      const result = await checkHistoryAnswer(accessToken, current.wordId, fullAnswer);
       if (result.correct) setCorrectCount((c) => c + 1);
       setFeedback(result);
       setPhase('feedback');
@@ -162,8 +194,6 @@ export function CatchUpReplayScreen({ route, navigation }: Props) {
   }
 
   if (!current || !view) return null;
-
-  const revealed = revealedFromPattern(current.displayPattern, current.missingIndexes);
 
   return (
     <View style={styles.flexFill}>
