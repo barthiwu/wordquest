@@ -1531,6 +1531,7 @@ describe('QuestsService', () => {
         'quests',
         'a1',
         prismaMock,
+        [],
       );
       expect(progressionMock.awardGlyphs).toHaveBeenCalledWith(
         'u1',
@@ -1571,9 +1572,9 @@ describe('QuestsService', () => {
 
       await service.completeWord('u1', 'a1');
 
-      expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u1', prismaMock);
-      expect(achievementsMock.checkConsistency).toHaveBeenCalledWith('u1', 1, prismaMock);
-      expect(achievementsMock.checkIndependentLearning).toHaveBeenCalledWith('u1', prismaMock);
+      expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u1', prismaMock, []);
+      expect(achievementsMock.checkConsistency).toHaveBeenCalledWith('u1', 1, prismaMock, []);
+      expect(achievementsMock.checkIndependentLearning).toHaveBeenCalledWith('u1', prismaMock, []);
     });
 
     it('fires an ALI QUEST_COMPLETION reaction (V20 Beta Release Checklist §10: ALI must respond to Quest completion)', async () => {
@@ -1601,6 +1602,115 @@ describe('QuestsService', () => {
           totalCount: 1,
         },
       });
+    });
+
+    it("surfaces a LEVEL_UP reaction collected during this word's completion live, via liveAliReactions (task #99: Daily Quest shows major events live)", async () => {
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...optionalWildAttempt });
+      prismaMock.quest.findUniqueOrThrow.mockResolvedValueOnce({
+        id: 'q1',
+        baseXp: 50,
+        baseGlyphs: 10,
+      });
+      prismaMock.challengeAttempt.count.mockResolvedValueOnce(1);
+      // Simulates awardXp's real behavior of pushing a descriptor onto
+      // the aliEvents collector instead of firing reactFireAndForget --
+      // the mock doesn't run the real implementation, so this test has
+      // to stand in for it.
+      progressionMock.awardXp.mockImplementationOnce(
+        async (
+          _userId: string,
+          _amount: number,
+          _reason: string,
+          _source: string,
+          _reference: string,
+          _db: unknown,
+          aliEvents?: Array<{ type: string; journeyStage: number; context: unknown }>,
+        ) => {
+          aliEvents?.push({ type: 'LEVEL_UP', journeyStage: 2, context: { newLevel: 5 } });
+        },
+      );
+      aliMock.react.mockImplementation(async (_userId: string, event: { type: string }) => {
+        if (event.type !== 'LEVEL_UP') return undefined;
+        return {
+          text: 'Level 5! The Village welcomes you.',
+          recommendation: null,
+          tone: 'Village',
+          promptVersion: 'v2',
+          expression: 'EXCITED',
+          pose: 'CELEBRATORY_HOP',
+          intensity: 4,
+          priority: 4,
+          durationMs: 3000,
+        };
+      });
+
+      const result = await service.completeWord('u1', 'a1');
+
+      expect(result.liveAliReactions).toEqual([
+        {
+          text: 'Level 5! The Village welcomes you.',
+          recommendation: null,
+          expression: 'EXCITED',
+          pose: 'CELEBRATORY_HOP',
+          intensity: 4,
+          priority: 4,
+          durationMs: 3000,
+        },
+      ]);
+      expect(result.streakReaction).toBeNull();
+    });
+
+    it('surfaces a STREAK_MILESTONE reaction in its own streakReaction field, separate from liveAliReactions', async () => {
+      prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...optionalWildAttempt });
+      prismaMock.quest.findUniqueOrThrow.mockResolvedValueOnce({
+        id: 'q1',
+        baseXp: 50,
+        baseGlyphs: 10,
+      });
+      prismaMock.challengeAttempt.count.mockResolvedValueOnce(1);
+      // Simulates recordDailyActivity's real behavior the same way the
+      // test above stands in for awardXp's.
+      progressionMock.recordDailyActivity.mockImplementationOnce(
+        async (
+          _userId: string,
+          _db: unknown,
+          aliEvents?: Array<{ type: string; journeyStage: number; context: unknown }>,
+        ) => {
+          aliEvents?.push({
+            type: 'STREAK_MILESTONE',
+            journeyStage: 2,
+            context: { streakDays: 7 },
+          });
+          return { currentStreak: 7 };
+        },
+      );
+      aliMock.react.mockImplementation(async (_userId: string, event: { type: string }) => {
+        if (event.type !== 'STREAK_MILESTONE') return undefined;
+        return {
+          text: 'Seven days running!',
+          recommendation: null,
+          tone: 'Village',
+          promptVersion: 'v2',
+          expression: 'PROUD',
+          pose: 'APPROVING_NOD',
+          intensity: 3,
+          priority: 3,
+          durationMs: 2500,
+        };
+      });
+
+      const result = await service.completeWord('u1', 'a1');
+
+      expect(result.streakReaction).toEqual({
+        text: 'Seven days running!',
+        recommendation: null,
+        expression: 'PROUD',
+        pose: 'APPROVING_NOD',
+        intensity: 3,
+        priority: 3,
+        durationMs: 2500,
+      });
+      expect(result.liveAliReactions).toEqual([]);
     });
 
     it('marks the attempt COMPLETED with wordStage WORD_COMPLETE', async () => {
@@ -1644,6 +1754,8 @@ describe('QuestsService', () => {
         totalCount: 1,
         calibrationJustCompleted: false,
         aliMessage: null,
+        liveAliReactions: [],
+        streakReaction: null,
       });
     });
 
@@ -1669,6 +1781,7 @@ describe('QuestsService', () => {
         { grammar: 90 },
         { grammar: 85 },
         prismaMock,
+        [],
       );
     });
 
@@ -1689,6 +1802,7 @@ describe('QuestsService', () => {
         {},
         {},
         prismaMock,
+        [],
       );
     });
 

@@ -28,7 +28,7 @@ import { shuffleIndexes } from '../arcade/scramble-quest/scramble.util';
 import { gameplayRules, computeGuessXp } from '../config/gameplay-rules';
 import { LearningProfileService } from '../learning-profile/learning-profile.service';
 import { averageScoreDimensions } from '../common/score-average';
-import { AliService, type AliResponse } from '../ali/ali.service';
+import { AliService, type AliResponse, type AliEvent } from '../ali/ali.service';
 import { quickAliReaction } from '../ali/ali-quick-reactions';
 import { quickAliExpression, type AliExpressionCue } from '../ali/ali-expression';
 import { AnalyticsService } from '../analytics/analytics.service';
@@ -191,6 +191,12 @@ export interface ParagraphResult {
   nextAction: string;
 }
 
+/** The subset of AliResponse every "here's what ALI has to say" client surface actually renders. */
+export type AliDisplayMessage = Pick<
+  AliResponse,
+  'text' | 'recommendation' | 'expression' | 'pose' | 'intensity' | 'priority' | 'durationMs'
+>;
+
 export interface WordCompletionResult {
   xpAwarded: number;
   glyphAwarded: number;
@@ -207,10 +213,29 @@ export interface WordCompletionResult {
    * must never fail quest completion itself, which has already
    * committed by the time this runs.
    */
-  aliMessage: Pick<
-    AliResponse,
-    'text' | 'recommendation' | 'expression' | 'pose' | 'intensity' | 'priority' | 'durationMs'
-  > | null;
+  aliMessage: AliDisplayMessage | null;
+  /**
+   * Task #99: Daily Quest is the one flow currently wired to surface
+   * ALI's reaction to a major progression event (Level-up, Journey,
+   * Mastery, Achievement) LIVE, right when it happens, instead of only
+   * landing quietly in ALI's message feed the way every other flow
+   * (arcade, Boss Battle, Master Challenge) still does. Collected via
+   * the aliEvents param threaded through awardXp/checkJourneyAdvancement/
+   * evaluateWordCycleCompletion/the achievement checks below, then
+   * resolved here — same after-the-transaction-commits, best-effort
+   * policy as aliMessage. Client feeds these into useAliReactionQueue.
+   * Usually empty; can hold more than one when a single word completion
+   * happens to cross several milestones at once.
+   */
+  liveAliReactions: AliDisplayMessage[];
+  /**
+   * STREAK_MILESTONE gets its own field instead of folding into
+   * liveAliReactions — the client renders it as a small callout that
+   * pops out of the streak container and back (AliStreakPopout), not
+   * the general ALI popup. null when no streak milestone was hit by
+   * this word's completion.
+   */
+  streakReaction: AliDisplayMessage | null;
 }
 
 /**
@@ -921,6 +946,13 @@ export class QuestsService {
   async completeWord(userId: string, questAttemptId: string): Promise<WordCompletionResult> {
     const attempt = await this.loadInProgressAttempt(userId, questAttemptId, 'OPTIONAL_WILD');
 
+    // Collects LEVEL_UP/JOURNEY_COMPLETION/STREAK_MILESTONE/MASTERY_EVENT/
+    // ACHIEVEMENT_UNLOCK descriptors from every progression/mastery/
+    // achievement call below instead of letting them fire-and-forget —
+    // see WordCompletionResult's own doc comments for why Daily Quest
+    // resolves and awaits these instead.
+    const aliEvents: AliEvent[] = [];
+
     const { result, aliContext } = await this.prisma.$transaction(
       async (tx: Prisma.TransactionClient) => {
         const quest = await tx.quest.findUniqueOrThrow({ where: { id: attempt.questId } });
@@ -946,6 +978,7 @@ export class QuestsService {
           'quests',
           attempt.id,
           tx,
+          aliEvents,
         );
         await this.progression.awardGlyphs(
           userId,
@@ -955,7 +988,7 @@ export class QuestsService {
           attempt.id,
           tx,
         );
-        const { currentStreak } = await this.progression.recordDailyActivity(userId, tx);
+        const { currentStreak } = await this.progression.recordDailyActivity(userId, tx, aliEvents);
 
         // Checked AFTER the attempt's own status is written to COMPLETED
         // above — checkIndependentLearning walks the player's most recent
@@ -963,8 +996,8 @@ export class QuestsService {
         // streak, and this quest wouldn't be in that window yet (or would
         // wrongly end the streak instead of extending it) if it ran before
         // this quest's own completion was persisted.
-        await this.achievements.checkConsistency(userId, currentStreak, tx);
-        await this.achievements.checkIndependentLearning(userId, tx);
+        await this.achievements.checkConsistency(userId, currentStreak, tx, aliEvents);
+        await this.achievements.checkIndependentLearning(userId, tx, aliEvents);
 
         // The skill-area path to MASTERED (Correction & Completion Spec
         // §2) — evaluated only now that the full word cycle is genuinely
@@ -982,6 +1015,7 @@ export class QuestsService {
           sentenceScores,
           paragraphScores,
           tx,
+          aliEvents,
         );
 
         // Adaptive AI Learning Engine (V1 Remaining Systems Spec §1) — every
@@ -1085,7 +1119,40 @@ export class QuestsService {
       // QuestCompleteScreen just won't show a message this time.
     }
 
-    return { ...result, aliMessage };
+    // Same after-the-transaction-commits, best-effort policy as
+    // aliMessage above -- these are the LEVEL_UP/JOURNEY_COMPLETION/
+    // STREAK_MILESTONE/MASTERY_EVENT/ACHIEVEMENT_UNLOCK descriptors
+    // aliEvents collected instead of firing (see WordCompletionResult's
+    // doc comments). A failure to narrate any one of them is dropped
+    // silently and never rolls back the progression it's reacting to,
+    // which has already committed.
+    const liveAliReactions: AliDisplayMessage[] = [];
+    let streakReaction: AliDisplayMessage | null = null;
+    await Promise.all(
+      aliEvents.map(async (event) => {
+        try {
+          const response = await this.ali.react(userId, event);
+          const display: AliDisplayMessage = {
+            text: response.text,
+            recommendation: response.recommendation,
+            expression: response.expression,
+            pose: response.pose,
+            intensity: response.intensity,
+            priority: response.priority,
+            durationMs: response.durationMs,
+          };
+          if (event.type === 'STREAK_MILESTONE') {
+            streakReaction = display;
+          } else {
+            liveAliReactions.push(display);
+          }
+        } catch {
+          // Dropped -- see the comment above.
+        }
+      }),
+    );
+
+    return { ...result, aliMessage, liveAliReactions, streakReaction };
   }
 
   /**
