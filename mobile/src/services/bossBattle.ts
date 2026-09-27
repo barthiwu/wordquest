@@ -52,6 +52,9 @@ export interface BattleAnswerResult {
 export interface LeaderboardEntry {
   userId: string;
   username: string;
+  /** Resolved player avatar, or null when they have none set. Backs the
+   * avatar-tap "Profile / Add Friend / Block" popup (2026-09). */
+  avatarUrl: string | null;
   /** Null while the battle is still LIVE — no comparative rank is shown until the group finalizes. */
   rank: number | null;
   battleXp: number;

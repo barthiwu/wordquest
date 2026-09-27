@@ -10,6 +10,7 @@ import { NotificationModule } from '../notifications/notification.module';
 import { IdempotencyModule } from '../idempotency/idempotency.module';
 import { QuestCardModule } from '../quest-card/quest-card.module';
 import { AnalyticsModule } from '../analytics/analytics.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AnalyticsModule } from '../analytics/analytics.module';
     IdempotencyModule,
     QuestCardModule,
     AnalyticsModule,
+    UsersModule,
   ],
   controllers: [BossBattleController],
   providers: [BossBattleService],

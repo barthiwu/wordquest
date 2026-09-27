@@ -16,6 +16,7 @@ import { NotificationService } from '../notifications/notification.service';
 import { IdempotencyService } from '../idempotency/idempotency.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
 import { AnalyticsService } from '../analytics/analytics.service';
+import { UsersService } from '../users/users.service';
 import { gameplayRules, bossBattleRewardForRank } from '../config/gameplay-rules';
 
 function utc(y: number, m: number, d: number, h = 0, min = 0, s = 0): Date {
@@ -82,6 +83,7 @@ describe('BossBattleService', () => {
   };
   const questCardsMock = { createCard: jest.fn().mockResolvedValue(undefined) };
   const analyticsMock = { track: jest.fn() };
+  const usersMock = { resolveAvatarUrl: jest.fn().mockResolvedValue(null) };
 
   const greetingWord = {
     id: 'w1',
@@ -125,6 +127,7 @@ describe('BossBattleService', () => {
         { provide: IdempotencyService, useValue: idempotencyMock },
         { provide: QuestCardService, useValue: questCardsMock },
         { provide: AnalyticsService, useValue: analyticsMock },
+        { provide: UsersService, useValue: usersMock },
       ],
     }).compile();
     service = moduleRef.get(BossBattleService);
@@ -850,6 +853,7 @@ describe('BossBattleService', () => {
       expect(result.entries[0]).toEqual({
         userId: 'u1',
         username: 'Ada',
+        avatarUrl: null,
         rank: null,
         battleXp: 30,
         correctAnswers: 2,

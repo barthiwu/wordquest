@@ -19,6 +19,8 @@ import { DuelPrepJourney } from './DuelPrepJourney';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
+import { AvatarBubble } from '@/components/AvatarBubble';
+import { AvatarActionMenu } from '@/components/AvatarActionMenu';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -76,6 +78,11 @@ export function WordDuelScreen({ navigation }: Props) {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Avatar-tap popup for the opponent -- only ever opened from the
+  // COMPLETED result screen below, since opponent identity is withheld
+  // by the backend entirely until then (WordDuelOpponentView's doc
+  // comment).
+  const [opponentMenuOpen, setOpponentMenuOpen] = useState(false);
 
   const applyState = useCallback((view: WordDuelStateView) => {
     setState(view);
@@ -295,8 +302,37 @@ export function WordDuelScreen({ navigation }: Props) {
       }),
     ];
     if (result.tieBreakReason) extraLines.push(t('resultTiebreakNote'));
+    // Present only once the match is COMPLETED (see WordDuelOpponentView's
+    // doc comment) -- undefined/absent during WAITING/ACTIVE, which this
+    // phase never renders anyway.
+    const opponentIdentity =
+      state.opponent?.userId && state.opponent.username
+        ? {
+            userId: state.opponent.userId,
+            username: state.opponent.username,
+            avatarUrl: state.opponent.avatarUrl ?? null,
+          }
+        : null;
     return (
       <ScrollView style={styles.flexFill} contentContainerStyle={styles.centeredScrollContent}>
+        {opponentIdentity && (
+          <Pressable
+            style={styles.opponentChip}
+            onPress={() => setOpponentMenuOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={t('friends:popup.avatarLabel', {
+              username: opponentIdentity.username,
+            })}
+          >
+            <AvatarBubble
+              colors={colors}
+              avatarUrl={opponentIdentity.avatarUrl}
+              username={opponentIdentity.username}
+              size={28}
+            />
+            <Text style={styles.opponentChipText}>{opponentIdentity.username}</Text>
+          </Pressable>
+        )}
         <ArcadeHeroResults
           colors={colors}
           title={outcomeTitle}
@@ -315,6 +351,16 @@ export function WordDuelScreen({ navigation }: Props) {
           secondaryLabel={t('arcade:backToPlay')}
           onSecondary={() => navigation.goBack()}
         />
+        {opponentIdentity && (
+          <AvatarActionMenu
+            visible={opponentMenuOpen}
+            onClose={() => setOpponentMenuOpen(false)}
+            userId={opponentIdentity.userId}
+            username={opponentIdentity.username}
+            avatarUrl={opponentIdentity.avatarUrl}
+            onOpenProfile={(userId) => navigation.navigate('PublicProfile', { userId })}
+          />
+        )}
       </ScrollView>
     );
   }
@@ -457,6 +503,16 @@ function createStyles(colors: ThemeColors, topInset: number) {
       padding: spacing.xl,
       gap: spacing.md,
     },
+    opponentChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.pill,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+    },
+    opponentChipText: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
     noOpponentIconOuter: {
       width: 120,
       height: 120,

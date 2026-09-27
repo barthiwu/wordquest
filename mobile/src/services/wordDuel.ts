@@ -2,10 +2,18 @@ import { apiRequest } from './apiClient';
 
 /** Opponent's live score only — never their current word or answers
  * (backend WordDuelOpponentView; matches the server's own "score only,
- * never their current word" comment). */
+ * never their current word" comment). userId/username/avatarUrl are
+ * deliberately absent (undefined) while the match is WAITING/ACTIVE —
+ * they are populated only once `status` is COMPLETED, backing the
+ * avatar-tap "Profile / Add Friend / Block" popup on the post-match
+ * result (2026-09). Never render/use these three fields outside a
+ * COMPLETED state. */
 export interface WordDuelOpponentView {
   correctCount: number;
   totalXp: number;
+  userId?: string;
+  username?: string;
+  avatarUrl?: string | null;
 }
 
 /** A letter-by-letter display of this player's current word — spaces

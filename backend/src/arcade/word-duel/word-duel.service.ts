@@ -22,10 +22,18 @@ import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant'
 import { FriendsService } from '../../friends/friends.service';
 
 /** Client-safe view of the opponent's progress — score only, never their
- * current word or answers (spec §6/§8). */
+ * current word or answers (spec §6/§8). Identity (userId/username/
+ * avatarUrl) is deliberately absent here: it is added ONLY once the
+ * match reaches COMPLETED (2026-09, Barth: backs the avatar-tap
+ * "Profile / Add Friend / Block" popup on the post-match result) --
+ * while status is WAITING or ACTIVE these three fields are always
+ * omitted, preserving the existing live-anonymity behavior exactly. */
 export interface WordDuelOpponentView {
   correctCount: number;
   totalXp: number;
+  userId?: string;
+  username?: string;
+  avatarUrl?: string | null;
 }
 
 /** Client-safe view of this player's current word — a letter-by-letter
@@ -546,6 +554,17 @@ export class WordDuelService {
       };
     }
 
+    // Identity is resolved ONLY once the match is COMPLETED -- see
+    // WordDuelOpponentView's doc comment for why this must never happen
+    // while status is WAITING or ACTIVE. FriendsService.getPublicIdentity
+    // is reused rather than a separate User lookup here so this follows
+    // the same "username is the only identity other players see" shape
+    // (FriendPublicView) every other public-facing surface uses.
+    const opponentIdentity =
+      opponentRow && playerState.match.status === 'COMPLETED'
+        ? await this.friends.getPublicIdentity(opponentRow.userId)
+        : null;
+
     return {
       matchId: playerState.matchId,
       status: playerState.match.status,
@@ -558,7 +577,17 @@ export class WordDuelService {
       correctCount: playerState.correctCount,
       totalXp: playerState.totalXp,
       opponent: opponentRow
-        ? { correctCount: opponentRow.correctCount, totalXp: opponentRow.totalXp }
+        ? {
+            correctCount: opponentRow.correctCount,
+            totalXp: opponentRow.totalXp,
+            ...(opponentIdentity
+              ? {
+                  userId: opponentIdentity.userId,
+                  username: opponentIdentity.username,
+                  avatarUrl: opponentIdentity.avatarUrl,
+                }
+              : {}),
+          }
         : null,
       result,
     };

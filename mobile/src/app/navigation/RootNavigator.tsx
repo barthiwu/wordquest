@@ -44,6 +44,8 @@ import { TermsOfServiceScreen } from '@/features/legal/TermsOfServiceScreen';
 import { AgeRestrictionScreen } from '@/features/legal/AgeRestrictionScreen';
 import { LanguageScreen } from '@/features/settings/LanguageScreen';
 import { AboutScreen } from '@/features/settings/AboutScreen';
+import { FriendsScreen } from '@/features/friends/FriendsScreen';
+import { PublicProfileScreen } from '@/features/friends/PublicProfileScreen';
 import type { WordCompletionResult } from '@/services/quests';
 import type { Submission } from '@/services/word-in-the-wild';
 import { linking } from './linking';
@@ -105,6 +107,8 @@ export type RootStackParamList = {
   AgeRestriction: undefined;
   Language: undefined;
   About: undefined;
+  Friends: undefined;
+  PublicProfile: { userId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -171,6 +175,8 @@ export function RootNavigator() {
         <Stack.Screen name="AgeRestriction" component={AgeRestrictionScreen} />
         <Stack.Screen name="Language" component={LanguageScreen} />
         <Stack.Screen name="About" component={AboutScreen} />
+        <Stack.Screen name="Friends" component={FriendsScreen} />
+        <Stack.Screen name="PublicProfile" component={PublicProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

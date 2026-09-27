@@ -30,6 +30,7 @@ import { quickAliReaction } from '../ali/ali-quick-reactions';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { renderWord } from '../vocabulary/english-variant';
 import { resolveEnglishVariant } from '../vocabulary/resolve-english-variant';
+import { UsersService } from '../users/users.service';
 
 type Db = PrismaService | Prisma.TransactionClient;
 const GROUP_SIZE = 20;
@@ -82,6 +83,11 @@ export interface BattleAnswerResult {
 export interface LeaderboardEntry {
   userId: string;
   username: string;
+  /** Resolved via UsersService.resolveAvatarUrl -- null when the player
+   * has no avatar set, same convention as FriendPublicView.avatarUrl.
+   * Backs the avatar-tap "Profile / Add Friend / Block" popup (2026-09,
+   * Barth). */
+  avatarUrl: string | null;
   /** Null while the battle is still LIVE — no comparative rank is exposed until the group finalizes (Correction & Completion Spec §4). */
   rank: number | null;
   battleXp: number;
@@ -126,7 +132,7 @@ interface RankablePlayer {
 }
 
 interface RankablePlayerWithUser extends RankablePlayer {
-  user: { id: string; username: string };
+  user: { id: string; username: string; avatarKey: string | null };
 }
 
 /**
@@ -154,6 +160,7 @@ export class BossBattleService {
     private readonly idempotency: IdempotencyService,
     private readonly questCards: QuestCardService,
     private readonly analytics: AnalyticsService,
+    private readonly users: UsersService,
   ) {}
 
   /** Lightweight — for a pre-battle countdown display, no join/eligibility side effects. */
@@ -464,7 +471,11 @@ export class BossBattleService {
             where: { id: player.id },
             data: { currentWordId: null, currentDisplayPattern: null, currentMissingIndexes: [] },
           });
-          result = { updatedPlayer: updated, nextChallenge: null, groupStillLive: groupStillLiveInTx };
+          result = {
+            updatedPlayer: updated,
+            nextChallenge: null,
+            groupStillLive: groupStillLiveInTx,
+          };
         } else {
           const next = await this.assignNextChallenge(
             updated.id,
@@ -476,7 +487,11 @@ export class BossBattleService {
             tx,
             variant,
           );
-          result = { updatedPlayer: updated, nextChallenge: next, groupStillLive: groupStillLiveInTx };
+          result = {
+            updatedPlayer: updated,
+            nextChallenge: next,
+            groupStillLive: groupStillLiveInTx,
+          };
         }
 
         // Recorded from INSIDE this same transaction — a crash between
@@ -550,7 +565,7 @@ export class BossBattleService {
       orderBy: { joinedAt: 'desc' },
       include: {
         group: { include: { battle: true } },
-        user: { select: { id: true, username: true } },
+        user: { select: { id: true, username: true, avatarKey: true } },
       },
     });
     if (!player) throw new NotFoundException('You have not joined a Boss Battle');
@@ -576,6 +591,7 @@ export class BossBattleService {
           {
             userId: player.user.id,
             username: player.user.username,
+            avatarUrl: await this.users.resolveAvatarUrl(player.user.avatarKey),
             rank: null,
             battleXp: player.battleXp,
             correctAnswers: player.correctAnswers,
@@ -590,24 +606,27 @@ export class BossBattleService {
 
     const players: RankablePlayerWithUser[] = await this.prisma.bossBattlePlayer.findMany({
       where: { groupId: player.groupId },
-      include: { user: { select: { id: true, username: true } } },
+      include: { user: { select: { id: true, username: true, avatarKey: true } } },
     });
     const ranked = this.rankPlayers(players);
 
     return {
       groupId: player.groupId,
       status,
-      entries: ranked.map((p, i) => ({
-        userId: p.user.id,
-        username: p.user.username,
-        rank: p.finalRank ?? i + 1,
-        battleXp: p.battleXp,
-        correctAnswers: p.correctAnswers,
-        incorrectAnswers: p.incorrectAnswers,
-        isYou: p.user.id === userId,
-        rewardXp: p.rewardXp ?? null,
-        rewardGlyphs: p.rewardGlyphs ?? null,
-      })),
+      entries: await Promise.all(
+        ranked.map(async (p, i) => ({
+          userId: p.user.id,
+          username: p.user.username,
+          avatarUrl: await this.users.resolveAvatarUrl(p.user.avatarKey),
+          rank: p.finalRank ?? i + 1,
+          battleXp: p.battleXp,
+          correctAnswers: p.correctAnswers,
+          incorrectAnswers: p.incorrectAnswers,
+          isYou: p.user.id === userId,
+          rewardXp: p.rewardXp ?? null,
+          rewardGlyphs: p.rewardGlyphs ?? null,
+        })),
+      ),
     };
   }
 

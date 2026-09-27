@@ -352,4 +352,20 @@ export class FriendsService {
   async areBlocked(userAId: string, userBId: string): Promise<boolean> {
     return this.isBlockedEitherWay(userAId, userBId);
   }
+
+  /** Exposed for other modules (Word Duel's post-match result, 2026-09)
+   * that need to resolve a bare userId to the same narrow, non-PII
+   * identity shape (username + avatarUrl) FriendPublicView already
+   * uses, without importing UsersService separately just for this one
+   * lookup. Returns null for a nonexistent user rather than throwing --
+   * callers here are enriching an already-resolved row (e.g. a match
+   * opponent), not looking a player up by an id they're unsure of. */
+  async getPublicIdentity(userId: string): Promise<FriendPublicView | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, username: true, avatarKey: true },
+    });
+    if (!user) return null;
+    return this.toPublicView(user);
+  }
 }

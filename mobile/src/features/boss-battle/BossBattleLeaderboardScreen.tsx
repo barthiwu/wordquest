@@ -1,5 +1,5 @@
 import { useCallback, useState, useMemo } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,8 @@ import { useThemeColors } from '@/state/themeStore';
 import { getBattleLeaderboard, type BattleLeaderboardView } from '@/services/bossBattle';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
+import { AvatarBubble } from '@/components/AvatarBubble';
+import { AvatarActionMenu } from '@/components/AvatarActionMenu';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -44,6 +46,13 @@ export function BossBattleLeaderboardScreen({ navigation }: Props) {
   const accessToken = useAuthStore((s) => s.accessToken);
   const [board, setBoard] = useState<BattleLeaderboardView | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // The avatar-tap popup's target -- null when closed. Never opened for
+  // the viewer's own row (isYou): a player can't add/block themselves.
+  const [menuTarget, setMenuTarget] = useState<{
+    userId: string;
+    username: string;
+    avatarUrl: string | null;
+  } | null>(null);
 
   const load = useCallback(() => {
     if (!accessToken) return;
@@ -134,6 +143,34 @@ export function BossBattleLeaderboardScreen({ navigation }: Props) {
         >
           <View style={styles.rowTop}>
             <Text style={styles.rank}>#{entry.rank}</Text>
+            {entry.isYou ? (
+              <AvatarBubble
+                colors={colors}
+                avatarUrl={entry.avatarUrl}
+                username={entry.username}
+                size={28}
+              />
+            ) : (
+              <Pressable
+                onPress={() =>
+                  setMenuTarget({
+                    userId: entry.userId,
+                    username: entry.username,
+                    avatarUrl: entry.avatarUrl,
+                  })
+                }
+                accessibilityRole="button"
+                accessibilityLabel={t('friends:popup.avatarLabel', { username: entry.username })}
+                hitSlop={6}
+              >
+                <AvatarBubble
+                  colors={colors}
+                  avatarUrl={entry.avatarUrl}
+                  username={entry.username}
+                  size={28}
+                />
+              </Pressable>
+            )}
             <Text style={styles.name}>{entry.username}</Text>
             <Text style={styles.xp}>{t('xpValue', { xp: entry.battleXp })}</Text>
           </View>
@@ -150,6 +187,17 @@ export function BossBattleLeaderboardScreen({ navigation }: Props) {
           </Text>
         </View>
       ))}
+
+      {menuTarget && (
+        <AvatarActionMenu
+          visible
+          onClose={() => setMenuTarget(null)}
+          userId={menuTarget.userId}
+          username={menuTarget.username}
+          avatarUrl={menuTarget.avatarUrl}
+          onOpenProfile={(userId) => navigation.navigate('PublicProfile', { userId })}
+        />
+      )}
     </ScrollView>
   );
 }

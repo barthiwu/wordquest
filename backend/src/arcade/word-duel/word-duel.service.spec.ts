@@ -291,7 +291,10 @@ describe('WordDuelService', () => {
     awardXp: jest.fn().mockResolvedValue(undefined),
     recordDailyActivity: jest.fn().mockResolvedValue({ currentStreak: 1 }),
   };
-  const friendsMock = { areBlocked: jest.fn().mockResolvedValue(false) };
+  const friendsMock = {
+    areBlocked: jest.fn().mockResolvedValue(false),
+    getPublicIdentity: jest.fn().mockResolvedValue(null),
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -307,6 +310,7 @@ describe('WordDuelService', () => {
     progressionMock.awardXp.mockResolvedValue(undefined);
     progressionMock.recordDailyActivity.mockResolvedValue({ currentStreak: 1 });
     friendsMock.areBlocked.mockReset().mockResolvedValue(false);
+    friendsMock.getPublicIdentity.mockReset().mockResolvedValue(null);
 
     store.words.set('w1', {
       id: 'w1',

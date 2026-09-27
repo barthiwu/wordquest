@@ -292,6 +292,16 @@ export function PassportScreen({ navigation }: Props) {
 
       <Pressable
         style={styles.section}
+        onPress={() => navigation.navigate('Friends')}
+        accessibilityRole="button"
+        accessibilityLabel={t('friendsTitle')}
+      >
+        <Text style={styles.sectionTitle}>{t('friendsTitle')}</Text>
+        <Text style={styles.sectionBody}>{t('friendsBody')}</Text>
+      </Pressable>
+
+      <Pressable
+        style={styles.section}
         onPress={() => navigation.navigate('QuestCardGallery')}
         accessibilityRole="button"
         accessibilityLabel={t('questCardsTitle')}
