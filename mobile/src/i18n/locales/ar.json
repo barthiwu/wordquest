@@ -787,7 +787,8 @@
     "wordDuelTitle": "مواجهة الكلمات",
     "wordDuelSubtitle": "تنافس مع لاعب آخر باستخدام تلميحات متتالية",
     "completeItTitle": "أكملها",
-    "completeItSubtitle": "أكمل الكلمة الناقصة"
+    "completeItSubtitle": "أكمل الكلمة الناقصة",
+    "backToPlay": "الرجوع إلى لعب"
   },
   "scrambleQuest": {
     "genericError": "تعذّر الوصول إلى ScrambleQuest حاليًا.",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "اختيار {{title}}",
     "completedAccessibilityLabel": "{{title}}، مكتملة",
     "bossBattleSubtitle": "تحدٍّ أسبوعي محدد بوقت ضد الجميع"
+  },
+  "completeIt": {
+    "genericError": "تعذّر الوصول إلى Complete It حاليًا."
   }
 }

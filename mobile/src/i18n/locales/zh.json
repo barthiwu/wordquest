@@ -787,7 +787,8 @@
     "wordDuelTitle": "单词对决",
     "wordDuelSubtitle": "通过逐步提示与其他玩家对战",
     "completeItTitle": "补全单词",
-    "completeItSubtitle": "填写缺失的单词"
+    "completeItSubtitle": "填写缺失的单词",
+    "backToPlay": "返回玩"
   },
   "scrambleQuest": {
     "genericError": "暂时无法连接 ScrambleQuest。",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "选择{{title}}",
     "completedAccessibilityLabel": "{{title}}，已完成",
     "bossBattleSubtitle": "每周限时挑战，所有人同场竞技"
+  },
+  "completeIt": {
+    "genericError": "暂时无法连接到 Complete It。"
   }
 }

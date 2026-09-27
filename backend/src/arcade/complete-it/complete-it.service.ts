@@ -13,39 +13,30 @@ import { ArcadeChallengeService } from '../challenge.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
-import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, SCRAMBLE_QUEST_CONFIG } from '../config/arcade.config';
-import { scrambleWord } from './scramble.util';
+import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, COMPLETE_IT_CONFIG } from '../config/arcade.config';
+import { blankSentence } from './complete-it.util';
 
-/** Client-safe view of the player's current ScrambleQuest word — the
- * scrambled letters, never the target word (spec §5/§8). */
-export interface ScrambleQuestChallengeView {
+/** Client-safe view of the player's current Complete It word — the
+ * word's own example sentence with the target word blanked out, never
+ * the target word itself (spec §5/§8). */
+export interface CompleteItChallengeView {
   sessionId: string;
   wordIndex: number;
   wordsTotal: number;
-  scrambledLetters: string;
+  sentenceWithBlank: string;
+  definition: string;
+  partOfSpeech: string;
   wordLength: number;
   timeLimitSeconds: number;
   /** ISO timestamp — server-authoritative deadline for this word. Render
    * a countdown from it; never decide anything about timing client-side
    * (spec §10/§11). */
   deadlineAt: string;
-  hintsRemaining: number;
-  maxHints: number;
-  /** Hints already spent on this word, so a resumed/re-fetched challenge
-   * (app relaunch mid-word) shows the same revealed letters instead of
-   * "forgetting" them. */
-  revealedLetters: { position: number; letter: string }[];
   currentStreak: number;
   longestStreak: number;
 }
 
-export interface ScrambleQuestHintResult {
-  position: number;
-  letter: string;
-  hintsRemaining: number;
-}
-
-export interface ScrambleQuestAnswerResult {
+export interface CompleteItAnswerResult {
   isCorrect: boolean;
   timedOut: boolean;
   correctAnswer: string;
@@ -56,22 +47,33 @@ export interface ScrambleQuestAnswerResult {
   totalXpAwarded: number;
   correctCount: number;
   wordsTotal: number;
-  nextChallenge: ScrambleQuestChallengeView | null;
+  nextChallenge: CompleteItChallengeView | null;
 }
 
 type ArcadeGameSessionRow = Prisma.ArcadeGameSessionGetPayload<Record<string, never>>;
 
 /**
- * ScrambleQuest (spec §5): timed word unscrambling. One
- * ArcadeGameSession per play-through, its full word sequence picked once
- * at start via ArcadeChallengeService (spec §8) and stored on
- * wordIds/wordsTotal. All correctness, timing, hint-count, and streak
- * decisions are made here from server-held state only — nothing here
- * ever trusts a client-submitted hint count, elapsed time, or
- * correctness flag (spec §11).
+ * Complete It (spec §5 sibling of ScrambleQuest): the player sees the
+ * word's own example sentence with the target word blanked out, plus
+ * its definition and part of speech, and types the missing word.
+ * Shares ArcadeGameSession/ArcadeAnswer with ScrambleQuest (schema
+ * comment: "ScrambleQuest or Complete It") — same session lifecycle,
+ * same [sessionId, wordIndex] idempotency guard, same reward formula.
+ * COMPLETE_IT_CONFIG.HINTS_ENABLED is false (2026-09 decision), so
+ * there's no hint endpoint at all here — currentWordHintsUsed always
+ * stays 0, which also means the hint modifier is always 1 (no penalty
+ * ever applies).
+ *
+ * TIMER_SECONDS wasn't in the spec's own Complete It config (only
+ * HINTS_ENABLED/WORDS_PER_SESSION were) even though the shared
+ * speedModifierFor doc comment says it applies "identically" to all
+ * three games — added here as the same kind of 2026-09 product
+ * decision ScrambleQuest's own timer already was, slightly longer
+ * since Complete It gives no letters at all up front, only sentence
+ * context (see arcade.config.ts).
  */
 @Injectable()
-export class ScrambleQuestService {
+export class CompleteItService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly challenges: ArcadeChallengeService,
@@ -80,19 +82,21 @@ export class ScrambleQuestService {
   ) {}
 
   /**
-   * Starts a new session, or resumes one already in progress (an app
-   * relaunch mid-session) as long as the current word's server-side
-   * timer hasn't already run out. A resumable-but-expired session is
-   * abandoned first, never left ACTIVE forever with no way to progress.
+   * Starts a new session, or resumes one already in progress as long as
+   * the current word's server-side timer hasn't already run out (same
+   * pattern as ScrambleQuestService.start). The word pool is filtered
+   * to sentences that actually contain their own word — see
+   * blankSentence's doc comment — so buildChallengeView never has to
+   * handle the "couldn't blank it" case mid-session.
    */
-  async start(userId: string): Promise<ScrambleQuestChallengeView> {
+  async start(userId: string): Promise<CompleteItChallengeView> {
     const existing = await this.prisma.arcadeGameSession.findFirst({
-      where: { userId, game: 'SCRAMBLE_QUEST', status: 'ACTIVE' },
+      where: { userId, game: 'COMPLETE_IT', status: 'ACTIVE' },
     });
 
     if (existing) {
       const deadlineMs =
-        existing.currentWordStartedAt.getTime() + SCRAMBLE_QUEST_CONFIG.TIMER_SECONDS * 1000;
+        existing.currentWordStartedAt.getTime() + COMPLETE_IT_CONFIG.TIMER_SECONDS * 1000;
       if (Date.now() < deadlineMs) {
         return this.buildChallengeView(existing);
       }
@@ -104,63 +108,32 @@ export class ScrambleQuestService {
 
     const picked = await this.challenges.pickChallenges(
       userId,
-      SCRAMBLE_QUEST_CONFIG.WORDS_PER_SESSION,
+      COMPLETE_IT_CONFIG.WORDS_PER_SESSION,
     );
-    if (picked.length === 0) {
-      throw new BadRequestException('No words are available for ScrambleQuest right now.');
+    const blankable = picked.filter(
+      (c) => blankSentence(c.word.exampleSentence, c.word.word).found,
+    );
+    if (blankable.length === 0) {
+      throw new BadRequestException('No words are available for Complete It right now.');
     }
 
     const session = await this.prisma.arcadeGameSession.create({
       data: {
         userId,
-        game: 'SCRAMBLE_QUEST',
-        wordsTotal: picked.length,
-        wordIds: picked.map((c) => c.word.id),
+        game: 'COMPLETE_IT',
+        wordsTotal: blankable.length,
+        wordIds: blankable.map((c) => c.word.id),
       },
     });
 
     return this.buildChallengeView(session);
   }
 
-  /**
-   * Reveals the next letter (left to right) of the current word. Up to
-   * SCRAMBLE_QUEST_CONFIG.MAX_HINTS_PER_WORD, capped further so a hint
-   * can never reveal the word's very last letter (spec doesn't require
-   * this, but a hint that fully solves the word isn't really a hint).
-   */
-  async requestHint(userId: string, sessionId: string): Promise<ScrambleQuestHintResult> {
-    const session = await this.loadActiveSession(userId, sessionId);
-    const word = await this.currentWord(session);
-    const maxHintsForWord = this.maxHintsFor(word.word);
-
-    if (session.currentWordHintsUsed >= maxHintsForWord) {
-      throw new BadRequestException(`No hints remaining (max ${maxHintsForWord}).`);
-    }
-
-    // Compare-and-swap on the exact hint count just read — a race loser
-    // (double-tap, or two requests in flight) can't both succeed and
-    // silently grant an extra hint.
-    const claimed = await this.prisma.arcadeGameSession.updateMany({
-      where: { id: sessionId, currentWordHintsUsed: session.currentWordHintsUsed },
-      data: { currentWordHintsUsed: { increment: 1 } },
-    });
-    if (claimed.count === 0) {
-      throw new ConflictException('This hint was already requested');
-    }
-
-    const position = session.currentWordHintsUsed; // 0-based: the hint just granted reveals this position
-    return {
-      position,
-      letter: word.word[position],
-      hintsRemaining: maxHintsForWord - position - 1,
-    };
-  }
-
   async submitAnswer(
     userId: string,
     sessionId: string,
     rawAnswer: string,
-  ): Promise<ScrambleQuestAnswerResult> {
+  ): Promise<CompleteItAnswerResult> {
     const session = await this.loadActiveSession(userId, sessionId);
     const word = await this.currentWord(session);
 
@@ -168,7 +141,7 @@ export class ScrambleQuestService {
     // the server-recorded currentWordStartedAt, never a client-reported
     // elapsed time.
     const responseTimeMs = Date.now() - session.currentWordStartedAt.getTime();
-    const timeLimitMs = SCRAMBLE_QUEST_CONFIG.TIMER_SECONDS * 1000;
+    const timeLimitMs = COMPLETE_IT_CONFIG.TIMER_SECONDS * 1000;
     const timedOut = responseTimeMs > timeLimitMs;
     const isCorrect = !timedOut && normalizeAnswer(rawAnswer) === word.normalizedWord;
 
@@ -182,7 +155,7 @@ export class ScrambleQuestService {
         difficulty: word.baseDifficulty,
         responseTimeMs,
         timeLimitMs,
-        hintsUsed: session.currentWordHintsUsed,
+        hintsUsed: 0, // Complete It never offers hints — COMPLETE_IT_CONFIG.HINTS_ENABLED is false
         streakBefore,
       });
     }
@@ -200,7 +173,7 @@ export class ScrambleQuestService {
               wordId: word.id,
               submittedAnswer: rawAnswer,
               isCorrect,
-              hintsUsed: session.currentWordHintsUsed,
+              hintsUsed: 0,
               timedOut,
               baseXp: reward.baseXp,
               speedModifier: reward.speedModifier,
@@ -223,9 +196,9 @@ export class ScrambleQuestService {
         }
 
         // Claim the session's advance — before the XP award — so a race
-        // loser aborts cleanly instead of double-awarding. The unique
-        // constraint above already catches this in practice; this is
-        // defense in depth, mirroring QuestsService.claimStageTransition.
+        // loser aborts cleanly instead of double-awarding (defense in
+        // depth alongside the unique constraint above, mirroring
+        // QuestsService.claimStageTransition / ScrambleQuestService).
         const claimed = await tx.arcadeGameSession.updateMany({
           where: { id: sessionId, currentIndex: wordIndex },
           data: {
@@ -234,7 +207,6 @@ export class ScrambleQuestService {
             longestStreak: newLongestStreak,
             totalXpAwarded: { increment: reward.finalXp },
             currentWordStartedAt: new Date(),
-            currentWordHintsUsed: 0,
             ...(isLastWord ? { status: 'COMPLETED' as const, endedAt: new Date() } : {}),
           },
         });
@@ -243,13 +215,11 @@ export class ScrambleQuestService {
         }
 
         if (isCorrect) {
-          // ProgressionService is the ONLY writer of account XP (spec §3)
-          // — reference ties this award back to the exact answer for
-          // auditing, same convention as QUEST_ANSWER/QUEST_COMPLETION.
+          // ProgressionService is the ONLY writer of account XP (spec §3).
           await this.progression.awardXp(
             userId,
             reward.finalXp,
-            'ARCADE_SCRAMBLE_QUEST_ANSWER',
+            'ARCADE_COMPLETE_IT_ANSWER',
             'arcade',
             `${sessionId}:${wordIndex}`,
             tx,
@@ -259,10 +229,7 @@ export class ScrambleQuestService {
         const correctSoFar = await tx.arcadeAnswer.count({ where: { sessionId, isCorrect: true } });
 
         // Daily-activity streak counts once, on full session completion —
-        // matching Daily Quest's own semantics (recordDailyActivity fires
-        // on QUEST_COMPLETION, not on every answer) so a trivial partial
-        // session can't farm the streak. 2026-09 decision: Arcade play
-        // DOES count (ARCADE_COUNTS_TOWARD_DAILY_STREAK).
+        // same semantics as ScrambleQuestService/Daily Quest.
         if (isLastWord && ARCADE_COUNTS_TOWARD_DAILY_STREAK) {
           await this.progression.recordDailyActivity(userId, tx);
         }
@@ -271,7 +238,7 @@ export class ScrambleQuestService {
       },
     );
 
-    let nextChallenge: ScrambleQuestChallengeView | null = null;
+    let nextChallenge: CompleteItChallengeView | null = null;
     if (!isLastWord) {
       const refreshed = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { id: sessionId },
@@ -299,13 +266,13 @@ export class ScrambleQuestService {
     sessionId: string,
   ): Promise<ArcadeGameSessionRow> {
     const session = await this.prisma.arcadeGameSession.findUnique({ where: { id: sessionId } });
-    if (!session) throw new NotFoundException('ScrambleQuest session not found');
-    if (session.userId !== userId) throw new ForbiddenException('Not your ScrambleQuest session');
-    if (session.game !== 'SCRAMBLE_QUEST') {
-      throw new BadRequestException('This session is not a ScrambleQuest session');
+    if (!session) throw new NotFoundException('Complete It session not found');
+    if (session.userId !== userId) throw new ForbiddenException('Not your Complete It session');
+    if (session.game !== 'COMPLETE_IT') {
+      throw new BadRequestException('This session is not a Complete It session');
     }
     if (session.status !== 'ACTIVE') {
-      throw new BadRequestException('This ScrambleQuest session has already ended');
+      throw new BadRequestException('This Complete It session has already ended');
     }
     return session;
   }
@@ -315,35 +282,29 @@ export class ScrambleQuestService {
     return this.prisma.word.findUniqueOrThrow({ where: { id: wordId } });
   }
 
-  /** A hint can never reveal the word's final letter — leaves at least
-   * one letter for the player to actually solve. */
-  private maxHintsFor(word: string): number {
-    return Math.min(SCRAMBLE_QUEST_CONFIG.MAX_HINTS_PER_WORD, Math.max(0, word.length - 1));
-  }
-
   private async buildChallengeView(
     session: ArcadeGameSessionRow,
-  ): Promise<ScrambleQuestChallengeView> {
+  ): Promise<CompleteItChallengeView> {
     const word = await this.currentWord(session);
-    const maxHintsForWord = this.maxHintsFor(word.word);
-    const revealedLetters = Array.from({ length: session.currentWordHintsUsed }, (_, position) => ({
-      position,
-      letter: word.word[position],
-    }));
+    // Guaranteed found:true — start() only ever puts blankable words
+    // into wordIds. If this were ever false it'd mean a data change
+    // happened after the session started, which nothing in this app
+    // does; falling back to the unblanked sentence would leak the
+    // answer, so this deliberately does NOT have a silent fallback.
+    const { sentenceWithBlank } = blankSentence(word.exampleSentence, word.word);
 
     return {
       sessionId: session.id,
       wordIndex: session.currentIndex,
       wordsTotal: session.wordsTotal,
-      scrambledLetters: scrambleWord(word.word, `${session.id}:${session.currentIndex}`),
+      sentenceWithBlank,
+      definition: word.definition,
+      partOfSpeech: word.partOfSpeech,
       wordLength: word.word.length,
-      timeLimitSeconds: SCRAMBLE_QUEST_CONFIG.TIMER_SECONDS,
+      timeLimitSeconds: COMPLETE_IT_CONFIG.TIMER_SECONDS,
       deadlineAt: new Date(
-        session.currentWordStartedAt.getTime() + SCRAMBLE_QUEST_CONFIG.TIMER_SECONDS * 1000,
+        session.currentWordStartedAt.getTime() + COMPLETE_IT_CONFIG.TIMER_SECONDS * 1000,
       ).toISOString(),
-      hintsRemaining: maxHintsForWord - session.currentWordHintsUsed,
-      maxHints: maxHintsForWord,
-      revealedLetters,
       currentStreak: session.currentStreak,
       longestStreak: session.longestStreak,
     };

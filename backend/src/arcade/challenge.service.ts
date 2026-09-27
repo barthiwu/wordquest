@@ -45,11 +45,7 @@ export class ArcadeChallengeService {
     count: number,
     excludeWordIds: string[] = [],
   ): Promise<ArcadeChallenge[]> {
-    const wordIds = await this.wordsService.pickWordsForQuest(
-      userId,
-      count,
-      excludeWordIds,
-    );
+    const wordIds = await this.wordsService.pickWordsForQuest(userId, count, excludeWordIds);
 
     const words = await this.prisma.word.findMany({
       where: { id: { in: wordIds } },

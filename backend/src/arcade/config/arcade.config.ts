@@ -35,10 +35,7 @@ export const ARCADE_SPEED_MODIFIER = {
  * Duel so "fast" means the same thing everywhere (spec §4: "one
  * centralized, configurable speed modifier").
  */
-export function speedModifierFor(
-  responseTimeMs: number,
-  timeLimitMs: number,
-): number {
+export function speedModifierFor(responseTimeMs: number, timeLimitMs: number): number {
   if (timeLimitMs <= 0) return ARCADE_SPEED_MODIFIER.NORMAL;
   const fraction = responseTimeMs / timeLimitMs;
   if (fraction <= 1 / 3) return ARCADE_SPEED_MODIFIER.FAST;
@@ -65,10 +62,7 @@ export const ARCADE_STREAK_BONUS_PER_STEP = 0.1;
 export const ARCADE_STREAK_BONUS_CAP_STEPS = 10;
 
 export function streakModifierFor(streakBeforeThisAnswer: number): number {
-  const steps = Math.min(
-    Math.max(0, streakBeforeThisAnswer),
-    ARCADE_STREAK_BONUS_CAP_STEPS,
-  );
+  const steps = Math.min(Math.max(0, streakBeforeThisAnswer), ARCADE_STREAK_BONUS_CAP_STEPS);
   return 1 + steps * ARCADE_STREAK_BONUS_PER_STEP;
 }
 
@@ -81,6 +75,14 @@ export const SCRAMBLE_QUEST_CONFIG = {
 
 // ── Complete It ────────────────────────────────────────────────────────
 export const COMPLETE_IT_CONFIG = {
+  // Not in the spec's own Complete It config -- only HINTS_ENABLED/
+  // WORDS_PER_SESSION were -- even though speedModifierFor's doc
+  // comment says the speed modifier applies "identically" across all
+  // three games. Added as the same kind of 2026-09 product decision
+  // ScrambleQuest's own TIMER_SECONDS already was; slightly longer
+  // since Complete It gives no letters at all up front, only sentence
+  // + definition context, unlike ScrambleQuest's scrambled letters.
+  TIMER_SECONDS: 45,
   HINTS_ENABLED: false, // 2026-09 decision: no hints in V1
   WORDS_PER_SESSION: 20,
 } as const;
@@ -116,5 +118,4 @@ export const ARCADE_AWARDS_GLYPHS = false;
  * WordDuelService.resolveMatch for the implementation and
  * WordDuelMatch.tieBreakReason for the audit trail.
  */
-export const WORD_DUEL_TIEBREAK_DESCRIPTION =
-  'most_correct_answers_then_earliest_final_score';
+export const WORD_DUEL_TIEBREAK_DESCRIPTION = 'most_correct_answers_then_earliest_final_score';

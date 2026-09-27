@@ -787,7 +787,8 @@
     "wordDuelTitle": "Duelo de Palavras",
     "wordDuelSubtitle": "Compita com outro jogador usando dicas progressivas",
     "completeItTitle": "Complete a Palavra",
-    "completeItSubtitle": "Complete a palavra que falta"
+    "completeItSubtitle": "Complete a palavra que falta",
+    "backToPlay": "Voltar para Jogar"
   },
   "scrambleQuest": {
     "genericError": "Não foi possível conectar ao ScrambleQuest agora.",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "Selecionar {{title}}",
     "completedAccessibilityLabel": "{{title}}, concluída",
     "bossBattleSubtitle": "Desafio semanal cronometrado contra todos"
+  },
+  "completeIt": {
+    "genericError": "Não foi possível acessar o Complete It agora."
   }
 }

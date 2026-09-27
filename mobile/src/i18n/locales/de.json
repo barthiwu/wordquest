@@ -787,7 +787,8 @@
     "wordDuelTitle": "Wortduell",
     "wordDuelSubtitle": "Tritt gegen einen anderen Spieler mit fortschreitenden Hinweisen an",
     "completeItTitle": "Vervollständige es",
-    "completeItSubtitle": "Ergänze das fehlende Wort"
+    "completeItSubtitle": "Ergänze das fehlende Wort",
+    "backToPlay": "Zurück zu Spielen"
   },
   "scrambleQuest": {
     "genericError": "ScrambleQuest ist momentan nicht erreichbar.",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "{{title}} auswählen",
     "completedAccessibilityLabel": "{{title}}, abgeschlossen",
     "bossBattleSubtitle": "Wöchentliche Zeit-Challenge gegen alle"
+  },
+  "completeIt": {
+    "genericError": "Complete It konnte momentan nicht erreicht werden."
   }
 }

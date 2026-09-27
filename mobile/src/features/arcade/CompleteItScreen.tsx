@@ -13,40 +13,43 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
-  requestScrambleHint,
-  startScrambleQuest,
-  submitScrambleAnswer,
-  type ScrambleQuestAnswerResult,
-  type ScrambleQuestChallenge,
-} from '@/services/scrambleQuest';
+  startCompleteIt,
+  submitCompleteItAnswer,
+  type CompleteItAnswerResult,
+  type CompleteItChallenge,
+} from '@/services/completeIt';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'ScrambleQuest'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'CompleteIt'>;
 
 type Phase = 'loading' | 'active' | 'submitting' | 'feedback' | 'complete' | 'error';
 
 /**
- * ScrambleQuest (spec §5) — one word at a time, 30s server-authoritative
- * timer, up to 3 letter-reveal hints, immediate advance on a correct
- * answer. The local countdown here is purely cosmetic: the server
- * decides timeout from its own recorded start time (ScrambleQuestService
- * §11), so a submission that lands right as this screen's clock hits
- * zero is judged by the server's clock, not this one's.
+ * Complete It (spec §5 sibling of ScrambleQuest) — the player sees the
+ * word's own example sentence with the target word blanked out, plus
+ * its definition/part of speech, and types the missing word. No hints
+ * at all (COMPLETE_IT_CONFIG.HINTS_ENABLED is false), unlike
+ * ScrambleQuest — this screen is ScrambleQuestScreen's structure minus
+ * the hint UI, with a sentence+definition card in place of the
+ * scrambled-letters puzzle. The local countdown is purely cosmetic: the
+ * server decides timeout from its own recorded start time
+ * (CompleteItService), so a submission landing right as this screen's
+ * clock hits zero is judged by the server's clock, not this one's.
  */
-export function ScrambleQuestScreen({ navigation }: Props) {
+export function CompleteItScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
-  const { t } = useTranslation(['scrambleQuest', 'arcade']);
+  const { t } = useTranslation(['completeIt', 'scrambleQuest', 'arcade']);
   const accessToken = useAuthStore((s) => s.accessToken);
 
   const [phase, setPhase] = useState<Phase>('loading');
-  const [challenge, setChallenge] = useState<ScrambleQuestChallenge | null>(null);
+  const [challenge, setChallenge] = useState<CompleteItChallenge | null>(null);
   const [answer, setAnswer] = useState('');
-  const [feedback, setFeedback] = useState<ScrambleQuestAnswerResult | null>(null);
+  const [feedback, setFeedback] = useState<CompleteItAnswerResult | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const autoSubmittedRef = useRef(false);
 
@@ -54,7 +57,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     if (!accessToken) return;
     setPhase('loading');
     try {
-      const view = await startScrambleQuest(accessToken);
+      const view = await startCompleteIt(accessToken);
       setChallenge(view);
       setAnswer('');
       autoSubmittedRef.current = false;
@@ -92,33 +95,15 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     if (!accessToken || !challenge || phase === 'submitting') return;
     setPhase('submitting');
     try {
-      const result = await submitScrambleAnswer(accessToken, challenge.sessionId, submittedAnswer);
+      const result = await submitCompleteItAnswer(
+        accessToken,
+        challenge.sessionId,
+        submittedAnswer,
+      );
       setFeedback(result);
       setPhase('feedback');
     } catch {
       setPhase('error');
-    }
-  };
-
-  const handleHint = async () => {
-    if (!accessToken || !challenge || challenge.hintsRemaining <= 0) return;
-    try {
-      const hint = await requestScrambleHint(accessToken, challenge.sessionId);
-      setChallenge((prev) =>
-        prev
-          ? {
-              ...prev,
-              hintsRemaining: hint.hintsRemaining,
-              revealedLetters: [
-                ...prev.revealedLetters,
-                { position: hint.position, letter: hint.letter },
-              ],
-            }
-          : prev,
-      );
-    } catch {
-      // A failed hint request (rate limit, race) just leaves the hint
-      // count where it was -- not worth interrupting the game over.
     }
   };
 
@@ -147,7 +132,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     return (
       <View style={styles.centered}>
         <BackButton onPress={() => navigation.goBack()} />
-        <Text style={styles.error}>{t('genericError')}</Text>
+        <Text style={styles.error}>{t('completeIt:genericError')}</Text>
       </View>
     );
   }
@@ -155,26 +140,26 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   if (phase === 'complete' && feedback) {
     return (
       <ScrollView style={styles.flexFill} contentContainerStyle={styles.centeredScrollContent}>
-        <Text style={styles.title}>{t('sessionCompleteTitle')}</Text>
+        <Text style={styles.title}>{t('scrambleQuest:sessionCompleteTitle')}</Text>
         <Text style={styles.summaryLine}>
-          {t('sessionXpEarned', { xp: feedback.totalXpAwarded })}
+          {t('scrambleQuest:sessionXpEarned', { xp: feedback.totalXpAwarded })}
         </Text>
         <Text style={styles.summaryLine}>
-          {t('sessionCorrectSummary', {
+          {t('scrambleQuest:sessionCorrectSummary', {
             correct: feedback.correctCount,
             total: feedback.wordsTotal,
           })}
         </Text>
         <Text style={styles.summaryLine}>
-          {t('sessionLongestStreak', { streak: feedback.longestStreak })}
+          {t('scrambleQuest:sessionLongestStreak', { streak: feedback.longestStreak })}
         </Text>
         <Pressable
           style={styles.button}
           onPress={load}
           accessibilityRole="button"
-          accessibilityLabel={t('playAgain')}
+          accessibilityLabel={t('scrambleQuest:playAgain')}
         >
-          <Text style={styles.buttonText}>{t('playAgain')}</Text>
+          <Text style={styles.buttonText}>{t('scrambleQuest:playAgain')}</Text>
         </Pressable>
         <Pressable
           style={styles.secondaryButton}
@@ -190,11 +175,6 @@ export function ScrambleQuestScreen({ navigation }: Props) {
 
   if (!challenge) return null;
 
-  const skeleton = Array.from({ length: challenge.wordLength }, (_, i) => {
-    const revealed = challenge.revealedLetters.find((r) => r.position === i);
-    return revealed ? revealed.letter.toUpperCase() : '_';
-  }).join(' ');
-
   return (
     <View style={styles.flexFill}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -202,11 +182,14 @@ export function ScrambleQuestScreen({ navigation }: Props) {
 
         <View style={styles.headerRow}>
           <Text style={styles.progressLabel}>
-            {t('progressLabel', { current: challenge.wordIndex + 1, total: challenge.wordsTotal })}
+            {t('scrambleQuest:progressLabel', {
+              current: challenge.wordIndex + 1,
+              total: challenge.wordsTotal,
+            })}
           </Text>
           <View style={styles.streakPill}>
             <Text style={styles.streakPillText}>
-              {t('streakLabel')} {challenge.currentStreak}
+              {t('scrambleQuest:streakLabel')} {challenge.currentStreak}
             </Text>
           </View>
         </View>
@@ -218,10 +201,9 @@ export function ScrambleQuestScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.puzzleCard}>
-          <Text style={styles.scrambledLetters}>
-            {challenge.scrambledLetters.toUpperCase().split('').join(' ')}
-          </Text>
-          {challenge.revealedLetters.length > 0 && <Text style={styles.skeleton}>{skeleton}</Text>}
+          <Text style={styles.sentence}>{challenge.sentenceWithBlank}</Text>
+          <Text style={styles.partOfSpeech}>{challenge.partOfSpeech}</Text>
+          <Text style={styles.definition}>{challenge.definition}</Text>
         </View>
 
         {phase === 'active' && (
@@ -230,11 +212,11 @@ export function ScrambleQuestScreen({ navigation }: Props) {
               style={styles.input}
               value={answer}
               onChangeText={setAnswer}
-              placeholder={t('answerPlaceholder')}
+              placeholder={t('scrambleQuest:answerPlaceholder')}
               placeholderTextColor={colors.inkMuted}
               autoCapitalize="none"
               autoCorrect={false}
-              accessibilityLabel={t('yourAnswerLabel')}
+              accessibilityLabel={t('scrambleQuest:yourAnswerLabel')}
               onSubmitEditing={() => handleSubmit(answer)}
             />
             <Pressable
@@ -242,22 +224,9 @@ export function ScrambleQuestScreen({ navigation }: Props) {
               onPress={() => handleSubmit(answer)}
               disabled={!answer.trim()}
               accessibilityRole="button"
-              accessibilityLabel={t('submit')}
+              accessibilityLabel={t('scrambleQuest:submit')}
             >
-              <Text style={styles.buttonText}>{t('submit')}</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.hintButton, challenge.hintsRemaining <= 0 && styles.buttonDisabled]}
-              onPress={handleHint}
-              disabled={challenge.hintsRemaining <= 0}
-              accessibilityRole="button"
-              accessibilityLabel={t('hintButton')}
-            >
-              <Text style={styles.hintButtonText}>
-                {challenge.hintsRemaining > 0
-                  ? `${t('hintButton')} (${t('hintsRemainingLabel', { count: challenge.hintsRemaining })})`
-                  : t('noHintsRemaining')}
-              </Text>
+              <Text style={styles.buttonText}>{t('scrambleQuest:submit')}</Text>
             </Pressable>
           </>
         )}
@@ -277,23 +246,24 @@ export function ScrambleQuestScreen({ navigation }: Props) {
               ]}
             >
               {feedback.timedOut
-                ? t('timedOutFeedback')
+                ? t('scrambleQuest:timedOutFeedback')
                 : feedback.isCorrect
-                  ? t('correctFeedback', { xp: feedback.xpAwarded })
-                  : t('incorrectFeedback')}
+                  ? t('scrambleQuest:correctFeedback', { xp: feedback.xpAwarded })
+                  : t('scrambleQuest:incorrectFeedback')}
             </Text>
             {!feedback.isCorrect && (
               <Text style={styles.revealText}>
-                {t('revealPrefix')} <Text style={styles.revealWord}>{feedback.correctAnswer}</Text>
+                {t('scrambleQuest:revealPrefix')}{' '}
+                <Text style={styles.revealWord}>{feedback.correctAnswer}</Text>
               </Text>
             )}
             <Pressable
               style={styles.button}
               onPress={handleContinue}
               accessibilityRole="button"
-              accessibilityLabel={t('continue')}
+              accessibilityLabel={t('scrambleQuest:continue')}
             >
-              <Text style={styles.buttonText}>{t('continue')}</Text>
+              <Text style={styles.buttonText}>{t('scrambleQuest:continue')}</Text>
             </Pressable>
           </View>
         )}
@@ -372,18 +342,19 @@ function createStyles(colors: ThemeColors, topInset: number) {
       alignItems: 'center',
       gap: spacing.sm,
     },
-    scrambledLetters: {
+    sentence: {
       color: colors.ink,
-      fontSize: typography.scale.xl,
-      fontWeight: '700',
-      letterSpacing: 4,
-    },
-    skeleton: {
-      color: colors.arcaneSoft,
       fontSize: typography.scale.lg,
       fontWeight: '700',
-      letterSpacing: 4,
+      textAlign: 'center',
     },
+    partOfSpeech: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+    },
+    definition: { color: colors.inkMuted, fontSize: typography.scale.sm, textAlign: 'center' },
     input: {
       backgroundColor: colors.surface,
       borderRadius: radius.md,
@@ -413,14 +384,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontSize: typography.scale.md,
       fontWeight: '600',
     },
-    hintButton: {
-      borderRadius: radius.md,
-      paddingVertical: spacing.sm,
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: colors.arcaneSoft,
-    },
-    hintButtonText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
     feedbackBar: { gap: spacing.sm },
     feedbackText: { fontSize: typography.scale.md, fontWeight: '700' },
     revealText: { color: colors.inkMuted, fontSize: typography.scale.sm },

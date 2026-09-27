@@ -5,26 +5,29 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { ScrambleQuestService } from './scramble-quest.service';
+import { CompleteItService } from './complete-it.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ArcadeChallengeService } from '../challenge.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { ProgressionService } from '../../progression/progression.service';
 
-describe('ScrambleQuestService', () => {
-  let service: ScrambleQuestService;
+describe('CompleteItService', () => {
+  let service: CompleteItService;
 
   const trainWord = {
     id: 'w1',
     word: 'train',
     normalizedWord: 'train',
+    exampleSentence: 'I need to train every day.',
+    definition: 'to practice a skill regularly',
+    partOfSpeech: 'verb',
     baseDifficulty: 'BEGINNER',
   };
 
   const baseSession = () => ({
     id: 's1',
     userId: 'u1',
-    game: 'SCRAMBLE_QUEST',
+    game: 'COMPLETE_IT',
     status: 'ACTIVE',
     currentStreak: 0,
     longestStreak: 0,
@@ -74,22 +77,22 @@ describe('ScrambleQuestService', () => {
 
     const moduleRef = await Test.createTestingModule({
       providers: [
-        ScrambleQuestService,
+        CompleteItService,
         { provide: PrismaService, useValue: prismaMock },
         { provide: ArcadeChallengeService, useValue: challengesMock },
         { provide: RewardEngineService, useValue: rewardEngineMock },
         { provide: ProgressionService, useValue: progressionMock },
       ],
     }).compile();
-    service = moduleRef.get(ScrambleQuestService);
+    service = moduleRef.get(CompleteItService);
   });
 
   describe('start', () => {
     it('creates a fresh session when none is active', async () => {
       prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
       challengesMock.pickChallenges.mockResolvedValueOnce([
-        { word: { id: 'w1' } },
-        { word: { id: 'w2' } },
+        { word: { id: 'w1', word: 'train', exampleSentence: 'I need to train every day.' } },
+        { word: { id: 'w2', word: 'humid', exampleSentence: 'The air felt humid today.' } },
       ]);
       prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
 
@@ -97,12 +100,26 @@ describe('ScrambleQuestService', () => {
 
       expect(challengesMock.pickChallenges).toHaveBeenCalledWith('u1', 20);
       expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ userId: 'u1', game: 'SCRAMBLE_QUEST', wordsTotal: 2 }),
+        data: expect.objectContaining({ userId: 'u1', game: 'COMPLETE_IT', wordsTotal: 2 }),
       });
-      expect(view.scrambledLetters.split('').sort().join('')).toBe(
-        'train'.split('').sort().join(''),
-      );
+      expect(view.sentenceWithBlank).toBe('I need to _____ every day.');
+      expect(view.definition).toBe(trainWord.definition);
       expect(view.wordIndex).toBe(0);
+    });
+
+    it('filters out words whose example sentence does not actually contain the word', async () => {
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
+      challengesMock.pickChallenges.mockResolvedValueOnce([
+        { word: { id: 'w1', word: 'train', exampleSentence: 'I need to train every day.' } },
+        { word: { id: 'w2', word: 'humid', exampleSentence: 'This sentence forgot its word.' } },
+      ]);
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
+
+      await service.start('u1');
+
+      expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({ wordsTotal: 1, wordIds: ['w1'] }),
+      });
     });
 
     it('resumes an active session whose current-word timer has not expired', async () => {
@@ -116,9 +133,11 @@ describe('ScrambleQuestService', () => {
     });
 
     it('abandons a stale session (timer already expired) and starts a fresh one', async () => {
-      const stale = { ...baseSession(), currentWordStartedAt: new Date(Date.now() - 60_000) };
+      const stale = { ...baseSession(), currentWordStartedAt: new Date(Date.now() - 120_000) };
       prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(stale);
-      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w1' } }]);
+      challengesMock.pickChallenges.mockResolvedValueOnce([
+        { word: { id: 'w1', word: 'train', exampleSentence: 'I need to train every day.' } },
+      ]);
       prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
 
       await service.start('u1');
@@ -130,48 +149,29 @@ describe('ScrambleQuestService', () => {
       expect(challengesMock.pickChallenges).toHaveBeenCalled();
     });
 
-    it('throws BadRequestException when no words are available', async () => {
+    it('throws BadRequestException when no words are available at all', async () => {
       prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
       challengesMock.pickChallenges.mockResolvedValueOnce([]);
 
       await expect(service.start('u1')).rejects.toThrow(BadRequestException);
     });
-  });
 
-  describe('requestHint', () => {
-    it('reveals the next letter and increments the hint count', async () => {
-      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(baseSession());
+    it('throws BadRequestException when no picked word survives the blankable filter', async () => {
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
+      challengesMock.pickChallenges.mockResolvedValueOnce([
+        { word: { id: 'w1', word: 'train', exampleSentence: 'This sentence forgot its word.' } },
+      ]);
 
-      const result = await service.requestHint('u1', 's1');
-
-      expect(result).toEqual({ position: 0, letter: 't', hintsRemaining: 2 });
-      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith({
-        where: { id: 's1', currentWordHintsUsed: 0 },
-        data: { currentWordHintsUsed: { increment: 1 } },
-      });
-    });
-
-    it('throws BadRequestException once max hints for the word are used', async () => {
-      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
-        ...baseSession(),
-        currentWordHintsUsed: 3, // 'train' has 5 letters -> maxHintsFor = min(3, 4) = 3
-      });
-
-      await expect(service.requestHint('u1', 's1')).rejects.toThrow(BadRequestException);
-    });
-
-    it('throws ConflictException when a concurrent hint request wins the race', async () => {
-      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(baseSession());
-      prismaMock.arcadeGameSession.updateMany.mockResolvedValueOnce({ count: 0 });
-
-      await expect(service.requestHint('u1', 's1')).rejects.toThrow(ConflictException);
+      await expect(service.start('u1')).rejects.toThrow(BadRequestException);
     });
   });
 
-  describe('loadActiveSession guards (via requestHint)', () => {
+  describe('loadActiveSession guards (via submitAnswer)', () => {
     it('throws NotFoundException when the session does not exist', async () => {
       prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(null);
-      await expect(service.requestHint('u1', 'missing')).rejects.toThrow(NotFoundException);
+      await expect(service.submitAnswer('u1', 'missing', 'train')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it("throws ForbiddenException for another player's session", async () => {
@@ -179,7 +179,7 @@ describe('ScrambleQuestService', () => {
         ...baseSession(),
         userId: 'someone-else',
       });
-      await expect(service.requestHint('u1', 's1')).rejects.toThrow(ForbiddenException);
+      await expect(service.submitAnswer('u1', 's1', 'train')).rejects.toThrow(ForbiddenException);
     });
 
     it('throws BadRequestException for a session that has already ended', async () => {
@@ -187,7 +187,7 @@ describe('ScrambleQuestService', () => {
         ...baseSession(),
         status: 'COMPLETED',
       });
-      await expect(service.requestHint('u1', 's1')).rejects.toThrow(BadRequestException);
+      await expect(service.submitAnswer('u1', 's1', 'train')).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -212,10 +212,14 @@ describe('ScrambleQuestService', () => {
       expect(result.xpAwarded).toBe(30);
       expect(result.currentStreak).toBe(1);
       expect(result.sessionComplete).toBe(false);
+      expect(result.nextChallenge?.sentenceWithBlank).toBe('I need to _____ every day.');
+      expect(rewardEngineMock.calculate).toHaveBeenCalledWith(
+        expect.objectContaining({ hintsUsed: 0 }),
+      );
       expect(progressionMock.awardXp).toHaveBeenCalledWith(
         'u1',
         30,
-        'ARCADE_SCRAMBLE_QUEST_ANSWER',
+        'ARCADE_COMPLETE_IT_ANSWER',
         'arcade',
         's1:0',
         prismaMock,
@@ -245,7 +249,7 @@ describe('ScrambleQuestService', () => {
     it('treats an answer submitted after the timer as a timeout miss, even if correct', async () => {
       prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
         ...baseSession(),
-        currentWordStartedAt: new Date(Date.now() - 40_000), // 40s ago, timer is 30s
+        currentWordStartedAt: new Date(Date.now() - 60_000), // 60s ago, timer is 45s
       });
       prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
         ...baseSession(),

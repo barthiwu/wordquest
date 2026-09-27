@@ -787,7 +787,8 @@
     "wordDuelTitle": "Словесная дуэль",
     "wordDuelSubtitle": "Соревнуйтесь с другим игроком, используя подсказки",
     "completeItTitle": "Заполни слово",
-    "completeItSubtitle": "Впишите пропущенное слово"
+    "completeItSubtitle": "Впишите пропущенное слово",
+    "backToPlay": "Назад к разделу «Играть»"
   },
   "scrambleQuest": {
     "genericError": "Не удалось подключиться к ScrambleQuest.",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "Выбрать {{title}}",
     "completedAccessibilityLabel": "{{title}}, завершён",
     "bossBattleSubtitle": "Еженедельное соревнование на время против всех"
+  },
+  "completeIt": {
+    "genericError": "Не удалось подключиться к Complete It."
   }
 }

@@ -787,7 +787,8 @@
     "wordDuelTitle": "वर्ड ड्यूल",
     "wordDuelSubtitle": "क्रमिक संकेतों के साथ किसी अन्य खिलाड़ी से मुकाबला करें",
     "completeItTitle": "इसे पूरा करें",
-    "completeItSubtitle": "छूटे हुए शब्द को भरें"
+    "completeItSubtitle": "छूटे हुए शब्द को भरें",
+    "backToPlay": "खेलें पर वापस जाएं"
   },
   "scrambleQuest": {
     "genericError": "अभी ScrambleQuest से संपर्क नहीं हो सका।",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "{{title}} चुनें",
     "completedAccessibilityLabel": "{{title}}, पूर्ण",
     "bossBattleSubtitle": "सभी के खिलाफ साप्ताहिक समय-सीमा चुनौती"
+  },
+  "completeIt": {
+    "genericError": "अभी Complete It से संपर्क नहीं हो सका।"
   }
 }

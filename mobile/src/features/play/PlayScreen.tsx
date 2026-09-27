@@ -263,9 +263,9 @@ export function PlayScreen({ navigation }: Props) {
       <GameRow
         title={t('arcade:completeItTitle')}
         subtitle={t('arcade:completeItSubtitle')}
-        cta={t('arcade:comingSoon')}
-        enabled={false}
-        onPress={() => {}}
+        cta={t('arcade:play')}
+        enabled
+        onPress={() => navigation.navigate('CompleteIt')}
         styles={styles}
       />
       <GameRow

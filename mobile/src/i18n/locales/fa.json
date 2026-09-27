@@ -787,7 +787,8 @@
     "wordDuelTitle": "دوئل کلمات",
     "wordDuelSubtitle": "با استفاده از سرنخ‌های پیش‌رونده با بازیکن دیگری رقابت کنید",
     "completeItTitle": "کامل کن",
-    "completeItSubtitle": "کلمه ناقص را کامل کنید"
+    "completeItSubtitle": "کلمه ناقص را کامل کنید",
+    "backToPlay": "بازگشت به بازی"
   },
   "scrambleQuest": {
     "genericError": "اکنون امکان اتصال به ScrambleQuest نیست.",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "انتخاب {{title}}",
     "completedAccessibilityLabel": "{{title}}، تکمیل‌شده",
     "bossBattleSubtitle": "چالش زمان‌دار هفتگی در برابر همه"
+  },
+  "completeIt": {
+    "genericError": "اکنون امکان دسترسی به Complete It نیست."
   }
 }

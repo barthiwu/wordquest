@@ -787,7 +787,8 @@
     "wordDuelTitle": "Duel de mots",
     "wordDuelSubtitle": "Affronte un autre joueur avec des indices progressifs",
     "completeItTitle": "Complète-le",
-    "completeItSubtitle": "Trouve le mot manquant"
+    "completeItSubtitle": "Trouve le mot manquant",
+    "backToPlay": "Retour à Jouer"
   },
   "scrambleQuest": {
     "genericError": "Impossible de joindre ScrambleQuest pour le moment.",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "Sélectionner {{title}}",
     "completedAccessibilityLabel": "{{title}}, terminée",
     "bossBattleSubtitle": "Défi hebdomadaire chronométré contre tout le monde"
+  },
+  "completeIt": {
+    "genericError": "Impossible d'accéder à Complete It pour le moment."
   }
 }

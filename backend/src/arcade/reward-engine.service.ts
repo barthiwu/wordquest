@@ -52,10 +52,7 @@ export interface RewardCalculationResult {
 export class RewardEngineService {
   calculate(input: RewardCalculationInput): RewardCalculationResult {
     const baseXp = ARCADE_BASE_XP[input.difficulty];
-    const speedModifier = speedModifierFor(
-      input.responseTimeMs,
-      input.timeLimitMs,
-    );
+    const speedModifier = speedModifierFor(input.responseTimeMs, input.timeLimitMs);
     const hintModifier = hintModifierFor(input.hintsUsed);
     const streakModifier = streakModifierFor(input.streakBefore);
 

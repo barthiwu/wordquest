@@ -22,8 +22,8 @@ import { EvidenceResultScreen } from '@/features/word-in-the-wild/EvidenceResult
 import { AchievementsScreen } from '@/features/achievements/AchievementsScreen';
 import { AliScreen } from '@/features/ali/AliScreen';
 import { BossBattleScreen } from '@/features/boss-battle/BossBattleScreen';
-import { ArcadeScreen } from '@/features/arcade/ArcadeScreen';
 import { ScrambleQuestScreen } from '@/features/arcade/ScrambleQuestScreen';
+import { CompleteItScreen } from '@/features/arcade/CompleteItScreen';
 import { BossBattleLeaderboardScreen } from '@/features/boss-battle/BossBattleLeaderboardScreen';
 import { MasterChallengeScreen } from '@/features/master-challenge/MasterChallengeScreen';
 import { OrderScreen } from '@/features/order/OrderScreen';
@@ -80,8 +80,8 @@ export type RootStackParamList = {
   Achievements: undefined;
   Ali: undefined;
   BossBattle: undefined;
-  Arcade: undefined;
   ScrambleQuest: undefined;
+  CompleteIt: undefined;
   BossBattleLeaderboard: undefined;
   MasterChallenge: undefined;
   Order: undefined;
@@ -143,8 +143,8 @@ export function RootNavigator() {
         <Stack.Screen name="Achievements" component={AchievementsScreen} />
         <Stack.Screen name="Ali" component={AliScreen} />
         <Stack.Screen name="BossBattle" component={BossBattleScreen} />
-        <Stack.Screen name="Arcade" component={ArcadeScreen} />
         <Stack.Screen name="ScrambleQuest" component={ScrambleQuestScreen} />
+        <Stack.Screen name="CompleteIt" component={CompleteItScreen} />
         <Stack.Screen name="BossBattleLeaderboard" component={BossBattleLeaderboardScreen} />
         <Stack.Screen name="MasterChallenge" component={MasterChallengeScreen} />
         <Stack.Screen name="Order" component={OrderScreen} />

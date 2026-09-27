@@ -787,7 +787,8 @@
     "wordDuelTitle": "Word Duel",
     "wordDuelSubtitle": "Race another player using progressive clues",
     "completeItTitle": "Complete It",
-    "completeItSubtitle": "Fill in the missing word"
+    "completeItSubtitle": "Fill in the missing word",
+    "backToPlay": "Back to Play"
   },
   "scrambleQuest": {
     "genericError": "Could not reach ScrambleQuest right now.",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "Select {{title}}",
     "completedAccessibilityLabel": "{{title}}, completed",
     "bossBattleSubtitle": "Weekly timed challenge against everyone"
+  },
+  "completeIt": {
+    "genericError": "Could not reach Complete It right now."
   }
 }

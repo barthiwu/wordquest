@@ -787,7 +787,8 @@
     "wordDuelTitle": "Duwa la Maneno",
     "wordDuelSubtitle": "Shindana na mchezaji mwingine kwa kutumia vidokezo vinavyoendelea",
     "completeItTitle": "Kamilisha",
-    "completeItSubtitle": "Jaza neno lililokosekana"
+    "completeItSubtitle": "Jaza neno lililokosekana",
+    "backToPlay": "Rudi kwa Cheza"
   },
   "scrambleQuest": {
     "genericError": "Imeshindwa kuunganishwa na ScrambleQuest kwa sasa.",
@@ -824,5 +825,8 @@
     "selectQuestAccessibilityLabel": "Chagua {{title}}",
     "completedAccessibilityLabel": "{{title}}, imekamilika",
     "bossBattleSubtitle": "Changamoto ya kila wiki yenye muda dhidi ya kila mtu"
+  },
+  "completeIt": {
+    "genericError": "Imeshindwa kufikia Complete It kwa sasa."
   }
 }
