@@ -17,6 +17,7 @@ import { updateMe, checkUsernameAvailability } from '@/services/users';
 import { useAuthStore } from '@/state/authStore';
 import { CountryPickerField } from '@/components/CountryPickerField';
 import { LanguagePickerField } from '@/components/LanguagePickerField';
+import { EnglishVariantField } from '@/components/EnglishVariantField';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -38,6 +39,10 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Biodata'>;
  *   ALI explains and guides in (Settings' LanguageScreen). WordQuest
  *   always teaches English, so this is not a vocabulary/target-language
  *   picker.
+ * - englishVariant: US/UK spelling-variant fairness preference (2026-09).
+ *   Always has a default (UK, matching the app's existing default
+ *   spelling throughout content), so unlike the fields above it never
+ *   gates canSubmit -- there is no "unset" state to block on.
  *
  * Age range for starting difficulty is derived server-side from the
  * exact dateOfBirth already collected at registration (common/age.ts's
@@ -59,6 +64,7 @@ export function BiodataScreen({ navigation }: Props) {
   const usernameCheckSeq = useRef(0);
   const [countryCode, setCountryCode] = useState<string | null>(null);
   const [nativeLanguage, setNativeLanguage] = useState<string | null>(null);
+  const [englishVariant, setEnglishVariant] = useState<'US' | 'UK'>('UK');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -109,6 +115,7 @@ export function BiodataScreen({ navigation }: Props) {
         username: normalizedUsername,
         countryCode,
         nativeLanguage,
+        englishVariant,
       });
       updateUser({ username: updated.username });
       navigation.navigate('OnboardingGoal');
@@ -173,6 +180,11 @@ export function BiodataScreen({ navigation }: Props) {
         <View style={styles.field}>
           <Text style={styles.label}>{t('biodata.languageLabel')}</Text>
           <LanguagePickerField value={nativeLanguage} onChange={setNativeLanguage} />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>{t('biodata.englishVariantLabel')}</Text>
+          <EnglishVariantField value={englishVariant} onChange={setEnglishVariant} />
         </View>
       </View>
 

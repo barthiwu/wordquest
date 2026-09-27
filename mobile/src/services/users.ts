@@ -13,6 +13,8 @@ export interface Me {
   countryCode: string | null;
   nativeLanguage: string | null;
   targetLanguage: string | null;
+  /** US/UK spelling-variant fairness preference (2026-09) -- null means UK (the app's default spelling throughout). See backend/src/vocabulary/english-variant.ts. */
+  englishVariant: 'US' | 'UK' | null;
   timezone: string | null;
   learningGoal: LearningGoal | null;
   onboardingCompletedAt: string | null;
@@ -28,6 +30,8 @@ export interface UpdateMeInput {
   countryCode?: string;
   nativeLanguage?: string;
   targetLanguage?: string;
+  /** US/UK spelling-variant fairness preference (2026-09) -- omit to leave unchanged. */
+  englishVariant?: 'US' | 'UK';
   /** An IANA timezone name (e.g. "America/Los_Angeles") — see utils/timezone.ts's getDeviceTimezone(). */
   timezone?: string;
   learningGoal?: LearningGoal;
@@ -122,6 +126,7 @@ export interface UpdateMeResult {
   countryCode: string | null;
   nativeLanguage: string | null;
   targetLanguage: string | null;
+  englishVariant: 'US' | 'UK' | null;
   timezone: string | null;
   learningGoal: LearningGoal | null;
   onboardingCompletedAt: string | null;

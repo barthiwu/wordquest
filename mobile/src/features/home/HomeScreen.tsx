@@ -19,6 +19,12 @@ import { getMyProgression, type Progression } from '@/services/progression';
 import { getMyJourney, type JourneyView } from '@/services/journey';
 import { getTodayQuestSummary, type TodayQuestSummary } from '@/services/quests';
 import { getLastPlayedArcadeGame, type LastPlayedArcadeGame } from '@/services/arcadeStatus';
+import {
+  CompleteItIcon,
+  ScrambleQuestIcon,
+  WordDuelIcon,
+  type ArcadeGameIconProps,
+} from '@/components/ArcadeGameIcons';
 import { getClanLeaderboard, type LeaderboardEntry } from '@/services/leaderboards';
 import { listMyWordMastery, type WordMasteryListItem } from '@/services/users';
 import { useAuthStore } from '@/state/authStore';
@@ -88,23 +94,23 @@ const ARCADE_GAME_META: Record<
   {
     titleKey: string;
     route: 'ScrambleQuest' | 'CompleteIt' | 'WordDuel';
-    icon: keyof typeof Ionicons.glyphMap;
+    Icon: (props: ArcadeGameIconProps) => React.ReactElement;
   }
 > = {
   SCRAMBLE_QUEST: {
     titleKey: 'arcade:scrambleQuestTitle',
     route: 'ScrambleQuest',
-    icon: 'shuffle-outline',
+    Icon: ScrambleQuestIcon,
   },
   COMPLETE_IT: {
     titleKey: 'arcade:completeItTitle',
     route: 'CompleteIt',
-    icon: 'create-outline',
+    Icon: CompleteItIcon,
   },
   WORD_DUEL: {
     titleKey: 'arcade:wordDuelTitle',
     route: 'WordDuel',
-    icon: 'people-outline',
+    Icon: WordDuelIcon,
   },
 };
 
@@ -141,7 +147,7 @@ export function HomeScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
-  const { t } = useTranslation(['home', 'arcade']);
+  const { t } = useTranslation(['home', 'arcade', 'catchUp']);
   const accessToken = useAuthStore((s) => s.accessToken);
   const displayName = useAuthStore((s) => s.user?.displayName);
   const avatarUrl = useAuthStore((s) => s.user?.avatarUrl);
@@ -301,9 +307,7 @@ export function HomeScreen({ navigation }: Props) {
           </Pressable>
 
           <View style={styles.lastPlayedCard}>
-            <View style={styles.lastPlayedIconWrap}>
-              <Ionicons name={chapterMeta.icon} size={24} color={colors.arcaneSoft} />
-            </View>
+            <chapterMeta.Icon colors={colors} />
             <Text style={styles.lastPlayedWordmark} numberOfLines={1} adjustsFontSizeToFit>
               {t(chapterMeta.titleKey)}
             </Text>
@@ -360,6 +364,16 @@ export function HomeScreen({ navigation }: Props) {
         currentStreak={progression?.currentStreak ?? 0}
         playedToday={progression?.playedToday ?? false}
       />
+
+      <Pressable
+        style={styles.catchUpLink}
+        onPress={() => navigation.navigate('CatchUpCalendar')}
+        accessibilityRole="button"
+        accessibilityLabel={t('catchUp:homeLinkLabel')}
+      >
+        <Ionicons name="calendar-outline" size={16} color={colors.arcaneSoft} />
+        <Text style={styles.catchUpLinkText}>{t('catchUp:homeLinkLabel')}</Text>
+      </Pressable>
 
       <ClanRankCard
         colors={colors}
@@ -507,14 +521,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       justifyContent: 'center',
       gap: spacing.sm,
     },
-    lastPlayedIconWrap: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      backgroundColor: colors.surfaceRaised,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
     lastPlayedWordmark: {
       color: colors.ink,
       fontSize: typography.scale.sm,
@@ -559,6 +565,14 @@ function createStyles(colors: ThemeColors, topInset: number) {
       paddingVertical: spacing.xs,
     },
     chapterButtonText: { color: '#0B2914', fontSize: typography.scale.xs, fontWeight: '700' },
+    catchUpLink: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.xs,
+      paddingVertical: spacing.xs,
+    },
+    catchUpLinkText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
     questButton: {
       backgroundColor: colors.arcane,
       borderRadius: radius.md,

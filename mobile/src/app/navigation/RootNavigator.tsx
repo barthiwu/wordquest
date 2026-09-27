@@ -15,6 +15,8 @@ import { ClanSelectionScreen } from '@/features/clans/ClanSelectionScreen';
 import { MainTabNavigator, type MainTabParamList } from './MainTabNavigator';
 import { DailyQuestScreen } from '@/features/quests/DailyQuestScreen';
 import { QuestCompleteScreen } from '@/features/quests/QuestCompleteScreen';
+import { CatchUpCalendarScreen } from '@/features/quests/CatchUpCalendarScreen';
+import { CatchUpReplayScreen } from '@/features/quests/CatchUpReplayScreen';
 import { SkillRadarScreen } from '@/features/skills/SkillRadarScreen';
 import { WordInTheWildScreen } from '@/features/word-in-the-wild/WordInTheWildScreen';
 import { SubmitEvidenceScreen } from '@/features/word-in-the-wild/SubmitEvidenceScreen';
@@ -74,6 +76,8 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList> | undefined;
   DailyQuest: { questKey: string };
   QuestComplete: WordCompletionResult;
+  CatchUpCalendar: undefined;
+  CatchUpReplay: { localDate: string };
   SkillRadar: undefined;
   WordInTheWild: undefined;
   SubmitEvidence: { missionId: string; word: string; definition: string };
@@ -138,6 +142,8 @@ export function RootNavigator() {
         <Stack.Screen name="Main" component={MainTabNavigator} />
         <Stack.Screen name="DailyQuest" component={DailyQuestScreen} />
         <Stack.Screen name="QuestComplete" component={QuestCompleteScreen} />
+        <Stack.Screen name="CatchUpCalendar" component={CatchUpCalendarScreen} />
+        <Stack.Screen name="CatchUpReplay" component={CatchUpReplayScreen} />
         <Stack.Screen name="SkillRadar" component={SkillRadarScreen} />
         <Stack.Screen name="WordInTheWild" component={WordInTheWildScreen} />
         <Stack.Screen name="SubmitEvidence" component={SubmitEvidenceScreen} />
