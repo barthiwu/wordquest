@@ -5,6 +5,7 @@ import { AppConfigService } from '../config/config.service';
 import { stripJsonCodeFence } from '../common/ai-json';
 import { aliToneForJourneyStage, aliToneModifiers, AliLearningSignals } from './ali-tone';
 import { nativeLanguageInstruction } from '../common/language-names';
+import { aliExpressionForEvent, AliExpressionCue } from './ali-expression';
 
 export type AliEventType =
   | 'LEVEL_UP'
@@ -33,7 +34,7 @@ export interface AliEvent {
   learningSignals?: AliLearningSignals;
 }
 
-export interface AliResponse {
+export interface AliResponse extends AliExpressionCue {
   text: string;
   recommendation: string | null;
   tone: string;
@@ -141,6 +142,7 @@ export class AliService {
     });
 
     const parsed = this.parseResponse(response);
+    const cue = aliExpressionForEvent(event.type, event.context);
 
     await this.prisma.aliMessage.create({
       data: {
@@ -151,10 +153,15 @@ export class AliService {
         recommendation: parsed.recommendation,
         tone,
         promptVersion: PROMPT_VERSION,
+        expression: cue.expression,
+        pose: cue.pose,
+        intensity: cue.intensity,
+        priority: cue.priority,
+        durationMs: cue.durationMs,
       },
     });
 
-    return { ...parsed, tone, promptVersion: PROMPT_VERSION };
+    return { ...parsed, tone, promptVersion: PROMPT_VERSION, ...cue };
   }
 
   /** Learning Assistant (spec §4.2): explains why an answer was wrong and gives one practice tip, on demand — never called reactively. */
@@ -235,6 +242,11 @@ export class AliService {
         promptVersion: string;
         eventType: string;
         createdAt: Date;
+        expression: string;
+        pose: string;
+        intensity: number;
+        priority: number;
+        durationMs: number;
       }) => ({
         text: r.text,
         recommendation: r.recommendation,
@@ -242,6 +254,11 @@ export class AliService {
         promptVersion: r.promptVersion,
         eventType: r.eventType as AliEventType,
         createdAt: r.createdAt.toISOString(),
+        expression: r.expression as AliExpressionCue['expression'],
+        pose: r.pose as AliExpressionCue['pose'],
+        intensity: r.intensity as AliExpressionCue['intensity'],
+        priority: r.priority as AliExpressionCue['priority'],
+        durationMs: r.durationMs,
       }),
     );
   }
@@ -263,7 +280,11 @@ export class AliService {
    * Journey-stage tone progression — neither of those change, this only
    * gives the model a specific voice to write the tone *in*.
    */
-  private buildSystemPrompt(tone: string, modifiers: string[] = [], nativeLanguage: string | null = null): string {
+  private buildSystemPrompt(
+    tone: string,
+    modifiers: string[] = [],
+    nativeLanguage: string | null = null,
+  ): string {
     const modifierBlock =
       modifiers.length > 0
         ? `\n\nAdditional context for this player right now:\n${modifiers.map((m) => `- ${m}`).join('\n')}`

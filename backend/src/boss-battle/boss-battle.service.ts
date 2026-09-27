@@ -27,6 +27,7 @@ import { IdempotencyService } from '../idempotency/idempotency.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
 import { JOURNEY_STAGES } from '../config/journey-stages';
 import { quickAliReaction } from '../ali/ali-quick-reactions';
+import { quickAliExpression, type AliExpressionCue } from '../ali/ali-expression';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { renderWord } from '../vocabulary/english-variant';
 import { resolveEnglishVariant } from '../vocabulary/resolve-english-variant';
@@ -78,6 +79,8 @@ export interface BattleAnswerResult {
   nextChallenge: BattleChallengeView | null;
   /** A short, zero-cost ALI reaction to this specific answer (V21 §6) — see ali-quick-reactions.ts. Null once the battle has ended and there's nothing left to react to. */
   aliQuickReaction: string | null;
+  /** The visual pairing for aliQuickReaction — see ali-expression.ts's quickAliExpression. Null alongside aliQuickReaction. */
+  aliQuickExpression: AliExpressionCue | null;
 }
 
 export interface LeaderboardEntry {
@@ -345,6 +348,7 @@ export class BossBattleService {
         battleEnded: true,
         nextChallenge: null,
         aliQuickReaction: null,
+        aliQuickExpression: null,
       };
     }
 
@@ -375,6 +379,7 @@ export class BossBattleService {
         battleEnded: true,
         nextChallenge: null,
         aliQuickReaction: null,
+        aliQuickExpression: null,
       };
     }
 
@@ -386,6 +391,7 @@ export class BossBattleService {
       ? gameplayRules.bossBattle.perCorrectAnswer
       : gameplayRules.bossBattle.perIncorrectAnswer;
     const aliQuickReaction = quickAliReaction(isCorrect);
+    const aliQuickExpression = quickAliExpression(isCorrect);
 
     const { updatedPlayer, nextChallenge, groupStillLive } = await this.prisma.$transaction(
       async (tx: Prisma.TransactionClient) => {
@@ -513,6 +519,7 @@ export class BossBattleService {
             battleEnded: !result.nextChallenge,
             nextChallenge: result.nextChallenge,
             aliQuickReaction,
+            aliQuickExpression,
           },
         );
 
@@ -556,6 +563,7 @@ export class BossBattleService {
       battleEnded: !nextChallenge,
       nextChallenge,
       aliQuickReaction,
+      aliQuickExpression,
     };
   }
 

@@ -752,6 +752,7 @@ describe('BossBattleService', () => {
         battleEnded: true,
         nextChallenge: null,
         aliQuickReaction: null,
+        aliQuickExpression: null,
       });
       // Not scored at all -- no mastery record, no event log, no XP.
       expect(masteryMock.recordAnswer).not.toHaveBeenCalled();

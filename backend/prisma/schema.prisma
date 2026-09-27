@@ -1363,6 +1363,15 @@ model AliMessage {
   recommendation String?
   tone           String // the tone tier at generation time, e.g. "Kingdom" (§4.4)
   promptVersion  String
+  // ALI Character & Animation Bible v1 §12 "Technical Contract" — the
+  // deterministic visual cue (ali-expression.ts) computed alongside this
+  // message, persisted so a historical AliMessage keeps the animation it
+  // was generated with (same versioning guarantee as promptVersion/tone).
+  expression String  @default("NEUTRAL")
+  pose       String  @default("PERCHED")
+  intensity  Int     @default(0)
+  priority   Int     @default(0)
+  durationMs Int     @default(0)
 
   createdAt DateTime @default(now())
 

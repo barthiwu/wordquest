@@ -202,7 +202,12 @@ export class MasteryService {
     let masteredWordsCount: number;
 
     if (justMastered) {
-      masteredWordsCount = await this.onWordMastered(userId, wordId, db);
+      masteredWordsCount = await this.onWordMastered(
+        userId,
+        wordId,
+        db,
+        (existing?.timesIncorrect ?? 0) === 0,
+      );
     } else {
       const current = await db.userProgression.findUniqueOrThrow({
         where: { userId },
@@ -244,8 +249,14 @@ export class MasteryService {
     const wasAlreadyMastered = existing?.currentLevel === 'MASTERED';
     const currentLevel: MasteryLevel = existing?.currentLevel ?? 'NEW';
 
-    const sentenceScore = Math.max(existing?.sentenceScore ?? 0, averageScoreDimensions(sentenceScores));
-    const paragraphScore = Math.max(existing?.paragraphScore ?? 0, averageScoreDimensions(paragraphScores));
+    const sentenceScore = Math.max(
+      existing?.sentenceScore ?? 0,
+      averageScoreDimensions(sentenceScores),
+    );
+    const paragraphScore = Math.max(
+      existing?.paragraphScore ?? 0,
+      averageScoreDimensions(paragraphScores),
+    );
     const hasGuessedCorrectly = (existing?.timesCorrect ?? 0) > 0;
 
     const newLevel = this.applyMasteryGate(currentLevel, {
@@ -284,7 +295,12 @@ export class MasteryService {
 
     const masteredViaSkillCheck = newLevel === 'MASTERED' && !wasAlreadyMastered;
     if (masteredViaSkillCheck) {
-      const masteredWordsCount = await this.onWordMastered(userId, wordId, db);
+      const masteredWordsCount = await this.onWordMastered(
+        userId,
+        wordId,
+        db,
+        (existing?.timesIncorrect ?? 0) === 0,
+      );
       await this.achievements.checkDiscoveryAndMastery(userId, masteredWordsCount, db);
     }
 
@@ -318,7 +334,12 @@ export class MasteryService {
     area: 'sentence' | 'paragraph',
     scores: Record<string, number>,
     db: Db = this.prisma,
-  ): Promise<{ attemptScore: number; bestScore: number; level: MasteryLevel; justMastered: boolean }> {
+  ): Promise<{
+    attemptScore: number;
+    bestScore: number;
+    level: MasteryLevel;
+    justMastered: boolean;
+  }> {
     const attemptScore = averageScoreDimensions(scores);
 
     const existing = await db.mastery.findUnique({ where: { userId_wordId: { userId, wordId } } });
@@ -335,7 +356,11 @@ export class MasteryService {
     const sentenceScore = area === 'sentence' ? bestScore : existingSentenceScore;
     const paragraphScore = area === 'paragraph' ? bestScore : existingParagraphScore;
 
-    const newLevel = this.applyMasteryGate(currentLevel, { hasGuessedCorrectly, sentenceScore, paragraphScore });
+    const newLevel = this.applyMasteryGate(currentLevel, {
+      hasGuessedCorrectly,
+      sentenceScore,
+      paragraphScore,
+    });
 
     const now = new Date();
     const areaUpdate = area === 'sentence' ? { sentenceScore } : { paragraphScore };
@@ -368,7 +393,12 @@ export class MasteryService {
 
     const justMastered = newLevel === 'MASTERED' && !wasAlreadyMastered;
     if (justMastered) {
-      const masteredWordsCount = await this.onWordMastered(userId, wordId, db);
+      const masteredWordsCount = await this.onWordMastered(
+        userId,
+        wordId,
+        db,
+        (existing?.timesIncorrect ?? 0) === 0,
+      );
       await this.achievements.checkDiscoveryAndMastery(userId, masteredWordsCount, db);
     }
 
@@ -535,7 +565,11 @@ export class MasteryService {
    * same as applyMasteryGate itself — can never demote anything, and is
    * a no-op on a word that's already MASTERED or doesn't yet qualify.
    */
-  async recheckGate(userId: string, wordId: string, db: Db = this.prisma): Promise<{ justMastered: boolean }> {
+  async recheckGate(
+    userId: string,
+    wordId: string,
+    db: Db = this.prisma,
+  ): Promise<{ justMastered: boolean }> {
     const existing = await db.mastery.findUnique({ where: { userId_wordId: { userId, wordId } } });
     if (!existing || existing.currentLevel === 'MASTERED') return { justMastered: false };
 
@@ -553,7 +587,12 @@ export class MasteryService {
       data: { currentLevel: 'MASTERED', masteredAt: now },
     });
 
-    const masteredWordsCount = await this.onWordMastered(userId, wordId, db);
+    const masteredWordsCount = await this.onWordMastered(
+      userId,
+      wordId,
+      db,
+      existing.timesIncorrect === 0,
+    );
     await this.achievements.checkDiscoveryAndMastery(userId, masteredWordsCount, db);
 
     return { justMastered: true };
@@ -565,7 +604,12 @@ export class MasteryService {
    * — masteredWordsCount, Journey/CEFR re-checks, and the ALI reaction
    * are the same regardless of which path got a word here.
    */
-  private async onWordMastered(userId: string, wordId: string, db: Db): Promise<number> {
+  private async onWordMastered(
+    userId: string,
+    wordId: string,
+    db: Db,
+    firstAttempt: boolean,
+  ): Promise<number> {
     const updated = await db.userProgression.update({
       where: { userId },
       data: { masteredWordsCount: { increment: 1 } },
@@ -590,7 +634,15 @@ export class MasteryService {
     this.ali.reactFireAndForget(userId, {
       type: 'MASTERY_EVENT',
       journeyStage: updated.journeyStage,
-      context: { wordMastered: word?.word, totalMastered: updated.masteredWordsCount },
+      // firstAttempt distinguishes the bible's 'first-attempt mastery'
+      // major sequence from 'mastery after struggle' (ali-expression.ts)
+      // — true when this word was mastered without ever having a wrong
+      // guess recorded against it.
+      context: {
+        wordMastered: word?.word,
+        totalMastered: updated.masteredWordsCount,
+        firstAttempt,
+      },
     });
 
     return updated.masteredWordsCount;

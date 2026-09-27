@@ -118,6 +118,11 @@ describe('AliService', () => {
           recommendation: 'Try a Boss Battle next.',
           tone: 'Witty, more direct, encouraging challenge',
           promptVersion: 'v2',
+          expression: 'PROUD',
+          pose: 'WING_SPREAD_FULL',
+          intensity: 4,
+          priority: 4,
+          durationMs: 4500,
         },
       });
     });
@@ -221,9 +226,11 @@ describe('AliService', () => {
   });
 
   describe('native-language localization', () => {
-    it('instructs the model to write in the player\'s native language when set and non-English', async () => {
+    it("instructs the model to write in the player's native language when set and non-English", async () => {
       prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'es' });
-      createMock.mockResolvedValueOnce(textResponse({ text: 'Buen trabajo!', recommendation: null }));
+      createMock.mockResolvedValueOnce(
+        textResponse({ text: 'Buen trabajo!', recommendation: null }),
+      );
 
       await service.react('u1', { type: 'LEVEL_UP', journeyStage: 0, context: { newLevel: 2 } });
 
@@ -269,9 +276,17 @@ describe('AliService', () => {
 
     it('applies to on-demand Learning Assistant calls too (explainMistake), not just react()', async () => {
       prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'fr' });
-      prismaMock.userProgression.findUnique.mockResolvedValueOnce({ journeyStage: 0, currentStreak: 0 });
-      prismaMock.learningProfile.findUnique.mockResolvedValueOnce({ weaknessAreas: [], currentDifficulty: 'BEGINNER' });
-      createMock.mockResolvedValueOnce(textResponse({ text: 'Presque!', recommendation: 'Try again.' }));
+      prismaMock.userProgression.findUnique.mockResolvedValueOnce({
+        journeyStage: 0,
+        currentStreak: 0,
+      });
+      prismaMock.learningProfile.findUnique.mockResolvedValueOnce({
+        weaknessAreas: [],
+        currentDifficulty: 'BEGINNER',
+      });
+      createMock.mockResolvedValueOnce(
+        textResponse({ text: 'Presque!', recommendation: 'Try again.' }),
+      );
 
       await service.explainMistake('u1', {
         word: 'resilient',
@@ -388,7 +403,10 @@ describe('AliService', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual(
-        expect.objectContaining({ eventType: 'STREAK_MILESTONE', createdAt: createdAt.toISOString() }),
+        expect.objectContaining({
+          eventType: 'STREAK_MILESTONE',
+          createdAt: createdAt.toISOString(),
+        }),
       );
       expect(prismaMock.aliMessage.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: { userId: 'u1' }, orderBy: { createdAt: 'desc' } }),

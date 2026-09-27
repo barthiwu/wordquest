@@ -1592,7 +1592,14 @@ describe('QuestsService', () => {
       expect(aliMock.react).toHaveBeenCalledWith('u1', {
         type: 'QUEST_COMPLETION',
         journeyStage: 2,
-        context: { word: 'greeting', xpAwarded: 50, glyphAwarded: 10, currentStreak: 1 },
+        context: {
+          word: 'greeting',
+          xpAwarded: 50,
+          glyphAwarded: 10,
+          currentStreak: 1,
+          correctCount: 1,
+          totalCount: 1,
+        },
       });
     });
 

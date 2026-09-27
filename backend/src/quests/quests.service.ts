@@ -29,6 +29,7 @@ import { LearningProfileService } from '../learning-profile/learning-profile.ser
 import { averageScoreDimensions } from '../common/score-average';
 import { AliService, type AliResponse } from '../ali/ali.service';
 import { quickAliReaction } from '../ali/ali-quick-reactions';
+import { quickAliExpression, type AliExpressionCue } from '../ali/ali-expression';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { renderWord } from '../vocabulary/english-variant';
 import { resolveEnglishVariant } from '../vocabulary/resolve-english-variant';
@@ -145,6 +146,8 @@ export interface AnswerResult {
    * no answer was actually evaluated in that case.
    */
   aliQuickReaction: string | null;
+  /** The visual pairing for aliQuickReaction — see ali-expression.ts's quickAliExpression. Null only alongside aliQuickReaction (timedOut). */
+  aliQuickExpression: AliExpressionCue | null;
 }
 
 export interface HintResult {
@@ -200,7 +203,10 @@ export interface WordCompletionResult {
    * must never fail quest completion itself, which has already
    * committed by the time this runs.
    */
-  aliMessage: Pick<AliResponse, 'text' | 'recommendation'> | null;
+  aliMessage: Pick<
+    AliResponse,
+    'text' | 'recommendation' | 'expression' | 'pose' | 'intensity' | 'priority' | 'durationMs'
+  > | null;
 }
 
 /**
@@ -579,6 +585,7 @@ export class QuestsService {
         masteryLevel: await this.mastery.getLevel(userId, wordId),
         understanding: null,
         aliQuickReaction: null,
+        aliQuickExpression: null,
       };
     }
 
@@ -621,6 +628,7 @@ export class QuestsService {
         masteryLevel: await this.mastery.getLevel(userId, wordId),
         understanding: null,
         aliQuickReaction: quickAliReaction(false),
+        aliQuickExpression: quickAliExpression(false),
       };
     }
 
@@ -694,6 +702,7 @@ export class QuestsService {
         exampleSentence: rendered.sentence,
       },
       aliQuickReaction: quickAliReaction(true),
+      aliQuickExpression: quickAliExpression(true),
     };
   }
 
@@ -1029,6 +1038,10 @@ export class QuestsService {
               xpAwarded: quest.baseXp,
               glyphAwarded: quest.baseGlyphs,
               currentStreak,
+              // Lets ali-expression.ts's resolveQuestCompletion tell a
+              // perfect run from a completed-but-imperfect one.
+              correctCount,
+              totalCount: attempt.wordIds.length,
             },
           },
         };
@@ -1055,7 +1068,15 @@ export class QuestsService {
         type: 'QUEST_COMPLETION',
         ...aliContext,
       });
-      aliMessage = { text: response.text, recommendation: response.recommendation };
+      aliMessage = {
+        text: response.text,
+        recommendation: response.recommendation,
+        expression: response.expression,
+        pose: response.pose,
+        intensity: response.intensity,
+        priority: response.priority,
+        durationMs: response.durationMs,
+      };
     } catch {
       // QuestCompleteScreen just won't show a message this time.
     }
