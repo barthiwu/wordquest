@@ -1,4 +1,5 @@
 import { apiRequest } from './apiClient';
+import type { AliDisplayMessage } from './aliExpression';
 
 /** Client-safe view of the current word — the word's own example
  * sentence with the target word blanked out, never the target word
@@ -44,6 +45,10 @@ export interface CompleteItAnswerResult {
   correctCount: number;
   wordsTotal: number;
   nextChallenge: CompleteItChallenge | null;
+  /** Populated only when sessionComplete — see AliStreakPopout. null otherwise, and null even then when no milestone was hit. */
+  streakReaction: AliDisplayMessage | null;
+  /** Populated only when sessionComplete — a "while you were playing..." recap of any Level-up/Journey reaction fired earlier this session. Always [] otherwise. */
+  deferredAliReactions: AliDisplayMessage[];
 }
 
 /** Starts a new session, or resumes one already in progress. */

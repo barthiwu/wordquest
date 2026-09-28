@@ -1,4 +1,5 @@
 import { apiRequest } from './apiClient';
+import type { AliDisplayMessage } from './aliExpression';
 
 export interface MasterChallengeStatus {
   status: 'LOCKED' | 'AVAILABLE' | 'COMPLETED';
@@ -22,6 +23,8 @@ export interface MasterChallengeResult {
   whatWentWell: string;
   whatNeedsImprovement: string;
   nextAction: string;
+  /** Any Level-up/Journey reaction this challenge's own XP award triggered. Usually []. */
+  deferredAliReactions: AliDisplayMessage[];
 }
 
 /**

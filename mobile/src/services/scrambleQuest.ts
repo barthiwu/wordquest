@@ -1,4 +1,5 @@
 import { apiRequest } from './apiClient';
+import type { AliDisplayMessage } from './aliExpression';
 
 /** Client-safe view of the current word — scrambled letters only, never
  * the target word (backend ScrambleQuestChallengeView). */
@@ -51,6 +52,10 @@ export interface ScrambleQuestAnswerResult {
   wordsTotal: number;
   nextChallenge: ScrambleQuestChallenge | null;
   meaning: ScrambleQuestWordMeaning;
+  /** Populated only when sessionComplete — see AliStreakPopout. null otherwise, and null even then when no milestone was hit. */
+  streakReaction: AliDisplayMessage | null;
+  /** Populated only when sessionComplete — a "while you were playing..." recap of any Level-up/Journey reaction fired earlier this session. Always [] otherwise. */
+  deferredAliReactions: AliDisplayMessage[];
 }
 
 /** Starts a new session, or resumes one already in progress. */

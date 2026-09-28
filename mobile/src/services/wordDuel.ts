@@ -1,4 +1,5 @@
 import { apiRequest } from './apiClient';
+import type { AliDisplayMessage } from './aliExpression';
 
 /** Opponent's live score only — never their current word or answers
  * (backend WordDuelOpponentView; matches the server's own "score only,
@@ -53,6 +54,10 @@ export interface WordDuelStateView {
   opponent: WordDuelOpponentView | null;
   /** null until status is COMPLETED. */
   result: WordDuelResultView | null;
+  /** Populated once status is COMPLETED — Word Duel has no in-play streak container, so this surfaces on the result view instead of live. null before COMPLETED or when no milestone was hit. */
+  streakReaction: AliDisplayMessage | null;
+  /** Populated once status is COMPLETED — a "while your match ran..." recap of any Level-up/Journey/Mastery/Achievement reaction. Always [] before COMPLETED. */
+  deferredAliReactions: AliDisplayMessage[];
 }
 
 export interface WordDuelAnswerResult {

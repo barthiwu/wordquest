@@ -56,3 +56,15 @@ export interface AliExpressionCue {
   /** 0 means "no timed pop-up moment" — render inline instead of as a dismissable bubble. */
   durationMs: number;
 }
+
+/**
+ * Client-side mirror of backend's AliDisplayMessage (ali.service.ts) —
+ * what every "here's what ALI has to say" endpoint (Daily Quest's
+ * aliMessage/liveAliReactions/streakReaction, arcade's streakReaction/
+ * deferredAliReactions, Boss Battle's/Master Challenge's
+ * deferredAliReactions) actually sends over the wire.
+ */
+export interface AliDisplayMessage extends AliExpressionCue {
+  text: string;
+  recommendation: string | null;
+}

@@ -1,5 +1,5 @@
 import { apiRequest } from './apiClient';
-import type { AliExpressionCue } from './aliExpression';
+import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
 import type { AliMessage } from './ali';
 
 export type MasteryLevel = 'NEW' | 'RECOGNIZING' | 'RECALLING' | 'STRONG' | 'MASTERED';
@@ -131,6 +131,20 @@ export interface WordCompletionResult {
     AliMessage,
     'text' | 'recommendation' | 'expression' | 'pose' | 'intensity' | 'priority' | 'durationMs'
   > | null;
+  /**
+   * Task #99: Level-up/Journey/Mastery/Achievement reactions this word's
+   * completion triggered, shown live via useAliReactionQueue + AliCharacter
+   * — Daily Quest is the one flow currently wired to show these live
+   * instead of only landing in ALI's message feed. Usually empty.
+   */
+  liveAliReactions: AliDisplayMessage[];
+  /**
+   * A STREAK_MILESTONE reaction, kept separate from liveAliReactions —
+   * render it as a small callout popping out of the streak container
+   * and back (AliStreakPopout), not the general ALI popup. null when no
+   * milestone was hit.
+   */
+  streakReaction: AliDisplayMessage | null;
 }
 
 export interface OptionalWildMission {

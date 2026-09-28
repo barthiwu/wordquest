@@ -1,5 +1,5 @@
 import { apiRequest } from './apiClient';
-import type { AliExpressionCue } from './aliExpression';
+import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
 
 export type BossBattleStatus = 'SCHEDULED' | 'LIVE' | 'COMPLETED';
 
@@ -82,6 +82,8 @@ export interface BattleLeaderboardView {
   groupId: string;
   status: BossBattleStatus;
   entries: LeaderboardEntry[];
+  /** A "while your battle ran..." recap of ALI's fire-and-forgotten reactions (Boss result, Level-up, Journey, Mastery, Achievement). Always [] until this player's group finalizes. */
+  deferredAliReactions: AliDisplayMessage[];
 }
 
 /** Lightweight — for a pre-battle countdown display, no join/eligibility side effects. */
