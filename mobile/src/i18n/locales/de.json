@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI: {{message}}",
       "dismissHint": "Schließen"
     },
+    "aliDeferredRecap": {
+      "title": "Während du gespielt hast…"
+    },
     "scoreCategories": {
       "grammar": "Grammatik",
       "vocabulary": "Wortschatz",

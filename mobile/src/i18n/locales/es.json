@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI: {{message}}",
       "dismissHint": "Descartar"
     },
+    "aliDeferredRecap": {
+      "title": "Mientras jugabas…"
+    },
     "scoreCategories": {
       "grammar": "Gramática",
       "vocabulary": "Vocabulario",

@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI: {{message}}",
       "dismissHint": "بستن"
     },
+    "aliDeferredRecap": {
+      "title": "در حالی که بازی می‌کردی…"
+    },
     "scoreCategories": {
       "grammar": "دستور زبان",
       "vocabulary": "واژگان",

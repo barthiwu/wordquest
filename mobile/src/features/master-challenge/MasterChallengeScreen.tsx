@@ -22,6 +22,7 @@ import {
 } from '@/services/masterChallenge';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import { BackButton } from '@/components/BackButton';
 import { FadeInUp } from '@/components/FadeInUp';
 import { ScoreRing } from '@/components/ScoreRing';
@@ -177,6 +178,12 @@ export function MasterChallengeScreen({ navigation }: Props) {
           </View>
           <Text style={styles.feedbackCardText}>{result.whatNeedsImprovement}</Text>
         </FadeInUp>
+
+        <AliDeferredRecap
+          reactions={result.deferredAliReactions}
+          colors={colors}
+          style={styles.deferredRecap}
+        />
       </ScrollView>
     );
   }
@@ -237,6 +244,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.md },
+    deferredRecap: { marginTop: spacing.xs },
     centered: {
       flex: 1,
       backgroundColor: colors.background,

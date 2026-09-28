@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI : {{message}}",
       "dismissHint": "Ignorer"
     },
+    "aliDeferredRecap": {
+      "title": "Pendant que tu jouais…"
+    },
     "scoreCategories": {
       "grammar": "Grammaire",
       "vocabulary": "Vocabulaire",

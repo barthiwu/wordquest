@@ -7,6 +7,7 @@ import { radius, spacing, typography, type ThemeColors } from '@/constants/theme
 import { useThemeColors } from '@/state/themeStore';
 import { getBattleLeaderboard, type BattleLeaderboardView } from '@/services/bossBattle';
 import { useAuthStore } from '@/state/authStore';
+import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import { BackButton } from '@/components/BackButton';
 import { AvatarBubble } from '@/components/AvatarBubble';
 import { AvatarActionMenu } from '@/components/AvatarActionMenu';
@@ -188,6 +189,12 @@ export function BossBattleLeaderboardScreen({ navigation }: Props) {
         </View>
       ))}
 
+      <AliDeferredRecap
+        reactions={board.deferredAliReactions}
+        colors={colors}
+        style={styles.deferredRecap}
+      />
+
       {menuTarget && (
         <AvatarActionMenu
           visible
@@ -206,6 +213,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.sm },
+    deferredRecap: { marginTop: spacing.sm },
     centered: {
       flex: 1,
       backgroundColor: colors.background,

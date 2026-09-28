@@ -21,6 +21,7 @@ import {
   type CompleteItChallenge,
 } from '@/services/completeIt';
 import { useAuthStore } from '@/state/authStore';
+import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
@@ -233,6 +234,11 @@ export function CompleteItScreen({ navigation }: Props) {
           secondaryLabel={t('arcade:backToPlay')}
           onSecondary={() => navigation.goBack()}
         />
+        <AliDeferredRecap
+          reactions={feedback.deferredAliReactions ?? []}
+          colors={colors}
+          style={styles.deferredRecap}
+        />
       </ScrollView>
     );
   }
@@ -386,6 +392,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
       padding: spacing.xl,
       gap: spacing.md,
     },
+    deferredRecap: { maxWidth: 360 },
     error: { color: colors.danger, fontSize: typography.scale.md, textAlign: 'center' },
     title: {
       color: colors.arcaneSoft,

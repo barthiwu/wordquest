@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI: {{message}}",
       "dismissHint": "إغلاق"
     },
+    "aliDeferredRecap": {
+      "title": "بينما كنت تلعب…"
+    },
     "scoreCategories": {
       "grammar": "القواعد",
       "vocabulary": "المفردات",

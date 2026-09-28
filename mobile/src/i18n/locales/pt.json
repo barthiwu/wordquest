@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI: {{message}}",
       "dismissHint": "Dispensar"
     },
+    "aliDeferredRecap": {
+      "title": "Enquanto você jogava…"
+    },
     "scoreCategories": {
       "grammar": "Gramática",
       "vocabulary": "Vocabulário",

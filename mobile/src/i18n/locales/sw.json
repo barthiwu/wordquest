@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI: {{message}}",
       "dismissHint": "Ondoa"
     },
+    "aliDeferredRecap": {
+      "title": "Wakati ulipokuwa ukicheza…"
+    },
     "scoreCategories": {
       "grammar": "Sarufi",
       "vocabulary": "Msamiati",

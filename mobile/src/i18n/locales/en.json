@@ -131,6 +131,9 @@
       "accessibilityLabel": "ALI: {{message}}",
       "dismissHint": "Dismiss"
     },
+    "aliDeferredRecap": {
+      "title": "While you were playing…"
+    },
     "scoreCategories": {
       "grammar": "Grammar",
       "vocabulary": "Vocab",

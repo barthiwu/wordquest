@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI: {{message}}",
       "dismissHint": "Скрыть"
     },
+    "aliDeferredRecap": {
+      "title": "Пока вы играли…"
+    },
     "scoreCategories": {
       "grammar": "Грамматика",
       "vocabulary": "Словарный запас",

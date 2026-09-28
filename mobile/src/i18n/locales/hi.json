@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI: {{message}}",
       "dismissHint": "खारिज करें"
     },
+    "aliDeferredRecap": {
+      "title": "जब आप खेल रहे थे…"
+    },
     "scoreCategories": {
       "grammar": "व्याकरण",
       "vocabulary": "शब्दावली",

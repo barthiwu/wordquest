@@ -113,6 +113,9 @@
       "accessibilityLabel": "ALI:{{message}}",
       "dismissHint": "关闭"
     },
+    "aliDeferredRecap": {
+      "title": "游玩期间的反应"
+    },
     "scoreCategories": {
       "grammar": "语法",
       "vocabulary": "词汇",

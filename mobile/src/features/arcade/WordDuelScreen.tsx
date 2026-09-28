@@ -14,6 +14,7 @@ import {
 } from '@/services/wordDuel';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { DuelPrepJourney } from './DuelPrepJourney';
 import { BackButton } from '@/components/BackButton';
@@ -351,6 +352,14 @@ export function WordDuelScreen({ navigation }: Props) {
           secondaryLabel={t('arcade:backToPlay')}
           onSecondary={() => navigation.goBack()}
         />
+        <AliDeferredRecap
+          reactions={[
+            ...(state.streakReaction ? [state.streakReaction] : []),
+            ...state.deferredAliReactions,
+          ]}
+          colors={colors}
+          style={styles.deferredRecap}
+        />
         {opponentIdentity && (
           <AvatarActionMenu
             visible={opponentMenuOpen}
@@ -503,6 +512,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
       padding: spacing.xl,
       gap: spacing.md,
     },
+    deferredRecap: { maxWidth: 360 },
     opponentChip: {
       flexDirection: 'row',
       alignItems: 'center',
