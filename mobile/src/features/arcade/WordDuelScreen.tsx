@@ -14,6 +14,7 @@ import {
 } from '@/services/wordDuel';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { AliBubble } from '@/components/AliBubble';
 import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { DuelPrepJourney } from './DuelPrepJourney';
@@ -79,6 +80,8 @@ export function WordDuelScreen({ navigation }: Props) {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [aliBubble, setAliBubble] = useState<{ id: number; message: string } | null>(null);
+  const aliBubbleCounter = useRef(0);
   // Avatar-tap popup for the opponent -- only ever opened from the
   // COMPLETED result screen below, since opponent identity is withheld
   // by the backend entirely until then (WordDuelOpponentView's doc
@@ -158,6 +161,10 @@ export function WordDuelScreen({ navigation }: Props) {
       });
       if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
       feedbackTimerRef.current = setTimeout(() => setFeedback(null), FEEDBACK_DISPLAY_MS);
+      if (result.aliQuickReaction) {
+        aliBubbleCounter.current += 1;
+        setAliBubble({ id: aliBubbleCounter.current, message: result.aliQuickReaction });
+      }
     } catch (err) {
       // A raced/duplicate submission (409, two taps or a slow retry) or
       // an answer that arrived just as the match ended (400) both just
@@ -384,6 +391,13 @@ export function WordDuelScreen({ navigation }: Props) {
 
   return (
     <View style={styles.flexFill}>
+      {aliBubble && (
+        <AliBubble
+          key={aliBubble.id}
+          message={aliBubble.message}
+          onDismiss={() => setAliBubble(null)}
+        />
+      )}
       <ScrollView contentContainerStyle={styles.container}>
         <BackButton onPress={() => navigation.goBack()} />
 

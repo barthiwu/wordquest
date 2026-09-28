@@ -1,5 +1,5 @@
 import { apiRequest } from './apiClient';
-import type { AliDisplayMessage } from './aliExpression';
+import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
 
 /** Opponent's live score only — never their current word or answers
  * (backend WordDuelOpponentView; matches the server's own "score only,
@@ -67,6 +67,10 @@ export interface WordDuelAnswerResult {
   currentStreak: number;
   longestStreak: number;
   state: WordDuelStateView;
+  /** A short, zero-cost ALI reaction to this specific answer (task #100). Word Duel has no per-word timeout, so this is never null. */
+  aliQuickReaction: string;
+  /** The visual pairing for aliQuickReaction — rendered by components/AliCharacter.tsx. */
+  aliQuickExpression: AliExpressionCue;
 }
 
 /** Joins matchmaking: resumes an in-progress match if this player

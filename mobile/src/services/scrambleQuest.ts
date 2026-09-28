@@ -1,5 +1,5 @@
 import { apiRequest } from './apiClient';
-import type { AliDisplayMessage } from './aliExpression';
+import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
 
 /** Client-safe view of the current word — scrambled letters only, never
  * the target word (backend ScrambleQuestChallengeView). */
@@ -56,6 +56,10 @@ export interface ScrambleQuestAnswerResult {
   streakReaction: AliDisplayMessage | null;
   /** Populated only when sessionComplete — a "while you were playing..." recap of any Level-up/Journey reaction fired earlier this session. Always [] otherwise. */
   deferredAliReactions: AliDisplayMessage[];
+  /** A short, zero-cost ALI reaction to this specific answer (task #100). Null only when timedOut. */
+  aliQuickReaction: string | null;
+  /** The visual pairing for aliQuickReaction — rendered by components/AliCharacter.tsx. Null only alongside aliQuickReaction (timedOut). */
+  aliQuickExpression: AliExpressionCue | null;
 }
 
 /** Starts a new session, or resumes one already in progress. */

@@ -23,6 +23,7 @@ import {
 } from '@/services/scrambleQuest';
 import { useAuthStore } from '@/state/authStore';
 import { AliDeferredRecap } from '@/components/AliDeferredRecap';
+import { AliBubble } from '@/components/AliBubble';
 import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
@@ -90,6 +91,8 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const autoSubmittedRef = useRef(false);
   const lastVibratedSecondRef = useRef<number | null>(null);
+  const [aliBubble, setAliBubble] = useState<{ id: number; message: string } | null>(null);
+  const aliBubbleCounter = useRef(0);
 
   const load = useCallback(async () => {
     if (!accessToken) return;
@@ -154,6 +157,10 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     try {
       const result = await submitScrambleAnswer(accessToken, challenge.sessionId, fullAnswer);
       setFeedback(result);
+      if (result.aliQuickReaction) {
+        aliBubbleCounter.current += 1;
+        setAliBubble({ id: aliBubbleCounter.current, message: result.aliQuickReaction });
+      }
       setPhase('feedback');
     } catch {
       setPhase('error');
@@ -265,6 +272,13 @@ export function ScrambleQuestScreen({ navigation }: Props) {
 
   return (
     <View style={styles.flexFill}>
+      {aliBubble && (
+        <AliBubble
+          key={aliBubble.id}
+          message={aliBubble.message}
+          onDismiss={() => setAliBubble(null)}
+        />
+      )}
       <ScrollView contentContainerStyle={styles.container}>
         <BackButton onPress={() => navigation.goBack()} />
 
