@@ -21,6 +21,8 @@ import { renderWord } from '../../vocabulary/english-variant';
 import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant';
 import { FriendsService } from '../../friends/friends.service';
 import { AliService, type AliDisplayMessage, type AliFeedMessage } from '../../ali/ali.service';
+import { quickAliReaction } from '../../ali/ali-quick-reactions';
+import { quickAliExpression, type AliExpressionCue } from '../../ali/ali-expression';
 
 /** Client-safe view of the opponent's progress — score only, never their
  * current word or answers (spec §6/§8). Identity (userId/username/
@@ -106,6 +108,16 @@ export interface WordDuelAnswerResult {
   currentStreak: number;
   longestStreak: number;
   state: WordDuelStateView;
+  /**
+   * A short, zero-cost ALI reaction to this specific answer (task #100
+   * follow-up — same per-answer treatment Daily Quest/Boss Battle
+   * already have, brought to Word Duel). Never null here -- unlike
+   * ScrambleQuest/Complete It, a Word Duel answer has no per-word
+   * timeout (see submitAnswer's own doc comment on WORD_TIME_REFERENCE_SECONDS).
+   */
+  aliQuickReaction: string;
+  /** The visual pairing for aliQuickReaction — see ali-expression.ts's quickAliExpression. */
+  aliQuickExpression: AliExpressionCue;
 }
 
 type WordDuelPlayerStateRow = Prisma.WordDuelPlayerStateGetPayload<Record<string, never>>;
@@ -272,6 +284,8 @@ export class WordDuelService {
     // underlying Word row/id regardless of spelling variant, so this is
     // the only change multiplayer fairness needed here.
     const isCorrect = normalizeAnswer(rawAnswer) === rendered.normalizedText;
+    const aliQuickReaction = quickAliReaction(isCorrect);
+    const aliQuickExpression = quickAliExpression(isCorrect);
 
     const streakBefore = playerState.currentStreak;
     const streakAfter = nextStreak(streakBefore, { isCorrect, timedOut: false });
@@ -373,6 +387,8 @@ export class WordDuelService {
       currentStreak: streakAfter,
       longestStreak: newLongestStreak,
       state,
+      aliQuickReaction,
+      aliQuickExpression,
     };
   }
 

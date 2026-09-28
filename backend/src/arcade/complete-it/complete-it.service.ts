@@ -24,6 +24,8 @@ import {
   type AliDisplayMessage,
   toAliDisplayMessage,
 } from '../../ali/ali.service';
+import { quickAliReaction } from '../../ali/ali-quick-reactions';
+import { quickAliExpression, type AliExpressionCue } from '../../ali/ali-expression';
 
 /** Client-safe view of the player's current Complete It word — the
  * word's own example sentence with the target word blanked out, never
@@ -87,6 +89,15 @@ export interface CompleteItAnswerResult {
    * the session-complete screen. Always [] on a non-final word.
    */
   deferredAliReactions: AliDisplayMessage[];
+  /**
+   * A short, zero-cost ALI reaction to this specific answer (task #100
+   * follow-up — same per-answer treatment Daily Quest/Boss Battle
+   * already have, brought to Complete It). Null only when timedOut.
+   */
+  aliQuickReaction: string | null;
+  /** The visual pairing for aliQuickReaction — see ali-expression.ts's
+   * quickAliExpression. Null only alongside aliQuickReaction (timedOut). */
+  aliQuickExpression: AliExpressionCue | null;
 }
 
 type ArcadeGameSessionRow = Prisma.ArcadeGameSessionGetPayload<Record<string, never>>;
@@ -250,6 +261,8 @@ export class CompleteItService {
     // "color" must be marked correct for a word whose UK-authored
     // answer is "colour" (2026-09 fairness feature).
     const isCorrect = !timedOut && normalizeAnswer(rawAnswer) === rendered.normalizedText;
+    const aliQuickReaction = timedOut ? null : quickAliReaction(isCorrect);
+    const aliQuickExpression = timedOut ? null : quickAliExpression(isCorrect);
 
     const streakBefore = session.currentStreak;
     const streakAfter = nextStreak(streakBefore, { isCorrect, timedOut });
@@ -400,6 +413,8 @@ export class CompleteItService {
       nextChallenge,
       streakReaction,
       deferredAliReactions,
+      aliQuickReaction,
+      aliQuickExpression,
     };
   }
 

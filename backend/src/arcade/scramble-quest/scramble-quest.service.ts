@@ -23,6 +23,8 @@ import {
   type AliDisplayMessage,
   toAliDisplayMessage,
 } from '../../ali/ali.service';
+import { quickAliReaction } from '../../ali/ali-quick-reactions';
+import { quickAliExpression, type AliExpressionCue } from '../../ali/ali-expression';
 
 /** Client-safe view of the player's current ScrambleQuest word — the
  * scrambled letters, never the target word (spec §5/§8). */
@@ -110,6 +112,15 @@ export interface ScrambleQuestAnswerResult {
    * Always [] on a non-final word.
    */
   deferredAliReactions: AliDisplayMessage[];
+  /**
+   * A short, zero-cost ALI reaction to this specific answer (task #100
+   * follow-up — same per-answer treatment Daily Quest/Boss Battle
+   * already have, brought to ScrambleQuest). Null only when timedOut.
+   */
+  aliQuickReaction: string | null;
+  /** The visual pairing for aliQuickReaction — see ali-expression.ts's
+   * quickAliExpression. Null only alongside aliQuickReaction (timedOut). */
+  aliQuickExpression: AliExpressionCue | null;
 }
 
 type ArcadeGameSessionRow = Prisma.ArcadeGameSessionGetPayload<Record<string, never>>;
@@ -245,6 +256,8 @@ export class ScrambleQuestService {
     // player typing "color" for a word whose UK headword is "colour"
     // must be marked correct (2026-09 fairness feature).
     const isCorrect = !timedOut && normalizeAnswer(rawAnswer) === rendered.normalizedText;
+    const aliQuickReaction = timedOut ? null : quickAliReaction(isCorrect);
+    const aliQuickExpression = timedOut ? null : quickAliExpression(isCorrect);
 
     const streakBefore = session.currentStreak;
     const streakAfter = nextStreak(streakBefore, { isCorrect, timedOut });
@@ -401,6 +414,8 @@ export class ScrambleQuestService {
       nextChallenge,
       streakReaction,
       deferredAliReactions,
+      aliQuickReaction,
+      aliQuickExpression,
       meaning: {
         definition: word.definition,
         partOfSpeech: word.partOfSpeech,
