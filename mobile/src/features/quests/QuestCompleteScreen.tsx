@@ -1,9 +1,12 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
+import { useAliReactionQueue } from '@/hooks/useAliReactionQueue';
+import type { AliDisplayMessage } from '@/services/aliExpression';
+import { AliReactionPopup } from '@/components/AliReactionPopup';
 import { FadeInUp } from '@/components/FadeInUp';
 import { GlyphCoin } from '@/components/GlyphIcon';
 import { RichAliText } from '@/components/RichAliText';
@@ -37,10 +40,51 @@ export function QuestCompleteScreen({ route, navigation }: Props) {
     totalCount,
     calibrationJustCompleted,
     aliMessage,
+    liveAliReactions,
+    streakReaction,
   } = route.params;
+
+  // Major progression events (level-up, journey, mastery, achievement
+  // unlock) fire live here rather than only landing in ALI's message
+  // feed (task #99). streakReaction rides along the same popup queue --
+  // unlike an arcade game's in-play streak-container pill, Daily Quest
+  // has no on-screen streak UI for it to pop out of and back into (it's
+  // the account's daily-play streak, whose own home is
+  // StreakMilestoneRibbon on Home), so there's nowhere else live to put
+  // it. This is separate from `aliMessage` above, which is ALI's
+  // synchronous QUEST_COMPLETION send-off and always shows as its own
+  // static card regardless of what's in this queue.
+  const aliQueue = useAliReactionQueue<AliDisplayMessage>();
+  const [queuedIndex, setQueuedIndex] = useState(0);
+  const queuedReactions = useMemo(
+    () => [...liveAliReactions, ...(streakReaction ? [streakReaction] : [])],
+    // Fixed snapshot from this screen's own mount-time route params --
+    // deliberately not re-derived if route.params were ever replaced.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  useEffect(() => {
+    if (queuedIndex < queuedReactions.length) aliQueue.enqueue(queuedReactions[queuedIndex]);
+    // Only queuedIndex should re-trigger this -- aliQueue.enqueue and
+    // queuedReactions are stable for the screen's lifetime.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queuedIndex]);
+
+  const handleAliReactionDismiss = () => {
+    aliQueue.dismiss();
+    setQueuedIndex((i) => i + 1);
+  };
 
   return (
     <View style={styles.container}>
+      {aliQueue.active && (
+        <AliReactionPopup
+          cue={aliQueue.active}
+          colors={colors}
+          onDismiss={handleAliReactionDismiss}
+        />
+      )}
       <FadeInUp style={styles.hero}>
         <Text style={styles.title}>{t('title')}</Text>
         <Text style={styles.subtitle}>
