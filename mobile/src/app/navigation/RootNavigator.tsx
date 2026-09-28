@@ -12,6 +12,7 @@ import { ResetPasswordScreen } from '@/features/auth/ResetPasswordScreen';
 import { BiodataScreen } from '@/features/onboarding/BiodataScreen';
 import { OnboardingGoalScreen } from '@/features/onboarding/OnboardingGoalScreen';
 import { ClanSelectionScreen } from '@/features/clans/ClanSelectionScreen';
+import { AppIntroScreen } from '@/features/onboarding/AppIntroScreen';
 import { MainTabNavigator, type MainTabParamList } from './MainTabNavigator';
 import { DailyQuestScreen } from '@/features/quests/DailyQuestScreen';
 import { QuestCompleteScreen } from '@/features/quests/QuestCompleteScreen';
@@ -76,6 +77,7 @@ export type RootStackParamList = {
   Biodata: undefined;
   OnboardingGoal: undefined;
   ClanSelection: undefined;
+  AppIntro: undefined;
   Main: NavigatorScreenParams<MainTabParamList> | undefined;
   DailyQuest: { questKey: string };
   QuestComplete: WordCompletionResult;
@@ -145,6 +147,7 @@ export function RootNavigator() {
         <Stack.Screen name="Biodata" component={BiodataScreen} />
         <Stack.Screen name="OnboardingGoal" component={OnboardingGoalScreen} />
         <Stack.Screen name="ClanSelection" component={ClanSelectionScreen} />
+        <Stack.Screen name="AppIntro" component={AppIntroScreen} />
         <Stack.Screen name="Main" component={MainTabNavigator} />
         <Stack.Screen name="DailyQuest" component={DailyQuestScreen} />
         <Stack.Screen name="QuestComplete" component={QuestCompleteScreen} />

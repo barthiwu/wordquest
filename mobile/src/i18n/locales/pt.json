@@ -33,6 +33,9 @@
       "hint": "Abre as configurações de verificação de e-mail",
       "dismiss": "Dispensar lembrete de verificação de e-mail"
     },
+    "firstTimeTip": {
+      "dismiss": "Entendi"
+    },
     "reportButton": {
       "reportLabel": "Denunciar {{label}}",
       "title": "Denunciar {{label}}?",
@@ -281,6 +284,17 @@
           "description": "Vá até o fim, no ritmo que for preciso."
         }
       }
+    },
+    "intro": {
+      "skip": "Pular",
+      "next": "Avançar",
+      "getStarted": "Começar",
+      "questsTitle": "Missões diárias",
+      "questsBody": "Alguns minutos por dia mantêm sua sequência viva e suas habilidades em crescimento.",
+      "arcadeTitle": "Arcade",
+      "arcadeBody": "Jogue ScrambleQuest, Complete a Palavra, ou desafie alguém para um Duelo de Palavras — sozinho ou cara a cara.",
+      "progressTitle": "Sua Jornada",
+      "progressBody": "Veja seu nível CEFR e domínio de palavras crescerem enquanto você percorre o caminho para a fluência."
     }
   },
   "clans": {
@@ -478,6 +492,8 @@
     "changeProfilePicture": "Alterar foto de perfil",
     "retry": "Tentar novamente",
     "noClanYet": "Ainda sem clã",
+    "tipTitle": "Acompanhe seu progresso",
+    "tipBody": "Jornada mostra seu caminho para a fluência, Palavras dominadas conta o que você aprendeu, e CEFR é nossa estimativa do seu nível real — ela se atualiza conforme você pratica.",
     "statLabelLevel": "Nível",
     "statLabelJourney": "Jornada",
     "statLabelWordsMastered": "Palavras dominadas",
@@ -876,6 +892,8 @@
   },
   "play": {
     "title": "Jogar",
+    "tipTitle": "Tudo para jogar, em um só lugar",
+    "tipBody": "Sua Missão diária está sempre aqui. Abaixo: jogos de Arcade para praticar mais, e a Batalha do Chefe, um evento semanal em equipe com seu clã.",
     "loadError": "Não foi possível carregar suas missões agora.",
     "startQuest": "Começar missão",
     "completedBadge": "Concluída",

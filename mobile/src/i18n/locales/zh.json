@@ -33,6 +33,9 @@
       "hint": "打开邮箱验证设置",
       "dismiss": "关闭邮箱验证提醒"
     },
+    "firstTimeTip": {
+      "dismiss": "知道了"
+    },
     "reportButton": {
       "reportLabel": "举报{{label}}",
       "title": "举报{{label}}?",
@@ -281,6 +284,17 @@
           "description": "不管需要多久，全力以赴。"
         }
       }
+    },
+    "intro": {
+      "skip": "跳过",
+      "next": "下一步",
+      "getStarted": "开始使用",
+      "questsTitle": "每日任务",
+      "questsBody": "每天几分钟，让你的连胜不间断，技能持续提升。",
+      "arcadeTitle": "街机厅",
+      "arcadeBody": "玩 ScrambleQuest、补全单词，或向他人发起单词对决——单人或对战皆可。",
+      "progressTitle": "你的旅程",
+      "progressBody": "在通往流利的路上，见证你的 CEFR 等级和单词掌握度不断提升。"
     }
   },
   "clans": {
@@ -478,6 +492,8 @@
     "changeProfilePicture": "更换头像",
     "retry": "重试",
     "noClanYet": "尚未加入部落",
+    "tipTitle": "追踪你的进度",
+    "tipBody": "\"旅程\"展示你通往流利的路径，\"已掌握单词\"统计你学会的内容，\"CEFR\"是我们对你真实水平的估算——会随着你的练习不断更新。",
     "statLabelLevel": "等级",
     "statLabelJourney": "旅程",
     "statLabelWordsMastered": "已掌握单词",
@@ -876,6 +892,8 @@
   },
   "play": {
     "title": "玩",
+    "tipTitle": "所有玩法，一站汇聚",
+    "tipBody": "你的每日任务始终在这里。下方是用于额外练习的街机游戏，以及与部落一起参与的每周团队活动——Boss 战斗。",
     "loadError": "暂时无法加载你的任务。",
     "startQuest": "开始任务",
     "completedBadge": "已完成",

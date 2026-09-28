@@ -33,6 +33,9 @@
       "hint": "Ouvre les paramètres de vérification de l’e-mail",
       "dismiss": "Ignorer le rappel de vérification de l’e-mail"
     },
+    "firstTimeTip": {
+      "dismiss": "Compris"
+    },
     "reportButton": {
       "reportLabel": "Signaler {{label}}",
       "title": "Signaler {{label}} ?",
@@ -281,6 +284,17 @@
           "description": "Aller jusqu'au bout, quel que soit le temps que ça prenne."
         }
       }
+    },
+    "intro": {
+      "skip": "Passer",
+      "next": "Suivant",
+      "getStarted": "Commencer",
+      "questsTitle": "Quêtes quotidiennes",
+      "questsBody": "Quelques minutes par jour gardent ta série active et tes compétences en progression.",
+      "arcadeTitle": "Arcade",
+      "arcadeBody": "Joue à ScrambleQuest, Complète-le, ou défie quelqu'un en Duel de mots — seul ou face à face.",
+      "progressTitle": "Ton Parcours",
+      "progressBody": "Observe ton niveau CECR et ta maîtrise des mots progresser sur le chemin vers l'aisance."
     }
   },
   "clans": {
@@ -478,6 +492,8 @@
     "changeProfilePicture": "Changer la photo de profil",
     "retry": "Réessayer",
     "noClanYet": "Pas encore de clan",
+    "tipTitle": "Suivre ta progression",
+    "tipBody": "Parcours montre ton chemin vers l'aisance, Mots maîtrisés compte ce que tu as appris, et le CECR est notre estimation de ton niveau réel — il se met à jour au fil de tes entraînements.",
     "statLabelLevel": "Niveau",
     "statLabelJourney": "Parcours",
     "statLabelWordsMastered": "Mots maîtrisés",
@@ -876,6 +892,8 @@
   },
   "play": {
     "title": "Jouer",
+    "tipTitle": "Tout pour jouer, au même endroit",
+    "tipBody": "Ta Quête quotidienne est toujours ici. En dessous : des jeux Arcade pour t'entraîner davantage, et le Combat de Boss, un événement d'équipe hebdomadaire avec ton clan.",
     "loadError": "Impossible de charger tes quêtes pour le moment.",
     "startQuest": "Commencer la quête",
     "completedBadge": "Terminée",

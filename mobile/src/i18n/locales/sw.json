@@ -33,6 +33,9 @@
       "hint": "Inafungua mipangilio ya uthibitisho wa barua pepe",
       "dismiss": "Ondoa kikumbusho cha uthibitisho wa barua pepe"
     },
+    "firstTimeTip": {
+      "dismiss": "Nimeelewa"
+    },
     "reportButton": {
       "reportLabel": "Ripoti {{label}}",
       "title": "Ripoti {{label}}?",
@@ -281,6 +284,17 @@
           "description": "Nenda mpaka mwisho, kwa kasi yoyote inayohitajika."
         }
       }
+    },
+    "intro": {
+      "skip": "Ruka",
+      "next": "Endelea",
+      "getStarted": "Anza",
+      "questsTitle": "Majukumu ya Kila Siku",
+      "questsBody": "Dakika chache kwa siku huweka mfululizo wako hai na ujuzi wako ukikua.",
+      "arcadeTitle": "Arcade",
+      "arcadeBody": "Cheza ScrambleQuest, Kamilisha, au mpe changamoto mtu katika Duwa la Maneno — peke yako au ana kwa ana.",
+      "progressTitle": "Safari Yako",
+      "progressBody": "Angalia kiwango chako cha CEFR na umahiri wa maneno vikikua unaposafiri njia ya ufasaha."
     }
   },
   "clans": {
@@ -478,6 +492,8 @@
     "changeProfilePicture": "Badilisha picha ya wasifu",
     "retry": "Jaribu tena",
     "noClanYet": "Bado hakuna ukoo",
+    "tipTitle": "Fuatilia maendeleo yako",
+    "tipBody": "Safari inaonyesha njia yako ya ufasaha, Maneno ya Umahiri inahesabu uliyojifunza, na CEFR ni makadirio yetu ya kiwango chako halisi — inasasishwa unapofanya mazoezi.",
     "statLabelLevel": "Kiwango",
     "statLabelJourney": "Safari",
     "statLabelWordsMastered": "Maneno ya Umahiri",
@@ -876,6 +892,8 @@
   },
   "play": {
     "title": "Cheza",
+    "tipTitle": "Kila kitu cha kucheza, mahali pamoja",
+    "tipBody": "Jukumu lako la Kila Siku liko hapa kila wakati. Chini yake: michezo ya Arcade kwa mazoezi zaidi, na Vita vya Boss, tukio la kila wiki la timu pamoja na ukoo wako.",
     "loadError": "Imeshindwa kupakia majukumu yako kwa sasa.",
     "startQuest": "Anza Jukumu",
     "completedBadge": "Imekamilika",

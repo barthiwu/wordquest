@@ -33,6 +33,9 @@
       "hint": "Öffnet die E-Mail-Bestätigungseinstellungen",
       "dismiss": "E-Mail-Bestätigungserinnerung ausblenden"
     },
+    "firstTimeTip": {
+      "dismiss": "Verstanden"
+    },
     "reportButton": {
       "reportLabel": "{{label}} melden",
       "title": "{{label}} melden?",
@@ -281,6 +284,17 @@
           "description": "Geh den ganzen Weg, egal wie lange es dauert."
         }
       }
+    },
+    "intro": {
+      "skip": "Überspringen",
+      "next": "Weiter",
+      "getStarted": "Los geht's",
+      "questsTitle": "Tägliche Aufgaben",
+      "questsBody": "Ein paar Minuten am Tag halten deine Serie am Leben und deine Fähigkeiten wachsen.",
+      "arcadeTitle": "Arcade",
+      "arcadeBody": "Spiele ScrambleQuest, Vervollständige es oder fordere jemanden zum Wortduell heraus — allein oder gegeneinander.",
+      "progressTitle": "Deine Reise",
+      "progressBody": "Verfolge, wie dein CEFR-Niveau und dein Wortschatz wachsen, während du deinen Weg zur Sprachgewandtheit gehst."
     }
   },
   "clans": {
@@ -478,6 +492,8 @@
     "changeProfilePicture": "Profilbild ändern",
     "retry": "Erneut versuchen",
     "noClanYet": "Noch kein Clan",
+    "tipTitle": "Deinen Fortschritt verfolgen",
+    "tipBody": "Reise zeigt deinen Weg zur Sprachgewandtheit, Gemeisterte Wörter zählt, was du gelernt hast, und CEFR ist unsere Schätzung deines tatsächlichen Niveaus — sie aktualisiert sich, während du übst.",
     "statLabelLevel": "Level",
     "statLabelJourney": "Reise",
     "statLabelWordsMastered": "Gemeisterte Wörter",
@@ -876,6 +892,8 @@
   },
   "play": {
     "title": "Spielen",
+    "tipTitle": "Alles zum Spielen an einem Ort",
+    "tipBody": "Deine tägliche Aufgabe ist immer hier. Darunter: Arcade-Spiele für zusätzliches Üben und der Bosskampf, ein wöchentliches Team-Event mit deinem Clan.",
     "loadError": "Deine Quests konnten momentan nicht geladen werden.",
     "startQuest": "Quest starten",
     "completedBadge": "Abgeschlossen",

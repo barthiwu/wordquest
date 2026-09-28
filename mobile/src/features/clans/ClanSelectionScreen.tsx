@@ -45,7 +45,7 @@ export function ClanSelectionScreen({ navigation }: Props) {
     setConfirming(true);
     try {
       await updateMe(accessToken, { clanId: selectedId });
-      navigation.replace('Main');
+      navigation.replace('AppIntro');
     } finally {
       setConfirming(false);
     }
@@ -106,7 +106,7 @@ export function ClanSelectionScreen({ navigation }: Props) {
       {clans && clans.length === 0 && (
         <Pressable
           style={styles.skipButton}
-          onPress={() => navigation.replace('Main')}
+          onPress={() => navigation.replace('AppIntro')}
           accessibilityRole="button"
           accessibilityLabel={t('skip')}
         >

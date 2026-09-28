@@ -18,6 +18,7 @@ import { getMyPassport, type PassportView } from '@/services/passport';
 import { useAuthStore } from '@/state/authStore';
 import { countryCodeToFlagEmoji } from '@/utils/countryFlag';
 import { countryNameForCode } from '@/constants/countries';
+import { FirstTimeTip } from '@/components/FirstTimeTip';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -112,6 +113,14 @@ export function PassportScreen({ navigation }: Props) {
           </Text>
         </View>
       </View>
+
+      <FirstTimeTip
+        id="passport.intro"
+        colors={colors}
+        icon="ribbon-outline"
+        title={t('tipTitle')}
+        body={t('tipBody')}
+      />
 
       <View style={styles.statGrid}>
         <Stat

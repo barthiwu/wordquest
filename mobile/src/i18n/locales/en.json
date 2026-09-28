@@ -33,6 +33,9 @@
       "hint": "Opens email verification settings",
       "dismiss": "Dismiss email verification reminder"
     },
+    "firstTimeTip": {
+      "dismiss": "Got it"
+    },
     "reportButton": {
       "reportLabel": "Report {{label}}",
       "title": "Report {{label}}?",
@@ -281,6 +284,17 @@
           "description": "Go all the way, at any pace it takes."
         }
       }
+    },
+    "intro": {
+      "skip": "Skip",
+      "next": "Next",
+      "getStarted": "Get started",
+      "questsTitle": "Daily Quests",
+      "questsBody": "A few minutes a day keeps your streak alive and your skills growing.",
+      "arcadeTitle": "Arcade",
+      "arcadeBody": "Play ScrambleQuest, Complete It, or challenge someone to Word Duel — solo or head-to-head.",
+      "progressTitle": "Your Journey",
+      "progressBody": "Watch your CEFR level and word mastery grow as you travel the path to fluency."
     }
   },
   "clans": {
@@ -478,6 +492,8 @@
     "changeProfilePicture": "Change profile picture",
     "retry": "Retry",
     "noClanYet": "No clan yet",
+    "tipTitle": "Tracking your progress",
+    "tipBody": "Journey shows your path to fluency, Words Mastered counts what you've learned, and CEFR is our estimate of your real-world level — it updates as you practice.",
     "statLabelLevel": "Level",
     "statLabelJourney": "Journey",
     "statLabelWordsMastered": "Words mastered",
@@ -876,6 +892,8 @@
   },
   "play": {
     "title": "Play",
+    "tipTitle": "Everything to play, in one place",
+    "tipBody": "Your Daily Quest is always here. Below it: Arcade games for extra practice, and Boss Battle, a weekly team event with your clan.",
     "loadError": "Could not load your quests right now.",
     "startQuest": "Start Quest",
     "completedBadge": "Completed",

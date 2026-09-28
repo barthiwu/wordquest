@@ -2,6 +2,7 @@ import { PropsWithChildren, useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useLanguageStore } from '@/state/languageStore';
+import { useTipsStore } from '@/state/tipsStore';
 import { DEFAULT_LANGUAGE_CODE } from '@/constants/languages';
 import i18n, { initI18n } from '@/i18n';
 
@@ -39,10 +40,18 @@ export function AppProviders({ children }: PropsWithChildren) {
   const hydrateLanguage = useLanguageStore((s) => s.hydrate);
   const languageCode = useLanguageStore((s) => s.code);
   const languageHydrated = useLanguageStore((s) => s.isHydrated);
+  const hydrateTips = useTipsStore((s) => s.hydrate);
 
   useEffect(() => {
     hydrateLanguage();
   }, [hydrateLanguage]);
+
+  // FirstTimeTip's "seen" set (Sept 2026 mechanics-explainer follow-up) --
+  // same fire-and-forget hydration as language above, never gating first
+  // paint on it.
+  useEffect(() => {
+    hydrateTips();
+  }, [hydrateTips]);
 
   useEffect(() => {
     if (!languageHydrated) return;

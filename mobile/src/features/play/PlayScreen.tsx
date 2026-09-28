@@ -17,6 +17,7 @@ import { useAuthStore } from '@/state/authStore';
 import { formatLocalClock, timeOfDayPeriod } from '@/utils/timeOfDay';
 import { formatBossBattleCountdown } from '@/utils/bossBattleCountdown';
 import { CompleteItIcon, ScrambleQuestIcon, WordDuelIcon } from '@/components/ArcadeGameIcons';
+import { FirstTimeTip } from '@/components/FirstTimeTip';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -144,6 +145,14 @@ export function PlayScreen({ navigation }: Props) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{t('play:title')}</Text>
+
+      <FirstTimeTip
+        id="play.intro"
+        colors={colors}
+        icon="compass-outline"
+        title={t('play:tipTitle')}
+        body={t('play:tipBody')}
+      />
 
       {!catalog && !error && (
         <View style={styles.centered}>
