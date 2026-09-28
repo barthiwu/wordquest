@@ -22,6 +22,7 @@ import {
   type ScrambleQuestChallenge,
 } from '@/services/scrambleQuest';
 import { useAuthStore } from '@/state/authStore';
+import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
@@ -265,11 +266,13 @@ export function ScrambleQuestScreen({ navigation }: Props) {
           <Text style={styles.progressLabel}>
             {t('progressLabel', { current: challenge.wordIndex + 1, total: challenge.wordsTotal })}
           </Text>
-          <View style={styles.streakPill}>
-            <Text style={styles.streakPillText}>
-              {t('streakLabel')} {challenge.currentStreak}
-            </Text>
-          </View>
+          <AliStreakPopout
+            pillStyle={styles.streakPill}
+            textStyle={styles.streakPillText}
+            label={`${t('streakLabel')} ${challenge.currentStreak}`}
+            reaction={feedback?.streakReaction ?? null}
+            colors={colors}
+          />
         </View>
 
         <CountdownRing

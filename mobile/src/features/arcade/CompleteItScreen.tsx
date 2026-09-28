@@ -21,6 +21,7 @@ import {
   type CompleteItChallenge,
 } from '@/services/completeIt';
 import { useAuthStore } from '@/state/authStore';
+import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
@@ -250,11 +251,13 @@ export function CompleteItScreen({ navigation }: Props) {
               total: challenge.wordsTotal,
             })}
           </Text>
-          <View style={styles.streakPill}>
-            <Text style={styles.streakPillText}>
-              {t('scrambleQuest:streakLabel')} {challenge.currentStreak}
-            </Text>
-          </View>
+          <AliStreakPopout
+            pillStyle={styles.streakPill}
+            textStyle={styles.streakPillText}
+            label={`${t('scrambleQuest:streakLabel')} ${challenge.currentStreak}`}
+            reaction={feedback?.streakReaction ?? null}
+            colors={colors}
+          />
         </View>
 
         <CountdownRing
