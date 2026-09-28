@@ -915,8 +915,8 @@
     "resultWinTitle": "Du hast gewonnen!",
     "resultLoseTitle": "Du hast verloren",
     "resultDrawTitle": "Unentschieden",
-    "resultYouSummary": "Du: {{correct}} richtig, {{xp}} XP",
-    "resultOpponentSummary": "Gegner: {{correct}} richtig, {{xp}} XP",
+    "resultTicketEyebrow": "Duell-Ergebnis",
+    "resultCorrectOfTotal": "{{correct}} von {{total}} richtig",
     "resultTiebreakNote": "Per Stichentscheid — meiste richtige Antworten, dann wer sein Endergebnis zuerst erreicht hat.",
     "playAgain": "Nochmal spielen"
   },

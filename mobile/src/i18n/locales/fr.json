@@ -915,8 +915,8 @@
     "resultWinTitle": "Vous avez gagné !",
     "resultLoseTitle": "Vous avez perdu",
     "resultDrawTitle": "Match nul",
-    "resultYouSummary": "Vous : {{correct}} correctes, {{xp}} XP",
-    "resultOpponentSummary": "Adversaire : {{correct}} correctes, {{xp}} XP",
+    "resultTicketEyebrow": "Résultat du duel",
+    "resultCorrectOfTotal": "{{correct}} sur {{total}} correctes",
     "resultTiebreakNote": "Départagé — le plus de bonnes réponses, puis le plus rapide à atteindre son score final.",
     "playAgain": "Rejouer"
   },

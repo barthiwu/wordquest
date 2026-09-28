@@ -915,8 +915,8 @@
     "resultWinTitle": "आप जीत गए!",
     "resultLoseTitle": "आप हार गए",
     "resultDrawTitle": "बराबरी",
-    "resultYouSummary": "आप: {{correct}} सही, {{xp}} XP",
-    "resultOpponentSummary": "प्रतिद्वंद्वी: {{correct}} सही, {{xp}} XP",
+    "resultTicketEyebrow": "द्वंद्व परिणाम",
+    "resultCorrectOfTotal": "{{total}} में से {{correct}} सही",
     "resultTiebreakNote": "टाईब्रेक से तय — सबसे ज़्यादा सही उत्तर, फिर अपने अंतिम स्कोर तक सबसे तेज़ पहुँचने वाला।",
     "playAgain": "फिर से खेलें"
   },

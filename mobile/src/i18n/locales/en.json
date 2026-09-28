@@ -915,8 +915,8 @@
     "resultWinTitle": "You won!",
     "resultLoseTitle": "You lost",
     "resultDrawTitle": "It's a draw",
-    "resultYouSummary": "You: {{correct}} correct, {{xp}} XP",
-    "resultOpponentSummary": "Opponent: {{correct}} correct, {{xp}} XP",
+    "resultTicketEyebrow": "Duel result",
+    "resultCorrectOfTotal": "{{correct}} of {{total}} correct",
     "resultTiebreakNote": "Decided by a tiebreak — most correct answers, then fastest to your final score.",
     "playAgain": "Play again"
   },

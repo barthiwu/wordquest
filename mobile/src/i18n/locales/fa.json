@@ -915,8 +915,8 @@
     "resultWinTitle": "شما بردید!",
     "resultLoseTitle": "شما باختید",
     "resultDrawTitle": "مساوی",
-    "resultYouSummary": "شما: {{correct}} درست، {{xp}} XP",
-    "resultOpponentSummary": "حریف: {{correct}} درست، {{xp}} XP",
+    "resultTicketEyebrow": "نتیجه دوئل",
+    "resultCorrectOfTotal": "{{correct}} از {{total}} درست",
     "resultTiebreakNote": "با قانون تساوی‌شکن تعیین شد — بیشترین پاسخ درست، سپس سریع‌ترین رسیدن به امتیاز نهایی.",
     "playAgain": "دوباره بازی کن"
   },

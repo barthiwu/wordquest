@@ -915,8 +915,8 @@
     "resultWinTitle": "Вы победили!",
     "resultLoseTitle": "Вы проиграли",
     "resultDrawTitle": "Ничья",
-    "resultYouSummary": "Вы: {{correct}} верно, {{xp}} XP",
-    "resultOpponentSummary": "Соперник: {{correct}} верно, {{xp}} XP",
+    "resultTicketEyebrow": "Результат дуэли",
+    "resultCorrectOfTotal": "{{correct}} из {{total}} верно",
     "resultTiebreakNote": "Решено по правилу ничьей — больше верных ответов, затем кто быстрее достиг своего итогового счёта.",
     "playAgain": "Играть снова"
   },

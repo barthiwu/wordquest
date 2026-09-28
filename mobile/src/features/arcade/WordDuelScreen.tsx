@@ -17,12 +17,11 @@ import { useAuthStore } from '@/state/authStore';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
 import { AliDeferredRecap } from '@/components/AliDeferredRecap';
-import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
+import { DuelTicketResult } from '@/components/DuelTicketResult';
 import { DuelPrepJourney } from './DuelPrepJourney';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
-import { AvatarBubble } from '@/components/AvatarBubble';
 import { AvatarActionMenu } from '@/components/AvatarActionMenu';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
@@ -73,6 +72,7 @@ export function WordDuelScreen({ navigation }: Props) {
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation(['wordDuel', 'arcade', 'scrambleQuest']);
   const accessToken = useAuthStore((s) => s.accessToken);
+  const userAvatarUrl = useAuthStore((s) => s.user?.avatarUrl ?? null);
 
   const [phase, setPhase] = useState<Phase>('loading');
   const [state, setState] = useState<WordDuelStateView | null>(null);
@@ -312,13 +312,10 @@ export function WordDuelScreen({ navigation }: Props) {
         : result.youWon
           ? t('resultWinTitle')
           : t('resultLoseTitle');
-    const extraLines = [
-      t('resultOpponentSummary', {
-        correct: state.opponent?.correctCount ?? 0,
-        xp: state.opponent?.totalXp ?? 0,
-      }),
-    ];
-    if (result.tieBreakReason) extraLines.push(t('resultTiebreakNote'));
+    // Only the tiebreak note is left as an extra line -- the opponent's
+    // score/XP now live on the ticket itself (DuelTicketResult's right
+    // avatar column), not a caption underneath.
+    const extraLines = result.tieBreakReason ? [t('resultTiebreakNote')] : [];
     // Present only once the match is COMPLETED (see WordDuelOpponentView's
     // doc comment) -- undefined/absent during WAITING/ACTIVE, which this
     // phase never renders anyway.
@@ -332,30 +329,28 @@ export function WordDuelScreen({ navigation }: Props) {
         : null;
     return (
       <ScrollView style={styles.flexFill} contentContainerStyle={styles.centeredScrollContent}>
-        {opponentIdentity && (
-          <Pressable
-            style={styles.opponentChip}
-            onPress={() => setOpponentMenuOpen(true)}
-            accessibilityRole="button"
-            accessibilityLabel={t('friends:popup.avatarLabel', {
-              username: opponentIdentity.username,
-            })}
-          >
-            <AvatarBubble
-              colors={colors}
-              avatarUrl={opponentIdentity.avatarUrl}
-              username={opponentIdentity.username}
-              size={28}
-            />
-            <Text style={styles.opponentChipText}>{opponentIdentity.username}</Text>
-          </Pressable>
-        )}
-        <ArcadeHeroResults
+        <DuelTicketResult
           colors={colors}
+          eyebrow={t('resultTicketEyebrow')}
           title={outcomeTitle}
-          subtitle={t('resultYouSummary', { correct: state.correctCount, xp: state.totalXp })}
-          correctCount={state.correctCount}
-          totalCount={state.wordsTotal}
+          subtitle={t('resultCorrectOfTotal', {
+            correct: state.correctCount,
+            total: state.wordsTotal,
+          })}
+          youCorrect={state.correctCount}
+          opponentCorrect={state.opponent?.correctCount ?? 0}
+          youAvatarUrl={userAvatarUrl}
+          youLabel={t('youLabel')}
+          youXpText={t('xpLabel', { xp: state.totalXp })}
+          opponentAvatarUrl={opponentIdentity?.avatarUrl}
+          opponentUsername={opponentIdentity?.username ?? t('opponentLabel')}
+          opponentXpText={t('xpLabel', { xp: state.opponent?.totalXp ?? 0 })}
+          onPressOpponent={opponentIdentity ? () => setOpponentMenuOpen(true) : undefined}
+          opponentAccessibilityLabel={
+            opponentIdentity
+              ? t('friends:popup.avatarLabel', { username: opponentIdentity.username })
+              : undefined
+          }
           stats={[
             {
               icon: 'flame',
@@ -537,16 +532,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       gap: spacing.md,
     },
     deferredRecap: { maxWidth: 360 },
-    opponentChip: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.xs,
-      backgroundColor: colors.surfaceRaised,
-      borderRadius: radius.pill,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.xs,
-    },
-    opponentChipText: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
     noOpponentIconOuter: {
       width: 120,
       height: 120,

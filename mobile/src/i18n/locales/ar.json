@@ -915,8 +915,8 @@
     "resultWinTitle": "لقد فزت!",
     "resultLoseTitle": "لقد خسرت",
     "resultDrawTitle": "تعادل",
-    "resultYouSummary": "أنت: {{correct}} إجابة صحيحة، {{xp}} XP",
-    "resultOpponentSummary": "الخصم: {{correct}} إجابة صحيحة، {{xp}} XP",
+    "resultTicketEyebrow": "نتيجة المبارزة",
+    "resultCorrectOfTotal": "{{correct}} من {{total}} إجابة صحيحة",
     "resultTiebreakNote": "تم الحسم بكسر التعادل — أكثر الإجابات الصحيحة، ثم الأسرع في بلوغ نتيجته النهائية.",
     "playAgain": "العب مرة أخرى"
   },

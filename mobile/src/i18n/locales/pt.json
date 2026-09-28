@@ -915,8 +915,8 @@
     "resultWinTitle": "Você venceu!",
     "resultLoseTitle": "Você perdeu",
     "resultDrawTitle": "Empate",
-    "resultYouSummary": "Você: {{correct}} corretas, {{xp}} XP",
-    "resultOpponentSummary": "Adversário: {{correct}} corretas, {{xp}} XP",
+    "resultTicketEyebrow": "Resultado do duelo",
+    "resultCorrectOfTotal": "{{correct}} de {{total}} corretas",
     "resultTiebreakNote": "Decidido por desempate — mais respostas corretas, depois quem chegou primeiro à pontuação final.",
     "playAgain": "Jogar novamente"
   },

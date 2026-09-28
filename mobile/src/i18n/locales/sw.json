@@ -915,8 +915,8 @@
     "resultWinTitle": "Umeshinda!",
     "resultLoseTitle": "Umeshindwa",
     "resultDrawTitle": "Sare",
-    "resultYouSummary": "Wewe: {{correct}} sahihi, {{xp}} XP",
-    "resultOpponentSummary": "Mpinzani: {{correct}} sahihi, {{xp}} XP",
+    "resultTicketEyebrow": "Matokeo ya duwa",
+    "resultCorrectOfTotal": "{{correct}} kati ya {{total}} sahihi",
     "resultTiebreakNote": "Imeamuliwa kwa kuvunja sare — majibu mengi sahihi zaidi, kisha aliyefika haraka zaidi kwenye alama yake ya mwisho.",
     "playAgain": "Cheza tena"
   },

@@ -915,8 +915,8 @@
     "resultWinTitle": "你赢了！",
     "resultLoseTitle": "你输了",
     "resultDrawTitle": "平局",
-    "resultYouSummary": "你：{{correct}} 个正确，{{xp}} XP",
-    "resultOpponentSummary": "对手：{{correct}} 个正确，{{xp}} XP",
+    "resultTicketEyebrow": "对决结果",
+    "resultCorrectOfTotal": "{{total}} 题中 {{correct}} 题正确",
     "resultTiebreakNote": "通过决胜规则判定——正确数更多者胜，若仍相同则以更快达到最终得分者胜。",
     "playAgain": "再玩一次"
   },
