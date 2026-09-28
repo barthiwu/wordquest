@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import type { AliExpressionCue } from '@/services/aliExpression';
@@ -27,9 +28,12 @@ interface AliBubbleProps {
  * ALI's reaction to a single guess/answer, as an actual pop-up instead of
  * quiet inline text sitting under the result (V23 product feedback — the
  * per-answer aliQuickReaction used to just be a <Text> in the feedback
- * card, easy to miss and not really a "reaction"). Floats over whatever
- * screen mounts it, springs in, auto-dismisses, and can be tapped away
- * early.
+ * card, easy to miss and not really a "reaction"). Anchors to the
+ * *bottom* of whatever screen mounts it — below the play area, below
+ * the continue/submit button — rather than the top (Barth: a
+ * top-anchored version used to sit above the header/status bar, easy to
+ * miss and read as a system notification rather than part of the game).
+ * Springs up into place, auto-dismisses, and can be tapped away early.
  *
  * Give it a fresh `key` from the caller for every new reaction (e.g. the
  * guess-attempt id, or an incrementing counter) — like FadeInUp, this
@@ -40,7 +44,9 @@ interface AliBubbleProps {
  * Render it as a sibling of the screen's scrollable content inside a
  * `flex: 1` wrapper View, not inside the ScrollView itself — it
  * position-absolutes to that wrapper so it floats over the content
- * rather than scrolling with it.
+ * rather than scrolling with it, pinned to the wrapper's bottom edge
+ * (inset by the device's safe-area bottom so it clears the home
+ * indicator).
  */
 export function AliBubble({
   message,
@@ -49,10 +55,11 @@ export function AliBubble({
   autoDismissMs = 2800,
 }: AliBubbleProps) {
   const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
+  const styles = useMemo(() => createStyles(colors, insets.bottom), [colors, insets.bottom]);
   const { t } = useTranslation('common');
   const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(-16)).current;
+  const translateY = useRef(new Animated.Value(16)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -97,11 +104,11 @@ export function AliBubble({
   );
 }
 
-function createStyles(colors: ThemeColors) {
+function createStyles(colors: ThemeColors, bottomInset: number) {
   return StyleSheet.create({
     wrapper: {
       position: 'absolute',
-      top: spacing.md,
+      bottom: spacing.md + bottomInset,
       left: spacing.lg,
       right: spacing.lg,
       zIndex: 20,
