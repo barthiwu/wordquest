@@ -22,6 +22,7 @@ import {
 } from '@/services/completeIt';
 import { useAuthStore } from '@/state/authStore';
 import { AliDeferredRecap } from '@/components/AliDeferredRecap';
+import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
 import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
@@ -92,7 +93,11 @@ export function CompleteItScreen({ navigation }: Props) {
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const autoSubmittedRef = useRef(false);
   const lastVibratedSecondRef = useRef<number | null>(null);
-  const [aliBubble, setAliBubble] = useState<{ id: number; message: string } | null>(null);
+  const [aliBubble, setAliBubble] = useState<{
+    id: number;
+    message: string;
+    expression: AliExpressionCue;
+  } | null>(null);
   const aliBubbleCounter = useRef(0);
 
   const load = useCallback(async () => {
@@ -152,9 +157,13 @@ export function CompleteItScreen({ navigation }: Props) {
     try {
       const result = await submitCompleteItAnswer(accessToken, challenge.sessionId, fullAnswer);
       setFeedback(result);
-      if (result.aliQuickReaction) {
+      if (result.aliQuickReaction && result.aliQuickExpression) {
         aliBubbleCounter.current += 1;
-        setAliBubble({ id: aliBubbleCounter.current, message: result.aliQuickReaction });
+        setAliBubble({
+          id: aliBubbleCounter.current,
+          message: result.aliQuickReaction,
+          expression: result.aliQuickExpression,
+        });
       }
       setPhase('feedback');
     } catch {
@@ -258,6 +267,7 @@ export function CompleteItScreen({ navigation }: Props) {
         <AliBubble
           key={aliBubble.id}
           message={aliBubble.message}
+          expression={aliBubble.expression}
           onDismiss={() => setAliBubble(null)}
         />
       )}

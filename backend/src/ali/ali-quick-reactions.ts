@@ -50,7 +50,7 @@ const ENCOURAGING_REACTIONS: readonly string[] = [
   "This one's a slippery word — try again.",
   "Not it, but you're circling it.",
   "Good try — one more look and it's yours.",
-  "Tricky one. Take another swing.",
+  'Tricky one. Take another swing.',
 ];
 
 /**

@@ -51,6 +51,7 @@ import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
 import { useEvidenceModeStore, type EvidenceMode } from '@/state/evidenceModeStore';
 import { FadeInUp } from '@/components/FadeInUp';
+import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
 import { AffordanceChip } from '@/components/AffordanceChip';
 import { ScoreRing } from '@/components/ScoreRing';
@@ -237,7 +238,11 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   const [paragraphBusy, setParagraphBusy] = useState(false);
   const [mistakeExplanation, setMistakeExplanation] = useState<string | null>(null);
   const [mistakeExplanationLoading, setMistakeExplanationLoading] = useState(false);
-  const [aliBubble, setAliBubble] = useState<{ id: number; message: string } | null>(null);
+  const [aliBubble, setAliBubble] = useState<{
+    id: number;
+    message: string;
+    expression: AliExpressionCue;
+  } | null>(null);
   const aliBubbleCounter = useRef(0);
   const inputRefs = useRef<Record<number, TextInput | null>>({});
 
@@ -360,9 +365,13 @@ export function DailyQuestScreen({ route, navigation }: Props) {
         xpAwarded: result.xpAwarded,
         aliQuickReaction: result.aliQuickReaction,
       });
-      if (result.aliQuickReaction) {
+      if (result.aliQuickReaction && result.aliQuickExpression) {
         aliBubbleCounter.current += 1;
-        setAliBubble({ id: aliBubbleCounter.current, message: result.aliQuickReaction });
+        setAliBubble({
+          id: aliBubbleCounter.current,
+          message: result.aliQuickReaction,
+          expression: result.aliQuickExpression,
+        });
       }
       if (result.isCorrect && result.understanding) {
         setUnderstanding(result.understanding);
@@ -720,6 +729,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
           <AliBubble
             key={aliBubble.id}
             message={aliBubble.message}
+            expression={aliBubble.expression}
             onDismiss={() => setAliBubble(null)}
           />
         )}

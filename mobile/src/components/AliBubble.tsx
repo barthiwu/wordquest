@@ -3,10 +3,21 @@ import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
-import { AliMark } from './AliMark';
+import type { AliExpressionCue } from '@/services/aliExpression';
+import { AliCharacter } from './AliCharacter';
 
 interface AliBubbleProps {
   message: string;
+  /**
+   * ALI's animated pairing for this reaction (task #100 follow-up —
+   * every quick-reaction caller has computed this since task #100, but
+   * this component kept rendering the static AliMark instead of using
+   * it). Drives the same animated AliCharacter rig AliReactionPopup
+   * uses for major events, so a quick per-answer reaction looks as
+   * alive as a big one, just smaller and calmer (quick reactions are
+   * fixed at intensity 1 — see quickAliExpression on the backend).
+   */
+  expression: AliExpressionCue;
   onDismiss: () => void;
   /** ms before auto-dismiss; pass 0 to disable (tap-to-dismiss only). */
   autoDismissMs?: number;
@@ -31,7 +42,12 @@ interface AliBubbleProps {
  * position-absolutes to that wrapper so it floats over the content
  * rather than scrolling with it.
  */
-export function AliBubble({ message, onDismiss, autoDismissMs = 2800 }: AliBubbleProps) {
+export function AliBubble({
+  message,
+  expression,
+  onDismiss,
+  autoDismissMs = 2800,
+}: AliBubbleProps) {
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { t } = useTranslation('common');
@@ -68,7 +84,12 @@ export function AliBubble({ message, onDismiss, autoDismissMs = 2800 }: AliBubbl
         accessibilityHint={t('aliBubble.dismissHint')}
       >
         <Animated.View style={styles.avatar}>
-          <AliMark size={14} />
+          <AliCharacter
+            size={34}
+            expression={expression.expression}
+            pose={expression.pose}
+            intensity={expression.intensity}
+          />
         </Animated.View>
         <Text style={styles.text}>{message}</Text>
       </Pressable>
@@ -104,10 +125,8 @@ function createStyles(colors: ThemeColors) {
       elevation: 8,
     },
     avatar: {
-      width: 26,
-      height: 26,
-      borderRadius: 13,
-      backgroundColor: colors.arcaneSoft,
+      width: 40,
+      height: 40,
       alignItems: 'center',
       justifyContent: 'center',
     },
