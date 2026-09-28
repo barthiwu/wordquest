@@ -6,6 +6,12 @@ import {
   MasterChallengeEvaluationService,
   type MasterChallengeScores,
 } from './master-challenge-evaluation.service';
+import {
+  AliService,
+  type AliEvent,
+  type AliDisplayMessage,
+  toAliDisplayMessage,
+} from '../ali/ali.service';
 
 export interface MasterChallengeStatusView {
   status: 'LOCKED' | 'AVAILABLE' | 'COMPLETED';
@@ -21,6 +27,16 @@ export interface MasterChallengeResult {
   whatWentWell: string;
   whatNeedsImprovement: string;
   nextAction: string;
+  /**
+   * Task #99 follow-up: any LEVEL_UP/JOURNEY_COMPLETION this challenge's
+   * own XP award triggered. Master Challenge is one-shot -- submit() IS
+   * the whole "session" -- so unlike arcade/Boss Battle there's no
+   * earlier fire-and-forget moment to read back later; this is resolved
+   * right here, after the transaction commits, the same way Daily
+   * Quest's completeWord does. The client still shows it as part of the
+   * results view, not as a mid-submission popup. Usually [].
+   */
+  deferredAliReactions: AliDisplayMessage[];
 }
 
 /**
@@ -36,6 +52,7 @@ export class MasterChallengeService {
     private readonly prisma: PrismaService,
     private readonly progression: ProgressionService,
     private readonly evaluation: MasterChallengeEvaluationService,
+    private readonly ali: AliService,
   ) {}
 
   async getStatus(userId: string, localDate: string): Promise<MasterChallengeStatusView> {
@@ -105,6 +122,8 @@ export class MasterChallengeService {
 
     const evaluation = await this.evaluation.evaluate(words, paragraph, player?.nativeLanguage);
 
+    const aliEvents: AliEvent[] = [];
+
     await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Claim first — the `record.status === 'COMPLETED'` check above ran
       // outside this transaction, so two concurrent submit() calls for
@@ -137,8 +156,22 @@ export class MasterChallengeService {
         'master-challenge',
         record.id,
         tx,
+        aliEvents,
       );
     });
+
+    // Best-effort, after the transaction commits — same policy as every
+    // other flow resolving a collected aliEvents array.
+    const deferredAliReactions: AliDisplayMessage[] = [];
+    await Promise.all(
+      aliEvents.map(async (event) => {
+        try {
+          deferredAliReactions.push(toAliDisplayMessage(await this.ali.react(userId, event)));
+        } catch {
+          // Dropped — see the comment above.
+        }
+      }),
+    );
 
     return {
       scores: evaluation.scores,
@@ -147,6 +180,7 @@ export class MasterChallengeService {
       whatWentWell: evaluation.whatWentWell,
       whatNeedsImprovement: evaluation.whatNeedsImprovement,
       nextAction: evaluation.nextAction,
+      deferredAliReactions,
     };
   }
 }

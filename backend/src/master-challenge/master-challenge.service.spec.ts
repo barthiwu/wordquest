@@ -4,6 +4,7 @@ import { MasterChallengeService } from './master-challenge.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProgressionService } from '../progression/progression.service';
 import { MasterChallengeEvaluationService } from './master-challenge-evaluation.service';
+import { AliService } from '../ali/ali.service';
 
 describe('MasterChallengeService', () => {
   let service: MasterChallengeService;
@@ -30,6 +31,7 @@ describe('MasterChallengeService', () => {
 
   const progressionMock = { awardXp: jest.fn().mockResolvedValue({}) };
   const evaluationMock = { evaluate: jest.fn() };
+  const aliMock = { react: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -39,6 +41,7 @@ describe('MasterChallengeService', () => {
         { provide: PrismaService, useValue: prismaMock },
         { provide: ProgressionService, useValue: progressionMock },
         { provide: MasterChallengeEvaluationService, useValue: evaluationMock },
+        { provide: AliService, useValue: aliMock },
       ],
     }).compile();
     service = moduleRef.get(MasterChallengeService);
@@ -265,6 +268,7 @@ describe('MasterChallengeService', () => {
         'master-challenge',
         'mc1',
         prismaMock,
+        [],
       );
     });
 
@@ -347,7 +351,73 @@ describe('MasterChallengeService', () => {
         whatWentWell: 'Good synthesis.',
         whatNeedsImprovement: 'Vary sentence length.',
         nextAction: 'Read more sample paragraphs.',
+        deferredAliReactions: [],
       });
+    });
+
+    it("resolves any LEVEL_UP/JOURNEY reaction this challenge's own XP award triggers (task #99 follow-up)", async () => {
+      prismaMock.questAttempt.findMany
+        .mockResolvedValueOnce([{ questId: 'q1' }, { questId: 'q2' }, { questId: 'q3' }])
+        .mockResolvedValueOnce([{ wordIds: ['w1'] }]);
+      prismaMock.quest.count.mockResolvedValueOnce(3);
+      prismaMock.dailyMasterChallenge.findUnique.mockResolvedValueOnce(null);
+      prismaMock.dailyMasterChallenge.create.mockResolvedValueOnce({
+        id: 'mc1',
+        status: 'AVAILABLE',
+      });
+      prismaMock.dailyMasterChallenge.findUniqueOrThrow.mockResolvedValueOnce({
+        id: 'mc1',
+        status: 'AVAILABLE',
+      });
+      prismaMock.word.findMany.mockResolvedValueOnce([{ word: 'resilient', definition: 'x' }]);
+      prismaMock.dailyMasterChallenge.updateMany.mockResolvedValueOnce({ count: 1 });
+      const evaluation = {
+        scores: { grammar: 90, vocabulary: 90, context: 60, naturalness: 80, coherence: 80 },
+        xpAwarded: 200,
+        allWordsUsedCorrectly: true,
+        whatWentWell: 'Good synthesis.',
+        whatNeedsImprovement: 'Vary sentence length.',
+        nextAction: 'Read more sample paragraphs.',
+      };
+      evaluationMock.evaluate.mockResolvedValueOnce(evaluation);
+      progressionMock.awardXp.mockImplementationOnce(
+        async (
+          _userId: string,
+          _amount: number,
+          _reason: string,
+          _source: string,
+          _reference: string,
+          _db: unknown,
+          aliEvents?: Array<{ type: string }>,
+        ) => {
+          aliEvents?.push({ type: 'LEVEL_UP', journeyStage: 3, context: { newLevel: 9 } } as never);
+        },
+      );
+      aliMock.react.mockResolvedValueOnce({
+        text: 'Level 9!',
+        recommendation: null,
+        tone: 'Village',
+        promptVersion: 'v2',
+        expression: 'EXCITED',
+        pose: 'CELEBRATORY_HOP',
+        intensity: 4,
+        priority: 4,
+        durationMs: 3000,
+      });
+
+      const result = await service.submit('u1', '2026-08-14', 'paragraph');
+
+      expect(result.deferredAliReactions).toEqual([
+        {
+          text: 'Level 9!',
+          recommendation: null,
+          expression: 'EXCITED',
+          pose: 'CELEBRATORY_HOP',
+          intensity: 4,
+          priority: 4,
+          durationMs: 3000,
+        },
+      ]);
     });
   });
 });
