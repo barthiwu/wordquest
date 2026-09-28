@@ -12,7 +12,7 @@ import { WordsService } from '../vocabulary/words.service';
 import { MasteryService } from '../mastery/mastery.service';
 import { ProgressionService } from '../progression/progression.service';
 import { AchievementService } from '../achievement/achievement.service';
-import { AliService } from '../ali/ali.service';
+import { AliService, type AliDisplayMessage } from '../ali/ali.service';
 import { NotificationService } from '../notifications/notification.service';
 import { generateOmissionChallenge } from '../vocabulary/omission-engine';
 import { gameplayRules, bossBattleRewardForRank } from '../config/gameplay-rules';
@@ -120,6 +120,17 @@ export interface LeaderboardView {
    * Once the group is COMPLETED, this contains the full ranked group.
    */
   entries: LeaderboardEntry[];
+  /**
+   * Task #99 follow-up: Boss Battle fires every one of its reactions
+   * (BOSS_BATTLE_RESULT, plus whatever LEVEL_UP/JOURNEY_COMPLETION/
+   * MASTERY_EVENT/ACHIEVEMENT_UNLOCK the battle triggered) fire-and-
+   * forget, the same as arcade play — there's no live moment to pop
+   * them up in during a self-paced battle. Once this group finalizes,
+   * they're read back here via AliService.listReactionsSince (since
+   * this player joined the group) for a "while your battle ran..."
+   * recap. Always [] while the group hasn't finalized yet.
+   */
+  deferredAliReactions: AliDisplayMessage[];
 }
 
 interface RankablePlayer {
@@ -609,6 +620,7 @@ export class BossBattleService {
             rewardGlyphs: null,
           },
         ],
+        deferredAliReactions: [],
       };
     }
 
@@ -617,6 +629,18 @@ export class BossBattleService {
       include: { user: { select: { id: true, username: true, avatarKey: true } } },
     });
     const ranked = this.rankPlayers(players);
+
+    // Best-effort, same policy as every other listReactionsSince caller
+    // — see LeaderboardView's deferredAliReactions doc comment.
+    let deferredAliReactions: AliDisplayMessage[] = [];
+    try {
+      deferredAliReactions = await this.ali.listReactionsSince(userId, player.joinedAt, [
+        'BOSS_BATTLE_RESULT',
+        ...AliService.DEFERRED_REACTION_EVENT_TYPES,
+      ]);
+    } catch {
+      // The leaderboard just won't show a recap this time.
+    }
 
     return {
       groupId: player.groupId,
@@ -635,6 +659,7 @@ export class BossBattleService {
           rewardGlyphs: p.rewardGlyphs ?? null,
         })),
       ),
+      deferredAliReactions,
     };
   }
 

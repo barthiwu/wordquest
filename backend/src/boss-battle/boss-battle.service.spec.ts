@@ -75,7 +75,10 @@ describe('BossBattleService', () => {
     checkCefrEligibility: jest.fn().mockResolvedValue(undefined),
   };
   const achievementsMock = { checkCompetition: jest.fn().mockResolvedValue(undefined) };
-  const aliMock = { reactFireAndForget: jest.fn() };
+  const aliMock = {
+    reactFireAndForget: jest.fn(),
+    listReactionsSince: jest.fn().mockResolvedValue([]),
+  };
   const notificationsMock = { notifyFireAndForget: jest.fn() };
   const idempotencyMock = {
     checkCache: jest.fn(),
@@ -974,6 +977,83 @@ describe('BossBattleService', () => {
       const result = await service.getMyGroupLeaderboard('u1');
 
       expect(result.entries[0].isYou).toBe(true);
+    });
+
+    it('reads back deferred ALI reactions since this player joined, once the group finalizes (task #99 follow-up)', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 18, 5));
+      const joinedAt = utc(2026, 8, 16, 17, 1);
+      prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce({
+        groupId: 'g1',
+        joinedAt,
+        group: {
+          id: 'g1',
+          status: 'COMPLETED',
+          battle: {
+            scheduledStartUtc: utc(2026, 8, 16, 17),
+            scheduledEndUtc: utc(2026, 8, 16, 18),
+          },
+        },
+        user: { id: 'u1', username: 'Ada' },
+      });
+      prismaMock.bossBattlePlayer.findMany.mockResolvedValueOnce([
+        {
+          id: 'p1',
+          userId: 'u1',
+          battleXp: 30,
+          correctAnswers: 2,
+          incorrectAnswers: 0,
+          lastXpAt: null,
+          finalRank: null,
+          user: { id: 'u1', username: 'Ada' },
+        },
+      ]);
+      aliMock.listReactionsSince.mockResolvedValueOnce([
+        {
+          text: 'You placed #1!',
+          recommendation: null,
+          eventType: 'BOSS_BATTLE_RESULT',
+          createdAt: new Date().toISOString(),
+          expression: 'TRIUMPHANT',
+          pose: 'CELEBRATORY_HOP',
+          intensity: 5,
+          priority: 4,
+          durationMs: 3000,
+        },
+      ]);
+
+      const result = await service.getMyGroupLeaderboard('u1');
+
+      expect(aliMock.listReactionsSince).toHaveBeenCalledWith(
+        'u1',
+        joinedAt,
+        expect.arrayContaining(['BOSS_BATTLE_RESULT', 'LEVEL_UP', 'JOURNEY_COMPLETION']),
+      );
+      expect(result.deferredAliReactions).toHaveLength(1);
+      expect(result.deferredAliReactions[0].text).toBe('You placed #1!');
+    });
+
+    it('leaves deferredAliReactions empty while the battle is still LIVE', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 8, 16, 17, 30));
+      prismaMock.bossBattlePlayer.findFirst.mockResolvedValueOnce({
+        groupId: 'g1',
+        battleXp: 30,
+        correctAnswers: 2,
+        incorrectAnswers: 0,
+        group: {
+          id: 'g1',
+          status: 'LIVE',
+          battle: {
+            scheduledStartUtc: utc(2026, 8, 16, 17),
+            scheduledEndUtc: utc(2026, 8, 16, 18),
+          },
+        },
+        user: { id: 'u1', username: 'Ada' },
+      });
+
+      const result = await service.getMyGroupLeaderboard('u1');
+
+      expect(result.deferredAliReactions).toEqual([]);
+      expect(aliMock.listReactionsSince).not.toHaveBeenCalled();
     });
 
     it('breaks a full tie (same XP, same correct, same incorrect) by earliest lastXpAt', async () => {
