@@ -31,6 +31,7 @@ import { BossBattleLeaderboardScreen } from '@/features/boss-battle/BossBattleLe
 import { MasterChallengeScreen } from '@/features/master-challenge/MasterChallengeScreen';
 import { OrderScreen } from '@/features/order/OrderScreen';
 import { SettingsScreen } from '@/features/settings/SettingsScreen';
+import { ProfileSettingsScreen } from '@/features/settings/ProfileSettingsScreen';
 import { ShopScreen } from '@/features/shop/ShopScreen';
 import { NotificationsScreen } from '@/features/notifications/NotificationsScreen';
 import { CalibrationResultScreen } from '@/features/learning-profile/CalibrationResultScreen';
@@ -94,6 +95,7 @@ export type RootStackParamList = {
   MasterChallenge: undefined;
   Order: undefined;
   Settings: undefined;
+  ProfileSettings: undefined;
   Shop: undefined;
   Notifications: undefined;
   CalibrationResult: undefined;
@@ -162,6 +164,7 @@ export function RootNavigator() {
         <Stack.Screen name="MasterChallenge" component={MasterChallengeScreen} />
         <Stack.Screen name="Order" component={OrderScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="ProfileSettings" component={ProfileSettingsScreen} />
         <Stack.Screen name="Shop" component={ShopScreen} />
         <Stack.Screen name="Notifications" component={NotificationsScreen} />
         <Stack.Screen name="CalibrationResult" component={CalibrationResultScreen} />

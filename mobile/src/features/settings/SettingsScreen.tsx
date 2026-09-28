@@ -1,11 +1,11 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,8 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { useSelectedLanguage } from '@/state/languageStore';
-import { logout, resendVerification, verifyEmail } from '@/services/auth';
-import { updateMe, checkUsernameAvailability } from '@/services/users';
+import { logout } from '@/services/auth';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -26,100 +25,32 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 /**
  * Settings — MVP-listed in BUILD_HANDOFF §6 but never built. Hosts the
  * account-lifecycle actions the rest of the app has nowhere else to
- * put: email verification and logout (which revokes the refresh token
- * server-side, not just clears local storage). Language preference
- * lives here too; legal documents and account deletion moved to their
- * own About screen (Sept 2026 request) rather than crowding this one.
+ * put: logout (which revokes the refresh token server-side, not just
+ * clears local storage). Language preference lives here too; legal
+ * documents and account deletion moved to their own About screen (Sept
+ * 2026 request) rather than crowding this one.
+ *
+ * Redesign (Sept 2026, Barth, "Settings Option B"): editing your name,
+ * username, profile picture and email verification used to all live
+ * inline on this screen. They're now one tap away on their own Profile
+ * screen (ProfileSettingsScreen) -- this screen shows an identity-card
+ * row instead (avatar + name + @username), like an iOS "Apple ID" card,
+ * so there's an at-a-glance identity check before diving into the rest
+ * of settings.
  */
 export function SettingsScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation('settings');
-  const accessToken = useAuthStore((s) => s.accessToken);
   const refreshToken = useAuthStore((s) => s.refreshToken);
   const clearSession = useAuthStore((s) => s.clearSession);
   const user = useAuthStore((s) => s.user);
-  const updateUser = useAuthStore((s) => s.updateUser);
   const selectedLanguage = useSelectedLanguage();
-  const [verifyToken, setVerifyToken] = useState('');
-  const [busy, setBusy] = useState<'resend' | 'verify' | 'logout' | 'profile' | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-
-  // Profile (display name + public username) -- local drafts so typing
-  // doesn't touch the authoritative authStore value until Save succeeds.
-  const [displayNameDraft, setDisplayNameDraft] = useState(user?.displayName ?? '');
-  const [usernameDraft, setUsernameDraft] = useState(user?.username ?? '');
-  const [usernameCheck, setUsernameCheck] = useState<
-    'idle' | 'checking' | 'available' | 'taken' | 'invalid'
-  >('idle');
-  const usernameCheckSeq = useRef(0);
-
-  useEffect(() => {
-    setDisplayNameDraft(user?.displayName ?? '');
-    setUsernameDraft(user?.username ?? '');
-  }, [user?.displayName, user?.username]);
-
-  const USERNAME_FORMAT = /^[a-z0-9_]{3,20}$/;
-
-  useEffect(() => {
-    if (!accessToken) return;
-    const candidate = usernameDraft.trim().toLowerCase();
-    if (candidate === (user?.username ?? '')) {
-      setUsernameCheck('idle');
-      return;
-    }
-    if (!USERNAME_FORMAT.test(candidate)) {
-      setUsernameCheck('invalid');
-      return;
-    }
-    setUsernameCheck('checking');
-    const seq = ++usernameCheckSeq.current;
-    const timer = setTimeout(async () => {
-      try {
-        const { available } = await checkUsernameAvailability(accessToken, candidate);
-        if (usernameCheckSeq.current === seq) setUsernameCheck(available ? 'available' : 'taken');
-      } catch {
-        if (usernameCheckSeq.current === seq) setUsernameCheck('idle');
-      }
-    }, 450);
-    return () => clearTimeout(timer);
-  }, [usernameDraft, accessToken, user?.username]);
-
-  const profileDirty =
-    displayNameDraft.trim() !== (user?.displayName ?? '') ||
-    usernameDraft.trim().toLowerCase() !== (user?.username ?? '');
-  const usernameBlocksSave =
-    usernameCheck === 'invalid' || usernameCheck === 'taken' || usernameCheck === 'checking';
-
-  const onSaveProfile = async () => {
-    if (!accessToken || !profileDirty || usernameBlocksSave) return;
-    setBusy('profile');
-    setMessage(null);
-    try {
-      const patch: { displayName?: string; username?: string } = {};
-      if (displayNameDraft.trim() !== (user?.displayName ?? ''))
-        patch.displayName = displayNameDraft.trim();
-      const normalizedUsername = usernameDraft.trim().toLowerCase();
-      if (normalizedUsername !== (user?.username ?? '')) patch.username = normalizedUsername;
-
-      const updated = await updateMe(accessToken, patch);
-      updateUser({ displayName: updated.displayName, username: updated.username });
-      setUsernameCheck('idle');
-      setMessage(t('messageProfileUpdated'));
-    } catch (err) {
-      setMessage(
-        err instanceof Error && err.message.toLowerCase().includes('taken')
-          ? t('errorUsernameTaken')
-          : t('errorProfileSave'),
-      );
-    } finally {
-      setBusy(null);
-    }
-  };
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const onLogout = async () => {
-    setBusy('logout');
+    setLoggingOut(true);
     try {
       if (refreshToken) await logout(refreshToken);
     } catch {
@@ -130,148 +61,49 @@ export function SettingsScreen({ navigation }: Props) {
     }
   };
 
-  const onResendVerification = async () => {
-    if (!accessToken) return;
-    setBusy('resend');
-    setMessage(null);
-    try {
-      await resendVerification(accessToken);
-      setMessage(t('messageVerificationSent'));
-    } catch {
-      setMessage(t('errorVerificationSend'));
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const onVerifyEmail = async () => {
-    if (!verifyToken.trim()) return;
-    setBusy('verify');
-    setMessage(null);
-    try {
-      await verifyEmail(verifyToken.trim());
-      setMessage(t('messageEmailVerified'));
-      setVerifyToken('');
-    } catch {
-      setMessage(t('errorVerificationInvalid'));
-    } finally {
-      setBusy(null);
-    }
-  };
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <BackButton onPress={() => navigation.goBack()} />
       <Text style={styles.title}>{t('title')}</Text>
 
-      {message && <Text style={styles.message}>{message}</Text>}
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('profileSection')}</Text>
-
-        <Text style={styles.fieldLabel}>{t('yourName')}</Text>
-        <TextInput
-          style={styles.input}
-          value={displayNameDraft}
-          onChangeText={setDisplayNameDraft}
-          placeholder={t('yourNamePlaceholder')}
-          placeholderTextColor={colors.inkMuted}
-          accessibilityLabel={t('yourName')}
-        />
-        <Text style={styles.fieldHint}>{t('yourNameHint')}</Text>
-
-        <Text style={[styles.fieldLabel, { marginTop: spacing.sm }]}>{t('usernameLabel')}</Text>
-        <TextInput
-          style={styles.input}
-          value={usernameDraft}
-          onChangeText={(v) => setUsernameDraft(v.toLowerCase())}
-          placeholder={t('usernamePlaceholder')}
-          placeholderTextColor={colors.inkMuted}
-          autoCapitalize="none"
-          autoCorrect={false}
-          accessibilityLabel={t('usernameLabel')}
-        />
-        <Text style={styles.fieldHint}>{t('usernameHint')}</Text>
-        {usernameCheck === 'checking' && (
-          <Text style={styles.usernameStatusChecking}>{t('usernameChecking')}</Text>
+      <Pressable
+        style={styles.profileCard}
+        onPress={() => navigation.navigate('ProfileSettings')}
+        accessibilityRole="button"
+        accessibilityLabel={t('profileSection')}
+      >
+        {user?.avatarUrl ? (
+          <Image source={{ uri: user.avatarUrl }} style={styles.profileCardAvatarImage} />
+        ) : (
+          <View style={styles.profileCardAvatarPlaceholder}>
+            <Text style={styles.profileCardAvatarInitial}>
+              {user?.displayName?.trim().charAt(0).toUpperCase() || '?'}
+            </Text>
+          </View>
         )}
-        {usernameCheck === 'available' && (
-          <Text style={styles.usernameStatusOk}>{t('usernameAvailable')}</Text>
-        )}
-        {usernameCheck === 'taken' && (
-          <Text style={styles.usernameStatusBad}>{t('usernameTaken')}</Text>
-        )}
-        {usernameCheck === 'invalid' && (
-          <Text style={styles.usernameStatusBad}>{t('usernameInvalid')}</Text>
-        )}
-
-        <Pressable
-          style={[
-            styles.secondaryButton,
-            (!profileDirty || usernameBlocksSave) && styles.buttonDisabled,
-          ]}
-          onPress={onSaveProfile}
-          disabled={busy !== null || !profileDirty || usernameBlocksSave}
-          accessibilityRole="button"
-          accessibilityLabel={t('saveProfile')}
-        >
-          {busy === 'profile' ? (
-            <ActivityIndicator color={colors.arcaneSoft} />
-          ) : (
-            <Text style={styles.secondaryButtonText}>{t('saveProfile')}</Text>
+        <View style={styles.profileCardText}>
+          <Text style={styles.profileCardName} numberOfLines={1}>
+            {user?.displayName ?? t('profileSection')}
+          </Text>
+          {user?.username && (
+            <Text style={styles.profileCardUsername} numberOfLines={1}>
+              @{user.username}
+            </Text>
           )}
-        </Pressable>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('emailVerificationSection')}</Text>
-        <Pressable
-          style={styles.secondaryButton}
-          onPress={onResendVerification}
-          disabled={busy !== null}
-          accessibilityRole="button"
-          accessibilityLabel={t('resendVerification')}
-        >
-          {busy === 'resend' ? (
-            <ActivityIndicator color={colors.arcaneSoft} />
-          ) : (
-            <Text style={styles.secondaryButtonText}>{t('resendVerification')}</Text>
-          )}
-        </Pressable>
-        <TextInput
-          style={styles.input}
-          placeholder={t('verificationCodePlaceholder')}
-          placeholderTextColor={colors.inkMuted}
-          value={verifyToken}
-          onChangeText={setVerifyToken}
-          autoCapitalize="none"
-          accessibilityLabel={t('verificationCodePlaceholder')}
-        />
-        <Pressable
-          style={[styles.secondaryButton, !verifyToken.trim() && styles.buttonDisabled]}
-          onPress={onVerifyEmail}
-          disabled={busy !== null || !verifyToken.trim()}
-          accessibilityRole="button"
-          accessibilityLabel={t('verifyEmail')}
-        >
-          {busy === 'verify' ? (
-            <ActivityIndicator color={colors.arcaneSoft} />
-          ) : (
-            <Text style={styles.secondaryButtonText}>{t('verifyEmail')}</Text>
-          )}
-        </Pressable>
-      </View>
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
+      </Pressable>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('sessionSection')}</Text>
         <Pressable
           style={styles.secondaryButton}
           onPress={onLogout}
-          disabled={busy !== null}
+          disabled={loggingOut}
           accessibilityRole="button"
           accessibilityLabel={t('logOut')}
         >
-          {busy === 'logout' ? (
+          {loggingOut ? (
             <ActivityIndicator color={colors.arcaneSoft} />
           ) : (
             <Text style={styles.secondaryButtonText}>{t('logOut')}</Text>
@@ -320,7 +152,49 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontSize: typography.scale.xl,
       fontWeight: typography.display.weight,
     },
-    message: { color: colors.arcaneSoft, fontSize: typography.scale.sm },
+    profileCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+    },
+    profileCardAvatarImage: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.surface,
+    },
+    profileCardAvatarPlaceholder: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    profileCardAvatarInitial: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.md,
+      fontWeight: typography.display.weight,
+    },
+    profileCardText: { flex: 1, gap: 2, minWidth: 0 },
+    profileCardName: {
+      color: colors.ink,
+      fontSize: typography.scale.md,
+      fontWeight: typography.display.weight,
+    },
+    profileCardUsername: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.sm,
+      fontWeight: '600',
+    },
     section: {
       backgroundColor: colors.surface,
       borderRadius: radius.lg,
@@ -335,16 +209,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontWeight: '700',
       textTransform: 'uppercase',
     },
-    input: {
-      backgroundColor: colors.background,
-      borderRadius: radius.md,
-      borderWidth: 1,
-      borderColor: colors.border,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      color: colors.ink,
-      fontSize: typography.scale.md,
-    },
     secondaryButton: {
       backgroundColor: colors.surfaceRaised,
       borderRadius: radius.md,
@@ -356,12 +220,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontSize: typography.scale.md,
       fontWeight: '700',
     },
-    buttonDisabled: { opacity: 0.4 },
-    fieldLabel: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
-    fieldHint: { color: colors.inkMuted, fontSize: typography.scale.xs },
-    usernameStatusChecking: { color: colors.inkMuted, fontSize: typography.scale.xs },
-    usernameStatusOk: { color: colors.success, fontSize: typography.scale.xs, fontWeight: '700' },
-    usernameStatusBad: { color: colors.warning, fontSize: typography.scale.xs, fontWeight: '700' },
     row: {
       flexDirection: 'row',
       alignItems: 'center',

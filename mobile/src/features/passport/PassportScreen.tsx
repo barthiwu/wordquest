@@ -2,7 +2,6 @@ import { useCallback, useState, useMemo } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -10,21 +9,12 @@ import {
   Text,
   View,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { getMyPassport, type PassportView } from '@/services/passport';
-import {
-  confirmAvatar,
-  createAvatarUploadTarget,
-  deleteAvatar,
-  uploadAvatarBytes,
-  type AvatarContentType,
-} from '@/services/users';
-import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
 import { countryCodeToFlagEmoji } from '@/utils/countryFlag';
 import { countryNameForCode } from '@/constants/countries';
@@ -52,10 +42,8 @@ export function PassportScreen({ navigation }: Props) {
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation('passport');
   const accessToken = useAuthStore((s) => s.accessToken);
-  const updateUser = useAuthStore((s) => s.updateUser);
   const [passport, setPassport] = useState<PassportView | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [avatarBusy, setAvatarBusy] = useState(false);
 
   const load = useCallback(() => {
     if (!accessToken) return;
@@ -69,83 +57,6 @@ export function PassportScreen({ navigation }: Props) {
   // so an earlier failure -- e.g. the backend still coming up -- clears
   // itself on the next visit instead of sticking until the app reloads.
   useFocusEffect(load);
-
-  const pickAndUploadAvatar = async (source: 'camera' | 'library') => {
-    if (!accessToken) return;
-    const permission =
-      source === 'camera'
-        ? await ImagePicker.requestCameraPermissionsAsync()
-        : await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert(
-        t('permissionNeededTitle'),
-        t('permissionNeededMessage', {
-          access: source === 'camera' ? t('cameraAccessLabel') : t('photoLibraryAccessLabel'),
-        }),
-      );
-      return;
-    }
-
-    const result =
-      source === 'camera'
-        ? await ImagePicker.launchCameraAsync({ quality: 0.8, allowsEditing: true, aspect: [1, 1] })
-        : await ImagePicker.launchImageLibraryAsync({
-            quality: 0.8,
-            allowsEditing: true,
-            aspect: [1, 1],
-          });
-    if (result.canceled) return;
-
-    const asset = result.assets[0];
-    const contentType: AvatarContentType =
-      asset.mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
-
-    setAvatarBusy(true);
-    try {
-      const target = await createAvatarUploadTarget(accessToken, contentType);
-      await uploadAvatarBytes(target.uploadUrl, asset.uri, contentType);
-      const confirmed = await confirmAvatar(accessToken, target.key);
-      setPassport((prev) => (prev ? { ...prev, avatarUrl: confirmed.avatarUrl } : prev));
-      // Keep Home's header (and anywhere else authStore.user is read) in
-      // sync immediately -- it only otherwise refreshes on the next
-      // login/app-cold-start via getMe().
-      updateUser({ avatarUrl: confirmed.avatarUrl });
-    } catch (err) {
-      Alert.alert(
-        t('couldNotSetProfilePicture'),
-        err instanceof ApiError ? err.message : t('genericTryAgain'),
-      );
-    } finally {
-      setAvatarBusy(false);
-    }
-  };
-
-  const onRemoveAvatar = async () => {
-    if (!accessToken) return;
-    setAvatarBusy(true);
-    try {
-      const result = await deleteAvatar(accessToken);
-      setPassport((prev) => (prev ? { ...prev, avatarUrl: result.avatarUrl } : prev));
-      updateUser({ avatarUrl: result.avatarUrl });
-    } catch {
-      Alert.alert(t('couldNotRemoveProfilePicture'), t('genericTryAgain'));
-    } finally {
-      setAvatarBusy(false);
-    }
-  };
-
-  const onAvatarPress = () => {
-    const options: Array<{ text: string; style?: 'cancel' | 'destructive'; onPress?: () => void }> =
-      [
-        { text: t('takePhoto'), onPress: () => pickAndUploadAvatar('camera') },
-        { text: t('chooseFromLibrary'), onPress: () => pickAndUploadAvatar('library') },
-      ];
-    if (passport?.avatarUrl) {
-      options.push({ text: t('removePhoto'), style: 'destructive', onPress: onRemoveAvatar });
-    }
-    options.push({ text: t('cancel'), style: 'cancel' });
-    Alert.alert(t('profilePictureTitle'), undefined, options);
-  };
 
   if (error) {
     return (
@@ -174,13 +85,10 @@ export function PassportScreen({ navigation }: Props) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Pressable
-          style={styles.avatarWrapper}
-          onPress={onAvatarPress}
-          disabled={avatarBusy}
-          accessibilityRole="button"
-          accessibilityLabel={t('changeProfilePicture')}
-        >
+        {/* Editable in Settings > Profile now (Sept 2026 redesign) -- this
+            header is a plain identity display, not a second edit entry
+            point. */}
+        <View style={styles.avatarWrapper}>
           {passport.avatarUrl ? (
             <Image source={{ uri: passport.avatarUrl }} style={styles.avatarImage} />
           ) : (
@@ -190,14 +98,7 @@ export function PassportScreen({ navigation }: Props) {
               </Text>
             </View>
           )}
-          <View style={styles.avatarBadge}>
-            {avatarBusy ? (
-              <ActivityIndicator size="small" color={colors.ink} />
-            ) : (
-              <Ionicons name="camera" size={13} color={colors.ink} />
-            )}
-          </View>
-        </Pressable>
+        </View>
         <View style={styles.headerText}>
           <Text style={styles.name}>{passport.displayName}</Text>
           <Text style={styles.username}>@{passport.username}</Text>
@@ -259,114 +160,82 @@ export function PassportScreen({ navigation }: Props) {
         )}
       </View>
 
-      <Pressable
-        style={styles.section}
-        onPress={() => navigation.navigate('Achievements')}
-        accessibilityRole="button"
-        accessibilityLabel={t('achievementsTitle')}
-      >
-        <Text style={styles.sectionTitle}>{t('achievementsTitle')}</Text>
-        <Text style={styles.sectionBody}>
-          {passport.achievements.length > 0
-            ? passport.achievements.map((a) => a.name).join(', ')
-            : t('achievementsEmpty')}
-        </Text>
-      </Pressable>
-
-      <Pressable
-        style={styles.section}
-        onPress={() => navigation.navigate('BossBattle')}
-        accessibilityRole="button"
-        accessibilityLabel={t('bossBattleHistoryTitle')}
-      >
-        <Text style={styles.sectionTitle}>{t('bossBattleHistoryTitle')}</Text>
-        <Text style={styles.sectionBody}>
-          {passport.bossBattleHistory.length > 0
-            ? t('bossBattleSummary', {
-                count: passport.bossBattleHistory.length,
-                wins: passport.bossBattleHistory.filter((b) => b.isWinner).length,
-              })
-            : t('bossBattleEmpty')}
-        </Text>
-      </Pressable>
-
-      <Pressable
-        style={styles.section}
-        onPress={() => navigation.navigate('Friends')}
-        accessibilityRole="button"
-        accessibilityLabel={t('friendsTitle')}
-      >
-        <Text style={styles.sectionTitle}>{t('friendsTitle')}</Text>
-        <Text style={styles.sectionBody}>{t('friendsBody')}</Text>
-      </Pressable>
-
-      <Pressable
-        style={styles.section}
-        onPress={() => navigation.navigate('QuestCardGallery')}
-        accessibilityRole="button"
-        accessibilityLabel={t('questCardsTitle')}
-      >
-        <Text style={styles.sectionTitle}>{t('questCardsTitle')}</Text>
-        {/* V22 §7/§9 finding: the showcase endpoints worked but this
-            section only ever showed a static teaser — now renders the
-            player's actual showcased cards, set from the gallery. */}
-        {passport.showcasedCards.length > 0 ? (
-          <View style={styles.showcaseRow}>
-            {passport.showcasedCards.map((c) => (
-              <View key={c.id} style={styles.showcaseChip}>
-                <Text style={styles.showcaseChipRarity}>{c.rarity}</Text>
-                <Text style={styles.showcaseChipTitle} numberOfLines={1}>
-                  {c.title}
-                </Text>
-              </View>
-            ))}
-          </View>
-        ) : (
-          <Text style={styles.sectionBody}>{t('questCardsEmpty')}</Text>
-        )}
-      </Pressable>
-
-      <Pressable
-        style={styles.section}
-        onPress={() => navigation.navigate('Order')}
-        accessibilityRole="button"
-        accessibilityLabel={t('theOrderTitle')}
-      >
-        <Text style={styles.sectionTitle}>{t('theOrderTitle')}</Text>
-        <Text style={styles.sectionBody}>
-          {passport.order ? passport.order.name : t('orderEmpty')}
-        </Text>
-      </Pressable>
-
-      <Pressable
-        style={styles.section}
-        onPress={() => navigation.navigate('Shop')}
-        accessibilityRole="button"
-        accessibilityLabel={t('shopTitle')}
-      >
-        <Text style={styles.sectionTitle}>{t('shopTitle')}</Text>
-        <Text style={styles.sectionBody}>{t('shopBody')}</Text>
-      </Pressable>
-
-      <Pressable
-        style={styles.section}
-        onPress={() => navigation.navigate('Notifications')}
-        accessibilityRole="button"
-        accessibilityLabel={t('notificationsTitle')}
-      >
-        <Text style={styles.sectionTitle}>{t('notificationsTitle')}</Text>
-        <Text style={styles.sectionBody}>{t('notificationsBody')}</Text>
-      </Pressable>
-
-      <Pressable
-        style={styles.section}
-        onPress={() => navigation.navigate('Settings')}
-        accessibilityRole="button"
-        accessibilityLabel={t('settingsTitle')}
-      >
-        <Text style={styles.sectionTitle}>{t('settingsTitle')}</Text>
-        <Text style={styles.sectionBody}>{t('settingsBody')}</Text>
-      </Pressable>
+      {/* Redesign (Sept 2026, Barth): Achievements-through-Settings used to
+          be seven separate bordered cards (plus a now-removed Boss Battle
+          history card -- Boss Battle's own screen, reachable from Compete,
+          already shows that history, so surfacing it twice was redundant).
+          Collapsed into one icon-led list, "Option B" from the design
+          review -- shorter scroll, easier to scan. Achievements and Quest
+          Cards trade their inline detail (the full achievement-name list /
+          showcased-card chips) for a plain count; the detail is still one
+          tap away on each row's own screen. */}
+      <View style={styles.listCard}>
+        <ListRow
+          icon="trophy-outline"
+          title={t('achievementsTitle')}
+          subtitle={
+            passport.achievements.length > 0
+              ? t('achievementsSummary', { count: passport.achievements.length })
+              : t('achievementsEmpty')
+          }
+          onPress={() => navigation.navigate('Achievements')}
+          styles={styles}
+          colors={colors}
+        />
+        <ListRow
+          icon="people-outline"
+          title={t('friendsTitle')}
+          subtitle={t('friendsBody')}
+          onPress={() => navigation.navigate('Friends')}
+          styles={styles}
+          colors={colors}
+        />
+        <ListRow
+          icon="albums-outline"
+          title={t('questCardsTitle')}
+          subtitle={
+            passport.showcasedCards.length > 0
+              ? t('questCardsShowcasedCount', { count: passport.showcasedCards.length })
+              : t('questCardsEmpty')
+          }
+          onPress={() => navigation.navigate('QuestCardGallery')}
+          styles={styles}
+          colors={colors}
+        />
+        <ListRow
+          icon="shield-outline"
+          title={t('theOrderTitle')}
+          subtitle={passport.order ? passport.order.name : t('orderEmpty')}
+          onPress={() => navigation.navigate('Order')}
+          styles={styles}
+          colors={colors}
+        />
+        <ListRow
+          icon="bag-outline"
+          title={t('shopTitle')}
+          subtitle={t('shopBody')}
+          onPress={() => navigation.navigate('Shop')}
+          styles={styles}
+          colors={colors}
+        />
+        <ListRow
+          icon="notifications-outline"
+          title={t('notificationsTitle')}
+          subtitle={t('notificationsBody')}
+          onPress={() => navigation.navigate('Notifications')}
+          styles={styles}
+          colors={colors}
+        />
+        <ListRow
+          icon="settings-outline"
+          title={t('settingsTitle')}
+          subtitle={t('settingsBody')}
+          onPress={() => navigation.navigate('Settings')}
+          styles={styles}
+          colors={colors}
+          isLast
+        />
+      </View>
     </ScrollView>
   );
 }
@@ -403,6 +272,46 @@ function Stat({
   }
 
   return <View style={styles.stat}>{content}</View>;
+}
+
+function ListRow({
+  icon,
+  title,
+  subtitle,
+  onPress,
+  styles,
+  colors,
+  isLast,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  subtitle: string;
+  onPress: () => void;
+  styles: ReturnType<typeof createStyles>;
+  colors: ThemeColors;
+  isLast?: boolean;
+}) {
+  return (
+    <Pressable
+      style={[styles.listRow, isLast && styles.listRowLast]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+    >
+      <View style={styles.listIcon}>
+        <Ionicons name={icon} size={17} color={colors.arcaneSoft} />
+      </View>
+      <View style={styles.listTextCol}>
+        <Text style={styles.listTitle} numberOfLines={1}>
+          {title}
+        </Text>
+        <Text style={styles.listSubtitle} numberOfLines={1}>
+          {subtitle}
+        </Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
+    </Pressable>
+  );
 }
 
 function createStyles(colors: ThemeColors, topInset: number) {
@@ -448,19 +357,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontSize: typography.scale.lg,
       fontWeight: typography.display.weight,
     },
-    avatarBadge: {
-      position: 'absolute',
-      right: -2,
-      bottom: -2,
-      width: 22,
-      height: 22,
-      borderRadius: 11,
-      backgroundColor: colors.arcane,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 2,
-      borderColor: colors.background,
-    },
     name: {
       color: colors.ink,
       fontSize: typography.scale.xl,
@@ -495,20 +391,33 @@ function createStyles(colors: ThemeColors, topInset: number) {
     sectionTitle: { color: colors.ink, fontSize: typography.scale.sm, fontWeight: '700' },
     sectionBody: { color: colors.inkMuted, fontSize: typography.scale.sm },
     sectionMeta: { color: colors.arcaneSoft, fontSize: typography.scale.xs },
-    showcaseRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
-    showcaseChip: {
+    listCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: 'hidden',
+    },
+    listRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    listRowLast: { borderBottomWidth: 0 },
+    listIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: radius.pill,
       backgroundColor: colors.surfaceRaised,
-      borderRadius: radius.sm,
-      paddingVertical: 4,
-      paddingHorizontal: spacing.sm,
-      maxWidth: 140,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
-    showcaseChipRarity: {
-      color: colors.arcaneSoft,
-      fontSize: 10,
-      fontWeight: '700',
-      textTransform: 'uppercase',
-    },
-    showcaseChipTitle: { color: colors.ink, fontSize: typography.scale.xs },
+    listTextCol: { flex: 1, gap: 2 },
+    listTitle: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '600' },
+    listSubtitle: { color: colors.inkMuted, fontSize: typography.scale.xs },
   });
 }
