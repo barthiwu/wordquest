@@ -75,4 +75,47 @@ describe('linking (web subpath)', () => {
     expect(linking.getPathFromState).toBeUndefined();
     expect(linking.prefixes[0]).toBe('https://barthiwu.github.io');
   });
+
+  // The actual bug (2026-09-29): useLinking's web implementation hands
+  // getStateFromPath the raw `location.pathname + location.search`
+  // directly -- it never consults `prefixes` the way native's
+  // Linking.parse() does -- so an incoming deep link still carrying the
+  // "/wordquest" subpath never matched any configured screen and
+  // silently resolved to `undefined`, falling back to the Stack's
+  // default initialRouteName ("Splash") and discarding the link. These
+  // three cases were the ones missing from this file that let that ship
+  // untested despite the "INCOMING" fix already being claimed above.
+  describe('getStateFromPath', () => {
+    it('strips the baseUrl off an incoming path before resolving, so a deep link matches its screen', () => {
+      const linking = requireWebLinking('/wordquest');
+
+      expect(linking.getStateFromPath).toBeDefined();
+      const state = linking.getStateFromPath!(
+        '/wordquest/verify-email?token=test123',
+        linking.config,
+      );
+
+      expect(state?.routes).toEqual([
+        expect.objectContaining({ name: 'VerifyEmail', params: { token: 'test123' } }),
+      ]);
+    });
+
+    it('resolves the root path (no extra segment after the baseUrl) same as before the fix', () => {
+      const linking = requireWebLinking('/wordquest');
+
+      // Neither "/wordquest" nor "/wordquest/" match any configured
+      // screen (Splash/Welcome/Main aren't URL-reachable -- see the
+      // config comment below) -- resolving to `undefined` here is
+      // correct and is what lets the Stack fall back to its default
+      // initialRouteName="Splash" for a plain, non-deep-linked launch.
+      expect(linking.getStateFromPath!('/wordquest', linking.config)).toBeUndefined();
+      expect(linking.getStateFromPath!('/wordquest/', linking.config)).toBeUndefined();
+    });
+
+    it('leaves getStateFromPath unset when there is no configured baseUrl (local web dev)', () => {
+      const linking = requireWebLinking('');
+
+      expect(linking.getStateFromPath).toBeUndefined();
+    });
+  });
 });

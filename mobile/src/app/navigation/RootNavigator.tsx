@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { NavigationContainer, type NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useThemeColors, useThemeStore } from '@/state/themeStore';
+import { useAuthStore } from '@/state/authStore';
 import { SplashScreen } from '@/features/splash/SplashScreen';
 import { WelcomeScreen } from '@/features/welcome/WelcomeScreen';
 import { RegistrationScreen } from '@/features/auth/RegistrationScreen';
@@ -120,6 +122,27 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export function RootNavigator() {
   const colors = useThemeColors();
   const mode = useThemeStore((s) => s.mode);
+  const hydrate = useAuthStore((s) => s.hydrate);
+
+  // Kick off session hydration unconditionally, independent of which
+  // screen ends up as the initial route. Normally that's Splash, which
+  // already awaits hydrate() itself before deciding Main vs Welcome --
+  // but a resolved deep link (VerifyEmail, ResetPassword, DailyQuest,
+  // ...) bypasses Splash entirely, the same way React Navigation deep
+  // linking always works: the matched screen becomes the sole initial
+  // route, so Splash's effect never runs for that launch. Without this,
+  // a deep-linked screen that reads auth state (e.g. VerifyEmailScreen's
+  // "Continue" button checking `accessToken`) would see the store's
+  // pre-hydration defaults for the entire session. authStore.hydrate()
+  // is idempotent (returns the same in-flight/settled promise on repeat
+  // calls), so this and Splash's own call never duplicate the work --
+  // whichever fires first wins, and every `useAuthStore` selector
+  // downstream (accessToken, isHydrated, user) re-renders reactively
+  // once it resolves, regardless of which screen is mounted at the time.
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+
   return (
     <NavigationContainer
       linking={linking}

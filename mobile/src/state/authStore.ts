@@ -34,34 +34,56 @@ export const useAuthStore = create<AuthState>((set) => {
     set({ accessToken: tokenState.accessToken, refreshToken: tokenState.refreshToken });
   });
 
+  // Both SplashScreen (the normal cold-start path) and RootNavigator (so a
+  // deep link that bypasses Splash entirely still hydrates the store --
+  // see RootNavigator.tsx's comment) call hydrate() on mount, which for a
+  // normal cold start means both fire within the same tick. This caches
+  // the in-flight promise so the second caller awaits the first one's
+  // work instead of reading tokens and re-fetching the profile a second
+  // time in parallel. The cache is cleared once hydration settles (rather
+  // than kept forever) so a later, genuinely separate hydrate() call --
+  // in a test, or any future re-hydrate after a session change -- still
+  // does real work instead of replaying a stale result.
+  let hydratePromise: Promise<void> | undefined;
+
   return {
     user: null,
     accessToken: null,
     refreshToken: null,
     isHydrated: false,
 
-    hydrate: async () => {
-      const { accessToken } = await useTokenStore.getState().loadTokens();
-      set({ isHydrated: true });
+    hydrate: () => {
+      if (hydratePromise) return hydratePromise;
 
-      // Tokens alone don't carry the profile -- only setSession (a fresh
-      // login/register/refresh response) does. A relaunch that skips those
-      // (restoring a session from SecureStore instead) would otherwise leave
-      // `user` null forever even though the tokens are perfectly valid,
-      // which is why displayName/avatar show as blank/placeholder until the
-      // next explicit login. Fetch it once here so a restored session looks
-      // the same as a fresh one. Failure (offline, or a dead refresh token --
-      // apiRequest already clears the session itself in that case) just
-      // leaves `user` null, same as before this existed.
-      if (accessToken) {
+      hydratePromise = (async () => {
         try {
-          const { getMe } = await import('@/services/users');
-          const user = await getMe(accessToken);
-          set({ user });
-        } catch {
-          // handled above
+          const { accessToken } = await useTokenStore.getState().loadTokens();
+          set({ isHydrated: true });
+
+          // Tokens alone don't carry the profile -- only setSession (a fresh
+          // login/register/refresh response) does. A relaunch that skips those
+          // (restoring a session from SecureStore instead) would otherwise leave
+          // `user` null forever even though the tokens are perfectly valid,
+          // which is why displayName/avatar show as blank/placeholder until the
+          // next explicit login. Fetch it once here so a restored session looks
+          // the same as a fresh one. Failure (offline, or a dead refresh token --
+          // apiRequest already clears the session itself in that case) just
+          // leaves `user` null, same as before this existed.
+          if (accessToken) {
+            try {
+              const { getMe } = await import('@/services/users');
+              const user = await getMe(accessToken);
+              set({ user });
+            } catch {
+              // handled above
+            }
+          }
+        } finally {
+          hydratePromise = undefined;
         }
-      }
+      })();
+
+      return hydratePromise;
     },
 
     setSession: async (result: AuthResult) => {
