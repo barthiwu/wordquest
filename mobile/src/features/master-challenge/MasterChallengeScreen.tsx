@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -26,6 +26,7 @@ import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import { BackButton } from '@/components/BackButton';
 import { FadeInUp } from '@/components/FadeInUp';
 import { ScoreRing } from '@/components/ScoreRing';
+import { trackEvent } from '@/services/analyticsClient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -63,6 +64,29 @@ export function MasterChallengeScreen({ navigation }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Telemetry spec §10. MASTER_CHALLENGE_VIEWED fires once on mount;
+  // MASTER_CHALLENGE_STARTED fires the first time status resolves as
+  // AVAILABLE (startedRef guards this against refiring on every
+  // useFocusEffect(load) refocus below); MASTER_CHALLENGE_ABANDONED
+  // fires on unmount only if the player actually started but never
+  // reached a result -- same mount/unmount-ref pattern used everywhere
+  // else this phase.
+  const startedRef = useRef(false);
+  // Unmount cleanups close over stale state, so `result` needs a ref
+  // mirror kept current at render time (same pattern as WordDuelScreen's
+  // latestRef) rather than reading the possibly-stale `result` directly.
+  const resultRef = useRef<MasterChallengeResult | null>(null);
+  resultRef.current = result;
+  useEffect(() => {
+    trackEvent('MASTER_CHALLENGE_VIEWED');
+    return () => {
+      if (startedRef.current && !resultRef.current) {
+        trackEvent('MASTER_CHALLENGE_ABANDONED');
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Score-category labels need the translated `t` function, so this
   // lives inside the component rather than as a module-level constant —
   // same keys (wordUsage/coherence/grammar/vocabulary/context), just
@@ -78,7 +102,13 @@ export function MasterChallengeScreen({ navigation }: Props) {
   const load = useCallback(() => {
     if (!accessToken) return;
     getMasterChallengeStatus(accessToken)
-      .then(setStatus)
+      .then((s) => {
+        setStatus(s);
+        if (s.status === 'AVAILABLE' && !startedRef.current) {
+          startedRef.current = true;
+          trackEvent('MASTER_CHALLENGE_STARTED');
+        }
+      })
       .catch(() => setError(t('loadError')));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
@@ -91,6 +121,7 @@ export function MasterChallengeScreen({ navigation }: Props) {
     setError(null);
     try {
       const r = await submitMasterChallenge(accessToken, paragraph.trim());
+      trackEvent('MASTER_CHALLENGE_COMPLETED');
       setResult(r);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t('submitError'));
