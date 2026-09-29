@@ -9,6 +9,7 @@ import { useThemeColors } from '@/state/themeStore';
 import {
   getWordDuelState,
   joinWordDuelQueue,
+  revealWordDuelClue,
   submitWordDuelAnswer,
   type WordDuelStateView,
 } from '@/services/wordDuel';
@@ -32,10 +33,10 @@ type Phase = 'loading' | 'waiting' | 'active' | 'no-opponent' | 'complete' | 'er
 
 /** How often to poll the live match state (spec §6/§11's deliberately
  * chosen REST + client-polling transport, not a WebSocket gateway —
- * see WordDuelService's doc comment). Short enough that a newly
- * revealed clue (CLUE_INTERVAL_SECONDS = 8s server-side) and an
- * opponent joining/finishing both feel prompt; well under the
- * controller's 120-req/min budget on the state endpoint. */
+ * see WordDuelService's doc comment). Short enough that the opponent
+ * joining/answering/finishing feels prompt; well under the controller's
+ * 120-req/min budget on the state endpoint. Clue reveals themselves are
+ * player-triggered (requestClue/revealWordDuelClue), not polled for. */
 const POLL_INTERVAL_MS = 2000;
 /** How long a correct/incorrect flash stays up before clearing itself —
  * a duel doesn't pause for the player to hit "Continue" the way
@@ -60,11 +61,13 @@ interface Feedback {
 
 /**
  * Word Duel (spec §6) — a two-player real-time race. Unlike
- * ScrambleQuest/Complete It there's no per-word timer or hint button:
- * clues reveal automatically as time passes (server-computed), and the
- * only clock that matters is the match-wide countdown. This screen's
- * countdown and clue count are refreshed by polling, not by a
- * WebSocket push — see POLL_INTERVAL_MS above.
+ * ScrambleQuest/Complete It there's no per-word timer, only the
+ * match-wide countdown — but clues ARE player-triggered here too (a
+ * "Clues" button, 2026-09-29 Barth spec), not automatic: the meaning
+ * is always shown, and tapping Clues reveals the word's synonym, then
+ * its origin/etymology, then a 60%-letters hint, in that fixed order.
+ * This screen's countdown/opponent progress are refreshed by polling,
+ * not a WebSocket push — see POLL_INTERVAL_MS above.
  */
 export function WordDuelScreen({ navigation }: Props) {
   const colors = useThemeColors();
@@ -73,11 +76,13 @@ export function WordDuelScreen({ navigation }: Props) {
   const { t } = useTranslation(['wordDuel', 'arcade', 'scrambleQuest']);
   const accessToken = useAuthStore((s) => s.accessToken);
   const userAvatarUrl = useAuthStore((s) => s.user?.avatarUrl ?? null);
+  const userUsername = useAuthStore((s) => s.user?.username ?? null);
 
   const [phase, setPhase] = useState<Phase>('loading');
   const [state, setState] = useState<WordDuelStateView | null>(null);
   const [answer, setAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [revealingClue, setRevealingClue] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -191,6 +196,30 @@ export function WordDuelScreen({ navigation }: Props) {
       }
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Player-triggered clue reveal (the "Clues" button, 2026-09-29 spec) —
+  // same CAS-guarded server endpoint shape as ScrambleQuest's hint
+  // button; a failed/raced tap (409, two taps in flight) just means
+  // another request already claimed this reveal, so it's silently
+  // dropped rather than shown as an error, same treatment handleSubmit
+  // gives a raced answer.
+  const handleRevealClue = async () => {
+    if (!accessToken || !state || revealingClue) return;
+    if (!state.current || state.current.cluesRevealed >= state.current.maxClues) return;
+    setRevealingClue(true);
+    try {
+      const fresh = await revealWordDuelClue(accessToken, state.matchId);
+      applyState(fresh);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        // Lost the race — another tap already revealed this clue.
+      } else {
+        setPhase('error');
+      }
+    } finally {
+      setRevealingClue(false);
     }
   };
 
@@ -421,14 +450,19 @@ export function WordDuelScreen({ navigation }: Props) {
 
         <View style={styles.scoreRow}>
           <View style={[styles.scoreCard, styles.scoreCardSelf]}>
-            <Text style={styles.scoreLabel}>{t('youLabel')}</Text>
+            <Text style={styles.scoreLabel}>
+              {userUsername ? t('youWithUsernameLabel', { username: userUsername }) : t('youLabel')}
+            </Text>
             <Text style={styles.scoreValue}>
               {t('correctCountLabel', { count: state.correctCount })}
             </Text>
             <Text style={styles.scoreXp}>{t('xpLabel', { xp: state.totalXp })}</Text>
           </View>
           <View style={styles.scoreCard}>
-            <Text style={styles.scoreLabel}>{t('opponentLabel')}</Text>
+            {/* Real username live as soon as an opponent has joined (2026-09-29
+                spec) — falls back to the generic label only in the brief window
+                before the backend has resolved their identity. */}
+            <Text style={styles.scoreLabel}>{state.opponent?.username ?? t('opponentLabel')}</Text>
             <Text style={styles.scoreValue}>
               {t('correctCountLabel', { count: state.opponent?.correctCount ?? 0 })}
             </Text>
@@ -445,6 +479,12 @@ export function WordDuelScreen({ navigation }: Props) {
                 end={{ x: 1, y: 0 }}
                 style={styles.puzzleCardAccentBar}
               />
+              {/* Always shown, never gated behind a clue — 2026-09-29,
+                  Barth: "The meaning of the word is supposed to appear
+                  normally". */}
+              <Text style={styles.meaningText}>
+                {t('meaningFormat', { meaning: state.current.meaning })}
+              </Text>
               <Text style={styles.displayHint}>{state.current.displayHint.toUpperCase()}</Text>
               <Text style={styles.clueProgress}>
                 {t('clueProgressLabel', {
@@ -452,6 +492,48 @@ export function WordDuelScreen({ navigation }: Props) {
                   max: state.current.maxClues,
                 })}
               </Text>
+
+              {/* Player-triggered — the "Clues" button (2026-09-29 spec):
+                  tapping it reveals the next clue, in fixed order
+                  (synonym, then origin/etymology, then a 60%-letter
+                  hint — see handleRevealClue). */}
+              <Pressable
+                style={[
+                  styles.cluesButton,
+                  (state.current.cluesRevealed >= state.current.maxClues || revealingClue) &&
+                    styles.buttonDisabled,
+                ]}
+                onPress={handleRevealClue}
+                disabled={state.current.cluesRevealed >= state.current.maxClues || revealingClue}
+                accessibilityRole="button"
+                accessibilityLabel={t('cluesButton')}
+              >
+                {revealingClue ? (
+                  <ActivityIndicator color={colors.ink} />
+                ) : (
+                  <Text style={styles.cluesButtonText}>
+                    {state.current.cluesRevealed < state.current.maxClues
+                      ? `${t('cluesButton')} (${t('scrambleQuest:hintsRemainingLabel', {
+                          count: state.current.maxClues - state.current.cluesRevealed,
+                        })})`
+                      : t('noCluesRemaining')}
+                  </Text>
+                )}
+              </Pressable>
+
+              {state.current.clues.map((clue, index) => (
+                <Text key={`${clue.type}-${index}`} style={styles.clueText}>
+                  {clue.type === 'SYNONYM' &&
+                    (clue.text
+                      ? t('synonymClueLabel', { text: clue.text })
+                      : t('synonymUnavailable'))}
+                  {clue.type === 'ORIGIN' &&
+                    (clue.text
+                      ? t('originClueLabel', { text: clue.text })
+                      : t('originUnavailable'))}
+                  {clue.type === 'HINT' && t('hintClueRevealedLabel')}
+                </Text>
+              ))}
             </View>
 
             <LetterBoxInput
@@ -620,7 +702,27 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontWeight: '700',
       letterSpacing: 4,
     },
+    meaningText: {
+      color: colors.glyph,
+      fontSize: typography.scale.sm,
+      fontStyle: 'italic',
+      textAlign: 'center',
+    },
     clueProgress: { color: colors.inkMuted, fontSize: typography.scale.xs },
+    cluesButton: {
+      borderRadius: radius.pill,
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.glyph,
+    },
+    cluesButtonText: { color: colors.glyph, fontSize: typography.scale.xs, fontWeight: '700' },
+    clueText: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+      textAlign: 'center',
+      paddingHorizontal: spacing.sm,
+    },
     input: {
       backgroundColor: colors.surface,
       borderRadius: radius.md,

@@ -1,4 +1,9 @@
-import { getWordDuelState, joinWordDuelQueue, submitWordDuelAnswer } from './wordDuel';
+import {
+  getWordDuelState,
+  joinWordDuelQueue,
+  revealWordDuelClue,
+  submitWordDuelAnswer,
+} from './wordDuel';
 import { apiRequest } from './apiClient';
 
 jest.mock('./apiClient', () => ({ apiRequest: jest.fn() }));
@@ -29,6 +34,15 @@ describe('wordDuel service', () => {
     expect(apiRequest).toHaveBeenCalledWith('/arcade/word-duel/m1/answer', {
       method: 'POST',
       body: { answer: 'train' },
+      accessToken: 'tok',
+    });
+  });
+
+  it('reveals the next clue for a match', async () => {
+    (apiRequest as jest.Mock).mockResolvedValueOnce({});
+    await revealWordDuelClue('tok', 'm1');
+    expect(apiRequest).toHaveBeenCalledWith('/arcade/word-duel/m1/clue', {
+      method: 'POST',
       accessToken: 'tok',
     });
   });

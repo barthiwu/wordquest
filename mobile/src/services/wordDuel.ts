@@ -4,11 +4,12 @@ import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
 /** Opponent's live score only — never their current word or answers
  * (backend WordDuelOpponentView; matches the server's own "score only,
  * never their current word" comment). userId/username/avatarUrl are
- * deliberately absent (undefined) while the match is WAITING/ACTIVE —
- * they are populated only once `status` is COMPLETED, backing the
- * avatar-tap "Profile / Add Friend / Block" popup on the post-match
- * result (2026-09). Never render/use these three fields outside a
- * COMPLETED state. */
+ * populated as soon as an opponent has actually joined the match (ACTIVE
+ * or COMPLETED) — 2026-09-29, Barth: the live scoreboard shows both
+ * players' real usernames, not just after the match ends. Still absent
+ * (undefined) while the match is WAITING (no opponent yet). The avatar-
+ * tap "Profile / Add Friend / Block" popup still only opens from the
+ * post-match result screen. */
 export interface WordDuelOpponentView {
   correctCount: number;
   totalXp: number;
@@ -17,15 +18,33 @@ export interface WordDuelOpponentView {
   avatarUrl?: string | null;
 }
 
+/** One of this player's current word's three clues, in fixed reveal
+ * order: synonym, then origin/etymology, then a hint that reveals ~60%
+ * of the word's letters (see `displayHint` below, which is what actually
+ * changes for the hint clue — its own `text` is always null). `text` is
+ * null when this word has no data for that clue type — most notably
+ * ORIGIN, which is always null right now: the vocabulary corpus has no
+ * origin/etymology content yet (a real content gap, not a bug — see
+ * WordDuelScreen for how this renders). */
+export interface WordDuelClueView {
+  type: 'SYNONYM' | 'ORIGIN' | 'HINT';
+  text: string | null;
+}
+
 /** A letter-by-letter display of this player's current word — spaces
  * between positions, revealed letters uppercase, hidden ones `_`. Clues
- * reveal automatically over time server-side (WORD_DUEL_CONFIG.
- * CLUE_INTERVAL_SECONDS); there is no hint button, unlike ScrambleQuest —
- * polling `getWordDuelState` is what picks up a newly-revealed letter. */
+ * are player-triggered via `revealWordDuelClue` (a real "Clues" button,
+ * 2026-09-29), same on-demand shape as ScrambleQuest's hint button —
+ * `displayHint` only reveals letters once the 3rd (HINT) clue has
+ * actually been tapped. */
 export interface WordDuelCurrentWordView {
+  /** The word's dictionary meaning — always shown, never gated behind a clue. */
+  meaning: string;
   displayHint: string;
   cluesRevealed: number;
   maxClues: number;
+  /** One entry per clue revealed so far, oldest first. */
+  clues: WordDuelClueView[];
 }
 
 export interface WordDuelResultView {
@@ -102,6 +121,20 @@ export function submitWordDuelAnswer(
   return apiRequest<WordDuelAnswerResult>(`/arcade/word-duel/${matchId}/answer`, {
     method: 'POST',
     body: { answer },
+    accessToken,
+  });
+}
+
+/** Reveals this player's next clue on their current word (the "Clues"
+ * button, 2026-09-29) — returns the full refreshed state, same as
+ * `getWordDuelState`/`joinWordDuelQueue`, so the caller can just
+ * `applyState` it directly. */
+export function revealWordDuelClue(
+  accessToken: string,
+  matchId: string,
+): Promise<WordDuelStateView> {
+  return apiRequest<WordDuelStateView>(`/arcade/word-duel/${matchId}/clue`, {
+    method: 'POST',
     accessToken,
   });
 }
