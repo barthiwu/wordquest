@@ -184,6 +184,8 @@
       "subtitle": "Deine Reise ist genau dort, wo du sie verlassen hast.",
       "emailPlaceholder": "E-Mail",
       "passwordPlaceholder": "Passwort",
+      "showPassword": "Passwort anzeigen",
+      "hidePassword": "Passwort verbergen",
       "errorIncorrect": "Falsche E-Mail-Adresse oder falsches Passwort.",
       "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
       "submit": "Anmelden",

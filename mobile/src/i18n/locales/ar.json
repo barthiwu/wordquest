@@ -184,6 +184,8 @@
       "subtitle": "مغامرتك لا تزال في انتظارك.",
       "emailPlaceholder": "البريد الإلكتروني",
       "passwordPlaceholder": "كلمة المرور",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
       "errorIncorrect": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
       "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
       "submit": "تسجيل الدخول",

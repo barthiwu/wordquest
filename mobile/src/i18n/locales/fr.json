@@ -184,6 +184,8 @@
       "subtitle": "Votre Aventure est exactement là où vous l’avez laissée.",
       "emailPlaceholder": "E-mail",
       "passwordPlaceholder": "Mot de passe",
+      "showPassword": "Afficher le mot de passe",
+      "hidePassword": "Masquer le mot de passe",
       "errorIncorrect": "E-mail ou mot de passe incorrect.",
       "errorGeneric": "Une erreur s'est produite. Veuillez réessayer.",
       "submit": "Se connecter",

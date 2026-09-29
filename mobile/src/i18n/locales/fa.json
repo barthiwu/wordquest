@@ -184,6 +184,8 @@
       "subtitle": "ماجرایتان دقیقاً همانجایی است که رهایش کردید.",
       "emailPlaceholder": "ایمیل",
       "passwordPlaceholder": "رمز عبور",
+      "showPassword": "نمایش رمز عبور",
+      "hidePassword": "پنهان کردن رمز عبور",
       "errorIncorrect": "ایمیل یا رمز عبور نادرست است.",
       "errorGeneric": "مشکلی پیش آمد. لطفاً دوباره تلاش کنید.",
       "submit": "ورود",

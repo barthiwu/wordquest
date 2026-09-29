@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { login } from '@/services/auth';
@@ -32,6 +33,7 @@ export function LoginScreen({ navigation }: Props) {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const canSubmit = email.includes('@') && password.length > 0;
 
@@ -76,15 +78,32 @@ export function LoginScreen({ navigation }: Props) {
           keyboardType="email-address"
           accessibilityLabel={t('login.emailPlaceholder')}
         />
-        <TextInput
-          style={styles.input}
-          placeholder={t('login.passwordPlaceholder')}
-          placeholderTextColor={colors.inkMuted}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          accessibilityLabel={t('login.passwordPlaceholder')}
-        />
+        <View style={styles.passwordField}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder={t('login.passwordPlaceholder')}
+            placeholderTextColor={colors.inkMuted}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!isPasswordVisible}
+            accessibilityLabel={t('login.passwordPlaceholder')}
+          />
+          <Pressable
+            style={styles.passwordToggle}
+            onPress={() => setIsPasswordVisible((visible) => !visible)}
+            accessibilityRole="button"
+            accessibilityLabel={
+              isPasswordVisible ? t('login.hidePassword') : t('login.showPassword')
+            }
+            hitSlop={8}
+          >
+            <Ionicons
+              name={isPasswordVisible ? 'eye-off' : 'eye'}
+              size={20}
+              color={colors.inkMuted}
+            />
+          </Pressable>
+        </View>
 
         {error && <Text style={styles.error}>{error}</Text>}
 
@@ -152,6 +171,25 @@ function createStyles(colors: ThemeColors, topInset: number) {
       paddingVertical: spacing.md,
       color: colors.ink,
       fontSize: typography.scale.md,
+    },
+    passwordField: {
+      justifyContent: 'center',
+    },
+    passwordInput: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      paddingRight: spacing.xxl,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+    },
+    passwordToggle: {
+      position: 'absolute',
+      right: spacing.md,
+      padding: spacing.xs,
     },
     error: { color: colors.danger, fontSize: typography.scale.sm },
     link: {

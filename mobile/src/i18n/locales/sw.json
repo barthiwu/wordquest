@@ -184,6 +184,8 @@
       "subtitle": "Safari yako iko pale pale ulipoiacha.",
       "emailPlaceholder": "Barua pepe",
       "passwordPlaceholder": "Nenosiri",
+      "showPassword": "Onyesha nenosiri",
+      "hidePassword": "Ficha nenosiri",
       "errorIncorrect": "Barua pepe au nenosiri sio sahihi.",
       "errorGeneric": "Hitilafu imetokea. Tafadhali jaribu tena.",
       "submit": "Ingia",

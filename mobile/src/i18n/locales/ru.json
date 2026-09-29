@@ -184,6 +184,8 @@
       "subtitle": "Ваше Путешествие ждёт там же, где вы его оставили.",
       "emailPlaceholder": "Email",
       "passwordPlaceholder": "Пароль",
+      "showPassword": "Показать пароль",
+      "hidePassword": "Скрыть пароль",
       "errorIncorrect": "Неверный email или пароль.",
       "errorGeneric": "Что-то пошло не так. Попробуйте ещё раз.",
       "submit": "Войти",

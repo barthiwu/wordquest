@@ -184,6 +184,8 @@
       "subtitle": "Tu Aventura está justo donde la dejaste.",
       "emailPlaceholder": "Correo electrónico",
       "passwordPlaceholder": "Contraseña",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
       "errorIncorrect": "Correo electrónico o contraseña incorrectos.",
       "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
       "submit": "Iniciar sesión",

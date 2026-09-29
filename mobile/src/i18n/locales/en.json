@@ -184,6 +184,8 @@
       "subtitle": "Your Journey is right where you left it.",
       "emailPlaceholder": "Email",
       "passwordPlaceholder": "Password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
       "errorIncorrect": "Incorrect email or password.",
       "errorGeneric": "Something went wrong. Please try again.",
       "submit": "Log in",

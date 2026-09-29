@@ -184,6 +184,8 @@
       "subtitle": "你的旅程就在你离开的地方。",
       "emailPlaceholder": "邮箱",
       "passwordPlaceholder": "密码",
+      "showPassword": "显示密码",
+      "hidePassword": "隐藏密码",
       "errorIncorrect": "邮箱或密码错误。",
       "errorGeneric": "出错了，请重试。",
       "submit": "登录",

@@ -184,6 +184,8 @@
       "subtitle": "Sua Jornada está exatamente onde você a deixou.",
       "emailPlaceholder": "E-mail",
       "passwordPlaceholder": "Senha",
+      "showPassword": "Mostrar senha",
+      "hidePassword": "Ocultar senha",
       "errorIncorrect": "E-mail ou senha incorretos.",
       "errorGeneric": "Algo deu errado. Tente novamente.",
       "submit": "Entrar",

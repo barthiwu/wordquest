@@ -184,6 +184,8 @@
       "subtitle": "आपकी यात्रा वहीं है जहां आपने इसे छोड़ा था।",
       "emailPlaceholder": "ईमेल",
       "passwordPlaceholder": "पासवर्ड",
+      "showPassword": "पासवर्ड दिखाएं",
+      "hidePassword": "पासवर्ड छिपाएं",
       "errorIncorrect": "गलत ईमेल या पासवर्ड।",
       "errorGeneric": "कुछ गलत हो गया। कृपया पुन: प्रयास करें।",
       "submit": "लॉग इन करें",

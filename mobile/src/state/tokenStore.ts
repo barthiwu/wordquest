@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 
@@ -38,15 +39,54 @@ interface TokenState {
  *
  * Tokens live in SecureStore (Keychain/Keystore-backed), not AsyncStorage
  * -- they're credentials, not preferences.
+ *
+ * On web there's no Keychain/Keystore to back SecureStore -- its web
+ * shim doesn't implement the read path (confirmed via the browser
+ * console: "getValueWithKeyAsync is not a function"), so hydrate()
+ * silently failed and every page load looked logged-out even right
+ * after a successful login. `storage` below swaps in a thin
+ * localStorage-backed shim on web only; native (iOS/Android) keeps using
+ * real SecureStore unchanged. localStorage is per-browser, unencrypted,
+ * origin-scoped storage -- an acceptable tradeoff for the browser-play
+ * build (see docs), not a claim that it's as secure as Keychain/Keystore.
  */
+const webStorage = {
+  getItemAsync: async (key: string): Promise<string | null> => {
+    try {
+      return window.localStorage.getItem(key);
+    } catch {
+      // Private-browsing / storage-blocked contexts can throw on access --
+      // treat that the same as "nothing stored" rather than crashing.
+      return null;
+    }
+  },
+  setItemAsync: async (key: string, value: string): Promise<void> => {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch {
+      // Storage full or blocked -- the token still lives in memory for
+      // this page load, it just won't survive a refresh. Non-fatal.
+    }
+  },
+  deleteItemAsync: async (key: string): Promise<void> => {
+    try {
+      window.localStorage.removeItem(key);
+    } catch {
+      // Nothing to clean up if storage was never writable.
+    }
+  },
+};
+
+const storage = Platform.OS === 'web' ? webStorage : SecureStore;
+
 export const useTokenStore = create<TokenState>((set) => ({
   accessToken: null,
   refreshToken: null,
 
   loadTokens: async () => {
     const [accessToken, refreshToken] = await Promise.all([
-      SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
-      SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
+      storage.getItemAsync(ACCESS_TOKEN_KEY),
+      storage.getItemAsync(REFRESH_TOKEN_KEY),
     ]);
     set({ accessToken, refreshToken });
     return { accessToken, refreshToken };
@@ -54,16 +94,16 @@ export const useTokenStore = create<TokenState>((set) => ({
 
   setTokens: async (accessToken: string, refreshToken: string) => {
     await Promise.all([
-      SecureStore.setItemAsync(ACCESS_TOKEN_KEY, accessToken),
-      SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken),
+      storage.setItemAsync(ACCESS_TOKEN_KEY, accessToken),
+      storage.setItemAsync(REFRESH_TOKEN_KEY, refreshToken),
     ]);
     set({ accessToken, refreshToken });
   },
 
   clearTokens: async () => {
     await Promise.all([
-      SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
-      SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
+      storage.deleteItemAsync(ACCESS_TOKEN_KEY),
+      storage.deleteItemAsync(REFRESH_TOKEN_KEY),
     ]);
     set({ accessToken: null, refreshToken: null });
   },
