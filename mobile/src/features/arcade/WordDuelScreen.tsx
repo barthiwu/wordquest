@@ -255,10 +255,23 @@ export function WordDuelScreen({ navigation }: Props) {
         try {
           const fresh = await getWordDuelState(accessToken, matchId);
           applyState(fresh);
-        } catch {
+        } catch (refreshErr) {
+          trackEvent(
+            'GAMEPLAY_ERROR',
+            {
+              step: 'duelAnswerRefetchAfterRace',
+              status: refreshErr instanceof ApiError ? refreshErr.status : undefined,
+            },
+            'WordDuel',
+          );
           setPhase('error');
         }
       } else {
+        trackEvent(
+          'GAMEPLAY_ERROR',
+          { step: 'duelAnswerSubmit', status: err instanceof ApiError ? err.status : undefined },
+          'WordDuel',
+        );
         setPhase('error');
       }
     } finally {

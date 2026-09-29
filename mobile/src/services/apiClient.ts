@@ -1,5 +1,6 @@
 import { env } from '@/app/config/env';
 import { useTokenStore } from '@/state/tokenStore';
+import { trackEvent } from './analyticsClient';
 
 /**
  * Thin fetch wrapper — every network call the app makes goes through here.
@@ -96,11 +97,17 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const payload = isJson ? await response.json() : undefined;
 
   if (!response.ok) {
-    throw new ApiError(
-      (payload && (payload as { message?: string }).message) || response.statusText,
-      response.status,
-      payload,
-    );
+    const message = (payload && (payload as { message?: string }).message) || response.statusText;
+    // Single choke point (Telemetry spec, generic error tracking) --
+    // every failed API call in the app funnels through this one throw
+    // site, so this is the one place API_ERROR needs to fire rather
+    // than instrumenting every services/*.ts caller individually. Not
+    // wrapped in the 401-refresh-retry branch above: by the time
+    // execution reaches here, `response` is already the final
+    // (post-retry, if any) response, so a request that succeeded after
+    // a silent token refresh never reports an error at all.
+    trackEvent('API_ERROR', { path, method, status: response.status, message });
+    throw new ApiError(message, response.status, payload);
   }
 
   return payload as T;

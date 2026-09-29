@@ -125,6 +125,10 @@ export function MasterChallengeScreen({ navigation }: Props) {
       setResult(r);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t('submitError'));
+      trackEvent('GAMEPLAY_ERROR', {
+        step: 'masterChallengeSubmit',
+        status: err instanceof ApiError ? err.status : undefined,
+      });
     } finally {
       setSubmitting(false);
     }

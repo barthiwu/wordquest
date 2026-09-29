@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { AppProviders } from '@/app/providers/AppProviders';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { RootNavigator } from '@/app/navigation/RootNavigator';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import { useThemeStore } from '@/state/themeStore';
@@ -23,10 +24,12 @@ export default function App() {
   }, [hydrateTheme]);
 
   return (
-    <AppProviders>
-      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
-      <RootNavigator />
-      <ThemeToggleButton />
-    </AppProviders>
+    <ErrorBoundary>
+      <AppProviders>
+        <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+        <RootNavigator />
+        <ThemeToggleButton />
+      </AppProviders>
+    </ErrorBoundary>
   );
 }

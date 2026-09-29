@@ -415,6 +415,11 @@ export function DailyQuestScreen({ route, navigation }: Props) {
       setStage('guessFeedback');
     } catch (err) {
       if (err instanceof ApiError) setErrorMessage(err.message);
+      trackEvent('GAMEPLAY_ERROR', {
+        questKey,
+        step: 'guess',
+        status: err instanceof ApiError ? err.status : undefined,
+      });
       setStage('error');
     } finally {
       setGuessBusy(false);
@@ -516,6 +521,11 @@ export function DailyQuestScreen({ route, navigation }: Props) {
       setStage('sentence');
     } catch (err) {
       if (err instanceof ApiError) setErrorMessage(err.message);
+      trackEvent('GAMEPLAY_ERROR', {
+        questKey,
+        step: 'understandingAck',
+        status: err instanceof ApiError ? err.status : undefined,
+      });
       setStage('error');
     }
   };
@@ -531,6 +541,11 @@ export function DailyQuestScreen({ route, navigation }: Props) {
       setStage('sentenceFeedback');
     } catch (err) {
       if (err instanceof ApiError) setErrorMessage(err.message);
+      trackEvent('GAMEPLAY_ERROR', {
+        questKey,
+        step: 'sentence',
+        status: err instanceof ApiError ? err.status : undefined,
+      });
       setStage('error');
     } finally {
       setSentenceBusy(false);
@@ -558,6 +573,11 @@ export function DailyQuestScreen({ route, navigation }: Props) {
       setStage('paragraphFeedback');
     } catch (err) {
       if (err instanceof ApiError) setErrorMessage(err.message);
+      trackEvent('GAMEPLAY_ERROR', {
+        questKey,
+        step: 'paragraph',
+        status: err instanceof ApiError ? err.status : undefined,
+      });
       setStage('error');
     } finally {
       setParagraphBusy(false);

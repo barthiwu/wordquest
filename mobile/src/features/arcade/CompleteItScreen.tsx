@@ -30,6 +30,7 @@ import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
 import { trackEvent } from '@/services/analyticsClient';
+import { ApiError } from '@/services/apiClient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -180,7 +181,12 @@ export function CompleteItScreen({ navigation }: Props) {
         });
       }
       setPhase('feedback');
-    } catch {
+    } catch (err) {
+      trackEvent('GAMEPLAY_ERROR', {
+        game: 'COMPLETE_IT',
+        step: 'submit',
+        status: err instanceof ApiError ? err.status : undefined,
+      });
       setPhase('error');
     }
   };
