@@ -15,7 +15,7 @@ module.exports = {
   ],
   settings: { react: { version: 'detect' } },
   env: { 'react-native/react-native': true, es2021: true, node: true },
-  ignorePatterns: ['node_modules', '.expo', 'dist', 'babel.config.js'],
+  ignorePatterns: ['node_modules', '.expo', 'dist', 'babel.config.js', 'scripts'], // scripts/ is plain Node CJS build tooling, not app source
   rules: {
     'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',

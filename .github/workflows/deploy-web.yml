@@ -19,6 +19,15 @@ name: Deploy web build to GitHub Pages
 # exists (e.g. the Railway staging URL); until then the build still
 # succeeds but the deployed site can't reach an API.
 
+# GitHub Pages serves this as plain static files -- no server-side
+# router -- so a real page load at a nested path (a deep link, a
+# verify-email/reset-password email link, or a browser refresh on any
+# in-app route) 404s: there's no literal file there, only dist/
+# index.html at the root. scripts/inject-spa-fallback.js writes the
+# standard GitHub-Pages SPA workaround (a 404.html redirect plus a
+# restore script in index.html) after every export -- see that file's
+# own comment for the full mechanism.
+
 on:
   push:
     branches: [main]
@@ -54,6 +63,8 @@ jobs:
         env:
           EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
         run: npx expo export -p web
+      - name: Add GitHub Pages SPA fallback
+        run: node scripts/inject-spa-fallback.js
       - uses: actions/upload-pages-artifact@v3
         with:
           path: mobile/dist
