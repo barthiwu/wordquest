@@ -9,15 +9,19 @@ function progressionRow(overrides: {
   totalXp: number;
   level?: number;
   clanName?: string | null;
+  countryCode?: string | null;
+  lastActiveOn?: Date | null;
 }) {
   return {
     userId: overrides.userId,
     totalXp: overrides.totalXp,
     level: overrides.level ?? 1,
+    lastActiveOn: overrides.lastActiveOn ?? null,
     user: {
       id: overrides.userId,
       username: overrides.username,
       clan: overrides.clanName ? { name: overrides.clanName } : null,
+      countryCode: overrides.countryCode ?? null,
     },
   };
 }
@@ -168,6 +172,87 @@ describe('LeaderboardsService', () => {
       expect(result.entries[0].clanName).toBe('Ember Vale');
       expect(result.entries[1].clanName).toBeNull();
     });
+
+    it("surfaces a player's lastActiveOn instant on their entry", async () => {
+      const activeAt = new Date('2026-09-28T10:00:00.000Z');
+      prismaMock.userProgression.findMany.mockResolvedValueOnce([
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900, lastActiveOn: activeAt }),
+      ]);
+      prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900, lastActiveOn: activeAt }),
+      );
+      prismaMock.userProgression.count.mockResolvedValueOnce(0);
+
+      const result = await service.getGlobal('u1');
+
+      expect(result.entries[0].lastActiveOn).toEqual(activeAt);
+    });
+  });
+
+  describe('getCountry', () => {
+    it('throws BadRequestException when the viewer has no country set', async () => {
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ countryCode: null });
+
+      await expect(service.getCountry('u1')).rejects.toThrow(BadRequestException);
+      expect(prismaMock.userProgression.findMany).not.toHaveBeenCalled();
+    });
+
+    it("scopes the query to the viewer's exact country and ranks only that country", async () => {
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ countryCode: 'NG' });
+      prismaMock.userProgression.findMany.mockResolvedValueOnce([
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900, countryCode: 'NG' }),
+        progressionRow({ userId: 'u2', username: 'Bo', totalXp: 300, countryCode: 'NG' }),
+      ]);
+
+      const result = await service.getCountry('u2');
+
+      expect(prismaMock.userProgression.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { user: { countryCode: 'NG' } } }),
+      );
+      expect(result.entries).toHaveLength(2);
+      expect(result.viewer).toMatchObject({ userId: 'u2', rank: 2 });
+    });
+
+    it('throws when the viewer somehow is not present in their own country rows', async () => {
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ countryCode: 'NG' });
+      prismaMock.userProgression.findMany.mockResolvedValueOnce([]);
+
+      await expect(service.getCountry('u1')).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('getContinent', () => {
+    it('throws BadRequestException when the viewer has no country set', async () => {
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ countryCode: null });
+
+      await expect(service.getContinent('u1')).rejects.toThrow(BadRequestException);
+      expect(prismaMock.userProgression.findMany).not.toHaveBeenCalled();
+    });
+
+    it("scopes the query to every country in the viewer's continent", async () => {
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ countryCode: 'NG' });
+      prismaMock.userProgression.findMany.mockResolvedValueOnce([
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900, countryCode: 'NG' }),
+        progressionRow({ userId: 'u2', username: 'Kwame', totalXp: 400, countryCode: 'GH' }),
+      ]);
+
+      const result = await service.getContinent('u1');
+
+      expect(prismaMock.userProgression.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { user: { countryCode: { in: expect.arrayContaining(['NG', 'GH']) } } },
+        }),
+      );
+      expect(result.entries).toHaveLength(2);
+      expect(result.viewer).toMatchObject({ userId: 'u1', rank: 1 });
+    });
+
+    it('throws when the viewer somehow is not present in their own continent rows', async () => {
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({ countryCode: 'NG' });
+      prismaMock.userProgression.findMany.mockResolvedValueOnce([]);
+
+      await expect(service.getContinent('u1')).rejects.toThrow(BadRequestException);
+    });
   });
 
   describe('getFriends', () => {
@@ -213,14 +298,15 @@ describe('LeaderboardsService', () => {
         ])
         .mockResolvedValueOnce([{ userId: 'u2', _sum: { rewardXp: 500 } }]); // "ahead" query for viewer
       prismaMock.user.findMany.mockResolvedValueOnce([
-        { id: 'u2', username: 'Bo', clan: null, countryCode: null },
-        { id: 'u1', username: 'Me', clan: null, countryCode: null },
+        { id: 'u2', username: 'Bo', clan: null, countryCode: null, progression: null },
+        { id: 'u1', username: 'Me', clan: null, countryCode: null, progression: null },
       ]);
       prismaMock.bossBattlePlayer.aggregate.mockResolvedValueOnce({ _sum: { rewardXp: 200 } });
       prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({
         username: 'Me',
         clan: null,
         countryCode: null,
+        progression: null,
       });
 
       const result = await service.getBossBattle('u1');
@@ -234,6 +320,7 @@ describe('LeaderboardsService', () => {
           countryCode: null,
           level: 0,
           totalXp: 500,
+          lastActiveOn: null,
         },
         {
           rank: 2,
@@ -243,6 +330,7 @@ describe('LeaderboardsService', () => {
           countryCode: null,
           level: 0,
           totalXp: 200,
+          lastActiveOn: null,
         },
       ]);
       expect(result.viewer).toMatchObject({ userId: 'u1', rank: 2, totalXp: 200 });
@@ -253,18 +341,47 @@ describe('LeaderboardsService', () => {
         .mockResolvedValueOnce([{ userId: 'u2', _sum: { rewardXp: 500 } }])
         .mockResolvedValueOnce([{ userId: 'u2', _sum: { rewardXp: 500 } }]);
       prismaMock.user.findMany.mockResolvedValueOnce([
-        { id: 'u2', username: 'Bo', clan: null, countryCode: null },
+        { id: 'u2', username: 'Bo', clan: null, countryCode: null, progression: null },
       ]);
       prismaMock.bossBattlePlayer.aggregate.mockResolvedValueOnce({ _sum: { rewardXp: null } });
       prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({
         username: 'Newbie',
         clan: null,
         countryCode: null,
+        progression: null,
       });
 
       const result = await service.getBossBattle('u1');
 
       expect(result.viewer).toMatchObject({ userId: 'u1', rank: 2, totalXp: 0 });
+    });
+
+    it("surfaces a player's lastActiveOn from their progression relation", async () => {
+      const activeAt = new Date('2026-09-29T08:00:00.000Z');
+      prismaMock.bossBattlePlayer.groupBy
+        .mockResolvedValueOnce([{ userId: 'u2', _sum: { rewardXp: 500 } }])
+        .mockResolvedValueOnce([]);
+      prismaMock.user.findMany.mockResolvedValueOnce([
+        {
+          id: 'u2',
+          username: 'Bo',
+          clan: null,
+          countryCode: null,
+          progression: { lastActiveOn: activeAt },
+        },
+      ]);
+      prismaMock.bossBattlePlayer.aggregate.mockResolvedValueOnce({ _sum: { rewardXp: 0 } });
+      prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({
+        username: 'Me',
+        clan: null,
+        countryCode: null,
+        progression: { lastActiveOn: activeAt },
+      });
+
+      const result = await service.getBossBattle('u1');
+
+      expect(result.entries[0].lastActiveOn).toEqual(activeAt);
+      expect(result.viewer.lastActiveOn).toEqual(activeAt);
     });
   });
 

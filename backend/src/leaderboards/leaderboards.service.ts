@@ -10,6 +10,12 @@ export interface LeaderboardEntry {
   countryCode: string | null;
   level: number;
   totalXp: number;
+  /** When this player was last active (UserProgression.lastActiveOn's raw
+   * instant, same field the streak system writes to) — null if they've
+   * never recorded activity. The mobile client uses this to show an
+   * "active today" style indicator; it is not itself a "currently
+   * online" signal, just the most recent activity timestamp we track. */
+  lastActiveOn: Date | null;
 }
 
 export interface LeaderboardView {
@@ -21,6 +27,7 @@ export interface LeaderboardView {
 interface ProgressionRow {
   totalXp: number;
   level: number;
+  lastActiveOn: Date | null;
   user: { id: string; username: string; clan: { name: string } | null; countryCode: string | null };
 }
 
@@ -55,6 +62,13 @@ const MAX_LIMIT = 100;
  * BossBattlePlayer, not a ProgressionRow), since Boss Battle is a group
  * event with its own XP pool rather than a per-player running total
  * WordQuest already tracks anywhere else.
+ *
+ * Global/Country/Continent were briefly dropped from the mobile UI
+ * (Sept 2026, in favor of Clan/Friend/Boss Battle only) and restored
+ * shortly after (2026-09, Barth: wants to follow how people are
+ * progressing across Overall and Country specifically) -- the service
+ * methods below were never removed, so this restore is UI-only on the
+ * mobile side; see LeaderboardScreen.
  */
 @Injectable()
 export class LeaderboardsService {
@@ -280,7 +294,13 @@ export class LeaderboardsService {
 
     const users = await this.prisma.user.findMany({
       where: { id: { in: grouped.map((g: { userId: string }) => g.userId) } },
-      select: { id: true, username: true, clan: { select: { name: true } }, countryCode: true },
+      select: {
+        id: true,
+        username: true,
+        clan: { select: { name: true } },
+        countryCode: true,
+        progression: { select: { lastActiveOn: true } },
+      },
     });
     const userById = new Map(users.map((u) => [u.id, u]));
 
@@ -295,6 +315,7 @@ export class LeaderboardsService {
           countryCode: user?.countryCode ?? null,
           level: 0,
           totalXp: g._sum.rewardXp ?? 0,
+          lastActiveOn: user?.progression?.lastActiveOn ?? null,
         };
       },
     );
@@ -308,7 +329,12 @@ export class LeaderboardsService {
       this.prisma.bossBattlePlayer.aggregate({ where: { userId }, _sum: { rewardXp: true } }),
       this.prisma.user.findUniqueOrThrow({
         where: { id: userId },
-        select: { username: true, clan: { select: { name: true } }, countryCode: true },
+        select: {
+          username: true,
+          clan: { select: { name: true } },
+          countryCode: true,
+          progression: { select: { lastActiveOn: true } },
+        },
       }),
     ]);
     const totalBossXp = viewerSum._sum.rewardXp ?? 0;
@@ -331,6 +357,7 @@ export class LeaderboardsService {
       countryCode: user.countryCode,
       level: 0,
       totalXp: totalBossXp,
+      lastActiveOn: user.progression?.lastActiveOn ?? null,
     };
   }
 
@@ -343,6 +370,7 @@ export class LeaderboardsService {
       countryCode: row.user.countryCode,
       level: row.level,
       totalXp: row.totalXp,
+      lastActiveOn: row.lastActiveOn,
     };
   }
 

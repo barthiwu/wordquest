@@ -8,7 +8,10 @@ import { useThemeColors } from '@/state/themeStore';
 import {
   getBossBattleXpLeaderboard,
   getClanLeaderboard,
+  getContinentLeaderboard,
+  getCountryLeaderboard,
   getFriendLeaderboard,
+  getGlobalLeaderboard,
   type LeaderboardEntry,
   type LeaderboardView,
 } from '@/services/leaderboards';
@@ -27,27 +30,40 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-type Category = 'clan' | 'friend' | 'bossBattle';
+type Category = 'global' | 'clan' | 'country' | 'continent' | 'friend' | 'bossBattle';
+
+/** A player counts as "active" for the leaderboard row badge when their
+ * last recorded activity (entry.lastActiveOn) falls within this many
+ * milliseconds of now. This is a simple recency window on a raw instant,
+ * not the player-local-calendar-day computation the streak system uses
+ * (playerLocalDate) — precise-to-the-day accuracy isn't needed for a
+ * lightweight "recently active" indicator on someone else's row. */
+const ACTIVE_RECENTLY_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 /**
- * §30 Leaderboards, now the Leaderboard tab. Trimmed to Clan, Friend
- * and Boss Battle (Sept 2026 — Global/Country/Continent removed as
- * noise once Clan/Friend/Boss Battle covered what players actually
- * cared about ranking against). All three are real, ranked from the
- * same authoritative data as Home/Passport — Clan scopes to the
- * viewer's own clan, Friend ranks the viewer against their accepted
- * friends (backend/src/friends), and Boss Battle ranks by lifetime
- * Boss Battle XP rather than general totalXp — see Row below for how
- * that category suppresses the (meaningless, always-0) level in its
- * subtitle. The standalone "play Boss Battle" CTA that used to sit
- * above these tabs was removed too — PlayScreen (now the Compete tab)
- * already has its own Boss Battle entry point, so this screen is
- * leaderboards only.
+ * §30 Leaderboards, now the Leaderboard tab. Global (Overall), Clan,
+ * Country, Continent, Friend and Boss Battle are all real, ranked from
+ * the same authoritative data as Home/Passport — Country and Continent
+ * scope to the viewer's own countryCode (set via the onboarding flag
+ * picker), same pattern as Clan scoping to the viewer's clan. Friend
+ * ranks the viewer against their accepted friends (backend/src/friends),
+ * and Boss Battle ranks by lifetime Boss Battle XP rather than general
+ * totalXp — see Row below for how that category suppresses the
+ * (meaningless, always-0) level in its subtitle.
+ *
+ * Global/Country/Continent were briefly trimmed out (Sept 2026, in
+ * favor of Clan/Friend/Boss Battle only) and restored a couple of days
+ * later (2026-09, Barth: wants to follow how people are progressing,
+ * specifically calling out Overall and Country) — the backend endpoints
+ * were never removed, so this was a UI-only restore. Barth used
+ * "Overall" rather than "Global" when asking for it back, so that's
+ * the English tab label now, though the underlying category/route name
+ * (`global`, `/leaderboards/global`) is unchanged.
  */
-// Boss Battle's own entry point moved fully to PlayScreen (the
-// Compete tab) — this screen no longer navigates anywhere, so its
-// screen props go unused; still typed as `Props` so it keeps
-// matching the Tab.Screen signature React Navigation expects.
+// This screen no longer navigates anywhere (the standalone "play
+// Boss Battle" CTA was removed once PlayScreen/Compete tab got its own
+// entry point), so its screen props go unused; still typed as `Props` so
+// it keeps matching the Tab.Screen signature React Navigation expects.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function LeaderboardScreen(_props: Props) {
   const colors = useThemeColors();
@@ -55,7 +71,7 @@ export function LeaderboardScreen(_props: Props) {
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation('leaderboards');
   const accessToken = useAuthStore((s) => s.accessToken);
-  const [category, setCategory] = useState<Category>('clan');
+  const [category, setCategory] = useState<Category>('global');
   const [view, setView] = useState<LeaderboardView | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,13 +79,19 @@ export function LeaderboardScreen(_props: Props) {
   // live inside the component rather than as module-level constants —
   // same maps, same keys, just built from t() each render.
   const categoryUnavailableMessage: Record<Category, string> = {
+    global: t('unavailableGlobal'),
     clan: t('unavailableClan'),
+    country: t('unavailableCountry'),
+    continent: t('unavailableContinent'),
     friend: t('unavailableFriend'),
     bossBattle: t('unavailableBossBattle'),
   };
 
   const categoryEmptyMessage: Record<Category, string> = {
+    global: t('emptyGlobal'),
     clan: t('emptyClan'),
+    country: t('emptyCountry'),
+    continent: t('emptyContinent'),
     friend: t('emptyFriend'),
     bossBattle: t('emptyBossBattle'),
   };
@@ -80,11 +102,17 @@ export function LeaderboardScreen(_props: Props) {
       setView(null);
       setError(null);
       const request =
-        cat === 'clan'
-          ? getClanLeaderboard(accessToken)
-          : cat === 'friend'
-            ? getFriendLeaderboard(accessToken)
-            : getBossBattleXpLeaderboard(accessToken);
+        cat === 'global'
+          ? getGlobalLeaderboard(accessToken)
+          : cat === 'clan'
+            ? getClanLeaderboard(accessToken)
+            : cat === 'country'
+              ? getCountryLeaderboard(accessToken)
+              : cat === 'continent'
+                ? getContinentLeaderboard(accessToken)
+                : cat === 'friend'
+                  ? getFriendLeaderboard(accessToken)
+                  : getBossBattleXpLeaderboard(accessToken);
       request.then(setView).catch((err) => {
         if (err instanceof ApiError && err.status === 400) {
           setError(categoryUnavailableMessage[cat]);
@@ -114,9 +142,27 @@ export function LeaderboardScreen(_props: Props) {
 
       <View style={styles.tabs}>
         <Tab
+          label={t('tabGlobal')}
+          active={category === 'global'}
+          onPress={() => selectCategory('global')}
+          styles={styles}
+        />
+        <Tab
           label={t('tabClan')}
           active={category === 'clan'}
           onPress={() => selectCategory('clan')}
+          styles={styles}
+        />
+        <Tab
+          label={t('tabCountry')}
+          active={category === 'country'}
+          onPress={() => selectCategory('country')}
+          styles={styles}
+        />
+        <Tab
+          label={t('tabContinent')}
+          active={category === 'continent'}
+          onPress={() => selectCategory('continent')}
           styles={styles}
         />
         <Tab
@@ -162,6 +208,7 @@ export function LeaderboardScreen(_props: Props) {
                 isViewer={item.userId === view.viewer.userId}
                 showLevel={category !== 'bossBattle'}
                 styles={styles}
+                colors={colors}
                 t={t}
               />
             )}
@@ -203,11 +250,19 @@ function Tab({
   );
 }
 
+/** True when `lastActiveOn` falls within ACTIVE_RECENTLY_WINDOW_MS of now. */
+function isActiveRecently(lastActiveOn: string | null): boolean {
+  if (!lastActiveOn) return false;
+  const elapsed = Date.now() - new Date(lastActiveOn).getTime();
+  return elapsed >= 0 && elapsed < ACTIVE_RECENTLY_WINDOW_MS;
+}
+
 function Row({
   entry,
   isViewer,
   showLevel,
   styles,
+  colors,
   t,
 }: {
   entry: LeaderboardEntry;
@@ -217,16 +272,26 @@ function Row({
    * just that part of the subtitle line rather than the whole row. */
   showLevel: boolean;
   styles: ReturnType<typeof createStyles>;
+  colors: ThemeColors;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
+  const activeRecently = isActiveRecently(entry.lastActiveOn);
   return (
     <View style={[styles.row, isViewer && styles.rowViewer]}>
       <Text style={styles.rowRank}>#{entry.rank}</Text>
       <View style={styles.rowMeta}>
-        <Text style={styles.rowName}>
-          {entry.countryCode ? `${countryCodeToFlagEmoji(entry.countryCode) ?? ''} ` : ''}
-          {entry.username}
-        </Text>
+        <View style={styles.rowNameLine}>
+          {activeRecently && (
+            <View
+              style={[styles.activeDot, { backgroundColor: colors.success }]}
+              accessibilityLabel={t('activeToday')}
+            />
+          )}
+          <Text style={styles.rowName}>
+            {entry.countryCode ? `${countryCodeToFlagEmoji(entry.countryCode) ?? ''} ` : ''}
+            {entry.username}
+          </Text>
+        </View>
         <Text style={styles.rowSub}>
           {showLevel ? t('levelLabel', { level: entry.level }) : ''}
           {entry.clanName ? `${showLevel ? ' · ' : ''}${entry.clanName}` : ''}
@@ -260,7 +325,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
     emptyText: { color: colors.inkMuted, fontSize: typography.scale.sm, textAlign: 'center' },
     tabs: { flexDirection: 'row', gap: spacing.xs, flexWrap: 'wrap' },
     tab: {
-      flexBasis: '23%',
+      flexBasis: '30%',
       flexGrow: 1,
       backgroundColor: colors.surface,
       borderRadius: radius.md,
@@ -292,6 +357,8 @@ function createStyles(colors: ThemeColors, topInset: number) {
       width: 36,
     },
     rowMeta: { flex: 1, gap: 2 },
+    rowNameLine: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+    activeDot: { width: 8, height: 8, borderRadius: 4 },
     rowName: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
     rowSub: { color: colors.inkMuted, fontSize: typography.scale.xs },
     rowXp: { color: colors.glyph, fontSize: typography.scale.sm, fontWeight: '700' },

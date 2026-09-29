@@ -8,6 +8,11 @@ export interface LeaderboardEntry {
   countryCode: string | null;
   level: number;
   totalXp: number;
+  /** ISO timestamp of this player's last recorded activity, or null if
+   * they've never recorded any — same instant the streak system writes
+   * to (UserProgression.lastActiveOn), not a live "currently online"
+   * signal. Used to show an "active today" style indicator. */
+  lastActiveOn: string | null;
 }
 
 export interface LeaderboardView {
