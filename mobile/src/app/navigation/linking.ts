@@ -1,4 +1,7 @@
+import { Platform } from 'react-native';
 import * as ExpoLinking from 'expo-linking';
+import Constants from 'expo-constants';
+import { getPathFromState as getPathFromStateDefault } from '@react-navigation/native';
 import type { LinkingOptions } from '@react-navigation/native';
 import type { RootStackParamList } from './RootNavigator';
 
@@ -18,13 +21,43 @@ import type { RootStackParamList } from './RootNavigator';
  * `exp://<host>/--/...` rather than `wordquest://...` — a standalone/
  * production build only ever sees the second prefix.
  *
- * Only screens that are genuine deep-link destinations (an actual
- * notify()/email call site's target, or a natural landing spot for one)
- * are listed — this is a routing table for real entry points, not an
- * exhaustive mirror of every screen in RootNavigator.
+ * --- The web subpath problem (found + fixed 2026-09-29) ---
+ * The GitHub Pages web build is deployed under a subpath, not the
+ * domain root (app.json's `experiments.baseUrl`, currently
+ * "/wordquest" — see scripts/inject-spa-fallback.js's own comment for
+ * the *server-side* half of this same problem). `ExpoLinking.
+ * createURL('/')` on web resolves to plain `window.location.origin +
+ * '/'`, with no idea that subpath exists. Left uncorrected, that broke
+ * two separate things, both confirmed live in a browser before this
+ * fix:
+ *   1. INCOMING: an opened deep link (a verify-email link, a
+ *      reset-password link) never matched any configured screen — the
+ *      extra "wordquest/" path segment never lined up — so React
+ *      Navigation silently fell back to the default route instead of
+ *      routing to VerifyEmail/ResetPassword.
+ *   2. OUTGOING: React Navigation's `prefixes` array is only consulted
+ *      when matching an INCOMING url; it is never re-applied when
+ *      WRITING one back to the browser's address bar. So every
+ *      in-app navigation left the address bar pointing at a
+ *      root-relative URL with no /wordquest segment at all (e.g.
+ *      landing on Welcome rewrote the bar to plain "/Welcome") —
+ *      which then 404s on the very next refresh.
+ * Fixed by (1) adding the real origin+baseUrl as a prefix, ahead of
+ * the origin-only one, so incoming URLs match correctly, and (2)
+ * wrapping the default `getPathFromState` to prepend that same
+ * baseUrl onto every outgoing path, since React Navigation won't do
+ * that on its own. Native platforms and Expo Go are unaffected by
+ * either change — `experiments.baseUrl` is a web-only concept.
  */
+const isWeb = Platform.OS === 'web' && typeof window !== 'undefined';
+const webBaseUrl = isWeb ? (Constants.expoConfig?.experiments?.baseUrl ?? '') : '';
+
 export const linking: LinkingOptions<RootStackParamList> = {
-  prefixes: [ExpoLinking.createURL('/'), 'wordquest://'],
+  prefixes: [
+    ...(isWeb ? [`${window.location.origin}${webBaseUrl}`] : []),
+    ExpoLinking.createURL('/'),
+    'wordquest://',
+  ],
   config: {
     screens: {
       VerifyEmail: 'verify-email',
@@ -53,4 +86,10 @@ export const linking: LinkingOptions<RootStackParamList> = {
       // documenting an intent by omission alone.
     },
   },
+  ...(webBaseUrl
+    ? {
+        getPathFromState: (state, options) =>
+          `${webBaseUrl}${getPathFromStateDefault(state, options)}`,
+      }
+    : {}),
 };
