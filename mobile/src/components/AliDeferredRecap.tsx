@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, type ReactNode } from 'react';
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -6,6 +6,7 @@ import type { AliDisplayMessage } from '@/services/aliExpression';
 import { AliMark } from './AliMark';
 import { FadeInUp } from './FadeInUp';
 import { RichAliText } from './RichAliText';
+import { trackEvent } from '@/services/analyticsClient';
 
 interface AliDeferredRecapProps {
   /** Reactions ALI logged mid-session instead of popping up live (the
@@ -38,6 +39,17 @@ interface AliDeferredRecapProps {
 export function AliDeferredRecap({ reactions, colors, style }: AliDeferredRecapProps): ReactNode {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { t } = useTranslation('common');
+
+  // Telemetry spec §15: this card IS the deferred "ALI dialogue" moment
+  // -- fire once per mount if it actually has content to show (mirrors
+  // the early-return null below). Mount-only by design: this component
+  // is shown once per results screen, never re-triggered mid-session.
+  useEffect(() => {
+    if (reactions.length > 0) {
+      trackEvent('ALI_DIALOGUE_SHOWN', { count: reactions.length });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (reactions.length === 0) return null;
 

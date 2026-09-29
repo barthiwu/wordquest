@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import type { AliDisplayMessage } from '@/services/aliExpression';
 import { AliCharacter } from './AliCharacter';
+import { trackEvent } from '@/services/analyticsClient';
 import { RichAliText } from './RichAliText';
 
 interface AliReactionPopupProps {
@@ -37,6 +38,11 @@ export function AliReactionPopup({ cue, colors, onDismiss }: AliReactionPopupPro
   const scale = useRef(new Animated.Value(0.9)).current;
 
   useEffect(() => {
+    trackEvent('ALI_MAJOR_ANIMATION_SHOWN', {
+      expression: cue.expression,
+      pose: cue.pose,
+      priority: cue.priority,
+    });
     Animated.parallel([
       Animated.spring(opacity, { toValue: 1, useNativeDriver: true, speed: 16, bounciness: 6 }),
       Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 16, bounciness: 6 }),
@@ -54,6 +60,11 @@ export function AliReactionPopup({ cue, colors, onDismiss }: AliReactionPopupPro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onPressDismiss = () => {
+    trackEvent('ALI_INTERACTION', { source: 'major_animation' });
+    onDismiss();
+  };
+
   return (
     <Animated.View
       pointerEvents="box-none"
@@ -61,7 +72,7 @@ export function AliReactionPopup({ cue, colors, onDismiss }: AliReactionPopupPro
     >
       <Pressable
         style={styles.card}
-        onPress={onDismiss}
+        onPress={onPressDismiss}
         accessibilityRole="button"
         // "ALI" itself is never translated (proper noun); `cue.text` is
         // ALI's own dynamic reaction text, out of scope like her other

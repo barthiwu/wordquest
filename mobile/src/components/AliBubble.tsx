@@ -6,6 +6,7 @@ import { radius, spacing, typography, type ThemeColors } from '@/constants/theme
 import { useThemeColors } from '@/state/themeStore';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliCharacter } from './AliCharacter';
+import { trackEvent } from '@/services/analyticsClient';
 
 interface AliBubbleProps {
   message: string;
@@ -62,6 +63,7 @@ export function AliBubble({
   const translateY = useRef(new Animated.Value(16)).current;
 
   useEffect(() => {
+    trackEvent('ALI_REACTION_SHOWN', { expression: expression.expression, pose: expression.pose });
     Animated.parallel([
       Animated.spring(opacity, { toValue: 1, useNativeDriver: true, speed: 18, bounciness: 6 }),
       Animated.spring(translateY, { toValue: 0, useNativeDriver: true, speed: 18, bounciness: 6 }),
@@ -74,6 +76,11 @@ export function AliBubble({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onPressDismiss = () => {
+    trackEvent('ALI_INTERACTION', { source: 'quick_reaction' });
+    onDismiss();
+  };
+
   return (
     <Animated.View
       pointerEvents="box-none"
@@ -81,7 +88,7 @@ export function AliBubble({
     >
       <Pressable
         style={styles.bubble}
-        onPress={onDismiss}
+        onPress={onPressDismiss}
         accessibilityRole="button"
         // "ALI" itself is never translated (proper noun); `message` is
         // ALI's own dynamic reaction text, out of scope like her other
