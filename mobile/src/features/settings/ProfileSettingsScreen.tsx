@@ -26,7 +26,6 @@ import {
   uploadAvatarBytes,
   type AvatarContentType,
 } from '@/services/users';
-import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -209,9 +208,15 @@ export function ProfileSettingsScreen({ navigation }: Props) {
       const confirmed = await confirmAvatar(accessToken, target.key);
       updateUser({ avatarUrl: confirmed.avatarUrl });
     } catch (err) {
+      // Surface the real failure reason, not just a generic retry prompt:
+      // uploadAvatarBytes() throws a plain Error (not ApiError) for the
+      // direct-to-R2 PUT step (a CORS block, an expired/invalid presigned
+      // URL, or a non-2xx from the bucket), and that reason is exactly
+      // what's needed to diagnose a storage-config problem live, without
+      // browser devtools access.
       setMessage(
         `${t('passport:couldNotSetProfilePicture')} ${
-          err instanceof ApiError ? err.message : t('passport:genericTryAgain')
+          err instanceof Error ? err.message : t('passport:genericTryAgain')
         }`,
       );
     } finally {
