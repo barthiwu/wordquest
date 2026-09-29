@@ -2,7 +2,11 @@ import { AnalyticsQueryController } from './analytics-query.controller';
 
 describe('AnalyticsQueryController', () => {
   let controller: AnalyticsQueryController;
-  const analyticsQueryMock = { getOverview: jest.fn(), getWordDuelDashboard: jest.fn() };
+  const analyticsQueryMock = {
+    getOverview: jest.fn(),
+    getWordDuelDashboard: jest.fn(),
+    getArcadeDashboard: jest.fn(),
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -17,5 +21,10 @@ describe('AnalyticsQueryController', () => {
   it('wordDuel delegates to getWordDuelDashboard', () => {
     controller.wordDuel();
     expect(analyticsQueryMock.getWordDuelDashboard).toHaveBeenCalledWith();
+  });
+
+  it('arcade delegates to getArcadeDashboard', () => {
+    controller.arcade();
+    expect(analyticsQueryMock.getArcadeDashboard).toHaveBeenCalledWith();
   });
 });

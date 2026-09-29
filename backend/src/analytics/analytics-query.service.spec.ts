@@ -6,6 +6,8 @@ describe('AnalyticsQueryService', () => {
     analyticsEvent: { groupBy: jest.fn(), count: jest.fn() },
     wordDuelMatch: { groupBy: jest.fn() },
     wordDuelAnswer: { aggregate: jest.fn(), count: jest.fn(), groupBy: jest.fn() },
+    arcadeGameSession: { groupBy: jest.fn() },
+    arcadeAnswer: { aggregate: jest.fn(), count: jest.fn() },
   };
   let service: AnalyticsQueryService;
 
@@ -126,6 +128,80 @@ describe('AnalyticsQueryService', () => {
       expect(result.avgCluesUsed).toBeNull();
       expect(result.avgResponseTimeMs).toBeNull();
       expect(result.clueUsage.every((row) => row.fraction === 0)).toBe(true);
+    });
+  });
+
+  describe('getArcadeDashboard', () => {
+    it('assembles per-game session-status counts, correctness, and averages for both games', async () => {
+      prismaMock.arcadeGameSession.groupBy.mockImplementation(({ where }: any) => {
+        if (where.game === 'SCRAMBLE_QUEST') {
+          return Promise.resolve([
+            { status: 'ACTIVE', _count: { _all: 2 } },
+            { status: 'COMPLETED', _count: { _all: 30 } },
+            { status: 'ABANDONED', _count: { _all: 4 } },
+          ]);
+        }
+        return Promise.resolve([
+          { status: 'ACTIVE', _count: { _all: 1 } },
+          { status: 'COMPLETED', _count: { _all: 10 } },
+          { status: 'ABANDONED', _count: { _all: 1 } },
+        ]);
+      });
+      prismaMock.arcadeAnswer.aggregate.mockImplementation(({ where }: any) => {
+        if (where.session.game === 'SCRAMBLE_QUEST') {
+          return Promise.resolve({
+            _avg: { hintsUsed: 0.6, responseTimeMs: 5200 },
+            _count: { _all: 300 },
+          });
+        }
+        return Promise.resolve({
+          _avg: { hintsUsed: 0.3, responseTimeMs: 4100 },
+          _count: { _all: 100 },
+        });
+      });
+      prismaMock.arcadeAnswer.count.mockImplementation(({ where }: any) => {
+        if (where.session.game === 'SCRAMBLE_QUEST') return Promise.resolve(240);
+        return Promise.resolve(80);
+      });
+
+      const result = await service.getArcadeDashboard();
+
+      expect(result.scrambleQuest).toEqual({
+        sessionsActive: 2,
+        sessionsCompleted: 30,
+        sessionsAbandoned: 4,
+        totalAnswers: 300,
+        correctAnswers: 240,
+        correctRate: 0.8,
+        avgHintsUsed: 0.6,
+        avgResponseTimeMs: 5200,
+      });
+      expect(result.completeIt).toEqual({
+        sessionsActive: 1,
+        sessionsCompleted: 10,
+        sessionsAbandoned: 1,
+        totalAnswers: 100,
+        correctAnswers: 80,
+        correctRate: 0.8,
+        avgHintsUsed: 0.3,
+        avgResponseTimeMs: 4100,
+      });
+    });
+
+    it('returns null rates/averages rather than dividing by zero when a game has no answers yet', async () => {
+      prismaMock.arcadeGameSession.groupBy.mockResolvedValue([]);
+      prismaMock.arcadeAnswer.aggregate.mockResolvedValue({
+        _avg: { hintsUsed: null, responseTimeMs: null },
+        _count: { _all: 0 },
+      });
+      prismaMock.arcadeAnswer.count.mockResolvedValue(0);
+
+      const result = await service.getArcadeDashboard();
+
+      expect(result.scrambleQuest.correctRate).toBeNull();
+      expect(result.scrambleQuest.avgHintsUsed).toBeNull();
+      expect(result.scrambleQuest.avgResponseTimeMs).toBeNull();
+      expect(result.completeIt.sessionsActive).toBe(0);
     });
   });
 });

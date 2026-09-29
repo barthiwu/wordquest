@@ -25,4 +25,9 @@ export class AnalyticsQueryController {
   wordDuel() {
     return this.analyticsQuery.getWordDuelDashboard();
   }
+
+  @Get('arcade')
+  arcade() {
+    return this.analyticsQuery.getArcadeDashboard();
+  }
 }

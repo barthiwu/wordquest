@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ArcadeGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface OverviewStats {
@@ -55,6 +56,30 @@ export interface WordDuelDashboardStats {
    * analytics_events, so this number holds up even across an
    * analytics-ingestion outage. */
   clueUsage: { clueNumber: number; fraction: number }[];
+}
+
+export interface ArcadeGameDashboardStats {
+  sessionsActive: number;
+  sessionsCompleted: number;
+  sessionsAbandoned: number;
+  totalAnswers: number;
+  correctAnswers: number;
+  correctRate: number | null;
+  avgHintsUsed: number | null;
+  avgResponseTimeMs: number | null;
+}
+
+/**
+ * ScrambleQuest/Complete It, ground-truth (ArcadeGameSession/
+ * ArcadeAnswer, not analytics_events) — same reasoning as
+ * WordDuelDashboardStats above. Word Duel is excluded even though it
+ * shares the ArcadeGame enum: it isn't an ArcadeGameSession row (see
+ * that model's doc comment in schema.prisma) and already has its own
+ * dedicated dashboard.
+ */
+export interface ArcadeDashboardStats {
+  scrambleQuest: ArcadeGameDashboardStats;
+  completeIt: ArcadeGameDashboardStats;
 }
 
 /**
@@ -159,6 +184,45 @@ export class AnalyticsQueryService {
       avgCluesUsed: answerAgg._avg.cluesRevealed,
       avgResponseTimeMs: answerAgg._avg.responseTimeMs,
       clueUsage,
+    };
+  }
+
+  async getArcadeDashboard(): Promise<ArcadeDashboardStats> {
+    const [scrambleQuest, completeIt] = await Promise.all([
+      this.getArcadeGameStats('SCRAMBLE_QUEST'),
+      this.getArcadeGameStats('COMPLETE_IT'),
+    ]);
+    return { scrambleQuest, completeIt };
+  }
+
+  private async getArcadeGameStats(game: ArcadeGame): Promise<ArcadeGameDashboardStats> {
+    const [sessionsByStatus, answerAgg, correctCount] = await Promise.all([
+      this.prisma.arcadeGameSession.groupBy({
+        by: ['status'],
+        where: { game },
+        _count: { _all: true },
+      }),
+      this.prisma.arcadeAnswer.aggregate({
+        where: { session: { game } },
+        _avg: { hintsUsed: true, responseTimeMs: true },
+        _count: { _all: true },
+      }),
+      this.prisma.arcadeAnswer.count({ where: { session: { game }, isCorrect: true } }),
+    ]);
+
+    const countFor = (status: string) =>
+      sessionsByStatus.find((row) => row.status === status)?._count._all ?? 0;
+    const totalAnswers = answerAgg._count._all;
+
+    return {
+      sessionsActive: countFor('ACTIVE'),
+      sessionsCompleted: countFor('COMPLETED'),
+      sessionsAbandoned: countFor('ABANDONED'),
+      totalAnswers,
+      correctAnswers: correctCount,
+      correctRate: totalAnswers > 0 ? correctCount / totalAnswers : null,
+      avgHintsUsed: answerAgg._avg.hintsUsed,
+      avgResponseTimeMs: answerAgg._avg.responseTimeMs,
     };
   }
 }
