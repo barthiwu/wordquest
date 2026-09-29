@@ -87,6 +87,7 @@ interface FakeWord {
   // updating; tests that DO care set them explicitly.
   definition?: string;
   synonyms?: string[];
+  category?: string | null;
 }
 
 function makeStore() {
@@ -252,8 +253,12 @@ function makeStore() {
       // Real Word rows always have a definition and a (possibly empty)
       // synonyms array -- default fixtures that don't set them
       // explicitly get harmless stand-ins rather than undefined, same
-      // as production's non-null columns.
-      return { definition: '', synonyms: [], ...w };
+      // as production's non-null columns. category defaults to null
+      // (a real, nullable column) and exampleSentence to '' (fixtures
+      // that don't care about the EXAMPLE clue's exact text never set
+      // it -- blankSentence() on an empty string just leaves it
+      // unblanked/empty, it never throws).
+      return { definition: '', synonyms: [], category: null, exampleSentence: '', ...w };
     }),
   };
 
@@ -343,6 +348,8 @@ describe('WordDuelService', () => {
       baseDifficulty: 'BEGINNER',
       definition: 'To teach a skill through practice.',
       synonyms: ['coach', 'drill'],
+      category: 'Skills',
+      exampleSentence: 'The coach will train the new recruits every morning.',
     });
     store.words.set('w2', {
       id: 'w2',
@@ -381,6 +388,8 @@ describe('WordDuelService', () => {
         WORD_DUEL_CONFIG.WORDS_PER_MATCH,
         [],
         WORD_DUEL_CONFIG.MIN_WORD_LENGTH,
+        // The EXAMPLE-clue sentence-quality filter (2026-09-30 spec).
+        expect.any(Function),
       );
       expect(view.status).toBe('WAITING');
       expect(view.wordsTotal).toBe(2);
@@ -966,26 +975,54 @@ describe('WordDuelService', () => {
       });
     };
 
-    it('reveals synonym, then the 60%-letter hint, in that fixed order', async () => {
+    it('reveals category, synonym, first & last letters, example, then 60% of the letters, in that fixed order (2026-09-30 spec)', async () => {
       seedActiveMatch();
 
       const afterFirst = await service.requestClue('u1', 'm1');
       expect(afterFirst.current?.cluesRevealed).toBe(1);
-      expect(afterFirst.current?.clues).toEqual([{ type: 'SYNONYM', text: 'coach' }]);
-      expect(afterFirst.current?.displayHint).toBe('_ _ _ _ _'); // hint clue not reached yet
+      expect(afterFirst.current?.clues).toEqual([{ type: 'CATEGORY', text: 'Skills' }]);
+      expect(afterFirst.current?.displayHint).toBe('_ _ _ _ _'); // no letters revealed yet
 
       const afterSecond = await service.requestClue('u1', 'm1');
       expect(afterSecond.current?.cluesRevealed).toBe(2);
       expect(afterSecond.current?.clues).toEqual([
+        { type: 'CATEGORY', text: 'Skills' },
         { type: 'SYNONYM', text: 'coach' },
-        { type: 'HINT', text: null },
       ]);
-      // 'train' is 5 letters; round(5 * 0.6) = 3 letters revealed, left-to-right.
-      expect(afterSecond.current?.displayHint).toBe('T R A _ _');
+      expect(afterSecond.current?.displayHint).toBe('_ _ _ _ _'); // still no letters revealed
+
+      const afterThird = await service.requestClue('u1', 'm1');
+      expect(afterThird.current?.cluesRevealed).toBe(3);
+      expect(afterThird.current?.clues[2]).toEqual({ type: 'FIRST_LAST', text: null });
+      // 'train' -- first (T) and last (N) letters only.
+      expect(afterThird.current?.displayHint).toBe('T _ _ _ N');
+
+      const afterFourth = await service.requestClue('u1', 'm1');
+      expect(afterFourth.current?.cluesRevealed).toBe(4);
+      expect(afterFourth.current?.clues[3]).toEqual({
+        type: 'EXAMPLE',
+        text: 'The coach will _____ the new recruits every morning.',
+      });
+      expect(afterFourth.current?.displayHint).toBe('T _ _ _ N'); // EXAMPLE reveals no letters
+
+      const afterFifth = await service.requestClue('u1', 'm1');
+      expect(afterFifth.current?.cluesRevealed).toBe(5);
+      expect(afterFifth.current?.clues[4]).toEqual({ type: 'LETTERS', text: null });
+      // round(5 * 0.6) = 3 letters total, always including the FIRST_LAST
+      // pair (T, N) -- the 3rd position is a deterministic-random pick
+      // from the interior, so assert on the shape rather than which
+      // exact interior letter it lands on.
+      const parts = afterFifth.current!.displayHint.split(' ');
+      expect(parts[0]).toBe('T');
+      expect(parts[4]).toBe('N');
+      expect(parts.filter((p) => p !== '_')).toHaveLength(3);
     });
 
-    it('throws BadRequestException once both clues have been used', async () => {
+    it('throws BadRequestException once all five clues have been used', async () => {
       seedActiveMatch();
+      await service.requestClue('u1', 'm1');
+      await service.requestClue('u1', 'm1');
+      await service.requestClue('u1', 'm1');
       await service.requestClue('u1', 'm1');
       await service.requestClue('u1', 'm1');
 
@@ -1028,8 +1065,25 @@ describe('WordDuelService', () => {
       });
       seedActiveMatch({ wordIds: ['w3'] });
 
+      await service.requestClue('u1', 'm1'); // CATEGORY (also null -- w3 has none recorded)
+      const view = await service.requestClue('u1', 'm1'); // SYNONYM
+      expect(view.current?.clues[1]).toEqual({ type: 'SYNONYM', text: null });
+    });
+
+    it('returns a null category clue when the word has none recorded, rather than throwing', async () => {
+      store.words.set('w4', {
+        id: 'w4',
+        word: 'quiet',
+        normalizedWord: 'quiet',
+        baseDifficulty: 'BEGINNER',
+        definition: 'Making little or no noise.',
+        synonyms: ['silent'],
+        // category deliberately omitted -- defaults to null.
+      });
+      seedActiveMatch({ wordIds: ['w4'] });
+
       const view = await service.requestClue('u1', 'm1');
-      expect(view.current?.clues).toEqual([{ type: 'SYNONYM', text: null }]);
+      expect(view.current?.clues).toEqual([{ type: 'CATEGORY', text: null }]);
     });
   });
 

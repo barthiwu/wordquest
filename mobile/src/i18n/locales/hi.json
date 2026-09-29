@@ -935,16 +935,13 @@
     "xpLabel": "{{xp}} XP",
     "clueProgressLabel": "{{revealed}}/{{max}} संकेत उजागर",
     "meaningFormat": "अर्थ: {{meaning}}",
-    "cluesButton": "सुराग",
     "noCluesRemaining": "कोई सुराग शेष नहीं",
     "synonymClueLabel": "पर्यायवाची: {{text}}",
     "synonymUnavailable": "इस शब्द के लिए कोई पर्यायवाची उपलब्ध नहीं है",
-    "hintClueRevealedLabel": "संकेत उजागर हुआ — ऊपर के अक्षर देखें",
     "youWithUsernameLabel": "आप ({{username}})",
     "answerPlaceholder": "शब्द लिखें...",
     "yourAnswerLabel": "आपका उत्तर",
-    "submit": "सबमिट करें",
-    "correctFeedback": "सही! +{{xp}} XP",
+    "correctFeedback": "⚡ सही! +{{xp}} XP",
     "incorrectFeedback": "बिल्कुल सही नहीं — {{answer}}",
     "resultWinTitle": "आप जीत गए!",
     "resultLoseTitle": "आप हार गए",
@@ -952,7 +949,22 @@
     "resultTicketEyebrow": "द्वंद्व परिणाम",
     "resultCorrectOfTotal": "{{total}} में से {{correct}} सही",
     "resultTiebreakNote": "टाईब्रेक से तय — सबसे ज़्यादा सही उत्तर, फिर अपने अंतिम स्कोर तक सबसे तेज़ पहुँचने वाला।",
-    "playAgain": "फिर से खेलें"
+    "playAgain": "फिर से खेलें",
+    "lockInButton": "लॉक इन करें",
+    "wordLengthLabel": "{{count}} अक्षर",
+    "cluesButtonReveal": "प्रकट करें: {{clueName}}",
+    "categoryClueLabel": "श्रेणी: {{text}}",
+    "categoryUnavailable": "इस शब्द के लिए कोई श्रेणी दर्ज नहीं है",
+    "firstLastClueRevealedLabel": "पहला और आखिरी अक्षर दिख गया — ऊपर अक्षर देखें",
+    "exampleClueLabel": "उदाहरण: {{text}}",
+    "lettersClueRevealedLabel": "60% अक्षर दिख गए — ऊपर अक्षर देखें",
+    "clueNames": {
+      "category": "श्रेणी",
+      "synonym": "समानार्थी शब्द",
+      "firstLast": "पहला और आखिरी",
+      "example": "उदाहरण",
+      "letters": "अक्षर दिखाएं"
+    }
   },
   "friends": {
     "popup": {

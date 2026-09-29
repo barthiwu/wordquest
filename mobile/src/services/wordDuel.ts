@@ -18,17 +18,23 @@ export interface WordDuelOpponentView {
   avatarUrl?: string | null;
 }
 
-/** One of this player's current word's two clues, in fixed reveal
- * order: synonym, then a hint that reveals ~60% of the word's letters
- * (see `displayHint` below, which is what actually changes for the hint
- * clue — its own `text` is always null). `text` is null when this word
- * has no data for that clue type — e.g. no synonym recorded. (A third
- * clue type, ORIGIN/etymology, existed briefly and was removed
- * 2026-09-29 per Barth — the vocabulary corpus had zero origin/
- * etymology content for any word, so it only ever showed a "not
- * available yet" fallback.) */
+/** One of this player's current word's five clues, in fixed reveal
+ * order (2026-09-30 spec, Barth: "This makes it more like a game, and
+ * less like an exam hall" — supersedes the 2026-09-29 synonym+hint
+ * two-clue design):
+ *   1. CATEGORY   — the word's category (e.g. "Nature").
+ *   2. SYNONYM    — the word's first recorded synonym.
+ *   3. FIRST_LAST — reveals the word's first and last letter (see
+ *      `displayHint`); `text` is always null.
+ *   4. EXAMPLE    — the word's own example sentence, with the target
+ *      word blanked out.
+ *   5. LETTERS    — reveals ~60% of the word's letters (always
+ *      including the two FIRST_LAST already revealed) — see
+ *      `displayHint`; `text` is always null.
+ * `text` is otherwise null when this word has no data for that clue
+ * type — e.g. no synonym or category recorded. */
 export interface WordDuelClueView {
-  type: 'SYNONYM' | 'HINT';
+  type: 'CATEGORY' | 'SYNONYM' | 'FIRST_LAST' | 'EXAMPLE' | 'LETTERS';
   text: string | null;
 }
 
@@ -41,6 +47,9 @@ export interface WordDuelClueView {
 export interface WordDuelCurrentWordView {
   /** The word's dictionary meaning — always shown, never gated behind a clue. */
   meaning: string;
+  /** The word's letter count — always shown alongside `meaning`, same
+   * "shown when a new word drops" treatment (2026-09-30 spec). */
+  wordLength: number;
   displayHint: string;
   cluesRevealed: number;
   maxClues: number;

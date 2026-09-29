@@ -132,23 +132,30 @@ export const WORD_DUEL_CONFIG = {
   WORDS_PER_MATCH: 20,
   // Progressive clues (spec §6): not in the spec's own Word Duel config
   // any more than Complete It's timer was -- added as a 2026-09 product
-  // decision once the actual mechanic had to be implemented, and
-  // revised 2026-09-29 (Barth) from an automatic, elapsed-time reveal
-  // to a player-triggered one -- the player taps a "Clues" button (see
-  // WordDuelService.requestClue), same on-demand shape as ScrambleQuest's
-  // MAX_HINTS_PER_WORD/Quests' synonym reveal, just two fixed clue types
-  // in a fixed order (synonym, then a 60%-of-the-word letter hint)
-  // instead of N generic letter reveals. (A third clue type, ORIGIN/
-  // etymology, was removed 2026-09-29 per Barth -- the vocabulary
-  // corpus has zero origin/etymology data for any word, so it only ever
-  // showed a "not available yet" fallback; see word-duel.service.ts's
-  // git history for the removed implementation.)
-  MAX_CLUES_PER_WORD: 2,
-  // The word-duel HINT clue (the 2nd/last clue) reveals this fraction
-  // of the word's letters at once, left-to-right, rounded to the
-  // nearest letter -- same "never reveal the final letter" cap as
-  // ScrambleQuest's MAX_HINTS_PER_WORD/hintRevealOrder.
-  HINT_CLUE_LETTER_FRACTION: 0.6,
+  // decision once the actual mechanic had to be implemented, then
+  // revised twice since: 2026-09-29 (Barth) moved from an automatic,
+  // elapsed-time reveal to a player-triggered one (a "Clues" button,
+  // see WordDuelService.requestClue), and 2026-09-30 (Barth: "This
+  // makes it more like a game, and less like an exam hall") replaced
+  // that revision's two fixed clues (synonym, then a letter hint) with
+  // five: CATEGORY, SYNONYM, FIRST_LAST (first + last letter), EXAMPLE
+  // (the word's own example sentence, blanked), then LETTERS (60% of
+  // the word's letters, always including the two FIRST_LAST already
+  // revealed) -- see word-duel.service.ts's resolveClue/
+  // revealedLetterPositions and this file's git history for the two
+  // superseded designs. (A short-lived ORIGIN/etymology clue type also
+  // existed briefly in the first, 2026-09-29 revision and was removed
+  // the same day -- the vocabulary corpus has zero origin/etymology
+  // data for any word.)
+  MAX_CLUES_PER_WORD: 5,
+  // The LETTERS clue (the 5th/last clue) reveals this fraction of the
+  // word's letters in total, always including the two positions the
+  // FIRST_LAST clue (3rd) already revealed, topped up with a
+  // deterministic-random selection of the rest -- see
+  // WordDuelService.revealedLetterPositions. (Renamed from
+  // HINT_CLUE_LETTER_FRACTION when the old single "HINT" clue became
+  // the FIRST_LAST + LETTERS pair; same 0.6 value throughout.)
+  LETTERS_CLUE_LETTER_FRACTION: 0.6,
   // Denominator for speedModifierFor's fast/normal/slow bucketing only
   // -- NOT an enforced per-word timeout (WordDuelAnswer has no
   // `timedOut` column, unlike ArcadeAnswer: a word Duel player is only

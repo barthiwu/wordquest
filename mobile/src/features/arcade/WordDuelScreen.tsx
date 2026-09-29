@@ -53,6 +53,18 @@ const MATCH_DURATION_SECONDS = 5 * 60;
  * use -- kept at 30s here (not the usual 10s) since a 5-minute match
  * clock needs a longer runway to feel like a real warning. */
 const URGENT_THRESHOLD_SECONDS = 30;
+/** The "Clues" button always names the SPECIFIC clue it's about to
+ * reveal next (2026-09-30 spec) rather than a generic "Clues (N left)"
+ * label -- indexed by `state.current.cluesRevealed`, same fixed order
+ * as the backend's resolveClue (CATEGORY, SYNONYM, FIRST_LAST, EXAMPLE,
+ * LETTERS). Translation keys, not display strings themselves. */
+const CLUE_NAME_KEYS = [
+  'clueNames.category',
+  'clueNames.synonym',
+  'clueNames.firstLast',
+  'clueNames.example',
+  'clueNames.letters',
+] as const;
 
 interface Feedback {
   isCorrect: boolean;
@@ -64,10 +76,15 @@ interface Feedback {
  * Word Duel (spec §6) — a two-player real-time race. Unlike
  * ScrambleQuest/Complete It there's no per-word timer, only the
  * match-wide countdown — but clues ARE player-triggered here too (a
- * "Clues" button, 2026-09-29 Barth spec, revised same day to drop the
- * Origin clue), not automatic: the meaning is always shown, and
- * tapping Clues reveals the word's synonym, then a 60%-letters hint,
- * in that fixed order.
+ * "Clues" button), not automatic: the meaning and the word's letter
+ * count are always shown, and tapping Clues reveals, one at a time,
+ * category, synonym, first & last letter, an example sentence, then
+ * 60% of the letters (2026-09-30 Barth spec, "This makes it more like
+ * a game, and less like an exam hall" — supersedes the 2026-09-29
+ * synonym+hint two-clue design). The "Lock In" button (same spec,
+ * renamed from "Submit" — "That language matters... 'Lock in' feels
+ * like a game decision") is always available the moment there's any
+ * text typed, with or without a single clue revealed.
  * This screen's countdown/opponent progress are refreshed by polling,
  * not a WebSocket push — see POLL_INTERVAL_MS above.
  */
@@ -498,11 +515,15 @@ export function WordDuelScreen({ navigation }: Props) {
                 end={{ x: 1, y: 0 }}
                 style={styles.puzzleCardAccentBar}
               />
-              {/* Always shown, never gated behind a clue — 2026-09-29,
-                  Barth: "The meaning of the word is supposed to appear
-                  normally". */}
+              {/* Meaning and letter count are both always shown, never
+                  gated behind a clue — 2026-09-30, Barth: "Meaning of
+                  the word and total letters in the word would always
+                  show when a new word is dropped". */}
               <Text style={styles.meaningText}>
                 {t('meaningFormat', { meaning: state.current.meaning })}
+              </Text>
+              <Text style={styles.wordLengthText}>
+                {t('wordLengthLabel', { count: state.current.wordLength })}
               </Text>
               <Text style={styles.displayHint}>{state.current.displayHint.toUpperCase()}</Text>
               <Text style={styles.clueProgress}>
@@ -512,11 +533,12 @@ export function WordDuelScreen({ navigation }: Props) {
                 })}
               </Text>
 
-              {/* Player-triggered — the "Clues" button (2026-09-29 spec,
-                  revised same day to drop the Origin clue per Barth):
+              {/* Player-triggered — the "Clues" button (2026-09-30 spec):
                   tapping it reveals the next clue, in fixed order
-                  (synonym, then a 60%-letter hint — see
-                  handleRevealClue). */}
+                  (category, synonym, first & last letter, example, then
+                  60% of the letters — see handleRevealClue). The button
+                  itself names the specific clue it's about to reveal
+                  next, not a generic "Clues (N left)" label. */}
               <Pressable
                 style={[
                   styles.cluesButton,
@@ -526,16 +548,22 @@ export function WordDuelScreen({ navigation }: Props) {
                 onPress={handleRevealClue}
                 disabled={state.current.cluesRevealed >= state.current.maxClues || revealingClue}
                 accessibilityRole="button"
-                accessibilityLabel={t('cluesButton')}
+                accessibilityLabel={
+                  state.current.cluesRevealed < state.current.maxClues
+                    ? t('cluesButtonReveal', {
+                        clueName: t(CLUE_NAME_KEYS[state.current.cluesRevealed]),
+                      })
+                    : t('noCluesRemaining')
+                }
               >
                 {revealingClue ? (
                   <ActivityIndicator color={colors.ink} />
                 ) : (
                   <Text style={styles.cluesButtonText}>
                     {state.current.cluesRevealed < state.current.maxClues
-                      ? `${t('cluesButton')} (${t('scrambleQuest:hintsRemainingLabel', {
-                          count: state.current.maxClues - state.current.cluesRevealed,
-                        })})`
+                      ? t('cluesButtonReveal', {
+                          clueName: t(CLUE_NAME_KEYS[state.current.cluesRevealed]),
+                        })
                       : t('noCluesRemaining')}
                   </Text>
                 )}
@@ -543,11 +571,17 @@ export function WordDuelScreen({ navigation }: Props) {
 
               {state.current.clues.map((clue, index) => (
                 <Text key={`${clue.type}-${index}`} style={styles.clueText}>
+                  {clue.type === 'CATEGORY' &&
+                    (clue.text
+                      ? t('categoryClueLabel', { text: clue.text })
+                      : t('categoryUnavailable'))}
                   {clue.type === 'SYNONYM' &&
                     (clue.text
                       ? t('synonymClueLabel', { text: clue.text })
                       : t('synonymUnavailable'))}
-                  {clue.type === 'HINT' && t('hintClueRevealedLabel')}
+                  {clue.type === 'FIRST_LAST' && t('firstLastClueRevealedLabel')}
+                  {clue.type === 'EXAMPLE' && t('exampleClueLabel', { text: clue.text })}
+                  {clue.type === 'LETTERS' && t('lettersClueRevealedLabel')}
                 </Text>
               ))}
             </View>
@@ -561,17 +595,23 @@ export function WordDuelScreen({ navigation }: Props) {
               accessibilityLabel={t('yourAnswerLabel')}
               onSubmitEditing={handleSubmit}
             />
+            {/* "Lock In", not "Submit" -- 2026-09-30 Barth: "'Submit'
+                feels like a form. 'LOCK IN' feels like a game decision."
+                Always available the moment there's any text typed --
+                revealing a clue first is never required (handleSubmit's
+                own guard is just `!answer.trim() || submitting`, no clue
+                gate). */}
             <Pressable
               style={[styles.button, (!answer.trim() || submitting) && styles.buttonDisabled]}
               onPress={handleSubmit}
               disabled={!answer.trim() || submitting}
               accessibilityRole="button"
-              accessibilityLabel={t('submit')}
+              accessibilityLabel={t('lockInButton')}
             >
               {submitting ? (
                 <ActivityIndicator color={colors.ink} />
               ) : (
-                <Text style={styles.buttonText}>{t('submit')}</Text>
+                <Text style={styles.buttonText}>{t('lockInButton')}</Text>
               )}
             </Pressable>
 
@@ -728,6 +768,13 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontSize: typography.scale.sm,
       fontStyle: 'italic',
       textAlign: 'center',
+    },
+    wordLengthText: {
+      color: colors.inkMuted,
+      fontSize: typography.scale.xs,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+      letterSpacing: 1,
     },
     clueProgress: { color: colors.inkMuted, fontSize: typography.scale.xs },
     cluesButton: {

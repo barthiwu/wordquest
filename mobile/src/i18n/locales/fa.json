@@ -935,16 +935,13 @@
     "xpLabel": "{{xp}} XP",
     "clueProgressLabel": "{{revealed}}/{{max}} سرنخ آشکار شد",
     "meaningFormat": "معنی: {{meaning}}",
-    "cluesButton": "سرنخ‌ها",
     "noCluesRemaining": "سرنخی باقی نمانده",
     "synonymClueLabel": "مترادف: {{text}}",
     "synonymUnavailable": "برای این کلمه مترادفی موجود نیست",
-    "hintClueRevealedLabel": "سرنخ آشکار شد — حروف بالا را ببینید",
     "youWithUsernameLabel": "شما ({{username}})",
     "answerPlaceholder": "کلمه را تایپ کنید...",
     "yourAnswerLabel": "پاسخ شما",
-    "submit": "ارسال",
-    "correctFeedback": "درست! +{{xp}} XP",
+    "correctFeedback": "⚡ درست! +{{xp}} XP",
     "incorrectFeedback": "دقیقاً درست نیست — {{answer}}",
     "resultWinTitle": "شما بردید!",
     "resultLoseTitle": "شما باختید",
@@ -952,7 +949,22 @@
     "resultTicketEyebrow": "نتیجه دوئل",
     "resultCorrectOfTotal": "{{correct}} از {{total}} درست",
     "resultTiebreakNote": "با قانون تساوی‌شکن تعیین شد — بیشترین پاسخ درست، سپس سریع‌ترین رسیدن به امتیاز نهایی.",
-    "playAgain": "دوباره بازی کن"
+    "playAgain": "دوباره بازی کن",
+    "lockInButton": "قفل کن",
+    "wordLengthLabel": "{{count}} حرف",
+    "cluesButtonReveal": "نمایش: {{clueName}}",
+    "categoryClueLabel": "دسته‌بندی: {{text}}",
+    "categoryUnavailable": "برای این کلمه دسته‌بندی ثبت نشده است",
+    "firstLastClueRevealedLabel": "حرف اول و آخر نمایش داده شد — به حروف بالا نگاه کنید",
+    "exampleClueLabel": "مثال: {{text}}",
+    "lettersClueRevealedLabel": "۶۰٪ از حروف نمایش داده شد — به حروف بالا نگاه کنید",
+    "clueNames": {
+      "category": "دسته‌بندی",
+      "synonym": "مترادف‌ها",
+      "firstLast": "حرف اول و آخر",
+      "example": "مثال",
+      "letters": "نمایش حروف"
+    }
   },
   "friends": {
     "popup": {

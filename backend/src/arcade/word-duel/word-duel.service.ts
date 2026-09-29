@@ -19,6 +19,8 @@ import {
 } from '../config/arcade.config';
 import { renderWord } from '../../vocabulary/english-variant';
 import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant';
+import { blankSentence, isCompleteItSentenceUsable } from '../complete-it/complete-it.util';
+import { shuffleIndexes } from '../scramble-quest/scramble.util';
 import { FriendsService } from '../../friends/friends.service';
 import { AliService, type AliDisplayMessage, type AliFeedMessage } from '../../ali/ali.service';
 import { quickAliReaction } from '../../ali/ali-quick-reactions';
@@ -42,19 +44,34 @@ export interface WordDuelOpponentView {
   avatarUrl?: string | null;
 }
 
-/** One of this player's current word's two clues, in fixed reveal order
- * (spec, revised 2026-09-29 Barth: "Take off the Origin... Synonym and
- * 60% letter hint is enough for clues button"): synonym, then a hint
- * that reveals HINT_CLUE_LETTER_FRACTION of the word's letters (see
- * `displayHint` below). `text` is null when this word has no data for
- * that clue type to show -- e.g. no synonym recorded. The HINT clue's
- * own `text` is always null; its effect is `displayHint` updating
- * instead, so there's nothing separate to show inline. (A third clue
- * type, ORIGIN/etymology, existed briefly and was removed the same day
- * -- the vocabulary corpus had zero origin/etymology data for any word,
- * so it only ever showed a "not available yet" fallback.) */
+/** One of this player's current word's five clues, in fixed reveal
+ * order (spec revision, 2026-09-30 Barth: "This makes it more like a
+ * game, and less like an exam hall" -- supersedes the 2026-09-29
+ * synonym+hint two-clue design):
+ *   1. CATEGORY   -- the word's `category` field (e.g. "Nature").
+ *   2. SYNONYM    -- the word's first recorded synonym.
+ *   3. FIRST_LAST -- reveals the word's first and last letter (see
+ *      `displayHint`); `text` is always null, same "the letters ARE the
+ *      clue" shape HINT used to have.
+ *   4. EXAMPLE    -- the word's own example sentence, with the target
+ *      word itself blanked out (reused from Complete It's own
+ *      `blankSentence`) so this clue gives context without just
+ *      stating the answer.
+ *   5. LETTERS    -- reveals LETTERS_CLUE_LETTER_FRACTION (60%) of the
+ *      word's letters at once, chosen deterministically-at-random and
+ *      always including the two positions FIRST_LAST already revealed
+ *      (see `displayHint`); `text` is always null, same reasoning as
+ *      FIRST_LAST.
+ * `text` is null both for the two letter-reveal clues above (their
+ * effect is `displayHint` changing instead) AND whenever a word
+ * genuinely has no data for that slot (e.g. no synonym recorded, or no
+ * category assigned) -- the client renders a "not available" fallback
+ * for that case, same convention the old SYNONYM clue already used.
+ * (ORIGIN/etymology briefly existed as a clue type in this file's
+ * history and was removed 2026-09-29 -- the vocabulary corpus had zero
+ * origin/etymology data for any word.) */
 export interface WordDuelClueView {
-  type: 'SYNONYM' | 'HINT';
+  type: 'CATEGORY' | 'SYNONYM' | 'FIRST_LAST' | 'EXAMPLE' | 'LETTERS';
   text: string | null;
 }
 
@@ -67,10 +84,19 @@ export interface WordDuelClueView {
  * over time — unlike the old behavior, matching ScrambleQuest's on-
  * demand hints/Quests' on-demand synonym reveal. */
 export interface WordDuelCurrentWordView {
-  /** The word's dictionary definition — always visible, not a clue. */
+  /** The word's dictionary definition — always visible, not a clue
+   * (2026-09-29 spec, still true). */
   meaning: string;
+  /** The word's letter count — always visible alongside `meaning`, same
+   * "shown when a new word drops, never gated behind a clue" treatment
+   * (2026-09-30 spec: "total letters in the word would always show").
+   * Matches `displayHint`'s own letter count (both derive from the same
+   * variant-rendered word text). */
+  wordLength: number;
   /** Underscore-blanked letter positions, space-separated; only changes
-   * once the HINT clue (the 2nd/last clue) has been revealed. */
+   * once the FIRST_LAST clue (3rd) and/or LETTERS clue (5th/last) have
+   * been revealed — see WordDuelClueView's doc comment for what each
+   * one reveals. */
   displayHint: string;
   cluesRevealed: number;
   maxClues: number;
@@ -267,6 +293,12 @@ export class WordDuelService {
       WORD_DUEL_CONFIG.WORDS_PER_MATCH,
       [],
       WORD_DUEL_CONFIG.MIN_WORD_LENGTH,
+      // The EXAMPLE clue (2026-09-30 spec) blanks the word out of its
+      // own example sentence -- same content-quality gate Complete It
+      // already applies to its own sentence-completion pool, reused
+      // here so Word Duel never picks a word whose only sentence is a
+      // bad whole-word match or an unusably terse fragment.
+      (c) => isCompleteItSentenceUsable(c.word.exampleSentence, c.word.word),
     );
     if (picked.length === 0) {
       throw new BadRequestException('No words are available for Word Duel right now.');
@@ -484,50 +516,90 @@ export class WordDuelService {
     return this.prisma.word.findUniqueOrThrow({ where: { id: wordId } });
   }
 
-  /** Always exactly MAX_CLUES_PER_WORD (2: synonym, hint) -- unlike the
-   * old per-letter reveal, clue count no longer depends on the word's
-   * own length. */
+  /** Always exactly MAX_CLUES_PER_WORD (5, as of the 2026-09-30 clue
+   * redesign) -- clue count never depends on the word's own length. */
   private maxCluesFor(): number {
     return WORD_DUEL_CONFIG.MAX_CLUES_PER_WORD;
   }
 
-  /** How many letters the HINT clue (the 2nd/last clue) reveals at
-   * once, left-to-right -- HINT_CLUE_LETTER_FRACTION of the word's
-   * length, rounded, and never the word's final letter (same "not
-   * really a clue if it solves the word" reasoning as ScrambleQuest's
-   * MAX_HINTS_PER_WORD/maxCluesFor above). */
-  private hintLetterCountFor(word: string): number {
-    const rounded = Math.round(word.length * WORD_DUEL_CONFIG.HINT_CLUE_LETTER_FRACTION);
-    return Math.min(word.length - 1, Math.max(0, rounded));
+  /**
+   * Which letter positions of `word` are currently revealed, given how
+   * many clues this player has requested so far (2026-09-30 spec) --
+   * shared by `buildDisplayHint` and `buildStateView`'s wordLength.
+   * Two clues affect this:
+   *  - FIRST_LAST (the 3rd clue, cluesRevealed >= 3): reveals position
+   *    0 and the final position.
+   *  - LETTERS (the 5th/last clue, cluesRevealed >= 5): reveals
+   *    LETTERS_CLUE_LETTER_FRACTION (60%) of the word's letters in
+   *    total, ALWAYS including the two FIRST_LAST already revealed,
+   *    topped up with a deterministic-random selection from the
+   *    remaining interior positions -- `seed` (playerStateId + the
+   *    word's slot in the match) makes that selection reproducible
+   *    across repeated polling, same idea as ScrambleQuest's
+   *    hintRevealOrder/shuffleIndexes seeding.
+   */
+  private revealedLetterPositions(word: string, cluesRevealed: number, seed: string): number[] {
+    const positions = new Set<number>();
+    if (cluesRevealed >= 3) {
+      positions.add(0);
+      positions.add(word.length - 1);
+    }
+    if (cluesRevealed >= 5) {
+      const targetCount = Math.max(
+        2,
+        Math.round(word.length * WORD_DUEL_CONFIG.LETTERS_CLUE_LETTER_FRACTION),
+      );
+      const interior = Array.from({ length: word.length }, (_, i) => i).filter(
+        (i) => i !== 0 && i !== word.length - 1,
+      );
+      const shuffled = shuffleIndexes(interior, seed);
+      const extraNeeded = Math.max(0, targetCount - positions.size);
+      shuffled.slice(0, extraNeeded).forEach((i) => positions.add(i));
+    }
+    return Array.from(positions);
   }
 
-  /** Blank/reveal row shown under the puzzle -- only reveals letters
-   * once the HINT clue (the 2nd clue) has actually been tapped;
-   * otherwise every position is blank, regardless of whether the
-   * synonym clue has been revealed. */
-  private buildDisplayHint(word: string, hintClueRevealed: boolean): string {
-    const revealCount = hintClueRevealed ? this.hintLetterCountFor(word) : 0;
+  /** Blank/reveal row shown under the puzzle -- see
+   * `revealedLetterPositions` for exactly which positions are shown at
+   * a given cluesRevealed count; every other position stays blank. */
+  private buildDisplayHint(word: string, cluesRevealed: number, seed: string): string {
+    const revealed = new Set(this.revealedLetterPositions(word, cluesRevealed, seed));
     return Array.from({ length: word.length }, (_, i) =>
-      i < revealCount ? word[i].toUpperCase() : '_',
+      revealed.has(i) ? word[i].toUpperCase() : '_',
     ).join(' ');
   }
 
   /**
-   * Resolves the content of the Nth clue (0-indexed: 0=synonym,
-   * 1=hint), spec order per Barth (2026-09-29, revised same day to drop
-   * the ORIGIN/etymology clue that used to sit at index 1 -- the
-   * vocabulary corpus had zero origin/etymology data for any word, so
-   * it only ever showed a "not available yet" fallback on the client;
-   * see this file's git history for the removed implementation).
-   * `text` is null when this word has nothing to show for that slot:
-   *  - SYNONYM: this word has no synonyms recorded (rare in the corpus,
-   *    but not impossible).
-   *  - HINT: text is always null -- its effect is `displayHint`
-   *    revealing letters instead, so there's no separate string here.
+   * Resolves the content of the Nth clue (0-indexed), 2026-09-30 spec
+   * order per Barth ("This makes it more like a game, and less like an
+   * exam hall" -- supersedes the 2026-09-29 synonym+hint two-clue
+   * design, see this file's git history for that one):
+   *   0 = CATEGORY, 1 = SYNONYM, 2 = FIRST_LAST, 3 = EXAMPLE, 4 = LETTERS.
+   * `text` is null when this word has nothing to show for that slot
+   * (CATEGORY/SYNONYM: not recorded for this word -- rare but possible
+   * in the corpus) or when the clue's effect is `displayHint` changing
+   * instead of a string (FIRST_LAST, LETTERS -- see WordDuelClueView's
+   * doc comment). `exampleSentenceWithBlank` is precomputed by the
+   * caller (buildStateView) since it needs the variant-rendered
+   * sentence/word, which this method doesn't have on its own.
    */
-  private resolveClue(index: number, synonyms: string[]): WordDuelClueView {
-    if (index === 0) return { type: 'SYNONYM', text: synonyms[0] ?? null };
-    return { type: 'HINT', text: null };
+  private resolveClue(
+    index: number,
+    word: { category: string | null; synonyms: string[] },
+    exampleSentenceWithBlank: string,
+  ): WordDuelClueView {
+    switch (index) {
+      case 0:
+        return { type: 'CATEGORY', text: word.category ?? null };
+      case 1:
+        return { type: 'SYNONYM', text: word.synonyms[0] ?? null };
+      case 2:
+        return { type: 'FIRST_LAST', text: null };
+      case 3:
+        return { type: 'EXAMPLE', text: exampleSentenceWithBlank };
+      default:
+        return { type: 'LETTERS', text: null };
+    }
   }
 
   /**
@@ -660,12 +732,22 @@ export class WordDuelService {
       const rendered = renderWord(word, variant);
       const maxClues = this.maxCluesFor();
       const cluesRevealed = Math.min(maxClues, playerState.currentWordCluesRevealed);
+      // Seeded on this player's own slot in the match (their
+      // playerStateId) plus the word's index within it, so the LETTERS
+      // clue's random-but-not-first/last letter selection is stable
+      // across repeated polling for THIS player, without needing to
+      // persist which positions were chosen -- same seeding idea as
+      // ScrambleQuest/Complete It's own hintRevealOrder/shuffleIndexes
+      // callers.
+      const seed = `${playerState.id}:${playerState.currentIndex}`;
+      const { sentenceWithBlank } = blankSentence(rendered.sentence, rendered.text);
       const clues = Array.from({ length: cluesRevealed }, (_, i) =>
-        this.resolveClue(i, word.synonyms),
+        this.resolveClue(i, word, sentenceWithBlank),
       );
       current = {
         meaning: word.definition,
-        displayHint: this.buildDisplayHint(rendered.text, cluesRevealed >= maxClues),
+        wordLength: rendered.text.length,
+        displayHint: this.buildDisplayHint(rendered.text, cluesRevealed, seed),
         cluesRevealed,
         maxClues,
         clues,
