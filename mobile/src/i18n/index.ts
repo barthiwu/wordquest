@@ -79,6 +79,7 @@ export const NAMESPACES = [
   'wordDuel',
   'friends',
   'feedback',
+  'adminDashboard',
 ] as const;
 
 export type Namespace = (typeof NAMESPACES)[number];

@@ -129,6 +129,17 @@ export function SettingsScreen({ navigation }: Props) {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('moreSection')}</Text>
+        {(user?.role === 'ADMIN' || user?.role === 'SUPPORT') && (
+          <Pressable
+            style={styles.row}
+            onPress={() => navigation.navigate('AdminDashboard')}
+            accessibilityRole="button"
+            accessibilityLabel={t('adminDashboardRow')}
+          >
+            <Text style={styles.rowText}>{t('adminDashboardRow')}</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
+          </Pressable>
+        )}
         <Pressable
           style={styles.row}
           onPress={() => navigation.navigate('SendFeedback')}

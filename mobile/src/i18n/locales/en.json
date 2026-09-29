@@ -380,7 +380,8 @@
     "languageRowLabel": "Language: {{language}}",
     "moreSection": "More",
     "aboutRow": "About",
-    "sendFeedbackRow": "Send Feedback"
+    "sendFeedbackRow": "Send Feedback",
+    "adminDashboardRow": "Analytics Dashboard"
   },
   "leaderboards": {
     "title": "Leaderboard",
@@ -1003,6 +1004,30 @@
       "reasonSomethingElse": "Something else",
       "skip": "Skip"
     }
+  },
+  "adminDashboard": {
+    "title": "Analytics Dashboard",
+    "overviewSection": "Overview",
+    "registeredUsers": "Registered players",
+    "activeLast24h": "Active (24h)",
+    "activeLast7d": "Active (7d)",
+    "questsStarted": "Quests started",
+    "questsCompleted": "Quests completed",
+    "arcadeSessionsStarted": "Arcade sessions started",
+    "bossBattlesJoined": "Boss Battles joined",
+    "shopPurchases": "Shop purchases",
+    "wordDuelSection": "Word Duel",
+    "matchesWaiting": "Waiting for opponent",
+    "matchesActive": "Active matches",
+    "matchesCompleted": "Completed matches",
+    "matchesAbandonedWaiting": "Abandoned (no opponent)",
+    "correctRate": "Correct-answer rate",
+    "avgCluesUsed": "Avg. clues used",
+    "avgResponseTime": "Avg. response time",
+    "clueUsageFunnel": "Clue usage funnel",
+    "clueN": "Clue {{n}}",
+    "loadError": "Couldn't load analytics right now. Pull to retry.",
+    "forbidden": "Your account doesn't have admin access to view this."
   },
   "friends": {
     "popup": {
