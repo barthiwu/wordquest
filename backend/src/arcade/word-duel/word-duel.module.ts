@@ -3,11 +3,12 @@ import { ArcadeModule } from '../arcade.module';
 import { ProgressionModule } from '../../progression/progression.module';
 import { FriendsModule } from '../../friends/friends.module';
 import { AliModule } from '../../ali/ali.module';
+import { AnalyticsModule } from '../../analytics/analytics.module';
 import { WordDuelService } from './word-duel.service';
 import { WordDuelController } from './word-duel.controller';
 
 @Module({
-  imports: [ArcadeModule, ProgressionModule, FriendsModule, AliModule],
+  imports: [ArcadeModule, ProgressionModule, FriendsModule, AliModule, AnalyticsModule],
   controllers: [WordDuelController],
   providers: [WordDuelService],
 })

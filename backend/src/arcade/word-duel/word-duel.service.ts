@@ -25,6 +25,7 @@ import { FriendsService } from '../../friends/friends.service';
 import { AliService, type AliDisplayMessage, type AliFeedMessage } from '../../ali/ali.service';
 import { quickAliReaction } from '../../ali/ali-quick-reactions';
 import { quickAliExpression, type AliExpressionCue } from '../../ali/ali-expression';
+import { AnalyticsService } from '../../analytics/analytics.service';
 
 /** Client-safe view of the opponent's progress — score only, never their
  * current word or answers (spec §6/§8). Identity (userId/username/
@@ -211,6 +212,7 @@ export class WordDuelService {
     private readonly progression: ProgressionService,
     private readonly friends: FriendsService,
     private readonly ali: AliService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   /**
@@ -284,6 +286,23 @@ export class WordDuelService {
       const playerState = await this.prisma.wordDuelPlayerState.create({
         data: { matchId: candidate.id, userId },
       });
+      // DUEL_STARTED (spec §12) for both participants — this is the
+      // moment the match actually goes ACTIVE, whether or not the
+      // opponent is polling right now to see it.
+      this.analytics.track(
+        userId,
+        'DUEL_STARTED',
+        { matchId: candidate.id },
+        { screen: 'WordDuel' },
+      );
+      if (waitingPlayer) {
+        this.analytics.track(
+          waitingPlayer.userId,
+          'DUEL_STARTED',
+          { matchId: candidate.id },
+          { screen: 'WordDuel' },
+        );
+      }
       return this.buildStateView(playerState.id);
     }
 
@@ -442,6 +461,32 @@ export class WordDuelService {
     await this.finalizeIfNeeded(matchId);
     const state = await this.buildStateView(playerState.id);
 
+    // DUEL_LOCK_IN + DUEL_ANSWER_RESULT (spec §12) — this endpoint
+    // resolves the answer synchronously, so both fire together here
+    // rather than at two separate request times. currentRewardXp is
+    // the reward actually computed for this submission (0 when wrong).
+    this.analytics.track(
+      userId,
+      'DUEL_LOCK_IN',
+      {
+        timeSinceWordPresentedMs: responseTimeMs,
+        cluesUsed: cluesRevealed,
+        currentRewardXp: reward.finalXp,
+      },
+      { screen: 'WordDuel' },
+    );
+    this.analytics.track(
+      userId,
+      'DUEL_ANSWER_RESULT',
+      {
+        correct: isCorrect,
+        cluesUsed: cluesRevealed,
+        responseTimeMs,
+        xpAwarded: reward.finalXp,
+      },
+      { screen: 'WordDuel' },
+    );
+
     return {
       isCorrect,
       correctAnswer: rendered.text,
@@ -480,6 +525,20 @@ export class WordDuelService {
     if (claimed.count === 0) {
       throw new ConflictException('This clue was already requested');
     }
+
+    // DUEL_CLUE_USED (spec §12) — clueNumber is 1-based (the clue that
+    // was JUST revealed), clueType from the same fixed order resolveClue
+    // uses. Never record the hidden answer here (spec §12).
+    this.analytics.track(
+      userId,
+      'DUEL_CLUE_USED',
+      {
+        clueNumber: playerState.currentWordCluesRevealed + 1,
+        clueType: this.clueTypeAt(playerState.currentWordCluesRevealed),
+        timeSinceWordPresentedMs: Date.now() - playerState.currentWordStartedAt.getTime(),
+      },
+      { screen: 'WordDuel' },
+    );
 
     return this.buildStateView(playerState.id);
   }
@@ -602,6 +661,24 @@ export class WordDuelService {
     }
   }
 
+  /** Same 0-indexed clue order as resolveClue, minus the word-specific
+   * text/displayHint payload — just the type, for analytics (spec §12:
+   * "Never record the hidden answer in telemetry"). */
+  private clueTypeAt(index: number): WordDuelClueView['type'] {
+    switch (index) {
+      case 0:
+        return 'CATEGORY';
+      case 1:
+        return 'SYNONYM';
+      case 2:
+        return 'FIRST_LAST';
+      case 3:
+        return 'EXAMPLE';
+      default:
+        return 'LETTERS';
+    }
+  }
+
   /**
    * Ends an ACTIVE match once either its server-authoritative deadline
    * has passed or both players have exhausted the word bank — whichever
@@ -645,6 +722,26 @@ export class WordDuelService {
     if (a && b && ARCADE_COUNTS_TOWARD_DAILY_STREAK) {
       await this.progression.recordDailyActivity(a.userId);
       await this.progression.recordDailyActivity(b.userId);
+    }
+
+    // DUEL_COMPLETED (spec §12) — fired once per participant, from the
+    // side that actually won the finalize race (the claimed.count === 0
+    // early-return above means this only ever runs once per match).
+    if (a) {
+      this.analytics.track(a.userId, 'DUEL_COMPLETED', {
+        correct: a.correctCount,
+        totalXp: a.totalXp,
+        won: resolved.winnerId === a.userId,
+        tie: resolved.winnerId === null,
+      });
+    }
+    if (b) {
+      this.analytics.track(b.userId, 'DUEL_COMPLETED', {
+        correct: b.correctCount,
+        totalXp: b.totalXp,
+        won: resolved.winnerId === b.userId,
+        tie: resolved.winnerId === null,
+      });
     }
   }
 

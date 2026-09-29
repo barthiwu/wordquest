@@ -7,6 +7,7 @@ import { RewardEngineService } from '../reward-engine.service';
 import { ProgressionService } from '../../progression/progression.service';
 import { FriendsService } from '../../friends/friends.service';
 import { AliService } from '../../ali/ali.service';
+import { AnalyticsService } from '../../analytics/analytics.service';
 import { WORD_DUEL_CONFIG, WORD_DUEL_TIEBREAK_DESCRIPTION } from '../config/arcade.config';
 
 /**
@@ -322,6 +323,7 @@ describe('WordDuelService', () => {
     react: jest.fn(),
     listReactionsSince: jest.fn().mockResolvedValue([]),
   };
+  const analyticsMock = { track: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -340,6 +342,7 @@ describe('WordDuelService', () => {
     friendsMock.getPublicIdentity.mockReset().mockResolvedValue(null);
     aliMock.react.mockReset();
     aliMock.listReactionsSince.mockReset().mockResolvedValue([]);
+    analyticsMock.track.mockReset();
 
     store.words.set('w1', {
       id: 'w1',
@@ -369,6 +372,7 @@ describe('WordDuelService', () => {
         { provide: ProgressionService, useValue: progressionMock },
         { provide: FriendsService, useValue: friendsMock },
         { provide: AliService, useValue: aliMock },
+        { provide: AnalyticsService, useValue: analyticsMock },
       ],
     }).compile();
     service = moduleRef.get(WordDuelService);
@@ -437,6 +441,22 @@ describe('WordDuelService', () => {
       expect(view.opponent).toEqual({ correctCount: 0, totalXp: 0 });
       expect(view.current).not.toBeNull(); // clock now runs — an opponent has joined
       expect(challengesMock.pickChallenges).not.toHaveBeenCalled();
+      // DUEL_STARTED fires for BOTH participants, not just the joiner —
+      // the waiting player finds out the match went ACTIVE on their next
+      // poll, but the event itself is recorded the moment it actually
+      // happened, server-side.
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u2',
+        'DUEL_STARTED',
+        { matchId: 'm1' },
+        { screen: 'WordDuel' },
+      );
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u1',
+        'DUEL_STARTED',
+        { matchId: 'm1' },
+        { screen: 'WordDuel' },
+      );
     });
 
     it("resumes the caller's own ACTIVE match without creating anything new", async () => {
@@ -765,6 +785,56 @@ describe('WordDuelService', () => {
       expect(result.state.wordIndex).toBe(1);
     });
 
+    it('tracks DUEL_LOCK_IN and DUEL_ANSWER_RESULT with the actual computed reward, never the hidden answer', async () => {
+      seedActiveMatch();
+      store.playerStates.get('ps1')!.currentWordCluesRevealed = 2;
+      rewardEngineMock.calculate.mockReturnValue({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+
+      await service.submitAnswer('u1', 'm1', 'train');
+
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u1',
+        'DUEL_LOCK_IN',
+        expect.objectContaining({ cluesUsed: 2, currentRewardXp: 30 }),
+        { screen: 'WordDuel' },
+      );
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u1',
+        'DUEL_ANSWER_RESULT',
+        { correct: true, cluesUsed: 2, responseTimeMs: expect.any(Number), xpAwarded: 30 },
+        { screen: 'WordDuel' },
+      );
+      const answerResultCall = analyticsMock.track.mock.calls.find(
+        (call: unknown[]) => call[1] === 'DUEL_ANSWER_RESULT',
+      );
+      expect(JSON.stringify(answerResultCall)).not.toContain('train');
+    });
+
+    it('reports currentRewardXp: 0 on an incorrect answer', async () => {
+      seedActiveMatch();
+
+      await service.submitAnswer('u1', 'm1', 'not-the-word');
+
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u1',
+        'DUEL_LOCK_IN',
+        expect.objectContaining({ currentRewardXp: 0 }),
+        { screen: 'WordDuel' },
+      );
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u1',
+        'DUEL_ANSWER_RESULT',
+        expect.objectContaining({ correct: false, xpAwarded: 0 }),
+        { screen: 'WordDuel' },
+      );
+    });
+
     it('resets the streak and awards no XP on a wrong answer, but still advances', async () => {
       seedActiveMatch();
       store.playerStates.get('ps1')!.currentStreak = 3;
@@ -831,6 +901,16 @@ describe('WordDuelService', () => {
       expect(result.state.result).not.toBeNull();
       expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u1');
       expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u2');
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u1',
+        'DUEL_COMPLETED',
+        expect.objectContaining({ correct: 1, won: true, tie: false }),
+      );
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u2',
+        'DUEL_COMPLETED',
+        expect.objectContaining({ correct: 0, won: false, tie: false }),
+      );
     });
 
     it('reads back a STREAK_MILESTONE and any deferred reactions once the match completes (task #99 follow-up)', async () => {
@@ -1084,6 +1164,26 @@ describe('WordDuelService', () => {
 
       const view = await service.requestClue('u1', 'm1');
       expect(view.current?.clues).toEqual([{ type: 'CATEGORY', text: null }]);
+    });
+
+    it('tracks DUEL_CLUE_USED with a 1-based clueNumber and the matching clueType, never the hidden answer', async () => {
+      seedActiveMatch();
+
+      await service.requestClue('u1', 'm1');
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u1',
+        'DUEL_CLUE_USED',
+        { clueNumber: 1, clueType: 'CATEGORY', timeSinceWordPresentedMs: expect.any(Number) },
+        { screen: 'WordDuel' },
+      );
+
+      await service.requestClue('u1', 'm1');
+      expect(analyticsMock.track).toHaveBeenCalledWith(
+        'u1',
+        'DUEL_CLUE_USED',
+        { clueNumber: 2, clueType: 'SYNONYM', timeSinceWordPresentedMs: expect.any(Number) },
+        { screen: 'WordDuel' },
+      );
     });
   });
 

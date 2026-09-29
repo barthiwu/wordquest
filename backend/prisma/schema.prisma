@@ -1454,11 +1454,32 @@ model AnalyticsEvent {
   userId     String?
   user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   eventName  String
+  // Groups events belonging to one play session (client-generated UUID,
+  // stable for the lifetime of one app open — Telemetry spec §5/§9).
+  sessionId  String?
+  // Client-generated UUID for idempotency: a retried client submission
+  // of the same interaction must not create a duplicate row (spec §25).
+  // Unique but nullable — server-authoritative events created directly
+  // via track() don't set one, and Postgres allows any number of NULLs
+  // in a unique column/index.
+  clientEventId String? @unique
+  // "ios" | "android" | "web" — absent for events the backend itself
+  // authored (e.g. quest_completed from QuestsService).
+  platform   String?
+  appVersion String?
+  // Screen the event happened on, e.g. "WordDuel", "DailyQuest" (spec §5).
+  screen     String?
+  // When the event actually happened on the client; falls back to
+  // createdAt for server-authored events, which have no separate client
+  // clock to report. `createdAt` doubles as the spec's `receivedAt` —
+  // when this row was written — rather than carrying a redundant column.
+  occurredAt DateTime @default(now())
   properties Json     @default("{}")
   createdAt  DateTime @default(now())
 
   @@index([eventName, createdAt])
   @@index([userId])
+  @@index([sessionId])
   @@map("analytics_events")
 }
 
