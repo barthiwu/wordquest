@@ -43,7 +43,7 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.bartholomewiwuoha.wordquest",
+      "bundleIdentifier": "com.wordquest.app",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
