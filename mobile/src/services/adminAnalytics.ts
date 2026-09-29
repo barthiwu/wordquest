@@ -30,6 +30,22 @@ export interface WordDuelDashboardStats {
   clueUsage: { clueNumber: number; fraction: number }[];
 }
 
+export interface ArcadeGameDashboardStats {
+  sessionsActive: number;
+  sessionsCompleted: number;
+  sessionsAbandoned: number;
+  totalAnswers: number;
+  correctAnswers: number;
+  correctRate: number | null;
+  avgHintsUsed: number | null;
+  avgResponseTimeMs: number | null;
+}
+
+export interface ArcadeDashboardStats {
+  scrambleQuest: ArcadeGameDashboardStats;
+  completeIt: ArcadeGameDashboardStats;
+}
+
 /** GET /analytics/dashboard/overview — admin/support-only server-side (RolesGuard); a non-admin token gets a 403. */
 export function getOverviewStats(accessToken: string): Promise<OverviewStats> {
   return apiRequest<OverviewStats>('/analytics/dashboard/overview', { accessToken });
@@ -38,4 +54,9 @@ export function getOverviewStats(accessToken: string): Promise<OverviewStats> {
 /** GET /analytics/dashboard/word-duel — same admin/support-only gate as getOverviewStats. */
 export function getWordDuelDashboardStats(accessToken: string): Promise<WordDuelDashboardStats> {
   return apiRequest<WordDuelDashboardStats>('/analytics/dashboard/word-duel', { accessToken });
+}
+
+/** GET /analytics/dashboard/arcade — same admin/support-only gate as getOverviewStats. */
+export function getArcadeDashboardStats(accessToken: string): Promise<ArcadeDashboardStats> {
+  return apiRequest<ArcadeDashboardStats>('/analytics/dashboard/arcade', { accessToken });
 }

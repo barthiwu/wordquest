@@ -16,8 +16,11 @@ import { BackButton } from '@/components/BackButton';
 import {
   getOverviewStats,
   getWordDuelDashboardStats,
+  getArcadeDashboardStats,
   type OverviewStats,
   type WordDuelDashboardStats,
+  type ArcadeDashboardStats,
+  type ArcadeGameDashboardStats,
 } from '@/services/adminAnalytics';
 import { ApiError } from '@/services/apiClient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -50,6 +53,7 @@ export function AdminDashboardScreen({ navigation }: Props) {
 
   const [overview, setOverview] = useState<OverviewStats | null>(null);
   const [wordDuel, setWordDuel] = useState<WordDuelDashboardStats | null>(null);
+  const [arcade, setArcade] = useState<ArcadeDashboardStats | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -61,12 +65,14 @@ export function AdminDashboardScreen({ navigation }: Props) {
       else setLoading(true);
       setError(null);
       try {
-        const [overviewResult, wordDuelResult] = await Promise.all([
+        const [overviewResult, wordDuelResult, arcadeResult] = await Promise.all([
           getOverviewStats(accessToken),
           getWordDuelDashboardStats(accessToken),
+          getArcadeDashboardStats(accessToken),
         ]);
         setOverview(overviewResult);
         setWordDuel(wordDuelResult);
+        setArcade(arcadeResult);
       } catch (err) {
         setError(err instanceof ApiError && err.status === 403 ? t('forbidden') : t('loadError'));
       } finally {
@@ -199,7 +205,48 @@ export function AdminDashboardScreen({ navigation }: Props) {
           </View>
         </View>
       )}
+
+      {!loading && !error && arcade && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('arcadeSection')}</Text>
+
+          <Text style={styles.subheading}>{t('scrambleQuestSubheading')}</Text>
+          <ArcadeGameCardGrid stats={arcade.scrambleQuest} t={t} styles={styles} />
+
+          <Text style={styles.subheading}>{t('completeItSubheading')}</Text>
+          <ArcadeGameCardGrid stats={arcade.completeIt} t={t} styles={styles} />
+        </View>
+      )}
     </ScrollView>
+  );
+}
+
+function ArcadeGameCardGrid({
+  stats,
+  t,
+  styles,
+}: {
+  stats: ArcadeGameDashboardStats;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  styles: ReturnType<typeof createStyles>;
+}) {
+  return (
+    <View style={styles.cardGrid}>
+      <StatCard label={t('sessionsActive')} value={stats.sessionsActive} styles={styles} />
+      <StatCard label={t('sessionsCompleted')} value={stats.sessionsCompleted} styles={styles} />
+      <StatCard label={t('sessionsAbandoned')} value={stats.sessionsAbandoned} styles={styles} />
+      <StatCard label={t('correctRate')} value={formatPercent(stats.correctRate)} styles={styles} />
+      <StatCard
+        label={t('avgHintsUsed')}
+        value={stats.avgHintsUsed !== null ? stats.avgHintsUsed.toFixed(1) : '—'}
+        styles={styles}
+      />
+      <StatCard
+        label={t('avgResponseTime')}
+        value={formatSeconds(stats.avgResponseTimeMs)}
+        styles={styles}
+      />
+    </View>
   );
 }
 

@@ -1027,7 +1027,14 @@
     "clueUsageFunnel": "Clue usage funnel",
     "clueN": "Clue {{n}}",
     "loadError": "Couldn't load analytics right now. Pull to retry.",
-    "forbidden": "Your account doesn't have admin access to view this."
+    "forbidden": "Your account doesn't have admin access to view this.",
+    "arcadeSection": "Arcade",
+    "scrambleQuestSubheading": "ScrambleQuest",
+    "completeItSubheading": "Complete It",
+    "sessionsActive": "Active sessions",
+    "sessionsCompleted": "Completed sessions",
+    "sessionsAbandoned": "Abandoned sessions",
+    "avgHintsUsed": "Avg. hints used"
   },
   "friends": {
     "popup": {
