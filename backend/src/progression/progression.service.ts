@@ -13,6 +13,7 @@ import { NotificationService } from '../notifications/notification.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
 import { playerLocalDate } from '../common/timezone';
 import { isUniqueConstraintError } from '../common/prisma-errors';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 /** Either the real PrismaService or the `tx` handle inside a $transaction callback — same query surface either way. */
 type Db = PrismaService | Prisma.TransactionClient;
@@ -39,6 +40,7 @@ export class ProgressionService {
     private readonly ali: AliService,
     private readonly notifications: NotificationService,
     private readonly questCards: QuestCardService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   async awardXp(
@@ -76,6 +78,8 @@ export class ProgressionService {
       if (isUniqueConstraintError(err)) return;
       throw err;
     }
+
+    this.analytics.track(userId, 'XP_AWARDED', { amount, reason, source, reference });
 
     const progression = await db.userProgression.update({
       where: { userId },
@@ -116,6 +120,7 @@ export class ProgressionService {
     } else {
       this.ali.reactFireAndForget(userId, levelUpEvent);
     }
+    this.analytics.track(userId, 'LEVEL_UP', { newLevel, glyphsAwarded: levelGlyphReward });
     this.notifications.notifyFireAndForget(
       userId,
       'LEVEL_UP',
@@ -264,6 +269,11 @@ export class ProgressionService {
     } else {
       this.ali.reactFireAndForget(userId, journeyEvent);
     }
+    this.analytics.track(userId, 'JOURNEY_ADVANCED', {
+      newStage,
+      stagesCrossed,
+      stageName: JOURNEY_STAGES[newStage]?.name,
+    });
     this.notifications.notifyFireAndForget(
       userId,
       'JOURNEY_UNLOCK',
@@ -579,6 +589,15 @@ export class ProgressionService {
     const isConsecutive =
       lastActive !== null && today.getTime() - lastActive.getTime() === 24 * 60 * 60 * 1000;
 
+    // A real break, not a brand-new player's first-ever recorded day
+    // (lastActive === null) -- only fire when a streak that was actually
+    // running (>1 day valued enough to report) just reset.
+    if (!isConsecutive && lastActive !== null && progression.currentStreak > 0) {
+      this.analytics.track(userId, 'STREAK_BROKEN', {
+        previousStreak: progression.currentStreak,
+      });
+    }
+
     const newStreak = isConsecutive ? progression.currentStreak + 1 : 1;
 
     await db.userProgression.update({
@@ -604,6 +623,7 @@ export class ProgressionService {
       } else {
         this.ali.reactFireAndForget(userId, streakEvent);
       }
+      this.analytics.track(userId, 'STREAK_MILESTONE', { streakDays: newStreak });
     }
 
     await this.checkCefrEligibility(userId, db);

@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AliService } from '../ali/ali.service';
 import { NotificationService } from '../notifications/notification.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 describe('ProgressionService — streak logic', () => {
   let service: ProgressionService;
@@ -40,6 +41,7 @@ describe('ProgressionService — streak logic', () => {
         { provide: AliService, useValue: { reactFireAndForget: jest.fn() } },
         { provide: NotificationService, useValue: { notifyFireAndForget: jest.fn() } },
         { provide: QuestCardService, useValue: questCardsMock },
+        { provide: AnalyticsService, useValue: { track: jest.fn() } },
       ],
     }).compile();
     service = moduleRef.get(ProgressionService);
@@ -145,6 +147,7 @@ describe('ProgressionService — level-up and Journey advancement', () => {
         { provide: AliService, useValue: { reactFireAndForget: jest.fn() } },
         { provide: NotificationService, useValue: { notifyFireAndForget: jest.fn() } },
         { provide: QuestCardService, useValue: questCardsMock },
+        { provide: AnalyticsService, useValue: { track: jest.fn() } },
       ],
     }).compile();
     service = moduleRef.get(ProgressionService);
@@ -600,6 +603,7 @@ describe('ProgressionService — spendGlyphs (Correction & Completion Spec §6: 
         { provide: AliService, useValue: { reactFireAndForget: jest.fn() } },
         { provide: NotificationService, useValue: { notifyFireAndForget: jest.fn() } },
         { provide: QuestCardService, useValue: { createCard: jest.fn() } },
+        { provide: AnalyticsService, useValue: { track: jest.fn() } },
       ],
     }).compile();
     service = moduleRef.get(ProgressionService);

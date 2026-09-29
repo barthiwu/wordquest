@@ -7,6 +7,7 @@ import {
 import { Prisma, QuestCardRarity } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { isUniqueConstraintError } from '../common/prisma-errors';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 type Db = PrismaService | Prisma.TransactionClient;
 export type QuestCardSource = 'JOURNEY_COMPLETION' | 'BOSS_BATTLE_WIN' | 'ACHIEVEMENT';
@@ -43,7 +44,10 @@ export interface QuestCardView {
  */
 @Injectable()
 export class QuestCardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly analytics: AnalyticsService,
+  ) {}
 
   /**
    * Idempotent by (userId, source, sourceEventId) — enforced by the
@@ -92,6 +96,13 @@ export class QuestCardService {
       if (isUniqueConstraintError(err)) return;
       throw err;
     }
+
+    this.analytics.track(userId, 'QUEST_CARD_EARNED', {
+      source,
+      sourceEventId,
+      rarity: opts.rarity,
+      journeyStageKey: opts.journeyStageKey,
+    });
   }
 
   /** Every card the player has ever earned — their permanent collectible gallery. */

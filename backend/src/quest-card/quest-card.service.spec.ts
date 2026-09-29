@@ -2,6 +2,7 @@ import { BadRequestException, ForbiddenException, NotFoundException } from '@nes
 import { Test } from '@nestjs/testing';
 import { QuestCardService, MAX_SHOWCASE_CARDS } from './quest-card.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 describe('QuestCardService', () => {
   let service: QuestCardService;
@@ -18,11 +19,16 @@ describe('QuestCardService', () => {
     },
     $transaction: jest.fn((callback: (tx: any) => unknown): unknown => callback(prismaMock)),
   };
+  const analyticsMock = { track: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
     const moduleRef = await Test.createTestingModule({
-      providers: [QuestCardService, { provide: PrismaService, useValue: prismaMock }],
+      providers: [
+        QuestCardService,
+        { provide: PrismaService, useValue: prismaMock },
+        { provide: AnalyticsService, useValue: analyticsMock },
+      ],
     }).compile();
     service = moduleRef.get(QuestCardService);
   });

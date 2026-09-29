@@ -5,6 +5,7 @@ import { ProgressionService } from '../progression/progression.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
 import { AliService, type AliEvent } from '../ali/ali.service';
 import { NotificationService } from '../notifications/notification.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { isUniqueConstraintError } from '../common/prisma-errors';
 import { usedAnyGuessAssistance } from '../config/gameplay-rules';
 import {
@@ -55,6 +56,7 @@ export class AchievementService {
     private readonly questCards: QuestCardService,
     private readonly ali: AliService,
     private readonly notifications: NotificationService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   listCatalog(): AchievementCatalogEntry[] {
@@ -211,6 +213,12 @@ export class AchievementService {
 
     const entry = ACHIEVEMENT_CATALOG.find((a) => a.id === achievementId)!;
     const reward = ACHIEVEMENT_REWARDS[entry.category];
+    this.analytics.track(userId, 'ACHIEVEMENT_UNLOCKED', {
+      achievementId,
+      category: entry.category,
+      xpAwarded: reward.xp,
+      glyphsAwarded: reward.glyphs,
+    });
     await this.progression.awardXp(
       userId,
       reward.xp,

@@ -3,9 +3,10 @@ import { MasteryService } from './mastery.service';
 import { ProgressionModule } from '../progression/progression.module';
 import { AchievementModule } from '../achievement/achievement.module';
 import { AliModule } from '../ali/ali.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 @Module({
-  imports: [ProgressionModule, AchievementModule, AliModule],
+  imports: [ProgressionModule, AchievementModule, AliModule, AnalyticsModule],
   providers: [MasteryService],
   exports: [MasteryService],
 })

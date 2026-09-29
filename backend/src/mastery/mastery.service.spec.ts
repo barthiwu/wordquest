@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ProgressionService } from '../progression/progression.service';
 import { AchievementService } from '../achievement/achievement.service';
 import { AliService } from '../ali/ali.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { gameplayRules } from '../config/gameplay-rules';
 
 describe('MasteryService', () => {
@@ -49,6 +50,7 @@ describe('MasteryService', () => {
         { provide: ProgressionService, useValue: progressionMock },
         { provide: AchievementService, useValue: achievementsMock },
         { provide: AliService, useValue: aliMock },
+        { provide: AnalyticsService, useValue: { track: jest.fn() } },
       ],
     }).compile();
     service = moduleRef.get(MasteryService);

@@ -5,6 +5,7 @@ import { ProgressionService } from '../progression/progression.service';
 import { QuestCardService } from '../quest-card/quest-card.service';
 import { AliService } from '../ali/ali.service';
 import { NotificationService } from '../notifications/notification.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { ACHIEVEMENT_CATALOG, ACHIEVEMENT_REWARDS } from './achievement-catalog';
 
 describe('AchievementService', () => {
@@ -36,6 +37,7 @@ describe('AchievementService', () => {
         { provide: QuestCardService, useValue: questCardsMock },
         { provide: AliService, useValue: aliMock },
         { provide: NotificationService, useValue: notificationsMock },
+        { provide: AnalyticsService, useValue: { track: jest.fn() } },
       ],
     }).compile();
     service = moduleRef.get(AchievementService);

@@ -7,6 +7,7 @@ import { AliService, type AliEvent } from '../ali/ali.service';
 import { gameplayRules } from '../config/gameplay-rules';
 import { nextReviewDueAt } from '../vocabulary/review-schedule';
 import { averageScoreDimensions } from '../common/score-average';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 export type MasteryLevel = 'NEW' | 'RECOGNIZING' | 'RECALLING' | 'STRONG' | 'MASTERED';
 
@@ -104,6 +105,7 @@ export class MasteryService {
     private readonly progression: ProgressionService,
     private readonly achievements: AchievementService,
     private readonly ali: AliService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   async recordAnswer(
@@ -654,6 +656,12 @@ export class MasteryService {
     } else {
       this.ali.reactFireAndForget(userId, masteryEvent);
     }
+    this.analytics.track(userId, 'MASTERY_ACHIEVED', {
+      wordId,
+      word: word?.word,
+      totalMastered: updated.masteredWordsCount,
+      firstAttempt,
+    });
 
     return updated.masteredWordsCount;
   }
