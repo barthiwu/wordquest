@@ -7,6 +7,7 @@ import { useTipsStore } from '@/state/tipsStore';
 import { useThemeStore } from '@/state/themeStore';
 import { useAnalyticsQueueStore } from '@/state/analyticsQueueStore';
 import { flushAnalyticsQueue } from '@/services/analyticsClient';
+import { useFeedbackPromptStore } from '@/state/feedbackPromptStore';
 import { DEFAULT_LANGUAGE_CODE } from '@/constants/languages';
 import i18n, { initI18n } from '@/i18n';
 
@@ -47,6 +48,7 @@ export function AppProviders({ children }: PropsWithChildren) {
   const hydrateTips = useTipsStore((s) => s.hydrate);
   const hydrateTheme = useThemeStore((s) => s.hydrate);
   const hydrateAnalyticsQueue = useAnalyticsQueueStore((s) => s.hydrate);
+  const hydrateFeedbackPrompt = useFeedbackPromptStore((s) => s.hydrate);
 
   useEffect(() => {
     hydrateLanguage();
@@ -58,6 +60,12 @@ export function AppProviders({ children }: PropsWithChildren) {
   useEffect(() => {
     hydrateTips();
   }, [hydrateTips]);
+
+  // Word Duel feedback prompt's 3-day cooldown (Telemetry spec §19) —
+  // same fire-and-forget hydration as every other store here.
+  useEffect(() => {
+    hydrateFeedbackPrompt();
+  }, [hydrateFeedbackPrompt]);
 
   // themeStore's light/dark preference (Sept 2026 bugfix: this hydrate
   // was defined from the start but never actually invoked anywhere, so

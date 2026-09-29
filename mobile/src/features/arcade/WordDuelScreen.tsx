@@ -20,6 +20,7 @@ import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
 import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import { DuelTicketResult } from '@/components/DuelTicketResult';
+import { WordDuelFeedbackPrompt } from '@/components/WordDuelFeedbackPrompt';
 import { DuelPrepJourney } from './DuelPrepJourney';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
@@ -471,6 +472,7 @@ export function WordDuelScreen({ navigation }: Props) {
           colors={colors}
           style={styles.deferredRecap}
         />
+        <WordDuelFeedbackPrompt matchId={state.matchId} />
         {opponentIdentity && (
           <AvatarActionMenu
             visible={opponentMenuOpen}
