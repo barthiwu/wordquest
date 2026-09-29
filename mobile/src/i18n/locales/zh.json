@@ -939,8 +939,6 @@
     "noCluesRemaining": "没有更多线索了",
     "synonymClueLabel": "同义词：{{text}}",
     "synonymUnavailable": "该词暂无同义词",
-    "originClueLabel": "词源：{{text}}",
-    "originUnavailable": "该词的词源信息暂不可用",
     "hintClueRevealedLabel": "提示已揭示——请查看上方的字母",
     "youWithUsernameLabel": "你（{{username}}）",
     "answerPlaceholder": "输入单词...",

@@ -939,8 +939,6 @@
     "noCluesRemaining": "No quedan pistas",
     "synonymClueLabel": "Sinónimo: {{text}}",
     "synonymUnavailable": "No hay sinónimo disponible para esta palabra",
-    "originClueLabel": "Origen: {{text}}",
-    "originUnavailable": "La información de origen aún no está disponible para esta palabra",
     "hintClueRevealedLabel": "Pista revelada: mira las letras de arriba",
     "youWithUsernameLabel": "Tú ({{username}})",
     "answerPlaceholder": "Escribe la palabra...",

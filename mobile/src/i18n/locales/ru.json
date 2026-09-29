@@ -939,8 +939,6 @@
     "noCluesRemaining": "Подсказки закончились",
     "synonymClueLabel": "Синоним: {{text}}",
     "synonymUnavailable": "Синоним для этого слова недоступен",
-    "originClueLabel": "Происхождение: {{text}}",
-    "originUnavailable": "Информация о происхождении этого слова пока недоступна",
     "hintClueRevealedLabel": "Подсказка открыта — посмотрите буквы выше",
     "youWithUsernameLabel": "Вы ({{username}})",
     "answerPlaceholder": "Введите слово...",

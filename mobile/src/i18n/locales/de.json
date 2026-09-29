@@ -939,8 +939,6 @@
     "noCluesRemaining": "Keine Hinweise mehr",
     "synonymClueLabel": "Synonym: {{text}}",
     "synonymUnavailable": "Kein Synonym für dieses Wort verfügbar",
-    "originClueLabel": "Herkunft: {{text}}",
-    "originUnavailable": "Herkunftsinformationen für dieses Wort sind noch nicht verfügbar",
     "hintClueRevealedLabel": "Hinweis aufgedeckt – schau dir die Buchstaben oben an",
     "youWithUsernameLabel": "Du ({{username}})",
     "answerPlaceholder": "Wort eingeben...",

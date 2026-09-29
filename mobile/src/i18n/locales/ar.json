@@ -939,8 +939,6 @@
     "noCluesRemaining": "لا توجد أدلة متبقية",
     "synonymClueLabel": "مرادف: {{text}}",
     "synonymUnavailable": "لا يوجد مرادف متاح لهذه الكلمة",
-    "originClueLabel": "الأصل: {{text}}",
-    "originUnavailable": "معلومات الأصل غير متوفرة بعد لهذه الكلمة",
     "hintClueRevealedLabel": "تم كشف التلميح — انظر الحروف أعلاه",
     "youWithUsernameLabel": "أنت ({{username}})",
     "answerPlaceholder": "اكتب الكلمة...",

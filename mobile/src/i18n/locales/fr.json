@@ -939,8 +939,6 @@
     "noCluesRemaining": "Plus d'indices",
     "synonymClueLabel": "Synonyme : {{text}}",
     "synonymUnavailable": "Aucun synonyme disponible pour ce mot",
-    "originClueLabel": "Origine : {{text}}",
-    "originUnavailable": "Les informations sur l'origine ne sont pas encore disponibles pour ce mot",
     "hintClueRevealedLabel": "Indice révélé : regardez les lettres ci-dessus",
     "youWithUsernameLabel": "Toi ({{username}})",
     "answerPlaceholder": "Tapez le mot...",

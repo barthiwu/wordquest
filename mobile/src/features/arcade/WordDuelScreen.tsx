@@ -63,9 +63,10 @@ interface Feedback {
  * Word Duel (spec §6) — a two-player real-time race. Unlike
  * ScrambleQuest/Complete It there's no per-word timer, only the
  * match-wide countdown — but clues ARE player-triggered here too (a
- * "Clues" button, 2026-09-29 Barth spec), not automatic: the meaning
- * is always shown, and tapping Clues reveals the word's synonym, then
- * its origin/etymology, then a 60%-letters hint, in that fixed order.
+ * "Clues" button, 2026-09-29 Barth spec, revised same day to drop the
+ * Origin clue), not automatic: the meaning is always shown, and
+ * tapping Clues reveals the word's synonym, then a 60%-letters hint,
+ * in that fixed order.
  * This screen's countdown/opponent progress are refreshed by polling,
  * not a WebSocket push — see POLL_INTERVAL_MS above.
  */
@@ -493,10 +494,11 @@ export function WordDuelScreen({ navigation }: Props) {
                 })}
               </Text>
 
-              {/* Player-triggered — the "Clues" button (2026-09-29 spec):
+              {/* Player-triggered — the "Clues" button (2026-09-29 spec,
+                  revised same day to drop the Origin clue per Barth):
                   tapping it reveals the next clue, in fixed order
-                  (synonym, then origin/etymology, then a 60%-letter
-                  hint — see handleRevealClue). */}
+                  (synonym, then a 60%-letter hint — see
+                  handleRevealClue). */}
               <Pressable
                 style={[
                   styles.cluesButton,
@@ -527,10 +529,6 @@ export function WordDuelScreen({ navigation }: Props) {
                     (clue.text
                       ? t('synonymClueLabel', { text: clue.text })
                       : t('synonymUnavailable'))}
-                  {clue.type === 'ORIGIN' &&
-                    (clue.text
-                      ? t('originClueLabel', { text: clue.text })
-                      : t('originUnavailable'))}
                   {clue.type === 'HINT' && t('hintClueRevealedLabel')}
                 </Text>
               ))}

@@ -939,8 +939,6 @@
     "noCluesRemaining": "سرنخی باقی نمانده",
     "synonymClueLabel": "مترادف: {{text}}",
     "synonymUnavailable": "برای این کلمه مترادفی موجود نیست",
-    "originClueLabel": "ریشه: {{text}}",
-    "originUnavailable": "اطلاعات ریشه‌شناسی این کلمه هنوز در دسترس نیست",
     "hintClueRevealedLabel": "سرنخ آشکار شد — حروف بالا را ببینید",
     "youWithUsernameLabel": "شما ({{username}})",
     "answerPlaceholder": "کلمه را تایپ کنید...",

@@ -939,8 +939,6 @@
     "noCluesRemaining": "Hakuna vidokezo vilivyobaki",
     "synonymClueLabel": "Kisawe: {{text}}",
     "synonymUnavailable": "Hakuna kisawe kwa neno hili",
-    "originClueLabel": "Asili: {{text}}",
-    "originUnavailable": "Taarifa za asili ya neno hili hazipatikani bado",
     "hintClueRevealedLabel": "Kidokezo kimefichuliwa — angalia herufi hapo juu",
     "youWithUsernameLabel": "Wewe ({{username}})",
     "answerPlaceholder": "Andika neno...",

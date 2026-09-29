@@ -18,16 +18,17 @@ export interface WordDuelOpponentView {
   avatarUrl?: string | null;
 }
 
-/** One of this player's current word's three clues, in fixed reveal
- * order: synonym, then origin/etymology, then a hint that reveals ~60%
- * of the word's letters (see `displayHint` below, which is what actually
- * changes for the hint clue — its own `text` is always null). `text` is
- * null when this word has no data for that clue type — most notably
- * ORIGIN, which is always null right now: the vocabulary corpus has no
- * origin/etymology content yet (a real content gap, not a bug — see
- * WordDuelScreen for how this renders). */
+/** One of this player's current word's two clues, in fixed reveal
+ * order: synonym, then a hint that reveals ~60% of the word's letters
+ * (see `displayHint` below, which is what actually changes for the hint
+ * clue — its own `text` is always null). `text` is null when this word
+ * has no data for that clue type — e.g. no synonym recorded. (A third
+ * clue type, ORIGIN/etymology, existed briefly and was removed
+ * 2026-09-29 per Barth — the vocabulary corpus had zero origin/
+ * etymology content for any word, so it only ever showed a "not
+ * available yet" fallback.) */
 export interface WordDuelClueView {
-  type: 'SYNONYM' | 'ORIGIN' | 'HINT';
+  type: 'SYNONYM' | 'HINT';
   text: string | null;
 }
 
@@ -35,7 +36,7 @@ export interface WordDuelClueView {
  * between positions, revealed letters uppercase, hidden ones `_`. Clues
  * are player-triggered via `revealWordDuelClue` (a real "Clues" button,
  * 2026-09-29), same on-demand shape as ScrambleQuest's hint button —
- * `displayHint` only reveals letters once the 3rd (HINT) clue has
+ * `displayHint` only reveals letters once the 2nd/last (HINT) clue has
  * actually been tapped. */
 export interface WordDuelCurrentWordView {
   /** The word's dictionary meaning — always shown, never gated behind a clue. */
