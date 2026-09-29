@@ -131,6 +131,15 @@ export function SettingsScreen({ navigation }: Props) {
         <Text style={styles.sectionTitle}>{t('moreSection')}</Text>
         <Pressable
           style={styles.row}
+          onPress={() => navigation.navigate('SendFeedback')}
+          accessibilityRole="button"
+          accessibilityLabel={t('sendFeedbackRow')}
+        >
+          <Text style={styles.rowText}>{t('sendFeedbackRow')}</Text>
+          <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
+        </Pressable>
+        <Pressable
+          style={styles.row}
           onPress={() => navigation.navigate('About')}
           accessibilityRole="button"
           accessibilityLabel={t('aboutRow')}

@@ -379,7 +379,8 @@
     "languageRow": "Language",
     "languageRowLabel": "Language: {{language}}",
     "moreSection": "More",
-    "aboutRow": "About"
+    "aboutRow": "About",
+    "sendFeedbackRow": "Send Feedback"
   },
   "leaderboards": {
     "title": "Leaderboard",
@@ -964,6 +965,43 @@
       "firstLast": "First & Last",
       "example": "Example",
       "letters": "Reveal Letters"
+    }
+  },
+  "feedback": {
+    "title": "Send Feedback",
+    "subtitle": "Tell us what's working, what isn't, or what you'd like to see -- someone on the team reads every one of these.",
+    "categoryLabel": "Category",
+    "category": {
+      "GAMEPLAY": "Gameplay",
+      "DIFFICULTY": "Difficulty",
+      "WORD_DUEL": "Word Duel",
+      "ARCADE": "Arcade",
+      "ALI": "Ali",
+      "BUG": "Bug",
+      "UI": "UI",
+      "OTHER": "Other"
+    },
+    "messageLabel": "Message",
+    "messagePlaceholder": "What's on your mind?",
+    "send": "Send",
+    "errorSubmit": "Could not send your feedback right now -- please try again.",
+    "sentTitle": "Thanks!",
+    "sentSubtitle": "Your feedback was sent.",
+    "done": "Done",
+    "wordDuelPrompt": {
+      "title": "How did that Duel feel?",
+      "tooEasy": "Too easy",
+      "justRight": "Just right",
+      "okay": "Okay",
+      "difficult": "Difficult",
+      "tooDifficult": "Too difficult",
+      "reasonsTitle": "What made it difficult?",
+      "reasonWordsTooDifficult": "Words were too difficult",
+      "reasonCluesNotHelpful": "Clues weren't helpful",
+      "reasonNotEnoughTime": "Not enough time",
+      "reasonDidNotUnderstand": "I didn't understand the game",
+      "reasonSomethingElse": "Something else",
+      "skip": "Skip"
     }
   },
   "friends": {

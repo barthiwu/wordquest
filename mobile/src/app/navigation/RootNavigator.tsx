@@ -48,6 +48,7 @@ import { TermsOfServiceScreen } from '@/features/legal/TermsOfServiceScreen';
 import { AgeRestrictionScreen } from '@/features/legal/AgeRestrictionScreen';
 import { LanguageScreen } from '@/features/settings/LanguageScreen';
 import { AboutScreen } from '@/features/settings/AboutScreen';
+import { SendFeedbackScreen } from '@/features/settings/SendFeedbackScreen';
 import { FriendsScreen } from '@/features/friends/FriendsScreen';
 import { PublicProfileScreen } from '@/features/friends/PublicProfileScreen';
 import type { WordCompletionResult } from '@/services/quests';
@@ -113,6 +114,7 @@ export type RootStackParamList = {
   AgeRestriction: undefined;
   Language: undefined;
   About: undefined;
+  SendFeedback: undefined;
   Friends: undefined;
   PublicProfile: { userId: string };
 };
@@ -204,6 +206,7 @@ export function RootNavigator() {
         <Stack.Screen name="AgeRestriction" component={AgeRestrictionScreen} />
         <Stack.Screen name="Language" component={LanguageScreen} />
         <Stack.Screen name="About" component={AboutScreen} />
+        <Stack.Screen name="SendFeedback" component={SendFeedbackScreen} />
         <Stack.Screen name="Friends" component={FriendsScreen} />
         <Stack.Screen name="PublicProfile" component={PublicProfileScreen} />
       </Stack.Navigator>
