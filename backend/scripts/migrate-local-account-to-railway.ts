@@ -156,6 +156,49 @@ async function main() {
 
     let skippedMasteries = 0;
 
+    // Everything below is built as plain arrays first and written with
+    // createMany (one INSERT per table instead of one round trip per
+    // row) -- a per-row create() loop over a network-proxied connection
+    // (Railway's TCP proxy adds real latency per query) can easily blow
+    // past an interactive transaction's timeout once there are a few
+    // hundred XP/glyph ledger rows, which surfaces as a confusing
+    // "Transaction not found" error from Prisma rather than a plain
+    // timeout message.
+    const xpTransactionsData = user.xpTransactions.map((xt) => {
+      const { id: _id, userId: _u, ...rest } = xt;
+      return { ...rest, userId: user.id };
+    });
+    const glyphTransactionsData = user.glyphTransactions.map((gt) => {
+      const { id: _id, userId: _u, ...rest } = gt;
+      return { ...rest, userId: user.id };
+    });
+    const masteriesData = user.masteries.flatMap((m) => {
+      const text = wordTextBySourceId.get(m.wordId);
+      const targetWordId = text ? targetWordIdByText.get(text) : undefined;
+      if (!targetWordId) {
+        skippedMasteries++;
+        return [];
+      }
+      const { id: _id, userId: _u, wordId: _w, ...rest } = m;
+      return [{ ...rest, userId: user.id, wordId: targetWordId }];
+    });
+    const achievementUnlocksData = user.achievementUnlocks.map((au) => {
+      const { id: _id, userId: _u, ...rest } = au;
+      return { ...rest, userId: user.id };
+    });
+    const questCardsData = user.questCards.map((qc) => {
+      const { id: _id, userId: _u, ...rest } = qc;
+      return { ...rest, userId: user.id };
+    });
+    const cefrAssessmentsData = user.cefrAssessments.map((ca) => {
+      const { id: _id, userId: _u, ...rest } = ca;
+      return { ...rest, userId: user.id, dimensions: rest.dimensions ?? Prisma.JsonNull };
+    });
+    const dailyMasterChallengesData = user.dailyMasterChallenges.map((dmc) => {
+      const { id: _id, userId: _u, ...rest } = dmc;
+      return { ...rest, userId: user.id, scores: rest.scores ?? Prisma.JsonNull };
+    });
+
     await target.$transaction(
       async (tx) => {
         await tx.user.create({
@@ -195,46 +238,23 @@ async function main() {
           await tx.notificationPreference.create({ data: { ...rest, userId: user.id } });
         }
 
-        for (const xt of user.xpTransactions) {
-          const { id: _id, userId: _u, ...rest } = xt;
-          await tx.xpTransaction.create({ data: { ...rest, userId: user.id } });
-        }
-        for (const gt of user.glyphTransactions) {
-          const { id: _id, userId: _u, ...rest } = gt;
-          await tx.glyphTransaction.create({ data: { ...rest, userId: user.id } });
-        }
-        for (const m of user.masteries) {
-          const text = wordTextBySourceId.get(m.wordId);
-          const targetWordId = text ? targetWordIdByText.get(text) : undefined;
-          if (!targetWordId) {
-            skippedMasteries++;
-            continue;
-          }
-          const { id: _id, userId: _u, wordId: _w, ...rest } = m;
-          await tx.mastery.create({ data: { ...rest, userId: user.id, wordId: targetWordId } });
-        }
-        for (const au of user.achievementUnlocks) {
-          const { id: _id, userId: _u, ...rest } = au;
-          await tx.achievementUnlock.create({ data: { ...rest, userId: user.id } });
-        }
-        for (const qc of user.questCards) {
-          const { id: _id, userId: _u, ...rest } = qc;
-          await tx.questCard.create({ data: { ...rest, userId: user.id } });
-        }
-        for (const ca of user.cefrAssessments) {
-          const { id: _id, userId: _u, ...rest } = ca;
-          await tx.cefrAssessment.create({
-            data: { ...rest, userId: user.id, dimensions: rest.dimensions ?? Prisma.JsonNull },
-          });
-        }
-        for (const dmc of user.dailyMasterChallenges) {
-          const { id: _id, userId: _u, ...rest } = dmc;
-          await tx.dailyMasterChallenge.create({
-            data: { ...rest, userId: user.id, scores: rest.scores ?? Prisma.JsonNull },
-          });
-        }
+        if (xpTransactionsData.length)
+          await tx.xpTransaction.createMany({ data: xpTransactionsData });
+        if (glyphTransactionsData.length)
+          await tx.glyphTransaction.createMany({ data: glyphTransactionsData });
+        if (masteriesData.length) await tx.mastery.createMany({ data: masteriesData });
+        if (achievementUnlocksData.length)
+          await tx.achievementUnlock.createMany({ data: achievementUnlocksData });
+        if (questCardsData.length) await tx.questCard.createMany({ data: questCardsData });
+        if (cefrAssessmentsData.length)
+          await tx.cefrAssessment.createMany({ data: cefrAssessmentsData });
+        if (dailyMasterChallengesData.length)
+          await tx.dailyMasterChallenge.createMany({ data: dailyMasterChallengesData });
       },
-      { timeout: 30000 },
+      // Generous timeout -- createMany batches make this fast in
+      // practice, but a slow proxied connection to Railway shouldn't
+      // abort a migration that's otherwise working.
+      { timeout: 120_000, maxWait: 15_000 },
     );
 
     console.log(
