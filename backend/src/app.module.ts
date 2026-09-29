@@ -37,6 +37,7 @@ import { LearningProfileModule } from './learning-profile/learning-profile.modul
 import { PracticeModule } from './practice/practice.module';
 import { ModerationModule } from './moderation/moderation.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { FeedbackModule } from './feedback/feedback.module';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     PracticeModule,
     ModerationModule,
     AnalyticsModule,
+    FeedbackModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

@@ -147,6 +147,7 @@ model User {
   reportsFiled             Report[]                  @relation("ReportsFiled")
   reportsReviewed          Report[]                  @relation("ReportsReviewed")
   analyticsEvents          AnalyticsEvent[]
+  feedback                 Feedback[]
   arcadeGameSessions       ArcadeGameSession[]
   wordDuelPlayerStates     WordDuelPlayerState[]
   // Friends (2026-09, Barth) -- see the Friendship/Block models near the
@@ -1481,6 +1482,68 @@ model AnalyticsEvent {
   @@index([userId])
   @@index([sessionId])
   @@map("analytics_events")
+}
+
+// ── Feedback (Telemetry spec §17-§20) ──────────────────────
+
+enum FeedbackType {
+  // A response to a targeted, lightweight prompt (spec §18) — an emoji-
+  // scale reaction, optionally with checkbox "what made it difficult"
+  // reasons, shown after a session with a cooldown (spec §19).
+  PROMPT
+  // A submission from the standalone Settings -> Send Feedback screen
+  // (spec §20) — always player-initiated, no cooldown.
+  FREEFORM
+}
+
+enum FeedbackCategory {
+  GAMEPLAY
+  DIFFICULTY
+  WORD_DUEL
+  ARCADE
+  ALI
+  BUG
+  UI
+  OTHER
+}
+
+enum FeedbackStatus {
+  NEW
+  REVIEWED
+  RESOLVED
+}
+
+model Feedback {
+  id       String @id @default(uuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type     FeedbackType
+  category FeedbackCategory
+  // The emoji-scale reaction as a 1-5 ordinal (spec §18's five-point
+  // scales, e.g. Word Duel's "Too easy" .. "Too difficult") -- which
+  // emoji/label maps to which number is a display-layer concern, kept
+  // out of the schema so the five-point meaning can be reused across
+  // different prompt copy (Daily Quest's own scale reads differently
+  // from Word Duel's, same ordinal). Null for a FREEFORM submission
+  // that's message-only.
+  rating   Int?
+  message  String?
+  // Which screen this came from (e.g. "WordDuel", "DailyQuest") --
+  // absent for a FREEFORM submission from the standalone Settings
+  // screen, which isn't tied to any one screen.
+  screen   String?
+  // Structured extras -- e.g. a PROMPT's selected "what made it
+  // difficult" checkboxes ({ reasons: ["words_too_difficult"] }), or a
+  // FREEFORM submission's matchId/questId if the player was mid-session
+  // when they opened the feedback screen.
+  context  Json?          @default("{}")
+  status   FeedbackStatus @default(NEW)
+  createdAt DateTime      @default(now())
+
+  @@index([userId])
+  @@index([category, createdAt])
+  @@index([status])
+  @@map("feedback")
 }
 
 // ── Trust & safety ───────────────────────────────────────
