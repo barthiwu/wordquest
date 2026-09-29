@@ -11,13 +11,15 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
-import { useThemeColors } from '@/state/themeStore';
+import { useThemeColors, useThemeStore } from '@/state/themeStore';
 import { register } from '@/services/auth';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
 import { syncPushToken } from '@/utils/pushNotifications';
-import { MINIMUM_AGE_YEARS, calculateAge, isValidCalendarDate, toIsoDate } from '@/utils/age';
+import { MINIMUM_AGE_YEARS, calculateAge, toIsoDate } from '@/utils/age';
+import { DobPicker } from '@/components/DobPicker';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -29,6 +31,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Registration'>;
  */
 export function RegistrationScreen({ navigation }: Props) {
   const colors = useThemeColors();
+  const themeMode = useThemeStore((s) => s.mode);
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation('auth');
@@ -36,39 +39,50 @@ export function RegistrationScreen({ navigation }: Props) {
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [dobMonth, setDobMonth] = useState('');
-  const [dobDay, setDobDay] = useState('');
-  const [dobYear, setDobYear] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [dobDate, setDobDate] = useState<Date | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Age gate (COPPA) — client-side check for a fast, friendly message;
-  // AuthService.register enforces the real minimum server-side either way.
-  const dobFieldsFilled = dobMonth.length > 0 && dobDay.length > 0 && dobYear.length === 4;
+  // DobPicker (native calendar / <input type="date">) can't produce an
+  // invalid calendar date the old free-text MM/DD/YYYY boxes could (no
+  // more Feb 30), so isValidCalendarDate no longer has anything to
+  // reject here -- future-date and minimum-age are the only checks left
+  // to make client-side, same reasoning as before (a fast, friendly
+  // message; AuthService.register enforces the real minimum server-side
+  // either way).
+  const dobParts = useMemo(() => {
+    if (!dobDate) return null;
+    return {
+      year: dobDate.getUTCFullYear(),
+      month: dobDate.getUTCMonth() + 1,
+      day: dobDate.getUTCDate(),
+    };
+  }, [dobDate]);
   const dobError = useMemo(() => {
-    if (!dobFieldsFilled) return null;
-    const month = Number(dobMonth);
-    const day = Number(dobDay);
-    const year = Number(dobYear);
-    if (!isValidCalendarDate(year, month, day)) {
-      return t('registration.dobErrorInvalidDate');
-    }
-    const dob = new Date(Date.UTC(year, month - 1, day));
-    if (dob.getTime() > Date.now()) {
+    if (!dobDate || !dobParts) return null;
+    if (dobDate.getTime() > Date.now()) {
       return t('registration.dobErrorFuture');
     }
-    if (calculateAge(year, month, day) < MINIMUM_AGE_YEARS) {
+    if (calculateAge(dobParts.year, dobParts.month, dobParts.day) < MINIMUM_AGE_YEARS) {
       return t('registration.dobErrorTooYoung', { minAge: MINIMUM_AGE_YEARS });
     }
     return null;
-  }, [dobFieldsFilled, dobMonth, dobDay, dobYear, t]);
-  const dobValid = dobFieldsFilled && dobError === null;
+  }, [dobDate, dobParts, t]);
+  const dobValid = dobParts !== null && dobError === null;
 
   const canSubmit =
     displayName.trim().length >= 2 && email.includes('@') && password.length >= 8 && dobValid;
 
+  const dobMaximumDate = useMemo(() => new Date(), []);
+  const dobMinimumDate = useMemo(() => {
+    const d = new Date();
+    d.setUTCFullYear(d.getUTCFullYear() - 120);
+    return d;
+  }, []);
+
   const onSubmit = async () => {
-    if (!canSubmit || submitting) return;
+    if (!canSubmit || submitting || !dobParts) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -76,7 +90,7 @@ export function RegistrationScreen({ navigation }: Props) {
         email: email.trim(),
         password,
         displayName: displayName.trim(),
-        dateOfBirth: toIsoDate(Number(dobYear), Number(dobMonth), Number(dobDay)),
+        dateOfBirth: toIsoDate(dobParts.year, dobParts.month, dobParts.day),
       });
       await setSession(result);
       syncPushToken(result.accessToken);
@@ -118,50 +132,46 @@ export function RegistrationScreen({ navigation }: Props) {
           keyboardType="email-address"
           accessibilityLabel={t('registration.emailPlaceholder')}
         />
-        <TextInput
-          style={styles.input}
-          placeholder={t('registration.passwordPlaceholder')}
-          placeholderTextColor={colors.inkMuted}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          accessibilityLabel={t('registration.passwordPlaceholder')}
-        />
+        <View style={styles.passwordField}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder={t('registration.passwordPlaceholder')}
+            placeholderTextColor={colors.inkMuted}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!isPasswordVisible}
+            accessibilityLabel={t('registration.passwordPlaceholder')}
+          />
+          <Pressable
+            style={styles.passwordToggle}
+            onPress={() => setIsPasswordVisible((visible) => !visible)}
+            accessibilityRole="button"
+            accessibilityLabel={
+              isPasswordVisible ? t('registration.hidePassword') : t('registration.showPassword')
+            }
+            hitSlop={8}
+          >
+            <Ionicons
+              name={isPasswordVisible ? 'eye-off' : 'eye'}
+              size={20}
+              color={colors.inkMuted}
+            />
+          </Pressable>
+        </View>
 
         <View style={styles.dobBlock}>
           <Text style={styles.dobLabel}>{t('registration.dobLabel')}</Text>
-          <View style={styles.dobRow}>
-            <TextInput
-              style={[styles.input, styles.dobInputSmall]}
-              placeholder={t('registration.dobMonthPlaceholder')}
-              placeholderTextColor={colors.inkMuted}
-              value={dobMonth}
-              onChangeText={(v) => setDobMonth(v.replace(/[^0-9]/g, '').slice(0, 2))}
-              keyboardType="number-pad"
-              maxLength={2}
-              accessibilityLabel={t('registration.dobMonthLabel')}
-            />
-            <TextInput
-              style={[styles.input, styles.dobInputSmall]}
-              placeholder={t('registration.dobDayPlaceholder')}
-              placeholderTextColor={colors.inkMuted}
-              value={dobDay}
-              onChangeText={(v) => setDobDay(v.replace(/[^0-9]/g, '').slice(0, 2))}
-              keyboardType="number-pad"
-              maxLength={2}
-              accessibilityLabel={t('registration.dobDayLabel')}
-            />
-            <TextInput
-              style={[styles.input, styles.dobInputLarge]}
-              placeholder={t('registration.dobYearPlaceholder')}
-              placeholderTextColor={colors.inkMuted}
-              value={dobYear}
-              onChangeText={(v) => setDobYear(v.replace(/[^0-9]/g, '').slice(0, 4))}
-              keyboardType="number-pad"
-              maxLength={4}
-              accessibilityLabel={t('registration.dobYearLabel')}
-            />
-          </View>
+          <DobPicker
+            value={dobDate}
+            onChange={setDobDate}
+            placeholder={t('registration.dobPlaceholder')}
+            doneLabel={t('registration.dobDoneButton')}
+            accessibilityLabel={t('registration.dobLabel')}
+            colors={colors}
+            mode={themeMode}
+            minimumDate={dobMinimumDate}
+            maximumDate={dobMaximumDate}
+          />
           <Text style={styles.dobHint}>
             {t('registration.dobHint', { minAge: MINIMUM_AGE_YEARS })}
           </Text>
@@ -227,6 +237,25 @@ function createStyles(colors: ThemeColors, topInset: number) {
       color: colors.ink,
       fontSize: typography.scale.md,
     },
+    passwordField: {
+      justifyContent: 'center',
+    },
+    passwordInput: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      paddingRight: spacing.xxl,
+      color: colors.ink,
+      fontSize: typography.scale.md,
+    },
+    passwordToggle: {
+      position: 'absolute',
+      right: spacing.md,
+      padding: spacing.xs,
+    },
     error: {
       color: colors.danger,
       fontSize: typography.scale.sm,
@@ -236,9 +265,6 @@ function createStyles(colors: ThemeColors, topInset: number) {
       color: colors.inkMuted,
       fontSize: typography.scale.sm,
     },
-    dobRow: { flexDirection: 'row', gap: spacing.sm },
-    dobInputSmall: { flex: 1, textAlign: 'center' },
-    dobInputLarge: { flex: 1.6, textAlign: 'center' },
     dobHint: {
       color: colors.inkMuted,
       fontSize: typography.scale.xs,
