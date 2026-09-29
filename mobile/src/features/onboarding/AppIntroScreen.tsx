@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import {
   Dimensions,
   NativeScrollEvent,
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
+import { trackEvent } from '@/services/analyticsClient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -57,7 +58,24 @@ export function AppIntroScreen({ navigation }: Props) {
   const [index, setIndex] = useState(0);
   const lastSlide = index === SLIDE_KEYS.length - 1;
 
-  const finish = () => navigation.replace('Main');
+  // Last stop in the onboarding chain (see the screen doc comment) --
+  // reaching Main from here is ONBOARDING_COMPLETED, the funnel's
+  // successful end. See BiodataScreen's identical abandon-on-unmount
+  // pattern/comment (Telemetry spec §8); this is the one onboarding
+  // screen where reachedNextRef being true actually means "completed,"
+  // not "advanced to a further onboarding step."
+  const reachedNextRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (!reachedNextRef.current) trackEvent('ONBOARDING_ABANDONED', { step: 'appIntro' });
+    };
+  }, []);
+
+  const finish = () => {
+    reachedNextRef.current = true;
+    trackEvent('ONBOARDING_COMPLETED');
+    navigation.replace('Main');
+  };
 
   const onMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const next = Math.round(e.nativeEvent.contentOffset.x / width);

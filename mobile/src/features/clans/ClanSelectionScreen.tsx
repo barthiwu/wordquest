@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { getClans, type Clan } from '@/services/clans';
 import { updateMe } from '@/services/users';
 import { useAuthStore } from '@/state/authStore';
 import { ReportButton } from '@/components/ReportButton';
+import { trackEvent } from '@/services/analyticsClient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -29,6 +30,14 @@ export function ClanSelectionScreen({ navigation }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
 
+  // See BiodataScreen's identical pattern/comment (Telemetry spec §8).
+  const reachedNextRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (!reachedNextRef.current) trackEvent('ONBOARDING_ABANDONED', { step: 'clan' });
+    };
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     getClans()
@@ -45,10 +54,16 @@ export function ClanSelectionScreen({ navigation }: Props) {
     setConfirming(true);
     try {
       await updateMe(accessToken, { clanId: selectedId });
+      reachedNextRef.current = true;
       navigation.replace('AppIntro');
     } finally {
       setConfirming(false);
     }
+  };
+
+  const onSkip = () => {
+    reachedNextRef.current = true;
+    navigation.replace('AppIntro');
   };
 
   return (
@@ -106,7 +121,7 @@ export function ClanSelectionScreen({ navigation }: Props) {
       {clans && clans.length === 0 && (
         <Pressable
           style={styles.skipButton}
-          onPress={() => navigation.replace('AppIntro')}
+          onPress={onSkip}
           accessibilityRole="button"
           accessibilityLabel={t('skip')}
         >

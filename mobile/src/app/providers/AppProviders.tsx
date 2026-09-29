@@ -6,7 +6,7 @@ import { useLanguageStore } from '@/state/languageStore';
 import { useTipsStore } from '@/state/tipsStore';
 import { useThemeStore } from '@/state/themeStore';
 import { useAnalyticsQueueStore } from '@/state/analyticsQueueStore';
-import { flushAnalyticsQueue } from '@/services/analyticsClient';
+import { flushAnalyticsQueue, trackEvent } from '@/services/analyticsClient';
 import { useFeedbackPromptStore } from '@/state/feedbackPromptStore';
 import { DEFAULT_LANGUAGE_CODE } from '@/constants/languages';
 import i18n, { initI18n } from '@/i18n';
@@ -93,6 +93,28 @@ export function AppProviders({ children }: PropsWithChildren) {
     });
     return () => subscription.remove();
   }, [hydrateAnalyticsQueue]);
+
+  // Session events (Telemetry spec §7). APP_OPENED + SESSION_STARTED
+  // fire exactly once per app process, right alongside the analyticsClient
+  // module's own per-process sessionId (see analyticsClient.ts) — this
+  // effect never re-fires on a re-render since its deps array is empty.
+  // SESSION_ENDED fires on the transition INTO background/inactive (not
+  // out of it, and not on every AppState flicker between the two) --
+  // 'active' is the only state gameplay actually happens in, so this
+  // reads the previous state via a ref rather than component state to
+  // avoid re-subscribing the listener on every transition.
+  useEffect(() => {
+    trackEvent('APP_OPENED');
+    trackEvent('SESSION_STARTED');
+    const previousState = { current: AppState.currentState };
+    const subscription = AppState.addEventListener('change', (state: AppStateStatus) => {
+      if (previousState.current === 'active' && state !== 'active') {
+        trackEvent('SESSION_ENDED');
+      }
+      previousState.current = state;
+    });
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     if (!languageHydrated) return;

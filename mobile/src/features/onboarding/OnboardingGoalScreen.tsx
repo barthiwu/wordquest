@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { updateMe, type LearningGoal } from '@/services/users';
 import { getDeviceTimezone } from '@/utils/timezone';
 import { useAuthStore } from '@/state/authStore';
 import { useLanguageStore } from '@/state/languageStore';
+import { trackEvent } from '@/services/analyticsClient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -34,6 +35,14 @@ export function OnboardingGoalScreen({ navigation }: Props) {
   const [selected, setSelected] = useState<LearningGoal | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // See BiodataScreen's identical pattern/comment (Telemetry spec §8).
+  const reachedNextRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (!reachedNextRef.current) trackEvent('ONBOARDING_ABANDONED', { step: 'goal' });
+    };
+  }, []);
 
   const goals = useMemo(
     () =>
@@ -72,6 +81,7 @@ export function OnboardingGoalScreen({ navigation }: Props) {
         // onboarding: if this throws, updateMe below still runs as normal.
         timezone: getDeviceTimezone(),
       });
+      reachedNextRef.current = true;
       navigation.navigate('ClanSelection');
     } catch {
       setError(t('goal.errorGeneric'));

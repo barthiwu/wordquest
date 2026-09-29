@@ -18,6 +18,7 @@ import { useAuthStore } from '@/state/authStore';
 import { CountryPickerField } from '@/components/CountryPickerField';
 import { LanguagePickerField } from '@/components/LanguagePickerField';
 import { EnglishVariantField } from '@/components/EnglishVariantField';
+import { trackEvent } from '@/services/analyticsClient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -73,6 +74,19 @@ export function BiodataScreen({ navigation }: Props) {
   // introducing a new shared constant for a two-line regex.
   const USERNAME_FORMAT = /^[a-z0-9_]{3,20}$/;
 
+  // Telemetry spec §8: this is onboarding's first screen after
+  // registration (see the screen doc comment above), so its mount is
+  // ONBOARDING_STARTED. reachedNextRef guards ONBOARDING_ABANDONED on
+  // unmount -- only fires if the player left without ever advancing past
+  // this step (closing the app, or navigating away some other way).
+  const reachedNextRef = useRef(false);
+  useEffect(() => {
+    trackEvent('ONBOARDING_STARTED');
+    return () => {
+      if (!reachedNextRef.current) trackEvent('ONBOARDING_ABANDONED', { step: 'biodata' });
+    };
+  }, []);
+
   useEffect(() => {
     if (!accessToken) return;
     const candidate = usernameDraft.trim().toLowerCase();
@@ -118,6 +132,7 @@ export function BiodataScreen({ navigation }: Props) {
         englishVariant,
       });
       updateUser({ username: updated.username });
+      reachedNextRef.current = true;
       navigation.navigate('OnboardingGoal');
     } catch (err) {
       setError(
