@@ -14,6 +14,7 @@ import {
   type WordDuelStateView,
 } from '@/services/wordDuel';
 import { ApiError } from '@/services/apiClient';
+import { trackEvent } from '@/services/analyticsClient';
 import { useAuthStore } from '@/state/authStore';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
@@ -117,6 +118,15 @@ export function WordDuelScreen({ navigation }: Props) {
   // comment).
   const [opponentMenuOpen, setOpponentMenuOpen] = useState(false);
 
+  // Telemetry (spec §4B/§12) — refs so the unmount cleanup below always
+  // reads the CURRENT phase/state rather than whatever was in scope
+  // when that effect first ran; a plain render-time assignment (not an
+  // effect) keeps this cheap and always up to date for a cleanup
+  // function that only ever runs once, on unmount.
+  const latestRef = useRef({ phase, state });
+  latestRef.current = { phase, state };
+  const trackedWordIndexRef = useRef<number | null>(null);
+
   const applyState = useCallback((view: WordDuelStateView) => {
     setState(view);
     if (view.status === 'WAITING') setPhase('waiting');
@@ -141,6 +151,28 @@ export function WordDuelScreen({ navigation }: Props) {
   useEffect(() => {
     join();
   }, [join]);
+
+  // DUEL_VIEWED / DUEL_ABANDONED (spec §12) — mount/unmount is the only
+  // reliable signal the CLIENT has for "the player opened this screen"
+  // and "the player left mid-match"; the backend has no visibility into
+  // either (it only ever sees API calls, not navigation). Abandonment is
+  // reported only for WAITING/ACTIVE — leaving from 'complete', 'error',
+  // or 'no-opponent' isn't abandoning a match, there either isn't one
+  // (yet) or it's already over.
+  useEffect(() => {
+    trackEvent('DUEL_VIEWED', undefined, 'WordDuel');
+    return () => {
+      const { phase: finalPhase, state: finalState } = latestRef.current;
+      if (finalPhase === 'waiting' || finalPhase === 'active') {
+        trackEvent(
+          'DUEL_ABANDONED',
+          { matchId: finalState?.matchId ?? null, wordIndex: finalState?.wordIndex ?? null },
+          'WordDuel',
+        );
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/unmount only, by design.
+  }, []);
 
   useEffect(
     () => () => {
@@ -174,8 +206,23 @@ export function WordDuelScreen({ navigation }: Props) {
     return () => clearInterval(interval);
   }, [phase, state?.matchEndsAt]);
 
+  // DUEL_WORD_PRESENTED (spec §12) — fires once per distinct word, keyed
+  // on wordIndex, so the 2s poll (POLL_INTERVAL_MS) re-fetching the SAME
+  // word never double-counts it.
+  useEffect(() => {
+    if (phase !== 'active' || !state?.current) return;
+    if (trackedWordIndexRef.current === state.wordIndex) return;
+    trackedWordIndexRef.current = state.wordIndex;
+    trackEvent('DUEL_WORD_PRESENTED', { wordIndex: state.wordIndex }, 'WordDuel');
+  }, [phase, state]);
+
   const handleSubmit = async () => {
     if (!accessToken || !state || submitting || !answer.trim()) return;
+    trackEvent(
+      'LOCK_IN_PRESSED',
+      { wordIndex: state.wordIndex, cluesUsed: state.current?.cluesRevealed ?? 0 },
+      'WordDuel',
+    );
     setSubmitting(true);
     const matchId = state.matchId;
     const submittedAnswer = answer;
@@ -227,6 +274,11 @@ export function WordDuelScreen({ navigation }: Props) {
   const handleRevealClue = async () => {
     if (!accessToken || !state || revealingClue) return;
     if (!state.current || state.current.cluesRevealed >= state.current.maxClues) return;
+    trackEvent(
+      'CLUE_BUTTON_PRESSED',
+      { wordIndex: state.wordIndex, clueNumber: state.current.cluesRevealed + 1 },
+      'WordDuel',
+    );
     setRevealingClue(true);
     try {
       const fresh = await revealWordDuelClue(accessToken, state.matchId);
