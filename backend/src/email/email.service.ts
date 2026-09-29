@@ -52,21 +52,21 @@ export class EmailService {
   }
 
   /**
-   * Both links below use the app's own custom URL scheme
-   * (`wordquest://...`, matching the mobile app.json `scheme` and the
-   * same scheme Notification.deepLink already uses for push taps —
-   * Correction & Completion Spec §6 "mobile deep link handling") rather
-   * than a web URL: WordQuest has no web companion for a
-   * `https://app.wordquest.example/...` link to land on, and most
-   * mobile mail clients (Gmail, Apple Mail) open a custom-scheme link
-   * exactly like any other. A real Universal Link / App Link (a
-   * `https://` URL that opens the app via a domain-verified
-   * association file, with a graceful web fallback when the app isn't
-   * installed) is the natural upgrade once WordQuest has a real domain
-   * to verify against — appBaseUrl stays available in config for that.
+   * Both links below point at the deployed web build (`appBaseUrl` -- APP_BASE_URL, e.g.
+   * `https://barthiwu.github.io/wordquest`), not a `wordquest://` custom-scheme
+   * URL. The mobile app's own linking config (`mobile/src/app/navigation/
+   * linking.ts`) already maps `verify-email`/`reset-password` as React
+   * Navigation screens reachable by either scheme -- the web build serves
+   * those same paths under its own origin (Expo web linking, same config)
+   * -- so an `https://` link works from any mail client on any device,
+   * including ones without the native app installed, where a bare
+   * `wordquest://` link (the previous approach here) just failed silently.
+   * A real Universal Link / App Link (a domain-verified association file
+   * that reopens the native app instead of its browser) is a natural
+   * future upgrade on top of this, not a prerequisite for it.
    */
   async sendVerificationEmail(to: string, token: string): Promise<void> {
-    const verifyUrl = `wordquest://verify-email?token=${encodeURIComponent(token)}`;
+    const verifyUrl = `${this.config.appBaseUrl}/verify-email?token=${encodeURIComponent(token)}`;
     const html = this.layout({
       preheader: 'Verify your email to keep your WordQuest progress safe.',
       heading: 'Verify your email',
@@ -76,12 +76,12 @@ export class EmailService {
       ctaUrl: verifyUrl,
       linkIntro: "If the button doesn't work, copy this link instead:",
     });
-    const text = `Verify your email\n\nOpen this link on the device with WordQuest installed:\n${verifyUrl}`;
+    const text = `Verify your email\n\nOpen this link:\n${verifyUrl}`;
     await this.send(to, 'Verify your WordQuest email', html, text);
   }
 
   async sendPasswordResetEmail(to: string, token: string): Promise<void> {
-    const resetUrl = `wordquest://reset-password?token=${encodeURIComponent(token)}`;
+    const resetUrl = `${this.config.appBaseUrl}/reset-password?token=${encodeURIComponent(token)}`;
     const html = this.layout({
       preheader: 'Reset your WordQuest password.',
       heading: 'Reset your password',
@@ -91,7 +91,7 @@ export class EmailService {
       ctaUrl: resetUrl,
       linkIntro: "If the button doesn't work, copy this link instead:",
     });
-    const text = `Reset your password\n\nOpen this link on the device with WordQuest installed:\n${resetUrl}\n\nIf you didn't request this, you can ignore this email.`;
+    const text = `Reset your password\n\nOpen this link:\n${resetUrl}\n\nIf you didn't request this, you can ignore this email.`;
     await this.send(to, 'Reset your WordQuest password', html, text);
   }
 

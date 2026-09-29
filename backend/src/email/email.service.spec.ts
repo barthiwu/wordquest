@@ -63,6 +63,17 @@ describe('EmailService', () => {
       expect(body.html).toContain(encodeURIComponent('tok/with+special=chars'));
     });
 
+    it('links to the configured web app base URL, not a wordquest:// scheme', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+
+      await service.sendVerificationEmail('user@example.com', 'tok123');
+
+      const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(init.body);
+      expect(body.html).toContain('https://app.wordquest.example/verify-email?token=tok123');
+      expect(body.html).not.toContain('wordquest://');
+    });
+
     it('throws a clear error when the provider responds with a non-ok status', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
@@ -91,6 +102,17 @@ describe('EmailService', () => {
       configured = false;
       await service.sendPasswordResetEmail('user@example.com', 'reset456');
       expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('links to the configured web app base URL, not a wordquest:// scheme', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+
+      await service.sendPasswordResetEmail('user@example.com', 'reset456');
+
+      const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(init.body);
+      expect(body.html).toContain('https://app.wordquest.example/reset-password?token=reset456');
+      expect(body.html).not.toContain('wordquest://');
     });
   });
 });

@@ -80,6 +80,16 @@ export default defineRailway((ctx) => {
       API_PREFIX: "api/v1",
       JWT_ACCESS_EXPIRES_IN: "15m",
       JWT_REFRESH_EXPIRES_IN: "30d",
+      // The web build’s deployed origin (Sept 2026) — EmailService
+      // builds verify-email/reset-password links off this instead of a
+      // wordquest:// scheme link, so those links work from any mail
+      // client, not just a device with the native app installed. See
+      // email.service.ts’s own doc comment on sendVerificationEmail.
+      APP_BASE_URL: "https://barthiwu.github.io/wordquest",
+      // EMAIL_FROM_ADDRESS is deliberately NOT declared here — it
+      // depends on Barth’s Resend account/sending-domain setup, which
+      // this sandbox has no visibility into. Set it directly on Railway
+      // (Variables tab) alongside EMAIL_API_KEY.
     },
   });
 
