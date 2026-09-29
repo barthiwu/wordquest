@@ -162,19 +162,28 @@ export function SendFeedbackScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
+    // BackButton is a direct sibling of both `content` (the ScrollView's
+    // contentContainerStyle) and `doneWrap`, not nested inside either --
+    // so its top/side spacing has to live here on `container`, matching
+    // every other BackButton-as-sibling screen's `topInset + spacing.xxl`
+    // convention (AboutScreen/ProfileSettingsScreen/OrderScreen/
+    // QuestCardGalleryScreen/AchievementsScreen), not a smaller one-off
+    // value. `content`/`doneWrap` deliberately do NOT repeat
+    // paddingHorizontal -- that would double up with this one, since the
+    // ScrollView they're applied to already sits inside container's
+    // horizontal padding.
     container: {
       flex: 1,
       backgroundColor: colors.background,
-      paddingTop: topInset + spacing.md,
+      paddingHorizontal: spacing.xl,
+      paddingTop: topInset + spacing.xxl,
     },
     content: {
-      paddingHorizontal: spacing.xl,
       paddingBottom: spacing.xl,
       gap: spacing.md,
     },
     doneWrap: {
       flex: 1,
-      paddingHorizontal: spacing.xl,
       justifyContent: 'center',
       gap: spacing.md,
     },
