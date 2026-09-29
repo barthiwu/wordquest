@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -44,6 +44,15 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ProfileSettings'>;
  * duplicated, since Profile is now the one canonical place to edit any
  * of this, and PassportScreen's own header is a plain (non-editable)
  * identity display now.
+ *
+ * The picture-source picker is a small in-house Modal, not
+ * Alert.alert -- react-native-web's Alert.alert is a no-op
+ * (`static alert() {}`), so the multi-option action sheet this needs
+ * (take photo / choose from library / remove / cancel) never
+ * displayed anything on the web build, which is what made "change
+ * profile picture" look completely dead there. Permission/error
+ * feedback below uses the screen's existing inline `message` banner
+ * for the same reason, instead of Alert.alert.
  */
 export function ProfileSettingsScreen({ navigation }: Props) {
   const colors = useThemeColors();
@@ -54,6 +63,7 @@ export function ProfileSettingsScreen({ navigation }: Props) {
   const user = useAuthStore((s) => s.user);
   const updateUser = useAuthStore((s) => s.updateUser);
   const [avatarBusy, setAvatarBusy] = useState(false);
+  const [avatarMenuVisible, setAvatarMenuVisible] = useState(false);
   const [verifyToken, setVerifyToken] = useState('');
   const [busy, setBusy] = useState<'resend' | 'verify' | 'profile' | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -161,13 +171,13 @@ export function ProfileSettingsScreen({ navigation }: Props) {
 
   const pickAndUploadAvatar = async (source: 'camera' | 'library') => {
     if (!accessToken) return;
+    setMessage(null);
     const permission =
       source === 'camera'
         ? await ImagePicker.requestCameraPermissionsAsync()
         : await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert(
-        t('passport:permissionNeededTitle'),
+      setMessage(
         t('passport:permissionNeededMessage', {
           access:
             source === 'camera'
@@ -199,9 +209,10 @@ export function ProfileSettingsScreen({ navigation }: Props) {
       const confirmed = await confirmAvatar(accessToken, target.key);
       updateUser({ avatarUrl: confirmed.avatarUrl });
     } catch (err) {
-      Alert.alert(
-        t('passport:couldNotSetProfilePicture'),
-        err instanceof ApiError ? err.message : t('passport:genericTryAgain'),
+      setMessage(
+        `${t('passport:couldNotSetProfilePicture')} ${
+          err instanceof ApiError ? err.message : t('passport:genericTryAgain')
+        }`,
       );
     } finally {
       setAvatarBusy(false);
@@ -210,32 +221,29 @@ export function ProfileSettingsScreen({ navigation }: Props) {
 
   const onRemoveAvatar = async () => {
     if (!accessToken) return;
+    setMessage(null);
     setAvatarBusy(true);
     try {
       const result = await deleteAvatar(accessToken);
       updateUser({ avatarUrl: result.avatarUrl });
     } catch {
-      Alert.alert(t('passport:couldNotRemoveProfilePicture'), t('passport:genericTryAgain'));
+      setMessage(`${t('passport:couldNotRemoveProfilePicture')} ${t('passport:genericTryAgain')}`);
     } finally {
       setAvatarBusy(false);
     }
   };
 
   const onAvatarPress = () => {
-    const options: Array<{ text: string; style?: 'cancel' | 'destructive'; onPress?: () => void }> =
-      [
-        { text: t('passport:takePhoto'), onPress: () => pickAndUploadAvatar('camera') },
-        { text: t('passport:chooseFromLibrary'), onPress: () => pickAndUploadAvatar('library') },
-      ];
-    if (user?.avatarUrl) {
-      options.push({
-        text: t('passport:removePhoto'),
-        style: 'destructive',
-        onPress: onRemoveAvatar,
-      });
+    setAvatarMenuVisible(true);
+  };
+
+  const onAvatarMenuSelect = (action: 'camera' | 'library' | 'remove') => {
+    setAvatarMenuVisible(false);
+    if (action === 'remove') {
+      onRemoveAvatar();
+    } else {
+      pickAndUploadAvatar(action);
     }
-    options.push({ text: t('passport:cancel'), style: 'cancel' });
-    Alert.alert(t('passport:profilePictureTitle'), undefined, options);
   };
 
   return (
@@ -369,6 +377,57 @@ export function ProfileSettingsScreen({ navigation }: Props) {
           )}
         </Pressable>
       </View>
+
+      <Modal
+        visible={avatarMenuVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setAvatarMenuVisible(false)}
+      >
+        <Pressable
+          style={styles.menuBackdrop}
+          onPress={() => setAvatarMenuVisible(false)}
+          accessibilityLabel={t('passport:cancel')}
+        >
+          <Pressable style={styles.menuCard} onPress={() => {}}>
+            <Text style={styles.menuTitle}>{t('passport:profilePictureTitle')}</Text>
+            <Pressable
+              style={styles.menuRow}
+              onPress={() => onAvatarMenuSelect('camera')}
+              accessibilityRole="button"
+              accessibilityLabel={t('passport:takePhoto')}
+            >
+              <Text style={styles.menuRowText}>{t('passport:takePhoto')}</Text>
+            </Pressable>
+            <Pressable
+              style={styles.menuRow}
+              onPress={() => onAvatarMenuSelect('library')}
+              accessibilityRole="button"
+              accessibilityLabel={t('passport:chooseFromLibrary')}
+            >
+              <Text style={styles.menuRowText}>{t('passport:chooseFromLibrary')}</Text>
+            </Pressable>
+            {user?.avatarUrl && (
+              <Pressable
+                style={styles.menuRow}
+                onPress={() => onAvatarMenuSelect('remove')}
+                accessibilityRole="button"
+                accessibilityLabel={t('passport:removePhoto')}
+              >
+                <Text style={styles.menuRowTextDanger}>{t('passport:removePhoto')}</Text>
+              </Pressable>
+            )}
+            <Pressable
+              style={styles.menuCancelRow}
+              onPress={() => setAvatarMenuVisible(false)}
+              accessibilityRole="button"
+              accessibilityLabel={t('passport:cancel')}
+            >
+              <Text style={styles.menuCancelText}>{t('passport:cancel')}</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </ScrollView>
   );
 }
@@ -462,5 +521,39 @@ function createStyles(colors: ThemeColors, topInset: number) {
     usernameStatusChecking: { color: colors.inkMuted, fontSize: typography.scale.xs },
     usernameStatusOk: { color: colors.success, fontSize: typography.scale.xs, fontWeight: '700' },
     usernameStatusBad: { color: colors.warning, fontSize: typography.scale.xs, fontWeight: '700' },
+    menuBackdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xl,
+    },
+    menuCard: {
+      width: '100%',
+      maxWidth: 340,
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+      gap: spacing.xs,
+    },
+    menuTitle: {
+      color: colors.ink,
+      fontSize: typography.scale.md,
+      fontWeight: typography.display.weight,
+      textAlign: 'center',
+      marginBottom: spacing.xs,
+    },
+    menuRow: {
+      paddingVertical: spacing.md,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      alignItems: 'center',
+    },
+    menuRowText: { color: colors.ink, fontSize: typography.scale.md },
+    menuRowTextDanger: { color: colors.danger, fontSize: typography.scale.md },
+    menuCancelRow: { alignItems: 'center', paddingTop: spacing.sm },
+    menuCancelText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
   });
 }
