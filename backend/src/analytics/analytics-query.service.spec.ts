@@ -22,8 +22,10 @@ describe('AnalyticsQueryService', () => {
         .mockResolvedValueOnce([{ userId: 'u1' }, { userId: 'u2' }, { userId: 'u3' }]); // 7d
       prismaMock.analyticsEvent.count
         .mockResolvedValueOnce(120) // quest_completed
+        .mockResolvedValueOnce(90) // QUEST_STARTED
         .mockResolvedValueOnce(40) // boss_battle_joined
-        .mockResolvedValueOnce(15); // shop_purchase
+        .mockResolvedValueOnce(15) // shop_purchase
+        .mockResolvedValueOnce(60); // ARCADE_SESSION_STARTED
 
       const result = await service.getOverview();
 
@@ -32,17 +34,25 @@ describe('AnalyticsQueryService', () => {
         activeUsersLast24h: 2,
         activeUsersLast7d: 3,
         questsCompleted: 120,
+        questsStarted: 90,
         bossBattlesJoined: 40,
         shopPurchases: 15,
+        arcadeSessionsStarted: 60,
       });
       expect(prismaMock.analyticsEvent.count).toHaveBeenCalledWith({
         where: { eventName: 'quest_completed' },
+      });
+      expect(prismaMock.analyticsEvent.count).toHaveBeenCalledWith({
+        where: { eventName: 'QUEST_STARTED' },
       });
       expect(prismaMock.analyticsEvent.count).toHaveBeenCalledWith({
         where: { eventName: 'boss_battle_joined' },
       });
       expect(prismaMock.analyticsEvent.count).toHaveBeenCalledWith({
         where: { eventName: 'shop_purchase' },
+      });
+      expect(prismaMock.analyticsEvent.count).toHaveBeenCalledWith({
+        where: { eventName: 'ARCADE_SESSION_STARTED' },
       });
     });
 

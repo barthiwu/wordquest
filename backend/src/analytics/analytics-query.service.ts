@@ -8,15 +8,24 @@ export interface OverviewStats {
    * model exists. */
   activeUsersLast24h: number;
   activeUsersLast7d: number;
-  /** Legacy event name (see event-names.ts's doc comment) — the only
-   * quest-lifecycle event actually wired up today (QuestsService.
-   * completeWord). QUEST_STARTED/QUEST_VIEWED/QUEST_ABANDONED are in
-   * the controlled vocabulary but not yet emitted anywhere, so a
-   * "quest completion rate" isn't computable yet — deliberately not
-   * included here rather than shipping an always-zero denominator. */
+  /** Legacy event name (see event-names.ts's doc comment) — kept
+   * alongside questsStarted below rather than merged into it, since
+   * this one is server-authoritative (QuestsService.completeWord) while
+   * questsStarted is client-reported. */
   questsCompleted: number;
+  /** QUEST_STARTED (spec §9), client-reported from DailyQuestScreen once
+   * the challenge actually loads — added once that instrumentation
+   * shipped; a rough "start rate" is questsCompleted / questsStarted,
+   * though the two aren't from the same source (one server, one
+   * client) so treat it as directional, not exact. */
+  questsStarted: number;
   bossBattlesJoined: number;
   shopPurchases: number;
+  /** ARCADE_SESSION_STARTED (spec §11), client-reported from
+   * ScrambleQuestScreen/CompleteItScreen — Word Duel isn't included
+   * here since it has its own dedicated dashboard (getWordDuelDashboard
+   * below) sourced from ground-truth match data instead. */
+  arcadeSessionsStarted: number;
 }
 
 export interface WordDuelDashboardStats {
@@ -71,8 +80,10 @@ export class AnalyticsQueryService {
       activeLast24h,
       activeLast7d,
       questsCompleted,
+      questsStarted,
       bossBattlesJoined,
       shopPurchases,
+      arcadeSessionsStarted,
     ] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.analyticsEvent.groupBy({
@@ -84,8 +95,10 @@ export class AnalyticsQueryService {
         where: { userId: { not: null }, createdAt: { gte: last7d } },
       }),
       this.prisma.analyticsEvent.count({ where: { eventName: 'quest_completed' } }),
+      this.prisma.analyticsEvent.count({ where: { eventName: 'QUEST_STARTED' } }),
       this.prisma.analyticsEvent.count({ where: { eventName: 'boss_battle_joined' } }),
       this.prisma.analyticsEvent.count({ where: { eventName: 'shop_purchase' } }),
+      this.prisma.analyticsEvent.count({ where: { eventName: 'ARCADE_SESSION_STARTED' } }),
     ]);
 
     return {
@@ -93,8 +106,10 @@ export class AnalyticsQueryService {
       activeUsersLast24h: activeLast24h.length,
       activeUsersLast7d: activeLast7d.length,
       questsCompleted,
+      questsStarted,
       bossBattlesJoined,
       shopPurchases,
+      arcadeSessionsStarted,
     };
   }
 
