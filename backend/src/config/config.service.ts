@@ -22,7 +22,7 @@ export class AppConfigService {
     return this.config.get<number>('port', 3000);
   }
 
-  get corsOrigin(): string {
+  get corsOrigin(): string | string[] {
     const value = this.config.get<string>('corsOrigin', '*');
     // V21 Beta Release Candidate Spec §12 "Authentication Production
     // Review": a production deploy that forgets to set CORS_ORIGIN must
@@ -37,7 +37,17 @@ export class AppConfigService {
         'CORS_ORIGIN must be set to a specific origin in production — refusing to boot with a wildcard CORS policy.',
       );
     }
-    return value;
+    // CORS_ORIGIN=*, or a single origin, is returned as-is (unchanged
+    // behavior). A comma-separated list (e.g. the GitHub Pages web
+    // build's origin alongside a future custom domain) is split and
+    // trimmed into an array, which Nest's enableCors also accepts —
+    // lets the API serve more than one legitimate browser origin
+    // without loosening the wildcard-in-production guard above.
+    const origins = value
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean);
+    return origins.length > 1 ? origins : value;
   }
 
   get databaseUrl(): string {

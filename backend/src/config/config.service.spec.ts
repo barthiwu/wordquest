@@ -30,4 +30,12 @@ describe('AppConfigService — corsOrigin', () => {
     const service = await makeService({ env: 'production' }); // corsOrigin unset -> defaults to '*'
     expect(() => service.corsOrigin).toThrow(/wildcard/i);
   });
+
+  it('splits a comma-separated CORS_ORIGIN into a trimmed array of origins', async () => {
+    const service = await makeService({
+      env: 'production',
+      corsOrigin: 'https://barthiwu.github.io, https://wordquest.app',
+    });
+    expect(service.corsOrigin).toEqual(['https://barthiwu.github.io', 'https://wordquest.app']);
+  });
 });
