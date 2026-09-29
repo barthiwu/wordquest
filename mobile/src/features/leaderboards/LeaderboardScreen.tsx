@@ -8,7 +8,6 @@ import { useThemeColors } from '@/state/themeStore';
 import {
   getBossBattleXpLeaderboard,
   getClanLeaderboard,
-  getContinentLeaderboard,
   getCountryLeaderboard,
   getFriendLeaderboard,
   getGlobalLeaderboard,
@@ -30,7 +29,7 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-type Category = 'global' | 'clan' | 'country' | 'continent' | 'friend' | 'bossBattle';
+type Category = 'global' | 'clan' | 'country' | 'friend' | 'bossBattle';
 
 /** A player counts as "active" for the leaderboard row badge when their
  * last recorded activity (entry.lastActiveOn) falls within this many
@@ -42,23 +41,26 @@ const ACTIVE_RECENTLY_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 /**
  * §30 Leaderboards, now the Leaderboard tab. Global (Overall), Clan,
- * Country, Continent, Friend and Boss Battle are all real, ranked from
- * the same authoritative data as Home/Passport — Country and Continent
- * scope to the viewer's own countryCode (set via the onboarding flag
- * picker), same pattern as Clan scoping to the viewer's clan. Friend
- * ranks the viewer against their accepted friends (backend/src/friends),
- * and Boss Battle ranks by lifetime Boss Battle XP rather than general
- * totalXp — see Row below for how that category suppresses the
- * (meaningless, always-0) level in its subtitle.
+ * Country, Friend and Boss Battle are all real, ranked from the same
+ * authoritative data as Home/Passport — Country scopes to the viewer's
+ * own countryCode (set via the onboarding flag picker), same pattern as
+ * Clan scoping to the viewer's clan. Friend ranks the viewer against
+ * their accepted friends (backend/src/friends), and Boss Battle ranks by
+ * lifetime Boss Battle XP rather than general totalXp — see Row below
+ * for how that category suppresses the (meaningless, always-0) level in
+ * its subtitle.
  *
- * Global/Country/Continent were briefly trimmed out (Sept 2026, in
- * favor of Clan/Friend/Boss Battle only) and restored a couple of days
- * later (2026-09, Barth: wants to follow how people are progressing,
+ * Global/Country were briefly trimmed out (Sept 2026, in favor of
+ * Clan/Friend/Boss Battle only) and restored a couple of days later
+ * (2026-09, Barth: wants to follow how people are progressing,
  * specifically calling out Overall and Country) — the backend endpoints
  * were never removed, so this was a UI-only restore. Barth used
- * "Overall" rather than "Global" when asking for it back, so that's
- * the English tab label now, though the underlying category/route name
- * (`global`, `/leaderboards/global`) is unchanged.
+ * "Overall" rather than "Global" when asking for it back, so that's the
+ * English tab label now, though the underlying category/route name
+ * (`global`, `/leaderboards/global`) is unchanged. Continent was in the
+ * initial restore pass but Barth explicitly asked for Overall + Country
+ * only, so it stays available server-side (getContinentLeaderboard /
+ * GET /leaderboards/continent) but isn't surfaced as a tab here.
  */
 // This screen no longer navigates anywhere (the standalone "play
 // Boss Battle" CTA was removed once PlayScreen/Compete tab got its own
@@ -82,7 +84,6 @@ export function LeaderboardScreen(_props: Props) {
     global: t('unavailableGlobal'),
     clan: t('unavailableClan'),
     country: t('unavailableCountry'),
-    continent: t('unavailableContinent'),
     friend: t('unavailableFriend'),
     bossBattle: t('unavailableBossBattle'),
   };
@@ -91,7 +92,6 @@ export function LeaderboardScreen(_props: Props) {
     global: t('emptyGlobal'),
     clan: t('emptyClan'),
     country: t('emptyCountry'),
-    continent: t('emptyContinent'),
     friend: t('emptyFriend'),
     bossBattle: t('emptyBossBattle'),
   };
@@ -108,11 +108,9 @@ export function LeaderboardScreen(_props: Props) {
             ? getClanLeaderboard(accessToken)
             : cat === 'country'
               ? getCountryLeaderboard(accessToken)
-              : cat === 'continent'
-                ? getContinentLeaderboard(accessToken)
-                : cat === 'friend'
-                  ? getFriendLeaderboard(accessToken)
-                  : getBossBattleXpLeaderboard(accessToken);
+              : cat === 'friend'
+                ? getFriendLeaderboard(accessToken)
+                : getBossBattleXpLeaderboard(accessToken);
       request.then(setView).catch((err) => {
         if (err instanceof ApiError && err.status === 400) {
           setError(categoryUnavailableMessage[cat]);
@@ -157,12 +155,6 @@ export function LeaderboardScreen(_props: Props) {
           label={t('tabCountry')}
           active={category === 'country'}
           onPress={() => selectCategory('country')}
-          styles={styles}
-        />
-        <Tab
-          label={t('tabContinent')}
-          active={category === 'continent'}
-          onPress={() => selectCategory('continent')}
           styles={styles}
         />
         <Tab
