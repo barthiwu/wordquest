@@ -11,9 +11,23 @@ function contextWithUserId(userId: string | undefined): ExecutionContext {
 
 describe('EmailVerificationGuard', () => {
   const prismaMock = { user: { findUnique: jest.fn() } };
-  const guard = new EmailVerificationGuard(prismaMock as any);
+  const configMock = { isEmailConfigured: true };
+  const guard = new EmailVerificationGuard(prismaMock as any, configMock as any);
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    configMock.isEmailConfigured = true;
+  });
+
+  it('allows every request through when email sending is not configured, without touching the database', async () => {
+    configMock.isEmailConfigured = false;
+    const createdAt = new Date();
+    createdAt.setDate(createdAt.getDate() - 30); // would otherwise be well past the grace window
+    prismaMock.user.findUnique.mockResolvedValue({ emailVerifiedAt: null, createdAt });
+
+    await expect(guard.canActivate(contextWithUserId('u1'))).resolves.toBe(true);
+    expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+  });
 
   it('allows the request through when there is no userId on it yet', async () => {
     await expect(guard.canActivate(contextWithUserId(undefined))).resolves.toBe(true);
@@ -34,7 +48,7 @@ describe('EmailVerificationGuard', () => {
     await expect(guard.canActivate(contextWithUserId('u1'))).resolves.toBe(true);
   });
 
-  it('blocks an unverified user once the grace period has elapsed', async () => {
+  it('blocks an unverified user once the grace period has elapsed, when email is configured', async () => {
     const createdAt = new Date();
     createdAt.setDate(createdAt.getDate() - 30); // well past the grace window
     prismaMock.user.findUnique.mockResolvedValue({ emailVerifiedAt: null, createdAt });
