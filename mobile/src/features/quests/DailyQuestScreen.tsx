@@ -54,6 +54,7 @@ import { FadeInUp } from '@/components/FadeInUp';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
 import { AffordanceChip } from '@/components/AffordanceChip';
+import { trackEvent } from '@/services/analyticsClient';
 import { ScoreRing } from '@/components/ScoreRing';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
@@ -246,6 +247,20 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   const aliBubbleCounter = useRef(0);
   const inputRefs = useRef<Record<number, TextInput | null>>({});
 
+  // Telemetry spec §9. completedRef guards QUEST_ABANDONED on unmount --
+  // same mount/unmount-ref pattern as WordDuelScreen's DUEL_ABANDONED.
+  // QUEST_VIEWED fires once per screen mount (questKey identifies which
+  // time-window quest); QUEST_STARTED/WORD_PRESENTED fire once the
+  // challenge actually loads, from load()'s success branch below.
+  const completedRef = useRef(false);
+  useEffect(() => {
+    trackEvent('QUEST_VIEWED', { questKey });
+    return () => {
+      if (!completedRef.current) trackEvent('QUEST_ABANDONED', { questKey });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Text vs Photo defaults to whatever the player last used on the standalone
   // Word in the Wild flow (SubmitEvidenceScreen) — the two share
   // useEvidenceModeStore so the preference carries over either direction.
@@ -264,6 +279,18 @@ export function DailyQuestScreen({ route, navigation }: Props) {
       .then((view) => {
         setChallenge(view);
         setAttemptId(view.questAttemptId);
+        // resumed = the attempt already had progress past Guess when
+        // this load fired (an app relaunch or leaving/reopening
+        // mid-word) -- worth distinguishing from a genuinely fresh
+        // start in the funnel.
+        trackEvent('QUEST_STARTED', { questKey, resumed: view.wordStage !== 'GUESSING' });
+        trackEvent('WORD_PRESENTED', {
+          questKey,
+          wordIndex: view.wordIndex,
+          wordCount: view.wordCount,
+          wordLength: view.wordLength,
+          partOfSpeech: view.partOfSpeech,
+        });
         // Resuming past Guess (app relaunch, or just leaving and
         // reopening the quest) has no in-session submitAnswer response
         // to source this from, since that only ever fires for a fresh
@@ -354,9 +381,18 @@ export function DailyQuestScreen({ route, navigation }: Props) {
     if (!accessToken || !challenge || !attemptId || stage !== 'guess' || !allBlanksFilled) return;
     if (guessBusy) return;
     const answer = buildAnswer(challenge);
+    trackEvent('GUESS_SUBMITTED', { questKey, wordIndex: challenge.wordIndex });
     setGuessBusy(true);
     try {
       const result = await submitAnswer(accessToken, attemptId, answer);
+      trackEvent('GUESS_RESULT', {
+        questKey,
+        wordIndex: challenge.wordIndex,
+        isCorrect: result.isCorrect,
+        timedOut: result.timedOut,
+        hintsUsed,
+        synonymsUsed,
+      });
       setGuessFeedback({
         isCorrect: result.isCorrect,
         timedOut: result.timedOut,
@@ -476,6 +512,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
     if (!accessToken || !attemptId) return;
     try {
       await acknowledgeUnderstanding(accessToken, attemptId);
+      trackEvent('SENTENCE_STARTED', { questKey });
       setStage('sentence');
     } catch (err) {
       if (err instanceof ApiError) setErrorMessage(err.message);
@@ -489,6 +526,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
     setSentenceBusy(true);
     try {
       const result = await submitSentence(accessToken, attemptId, sentenceText.trim());
+      trackEvent('SENTENCE_SUBMITTED', { questKey });
       setSentenceResult(result);
       setStage('sentenceFeedback');
     } catch (err) {
@@ -504,12 +542,18 @@ export function DailyQuestScreen({ route, navigation }: Props) {
     : 0;
   const paragraphValid = paragraphWordCount >= 30 && paragraphWordCount <= 100;
 
+  const onContinueToParagraph = () => {
+    trackEvent('PARAGRAPH_STARTED', { questKey });
+    setStage('paragraph');
+  };
+
   const onSubmitParagraph = async () => {
     if (!accessToken || !attemptId || !paragraphValid) return;
     if (paragraphBusy) return;
     setParagraphBusy(true);
     try {
       const result = await submitParagraph(accessToken, attemptId, paragraphText.trim());
+      trackEvent('PARAGRAPH_SUBMITTED', { questKey });
       setParagraphResult(result);
       setStage('paragraphFeedback');
     } catch (err) {
@@ -571,6 +615,8 @@ export function DailyQuestScreen({ route, navigation }: Props) {
         await submitTextEvidence(accessToken, mission.id, wildText.trim());
       }
       const result = await completeWord(accessToken, attemptId);
+      completedRef.current = true;
+      trackEvent('QUEST_COMPLETED', { questKey });
       navigation.replace('QuestComplete', result);
     } catch (err) {
       setWildError(err instanceof ApiError ? err.message : t('couldNotSubmitEvidence'));
@@ -1092,7 +1138,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
 
         <Pressable
           style={styles.button}
-          onPress={() => setStage('paragraph')}
+          onPress={onContinueToParagraph}
           accessibilityRole="button"
           accessibilityLabel={t('continue')}
         >
