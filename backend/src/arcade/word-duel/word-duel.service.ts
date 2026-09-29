@@ -26,11 +26,14 @@ import { quickAliExpression, type AliExpressionCue } from '../../ali/ali-express
 
 /** Client-safe view of the opponent's progress — score only, never their
  * current word or answers (spec §6/§8). Identity (userId/username/
- * avatarUrl) is deliberately absent here: it is added ONLY once the
- * match reaches COMPLETED (2026-09, Barth: backs the avatar-tap
- * "Profile / Add Friend / Block" popup on the post-match result) --
- * while status is WAITING or ACTIVE these three fields are always
- * omitted, preserving the existing live-anonymity behavior exactly. */
+ * avatarUrl) is populated as soon as an opponent has actually joined the
+ * match (ACTIVE or COMPLETED) -- 2026-09-29, Barth: "display the username
+ * of the two players facing off" while the duel is live, not just on the
+ * post-match result. (Previously these three fields were withheld until
+ * COMPLETED -- 2026-09 decision backing the avatar-tap "Profile / Add
+ * Friend / Block" popup there; that popup still only appears on the
+ * result screen, this just also surfaces the plain username live.) Still
+ * always absent while WAITING (no opponent to identify yet). */
 export interface WordDuelOpponentView {
   correctCount: number;
   totalXp: number;
@@ -39,14 +42,40 @@ export interface WordDuelOpponentView {
   avatarUrl?: string | null;
 }
 
+/** One of this player's current word's three clues, in fixed reveal
+ * order (spec, 2026-09-29 Barth): synonym, then origin/etymology, then a
+ * hint that reveals HINT_CLUE_LETTER_FRACTION of the word's letters (see
+ * `displayHint` below). `text` is null when this word has no data for
+ * that clue type to show -- e.g. no synonym recorded, or (currently
+ * always -- see this file's clue-rollout note near requestClue) no
+ * etymology data at all, since the vocabulary corpus has no
+ * origin/etymology field yet. The HINT clue's own `text` is always null;
+ * its effect is `displayHint` updating instead, so there's nothing
+ * separate to show inline. */
+export interface WordDuelClueView {
+  type: 'SYNONYM' | 'ORIGIN' | 'HINT';
+  text: string | null;
+}
+
 /** Client-safe view of this player's current word — a letter-by-letter
- * display hint, never the target word itself (spec §6/§8). Clues reveal
- * automatically over time (see WORD_DUEL_CONFIG.CLUE_INTERVAL_SECONDS),
- * unlike ScrambleQuest's on-demand hints. */
+ * display hint, never the target word itself (spec §6/§8), plus the
+ * word's meaning (always shown, never gated -- 2026-09-29, Barth: "The
+ * meaning of the word is supposed to appear normally") and whichever of
+ * its three clues this player has revealed so far. Clues are player-
+ * triggered (WordDuelService.requestClue), not revealed automatically
+ * over time — unlike the old behavior, matching ScrambleQuest's on-
+ * demand hints/Quests' on-demand synonym reveal. */
 export interface WordDuelCurrentWordView {
+  /** The word's dictionary definition — always visible, not a clue. */
+  meaning: string;
+  /** Underscore-blanked letter positions, space-separated; only changes
+   * once the HINT clue (the 3rd clue) has been revealed. */
   displayHint: string;
   cluesRevealed: number;
   maxClues: number;
+  /** One entry per clue revealed so far, oldest first — length always
+   * equals cluesRevealed. */
+  clues: WordDuelClueView[];
 }
 
 export interface WordDuelResultView {
@@ -307,13 +336,11 @@ export class WordDuelService {
       });
     }
 
-    // Clue count depends on the rendered word's own length (e.g.
-    // "colour" is 6 letters, its US form "color" is 5) -- must match
-    // whatever buildStateView showed this player while they were
-    // answering, or the "never reveal the final letter" cap could be
-    // off by one relative to what they actually saw.
-    const maxClues = this.maxCluesFor(rendered.text);
-    const cluesRevealed = this.computeCluesRevealed(playerState.currentWordStartedAt, maxClues);
+    // Audit value only -- how many of THIS word's clues this player
+    // actually revealed before answering it, read straight off the
+    // persisted, player-triggered counter (requestClue), not
+    // recomputed from elapsed time.
+    const cluesRevealed = playerState.currentWordCluesRevealed;
     const wordIndex = playerState.currentIndex;
 
     await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -358,6 +385,8 @@ export class WordDuelService {
           totalXp: { increment: reward.finalXp },
           ...(isCorrect ? { correctCount: { increment: 1 } } : {}),
           currentWordStartedAt: new Date(),
+          // New word, new clue budget -- same reset as currentWordStartedAt.
+          currentWordCluesRevealed: 0,
         },
       });
       if (claimed.count === 0) {
@@ -392,6 +421,36 @@ export class WordDuelService {
     };
   }
 
+  /**
+   * Reveals this player's next clue on their current word (spec,
+   * 2026-09-29 Barth: player-triggered, via a "Clues" button -- see
+   * WordDuelCurrentWordView's doc comment for why this replaced the old
+   * automatic time-based reveal). Same CAS-guarded "read the exact
+   * count, updateMany gated on it still matching" shape as
+   * ScrambleQuestService.requestHint, so a raced double-tap can't grant
+   * two clues for one tap. Returns the full state view (like
+   * getState/joinQueue) rather than a delta, since the mobile screen
+   * already knows how to apply a WordDuelStateView wholesale.
+   */
+  async requestClue(userId: string, matchId: string): Promise<WordDuelStateView> {
+    const playerState = await this.loadActivePlayerState(userId, matchId);
+    const maxClues = this.maxCluesFor();
+
+    if (playerState.currentWordCluesRevealed >= maxClues) {
+      throw new BadRequestException(`No clues remaining (max ${maxClues}).`);
+    }
+
+    const claimed = await this.prisma.wordDuelPlayerState.updateMany({
+      where: { id: playerState.id, currentWordCluesRevealed: playerState.currentWordCluesRevealed },
+      data: { currentWordCluesRevealed: { increment: 1 } },
+    });
+    if (claimed.count === 0) {
+      throw new ConflictException('This clue was already requested');
+    }
+
+    return this.buildStateView(playerState.id);
+  }
+
   private isStaleWaitingMatch(createdAt: Date): boolean {
     const cutoffMs = Date.now() - WORD_DUEL_CONFIG.MATCHMAKING_TIMEOUT_SECONDS * 1000;
     return createdAt.getTime() < cutoffMs;
@@ -424,23 +483,57 @@ export class WordDuelService {
     return this.prisma.word.findUniqueOrThrow({ where: { id: wordId } });
   }
 
-  /** A clue can never reveal the word's final letter — same reasoning as
-   * ScrambleQuestService.maxHintsFor: a "clue" that fully solves the
-   * word isn't really a clue. */
-  private maxCluesFor(word: string): number {
-    return Math.min(WORD_DUEL_CONFIG.MAX_CLUES_PER_WORD, Math.max(0, word.length - 1));
+  /** Always exactly MAX_CLUES_PER_WORD (3: synonym, origin, hint) --
+   * unlike the old per-letter reveal, clue count no longer depends on
+   * the word's own length. */
+  private maxCluesFor(): number {
+    return WORD_DUEL_CONFIG.MAX_CLUES_PER_WORD;
   }
 
-  private computeCluesRevealed(currentWordStartedAt: Date, maxClues: number): number {
-    const elapsedMs = Date.now() - currentWordStartedAt.getTime();
-    const revealed = Math.floor(elapsedMs / (WORD_DUEL_CONFIG.CLUE_INTERVAL_SECONDS * 1000));
-    return Math.max(0, Math.min(maxClues, revealed));
+  /** How many letters the HINT clue (the 3rd/last clue) reveals at
+   * once, left-to-right -- HINT_CLUE_LETTER_FRACTION of the word's
+   * length, rounded, and never the word's final letter (same "not
+   * really a clue if it solves the word" reasoning as ScrambleQuest's
+   * MAX_HINTS_PER_WORD/maxCluesFor above). */
+  private hintLetterCountFor(word: string): number {
+    const rounded = Math.round(word.length * WORD_DUEL_CONFIG.HINT_CLUE_LETTER_FRACTION);
+    return Math.min(word.length - 1, Math.max(0, rounded));
   }
 
-  private buildDisplayHint(word: string, cluesRevealed: number): string {
+  /** Blank/reveal row shown under the puzzle -- only reveals letters
+   * once the HINT clue (the 3rd clue) has actually been tapped;
+   * otherwise every position is blank, regardless of how many of the
+   * other two clues have been revealed. */
+  private buildDisplayHint(word: string, hintClueRevealed: boolean): string {
+    const revealCount = hintClueRevealed ? this.hintLetterCountFor(word) : 0;
     return Array.from({ length: word.length }, (_, i) =>
-      i < cluesRevealed ? word[i].toUpperCase() : '_',
+      i < revealCount ? word[i].toUpperCase() : '_',
     ).join(' ');
+  }
+
+  /**
+   * Resolves the content of the Nth clue (0-indexed: 0=synonym,
+   * 1=origin/etymology, 2=hint), spec order per Barth (2026-09-29).
+   * `text` is null when this word has nothing to show for that slot:
+   *  - SYNONYM: this word has no synonyms recorded (rare in the corpus,
+   *    but not impossible).
+   *  - ORIGIN: ALWAYS null right now. The vocabulary corpus (Word model
+   *    / CSV seed data) has no origin/etymology field or content for
+   *    ANY word yet -- confirmed by checking both the Prisma schema and
+   *    the production CSV. This is a genuine content gap, not a bug in
+   *    this method: adding real etymology data is a separate, much
+   *    larger content project (a new schema field, plus sourcing/
+   *    writing or AI-generating and reviewing text for the ~10,000-word
+   *    corpus) that needs Barth's own go-ahead on scope/approach, not a
+   *    guess made here. The client shows a "not available yet"
+   *    fallback for this slot rather than fabricated content.
+   *  - HINT: text is always null -- its effect is `displayHint`
+   *    revealing letters instead, so there's no separate string here.
+   */
+  private resolveClue(index: number, synonyms: string[]): WordDuelClueView {
+    if (index === 0) return { type: 'SYNONYM', text: synonyms[0] ?? null };
+    if (index === 1) return { type: 'ORIGIN', text: null };
+    return { type: 'HINT', text: null };
   }
 
   /**
@@ -571,12 +664,17 @@ export class WordDuelService {
       // differently.
       const variant = await resolveEnglishVariant(this.prisma, playerState.userId);
       const rendered = renderWord(word, variant);
-      const maxClues = this.maxCluesFor(rendered.text);
-      const cluesRevealed = this.computeCluesRevealed(playerState.currentWordStartedAt, maxClues);
+      const maxClues = this.maxCluesFor();
+      const cluesRevealed = Math.min(maxClues, playerState.currentWordCluesRevealed);
+      const clues = Array.from({ length: cluesRevealed }, (_, i) =>
+        this.resolveClue(i, word.synonyms),
+      );
       current = {
-        displayHint: this.buildDisplayHint(rendered.text, cluesRevealed),
+        meaning: word.definition,
+        displayHint: this.buildDisplayHint(rendered.text, cluesRevealed >= maxClues),
         cluesRevealed,
         maxClues,
+        clues,
       };
     }
 
@@ -590,16 +688,17 @@ export class WordDuelService {
       };
     }
 
-    // Identity is resolved ONLY once the match is COMPLETED -- see
-    // WordDuelOpponentView's doc comment for why this must never happen
-    // while status is WAITING or ACTIVE. FriendsService.getPublicIdentity
-    // is reused rather than a separate User lookup here so this follows
-    // the same "username is the only identity other players see" shape
-    // (FriendPublicView) every other public-facing surface uses.
-    const opponentIdentity =
-      opponentRow && playerState.match.status === 'COMPLETED'
-        ? await this.friends.getPublicIdentity(opponentRow.userId)
-        : null;
+    // Identity is resolved as soon as an opponent has actually joined
+    // the match (ACTIVE or COMPLETED -- opponentRow is only ever
+    // non-null then; see WordDuelOpponentView's doc comment for the
+    // 2026-09-29 change from "COMPLETED only"). FriendsService.
+    // getPublicIdentity is reused rather than a separate User lookup
+    // here so this follows the same "username is the only identity
+    // other players see" shape (FriendPublicView) every other
+    // public-facing surface uses.
+    const opponentIdentity = opponentRow
+      ? await this.friends.getPublicIdentity(opponentRow.userId)
+      : null;
 
     // Read back rather than resolved live -- see WordDuelStateView's
     // streakReaction/deferredAliReactions doc comments for why (no

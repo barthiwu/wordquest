@@ -131,14 +131,20 @@ export const WORD_DUEL_CONFIG = {
   // rare; a player who does just waits for the match clock to run out.
   WORDS_PER_MATCH: 20,
   // Progressive clues (spec §6): not in the spec's own Word Duel config
-  // any more than Complete It's timer was -- both added as 2026-09
-  // product decisions once the actual mechanic had to be implemented.
-  // Every CLUE_INTERVAL_SECONDS elapsed on a player's current word, one
-  // more letter reveals automatically (no request needed, unlike
-  // ScrambleQuest's on-demand hints) -- same "never reveal the final
-  // letter" cap as ScrambleQuest's MAX_HINTS_PER_WORD.
-  CLUE_INTERVAL_SECONDS: 8,
+  // any more than Complete It's timer was -- added as a 2026-09 product
+  // decision once the actual mechanic had to be implemented, and
+  // revised 2026-09-29 (Barth) from an automatic, elapsed-time reveal
+  // to a player-triggered one -- the player taps a "Clues" button (see
+  // WordDuelService.requestClue), same on-demand shape as ScrambleQuest's
+  // MAX_HINTS_PER_WORD/Quests' synonym reveal, just three fixed clue
+  // types in a fixed order (synonym, then origin/etymology, then a
+  // 60%-of-the-word letter hint) instead of N generic letter reveals.
   MAX_CLUES_PER_WORD: 3,
+  // The word-duel HINT clue (the 3rd/last clue) reveals this fraction
+  // of the word's letters at once, left-to-right, rounded to the
+  // nearest letter -- same "never reveal the final letter" cap as
+  // ScrambleQuest's MAX_HINTS_PER_WORD/hintRevealOrder.
+  HINT_CLUE_LETTER_FRACTION: 0.6,
   // Denominator for speedModifierFor's fast/normal/slow bucketing only
   // -- NOT an enforced per-word timeout (WordDuelAnswer has no
   // `timedOut` column, unlike ArcadeAnswer: a word Duel player is only

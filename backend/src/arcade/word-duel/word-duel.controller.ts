@@ -10,6 +10,7 @@ import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
  * POST /api/v1/arcade/word-duel/join
  * GET  /api/v1/arcade/word-duel/:matchId
  * POST /api/v1/arcade/word-duel/:matchId/answer
+ * POST /api/v1/arcade/word-duel/:matchId/clue
  *
  * REST + client-polling transport for now (see the doc comment atop
  * WordDuelService) — no WebSocket gateway exists in this codebase yet
@@ -18,10 +19,12 @@ import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
  * limit answer, hint, and matchmaking operations" — same tighter
  * budget the other Arcade games use for their own start/answer
  * routes). `:matchId` (GET) is what a polling client hits on a short
- * interval to pick up the opponent joining, clues revealing over
- * time, and the match ending — a materially higher budget than
- * answer/join, sized for that polling cadence rather than for one-off
- * actions.
+ * interval to pick up the opponent joining and the match ending — a
+ * materially higher budget than answer/join/clue, sized for that
+ * polling cadence rather than for one-off actions. `clue` (POST) is
+ * the player-triggered "Clues" button (2026-09-29, Barth) — same
+ * tighter answer/hint-style rate limit as `answer`, mirroring
+ * ScrambleQuestController's own hint route.
  */
 @Controller('arcade/word-duel')
 @UseGuards(JwtAuthGuard, EmailVerificationGuard)
@@ -48,5 +51,11 @@ export class WordDuelController {
     @Body() dto: SubmitWordDuelAnswerDto,
   ) {
     return this.wordDuel.submitAnswer(userId, matchId, dto.answer);
+  }
+
+  @Post(':matchId/clue')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  requestClue(@CurrentUserId() userId: string, @Param('matchId') matchId: string) {
+    return this.wordDuel.requestClue(userId, matchId);
   }
 }

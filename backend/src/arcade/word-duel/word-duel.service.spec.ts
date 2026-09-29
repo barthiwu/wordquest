@@ -44,6 +44,7 @@ interface FakePlayerState {
   correctCount: number;
   currentIndex: number;
   currentWordStartedAt: Date;
+  currentWordCluesRevealed: number;
   joinedAt: Date;
   disconnectedAt: Date | null;
   reconnectedAt: Date | null;
@@ -81,6 +82,11 @@ interface FakeWord {
   wordUS?: string | null;
   normalizedWordUS?: string | null;
   exampleSentenceUS?: string | null;
+  // Meaning/clue fields -- optional with defaults below so existing
+  // fixtures that don't care about them (most of this file) don't need
+  // updating; tests that DO care set them explicitly.
+  definition?: string;
+  synonyms?: string[];
 }
 
 function makeStore() {
@@ -207,6 +213,7 @@ function makeStore() {
         correctCount: 0,
         currentIndex: 0,
         currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
         joinedAt: new Date(),
         disconnectedAt: null,
         reconnectedAt: null,
@@ -218,8 +225,14 @@ function makeStore() {
     updateMany: jest.fn((args: any) => {
       const p = playerStates.get(args.where.id);
       if (!p) return { count: 0 };
-      if (args.where.currentIndex !== undefined && p.currentIndex !== args.where.currentIndex) {
-        return { count: 0 };
+      // Generic CAS guard: any scalar `where` field beyond `id` (e.g.
+      // currentIndex for submitAnswer's claim, currentWordCluesRevealed
+      // for requestClue's) must still match the row's current value, or
+      // this is a lost race -- same "count: 0 on a stale read" contract
+      // Prisma's real updateMany gives.
+      for (const [key, value] of Object.entries<any>(args.where)) {
+        if (key === 'id') continue;
+        if ((p as any)[key] !== value) return { count: 0 };
       }
       for (const [key, value] of Object.entries<any>(args.data)) {
         if (value && typeof value === 'object' && 'increment' in value) {
@@ -236,7 +249,11 @@ function makeStore() {
     findUniqueOrThrow: jest.fn((args: any) => {
       const w = words.get(args.where.id);
       if (!w) throw new Error(`Word ${args.where.id} not found`);
-      return { ...w };
+      // Real Word rows always have a definition and a (possibly empty)
+      // synonyms array -- default fixtures that don't set them
+      // explicitly get harmless stand-ins rather than undefined, same
+      // as production's non-null columns.
+      return { definition: '', synonyms: [], ...w };
     }),
   };
 
@@ -324,12 +341,16 @@ describe('WordDuelService', () => {
       word: 'train',
       normalizedWord: 'train',
       baseDifficulty: 'BEGINNER',
+      definition: 'To teach a skill through practice.',
+      synonyms: ['coach', 'drill'],
     });
     store.words.set('w2', {
       id: 'w2',
       word: 'humid',
       normalizedWord: 'humid',
       baseDifficulty: 'INTERMEDIATE',
+      definition: 'Containing a high amount of moisture in the air.',
+      synonyms: ['damp'],
     });
 
     const moduleRef = await Test.createTestingModule({
@@ -394,6 +415,7 @@ describe('WordDuelService', () => {
         correctCount: 0,
         currentIndex: 0,
         currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
         joinedAt: new Date(),
         disconnectedAt: null,
         reconnectedAt: null,
@@ -434,6 +456,7 @@ describe('WordDuelService', () => {
           correctCount: 0,
           currentIndex: 0,
           currentWordStartedAt: new Date(),
+          currentWordCluesRevealed: 0,
           joinedAt: new Date(),
           disconnectedAt: null,
           reconnectedAt: null,
@@ -470,6 +493,7 @@ describe('WordDuelService', () => {
         correctCount: 0,
         currentIndex: 0,
         currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
         joinedAt: new Date(),
         disconnectedAt: null,
         reconnectedAt: null,
@@ -508,6 +532,7 @@ describe('WordDuelService', () => {
         correctCount: 0,
         currentIndex: 0,
         currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
         joinedAt: new Date(),
         disconnectedAt: null,
         reconnectedAt: null,
@@ -550,6 +575,7 @@ describe('WordDuelService', () => {
         correctCount: 0,
         currentIndex: 0,
         currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
         joinedAt: new Date(),
         disconnectedAt: null,
         reconnectedAt: null,
@@ -564,6 +590,7 @@ describe('WordDuelService', () => {
         correctCount: 2,
         currentIndex: 1,
         currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
         joinedAt: new Date(),
         disconnectedAt: null,
         reconnectedAt: null,
@@ -573,6 +600,63 @@ describe('WordDuelService', () => {
 
       expect(view.opponent).toEqual({ correctCount: 2, totalXp: 40 }); // score only, never their current word
       expect(view.current?.displayHint).toBe('_ _ _ _ _'); // no clues revealed yet
+      // Meaning is always shown, unlike the letter/clue reveal -- 2026-09-29 spec.
+      expect(view.current?.meaning).toBe('To teach a skill through practice.');
+      expect(view.current?.clues).toEqual([]);
+    });
+
+    it("shows the opponent's real username live, once they've joined an ACTIVE match (2026-09-29: no longer COMPLETED-only)", async () => {
+      store.matches.set('m1', {
+        id: 'm1',
+        status: 'ACTIVE',
+        wordIds: ['w1'],
+        startedAt: new Date(),
+        endsAt: new Date(Date.now() + 60_000),
+        completedAt: null,
+        winnerId: null,
+        tieBreakReason: null,
+        createdAt: new Date(),
+      });
+      store.playerStates.set('ps1', {
+        id: 'ps1',
+        matchId: 'm1',
+        userId: 'u1',
+        totalXp: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        correctCount: 0,
+        currentIndex: 0,
+        currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
+        joinedAt: new Date(),
+        disconnectedAt: null,
+        reconnectedAt: null,
+      });
+      store.playerStates.set('ps2', {
+        id: 'ps2',
+        matchId: 'm1',
+        userId: 'u2',
+        totalXp: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        correctCount: 0,
+        currentIndex: 0,
+        currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
+        joinedAt: new Date(),
+        disconnectedAt: null,
+        reconnectedAt: null,
+      });
+      friendsMock.getPublicIdentity.mockResolvedValueOnce({
+        userId: 'u2',
+        username: 'RivalRex',
+        avatarUrl: null,
+      });
+
+      const view = await service.getState('u1', 'm1');
+
+      expect(friendsMock.getPublicIdentity).toHaveBeenCalledWith('u2');
+      expect(view.opponent?.username).toBe('RivalRex');
     });
   });
 
@@ -600,6 +684,7 @@ describe('WordDuelService', () => {
         correctCount: 0,
         currentIndex: 0,
         currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
         joinedAt: new Date(),
         disconnectedAt: null,
         reconnectedAt: null,
@@ -614,6 +699,7 @@ describe('WordDuelService', () => {
         correctCount: 0,
         currentIndex: 0,
         currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
         joinedAt: new Date(),
         disconnectedAt: null,
         reconnectedAt: null,
@@ -834,6 +920,125 @@ describe('WordDuelService', () => {
     });
   });
 
+  describe('requestClue (2026-09-29: player-triggered, replacing the old automatic time-based reveal)', () => {
+    const seedActiveMatch = (overrides: Partial<FakeMatch> = {}) => {
+      store.matches.set('m1', {
+        id: 'm1',
+        status: 'ACTIVE',
+        wordIds: ['w1', 'w2'],
+        startedAt: new Date(Date.now() - 5_000),
+        endsAt: new Date(Date.now() + 60_000),
+        completedAt: null,
+        winnerId: null,
+        tieBreakReason: null,
+        createdAt: new Date(Date.now() - 5_000),
+        ...overrides,
+      });
+      store.playerStates.set('ps1', {
+        id: 'ps1',
+        matchId: 'm1',
+        userId: 'u1',
+        totalXp: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        correctCount: 0,
+        currentIndex: 0,
+        currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
+        joinedAt: new Date(),
+        disconnectedAt: null,
+        reconnectedAt: null,
+      });
+      store.playerStates.set('ps2', {
+        id: 'ps2',
+        matchId: 'm1',
+        userId: 'u2',
+        totalXp: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        correctCount: 0,
+        currentIndex: 0,
+        currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
+        joinedAt: new Date(),
+        disconnectedAt: null,
+        reconnectedAt: null,
+      });
+    };
+
+    it('reveals synonym, then a null origin clue, then the 60%-letter hint, in that fixed order', async () => {
+      seedActiveMatch();
+
+      const afterFirst = await service.requestClue('u1', 'm1');
+      expect(afterFirst.current?.cluesRevealed).toBe(1);
+      expect(afterFirst.current?.clues).toEqual([{ type: 'SYNONYM', text: 'coach' }]);
+      expect(afterFirst.current?.displayHint).toBe('_ _ _ _ _'); // hint clue not reached yet
+
+      const afterSecond = await service.requestClue('u1', 'm1');
+      expect(afterSecond.current?.cluesRevealed).toBe(2);
+      expect(afterSecond.current?.clues).toEqual([
+        { type: 'SYNONYM', text: 'coach' },
+        { type: 'ORIGIN', text: null }, // no etymology data exists in the corpus yet
+      ]);
+      expect(afterSecond.current?.displayHint).toBe('_ _ _ _ _');
+
+      const afterThird = await service.requestClue('u1', 'm1');
+      expect(afterThird.current?.cluesRevealed).toBe(3);
+      expect(afterThird.current?.clues[2]).toEqual({ type: 'HINT', text: null });
+      // 'train' is 5 letters; round(5 * 0.6) = 3 letters revealed, left-to-right.
+      expect(afterThird.current?.displayHint).toBe('T R A _ _');
+    });
+
+    it('throws BadRequestException once all 3 clues have been used', async () => {
+      seedActiveMatch();
+      await service.requestClue('u1', 'm1');
+      await service.requestClue('u1', 'm1');
+      await service.requestClue('u1', 'm1');
+
+      await expect(service.requestClue('u1', 'm1')).rejects.toThrow(BadRequestException);
+    });
+
+    it('throws ConflictException when a concurrent clue request wins the race', async () => {
+      seedActiveMatch();
+      store.wordDuelPlayerState.updateMany.mockReturnValueOnce({ count: 0 });
+
+      await expect(service.requestClue('u1', 'm1')).rejects.toThrow(ConflictException);
+    });
+
+    it("resets a player's clue count to 0 once they advance to the next word", async () => {
+      seedActiveMatch();
+      await service.requestClue('u1', 'm1');
+      await service.requestClue('u1', 'm1');
+      expect(store.playerStates.get('ps1')!.currentWordCluesRevealed).toBe(2);
+
+      rewardEngineMock.calculate.mockReturnValue({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+      await service.submitAnswer('u1', 'm1', 'train');
+
+      expect(store.playerStates.get('ps1')!.currentWordCluesRevealed).toBe(0);
+    });
+
+    it('returns a null synonym clue when the word has none recorded, rather than throwing', async () => {
+      store.words.set('w3', {
+        id: 'w3',
+        word: 'zesty',
+        normalizedWord: 'zesty',
+        baseDifficulty: 'BEGINNER',
+        definition: 'Full of lively, energetic flavor.',
+        synonyms: [],
+      });
+      seedActiveMatch({ wordIds: ['w3'] });
+
+      const view = await service.requestClue('u1', 'm1');
+      expect(view.current?.clues).toEqual([{ type: 'SYNONYM', text: null }]);
+    });
+  });
+
   describe('US/UK spelling-variant rendering (2026-09 fairness feature)', () => {
     // 'Colour'/'Color' differ both in spelling and in letter count (6 vs
     // 5), so a wrong-variant hint length is impossible to miss.
@@ -874,6 +1079,7 @@ describe('WordDuelService', () => {
           correctCount: 0,
           currentIndex: 0,
           currentWordStartedAt: new Date(),
+          currentWordCluesRevealed: 0,
           joinedAt: new Date(),
           disconnectedAt: null,
           reconnectedAt: null,

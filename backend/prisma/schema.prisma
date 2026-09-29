@@ -1693,10 +1693,18 @@ model WordDuelPlayerState {
   currentIndex Int @default(0)
 
   // Server-authoritative clock for this player's CURRENT word only —
-  // anchors the progressive-clue reveal schedule (spec §6: "progressive
-  // clues") and responseTimeMs, exactly like ArcadeGameSession's own
+  // responseTimeMs, exactly like ArcadeGameSession's own
   // currentWordStartedAt. Reset every time currentIndex advances.
   currentWordStartedAt DateTime @default(now())
+
+  // 2026-09-29 (Barth): clues are now player-triggered (a real "Clues"
+  // button), not revealed automatically over elapsed time — this is
+  // the persisted count of how many of this player's CURRENT word's
+  // clues they've tapped through so far (0..WORD_DUEL_CONFIG.
+  // MAX_CLUES_PER_WORD), mirroring ScrambleQuestService's own
+  // currentWordHintsUsed column/CAS pattern. Reset to 0 every time
+  // currentIndex advances, exactly like currentWordStartedAt above.
+  currentWordCluesRevealed Int @default(0)
 
   joinedAt       DateTime  @default(now())
   disconnectedAt DateTime?
