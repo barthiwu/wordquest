@@ -82,6 +82,9 @@
         "projectId": "0ef38d51-a343-43ae-83ef-fe83e173374d"
       }
     },
-    "owner": "barthiwus-team"
+    "owner": "barthiwus-team",
+    "experiments": {
+      "baseUrl": "/wordquest"
+    }
   }
 }

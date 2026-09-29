@@ -1,0 +1,69 @@
+name: Deploy web build to GitHub Pages
+
+# Publishes mobile/'s Expo web export (expo export -p web) as a static
+# site on GitHub Pages -- the "play WordQuest in your browser" link.
+# Separate from ci.yml (routine PR checks) and deploy.yml (the backend's
+# Railway pipeline), same reasoning as those two staying apart: this
+# needs Pages' write permissions, which a routine PR build shouldn't
+# carry.
+#
+# One-time manual step this file does NOT do for you: Settings -> Pages
+# -> Build and deployment -> Source: "GitHub Actions", on this repo.
+# Until that's set, this workflow can still build (job "build" always
+# runs) but "deploy" will fail to publish.
+#
+# EXPO_PUBLIC_API_URL is read from this repo's Actions variable of the
+# same name (Settings -> Secrets and variables -> Actions -> Variables)
+# -- Expo inlines it into the JS bundle at build time (see
+# mobile/src/app/config/env.ts). Point it at the live backend once one
+# exists (e.g. the Railway staging URL); until then the build still
+# succeeds but the deployed site can't reach an API.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - name: Export static web build
+        env:
+          EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
+        run: npx expo export -p web
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: mobile/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
