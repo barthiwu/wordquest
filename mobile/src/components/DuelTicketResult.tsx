@@ -126,10 +126,17 @@ export function DuelTicketResult({
             )}
 
             <View style={styles.seal}>
+              {/* The opponent's avatar renders first/left in this row and
+                  "you" renders second/right (see avatarRow below), so the
+                  seal's score must read in that same left-to-right order
+                  -- opponent's count first, then yours -- or the badge
+                  visually reads as attributed to the wrong player (found
+                  live, 2026-09-29: a 4-0 win showed "4-0" next to the
+                  opponent's avatar instead of the winner's). */}
               <Text style={styles.sealText}>
-                {youCorrect}
-                {'–'}
                 {opponentCorrect}
+                {'–'}
+                {youCorrect}
               </Text>
             </View>
 

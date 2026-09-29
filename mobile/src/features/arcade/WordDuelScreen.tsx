@@ -24,6 +24,7 @@ import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
 import { AvatarActionMenu } from '@/components/AvatarActionMenu';
+import { AvatarBubble } from '@/components/AvatarBubble';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -451,6 +452,14 @@ export function WordDuelScreen({ navigation }: Props) {
 
         <View style={styles.scoreRow}>
           <View style={[styles.scoreCard, styles.scoreCardSelf]}>
+            <View style={styles.scoreCardAvatarSpacer}>
+              <AvatarBubble
+                colors={colors}
+                avatarUrl={userAvatarUrl}
+                username={userUsername ?? t('youLabel')}
+                size={40}
+              />
+            </View>
             <Text style={styles.scoreLabel}>
               {userUsername ? t('youWithUsernameLabel', { username: userUsername }) : t('youLabel')}
             </Text>
@@ -460,9 +469,18 @@ export function WordDuelScreen({ navigation }: Props) {
             <Text style={styles.scoreXp}>{t('xpLabel', { xp: state.totalXp })}</Text>
           </View>
           <View style={styles.scoreCard}>
-            {/* Real username live as soon as an opponent has joined (2026-09-29
-                spec) — falls back to the generic label only in the brief window
-                before the backend has resolved their identity. */}
+            {/* Real username + avatar live as soon as an opponent has joined
+                (2026-09-29 spec) — falls back to the generic label/blank
+                avatar only in the brief window before the backend has
+                resolved their identity. */}
+            <View style={styles.scoreCardAvatarSpacer}>
+              <AvatarBubble
+                colors={colors}
+                avatarUrl={state.opponent?.avatarUrl}
+                username={state.opponent?.username ?? t('opponentLabel')}
+                size={40}
+              />
+            </View>
             <Text style={styles.scoreLabel}>{state.opponent?.username ?? t('opponentLabel')}</Text>
             <Text style={styles.scoreValue}>
               {t('correctCountLabel', { count: state.opponent?.correctCount ?? 0 })}
@@ -668,6 +686,11 @@ function createStyles(colors: ThemeColors, topInset: number) {
       alignItems: 'center',
       gap: 2,
     },
+    // Extra breathing room under the avatar bubble at the top of each
+    // score card, before the username/score text starts -- `gap: 2`
+    // above is fine for the text lines but too tight right under a
+    // 40px avatar image.
+    scoreCardAvatarSpacer: { marginBottom: 4 },
     // The player's own score card only -- same gold-outline language as
     // the streak pill in ScrambleQuest/Complete It, so "you" is visually
     // distinct from the opponent's card at a glance.
