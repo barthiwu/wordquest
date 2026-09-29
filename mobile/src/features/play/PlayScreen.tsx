@@ -18,6 +18,7 @@ import { formatLocalClock, timeOfDayPeriod } from '@/utils/timeOfDay';
 import { formatBossBattleCountdown } from '@/utils/bossBattleCountdown';
 import { CompleteItIcon, ScrambleQuestIcon, WordDuelIcon } from '@/components/ArcadeGameIcons';
 import { FirstTimeTip } from '@/components/FirstTimeTip';
+import { trackEvent } from '@/services/analyticsClient';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -76,6 +77,21 @@ export function PlayScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // Telemetry spec §11: ARCADE_OPENED fires once per mount (not on every
+  // tab refocus -- see useFocusEffect(load) below, which re-fetches data
+  // but isn't a fresh "opened the hub" from the player's perspective).
+  useEffect(() => {
+    trackEvent('ARCADE_OPENED');
+  }, []);
+
+  const selectGame = (
+    game: string,
+    screen: 'ScrambleQuest' | 'WordDuel' | 'CompleteIt' | 'BossBattle',
+  ) => {
+    trackEvent('ARCADE_GAME_SELECTED', { game });
+    navigation.navigate(screen);
+  };
 
   const load = useCallback(() => {
     if (!accessToken) return;
@@ -259,7 +275,7 @@ export function PlayScreen({ navigation }: Props) {
         subtitle={t('arcade:scrambleQuestSubtitle')}
         cta={t('arcade:play')}
         enabled
-        onPress={() => navigation.navigate('ScrambleQuest')}
+        onPress={() => selectGame('SCRAMBLE_QUEST', 'ScrambleQuest')}
         icon={<ScrambleQuestIcon colors={colors} />}
         styles={styles}
       />
@@ -268,7 +284,7 @@ export function PlayScreen({ navigation }: Props) {
         subtitle={t('arcade:wordDuelSubtitle')}
         cta={t('arcade:play')}
         enabled
-        onPress={() => navigation.navigate('WordDuel')}
+        onPress={() => selectGame('WORD_DUEL', 'WordDuel')}
         icon={<WordDuelIcon colors={colors} />}
         styles={styles}
       />
@@ -277,7 +293,7 @@ export function PlayScreen({ navigation }: Props) {
         subtitle={t('arcade:completeItSubtitle')}
         cta={t('arcade:play')}
         enabled
-        onPress={() => navigation.navigate('CompleteIt')}
+        onPress={() => selectGame('COMPLETE_IT', 'CompleteIt')}
         icon={<CompleteItIcon colors={colors} />}
         styles={styles}
       />
@@ -286,7 +302,7 @@ export function PlayScreen({ navigation }: Props) {
         subtitle={t('play:bossBattleSubtitle')}
         cta={t('arcade:play')}
         enabled
-        onPress={() => navigation.navigate('BossBattle')}
+        onPress={() => selectGame('BOSS_BATTLE', 'BossBattle')}
         badge={battleCountdown?.compact}
         badgeSubtext={battleCountdown?.subtitle}
         styles={styles}

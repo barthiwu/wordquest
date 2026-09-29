@@ -29,6 +29,7 @@ import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
+import { trackEvent } from '@/services/analyticsClient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -100,11 +101,23 @@ export function CompleteItScreen({ navigation }: Props) {
   } | null>(null);
   const aliBubbleCounter = useRef(0);
 
+  // See ScrambleQuestScreen's identical pattern/comment (Telemetry spec §11).
+  const completedRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (!completedRef.current) {
+        trackEvent('ARCADE_SESSION_ABANDONED', { game: 'COMPLETE_IT' });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const load = useCallback(async () => {
     if (!accessToken) return;
     setPhase('loading');
     try {
       const view = await startCompleteIt(accessToken);
+      trackEvent('ARCADE_SESSION_STARTED', { game: 'COMPLETE_IT' });
       setChallenge(view);
       setAnswer('');
       autoSubmittedRef.current = false;
@@ -156,6 +169,7 @@ export function CompleteItScreen({ navigation }: Props) {
     );
     try {
       const result = await submitCompleteItAnswer(accessToken, challenge.sessionId, fullAnswer);
+      trackEvent('ARCADE_ANSWER_SUBMITTED', { game: 'COMPLETE_IT', isCorrect: result.isCorrect });
       setFeedback(result);
       if (result.aliQuickReaction && result.aliQuickExpression) {
         aliBubbleCounter.current += 1;
@@ -196,6 +210,8 @@ export function CompleteItScreen({ navigation }: Props) {
   const handleContinue = () => {
     if (!feedback) return;
     if (feedback.sessionComplete || !feedback.nextChallenge) {
+      completedRef.current = true;
+      trackEvent('ARCADE_SESSION_COMPLETED', { game: 'COMPLETE_IT' });
       setPhase('complete');
       return;
     }

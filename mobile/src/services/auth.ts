@@ -1,8 +1,11 @@
 import { apiRequest } from './apiClient';
+import type { UserRole } from './users';
 
 export interface AuthUser {
   id: string;
   email: string;
+  /** Not sent by register/login (only /users/me) -- undefined until the next getMe() hydrate. */
+  role?: UserRole;
   /** The account owner's real name -- shown only to the account owner, never other players. See `username`. */
   displayName: string;
   /** The public handle shown to other players (leaderboards, Boss Battle, Quest Cards). */

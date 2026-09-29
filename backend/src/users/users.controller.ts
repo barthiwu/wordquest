@@ -35,6 +35,11 @@ export class UsersController {
     return {
       id: user.id,
       email: user.email,
+      // Surfaced so the mobile app can show/hide admin-only entry
+      // points (the Analytics Dashboard) client-side -- purely a UX
+      // convenience, the real gate is RolesGuard on the admin endpoints
+      // themselves (Telemetry spec Phase 5/6).
+      role: user.role,
       displayName: user.displayName,
       username: user.username,
       countryCode: user.countryCode,

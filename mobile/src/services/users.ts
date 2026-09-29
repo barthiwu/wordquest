@@ -1,11 +1,16 @@
 import { apiRequest } from './apiClient';
 
 export type LearningGoal = 'CASUAL' | 'TRAVEL' | 'ACADEMIC' | 'CAREER' | 'FLUENCY';
+/** Mirrors backend Role enum -- see prisma/schema.prisma. Used client-side only
+ * to show/hide admin-only entry points (Analytics Dashboard); the real
+ * enforcement is server-side RolesGuard on the admin endpoints themselves. */
+export type UserRole = 'USER' | 'ADMIN' | 'CONTENT_EDITOR' | 'SUPPORT';
 export type MasteryLevel = 'NEW' | 'RECOGNIZING' | 'RECALLING' | 'STRONG' | 'MASTERED';
 
 export interface Me {
   id: string;
   email: string;
+  role: UserRole;
   /** The account owner's real name -- shown only to the account owner, never other players. See `username`. */
   displayName: string;
   /** The public handle shown to other players (leaderboards, Boss Battle, Quest Cards). Lowercase letters, digits, underscores; 3-20 chars. */

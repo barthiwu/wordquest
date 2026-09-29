@@ -30,6 +30,7 @@ import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
+import { trackEvent } from '@/services/analyticsClient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -99,11 +100,27 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   } | null>(null);
   const aliBubbleCounter = useRef(0);
 
+  // Telemetry spec §11 (generic Arcade events -- shared with CompleteIt,
+  // distinguished by the `game` property). completedRef guards
+  // ARCADE_SESSION_ABANDONED on unmount, same mount/unmount-ref pattern
+  // as WordDuelScreen's DUEL_ABANDONED / DailyQuestScreen's
+  // QUEST_ABANDONED.
+  const completedRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (!completedRef.current) {
+        trackEvent('ARCADE_SESSION_ABANDONED', { game: 'SCRAMBLE_QUEST' });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const load = useCallback(async () => {
     if (!accessToken) return;
     setPhase('loading');
     try {
       const view = await startScrambleQuest(accessToken);
+      trackEvent('ARCADE_SESSION_STARTED', { game: 'SCRAMBLE_QUEST' });
       setChallenge(view);
       setDisplayedLetters(view.scrambledLetters);
       setAnswer('');
@@ -161,6 +178,10 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     );
     try {
       const result = await submitScrambleAnswer(accessToken, challenge.sessionId, fullAnswer);
+      trackEvent('ARCADE_ANSWER_SUBMITTED', {
+        game: 'SCRAMBLE_QUEST',
+        isCorrect: result.isCorrect,
+      });
       setFeedback(result);
       if (result.aliQuickReaction && result.aliQuickExpression) {
         aliBubbleCounter.current += 1;
@@ -217,6 +238,8 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   const handleContinue = () => {
     if (!feedback) return;
     if (feedback.sessionComplete || !feedback.nextChallenge) {
+      completedRef.current = true;
+      trackEvent('ARCADE_SESSION_COMPLETED', { game: 'SCRAMBLE_QUEST' });
       setPhase('complete');
       return;
     }
