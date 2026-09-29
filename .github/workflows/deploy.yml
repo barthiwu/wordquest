@@ -6,8 +6,8 @@ name: Deploy (backend)
 # surface to misconfigure. See docs/DEPLOYMENT.md for the full setup
 # (Railway project/service creation, env vars, backup/restore runbook).
 #
-# What's wired up and will genuinely run once the one-time Railway setup
-# in docs/DEPLOYMENT.md is done and this workflow's secrets are set:
+# What's wired up and will genuinely run once this workflow's secrets
+# are set:
 #   1. Build the backend's Dockerfile and push it to GitHub Container
 #      Registry (ghcr.io) — needs no secrets beyond the automatic
 #      GITHUB_TOKEN. This image is NOT what Railway deploys (Railway
@@ -15,22 +15,31 @@ name: Deploy (backend)
 #      job below); ghcr.io's copy exists as a versioned, pull-able audit
 #      trail / manual-rollback reference, tagged by both short SHA and
 #      `latest`.
-#   2. Run `prisma migrate deploy` against staging — the REAL migration
-#      command (see backend/README.md's "Schema changes and migrations"
-#      section), against `STAGING_DATABASE_URL` (the Railway Postgres
-#      service's PUBLIC connection string — Postgres service -> Connect
-#      tab -> "Public Network" — GitHub's runners aren't on Railway's
-#      private network, so the public proxy endpoint is what a CI runner
-#      can actually reach).
+#   2. Run `prisma migrate deploy` against `STAGING_DATABASE_URL` — the
+#      REAL migration command (see backend/README.md's "Schema changes
+#      and migrations" section). GitHub's runners aren't on Railway's
+#      private network, so this has to be the Postgres service's PUBLIC
+#      connection string (Postgres service -> Connect tab -> "Public
+#      Network").
 #   3. Deploy the backend service on Railway via the CLI, authenticated
-#      with a Railway PROJECT token (`RAILWAY_TOKEN`) scoped to the
-#      `staging` environment — see docs/DEPLOYMENT.md for how to mint
-#      one and where the `RAILWAY_SERVICE` secret (the service name/id)
-#      comes from.
+#      with a Railway PROJECT token (`RAILWAY_TOKEN`).
 #
-# Both `STAGING_DATABASE_URL` and `RAILWAY_TOKEN`/`RAILWAY_SERVICE` are
-# GitHub Environment secrets on the "staging" Environment — they don't
-# exist until someone completes the one-time Railway project setup.
+# Naming note (Barth, Sept 2026): this Railway project has exactly one
+# environment, and Railway itself calls it "production" — there's no
+# separate Railway "staging" environment to point at. Rather than
+# auto-deploying on every tag push straight into something named
+# production, this pipeline still treats it as the cautious/staging
+# tier: the GitHub side (the secrets below, this job's `environment:`)
+# stays named "staging" on purpose, but `railway up`'s `--environment`
+# flag below has to say `production`, because that's Railway's actual
+# name for the only environment that exists. A true second Railway
+# environment (and a real "production" pipeline gated behind manual
+# approval, per docs/DEPLOYMENT.md step 7) is future work, not done
+# here.
+#
+# `STAGING_DATABASE_URL`, `RAILWAY_TOKEN`, and `RAILWAY_SERVICE` are
+# GitHub Environment secrets on the "staging" GitHub Environment — set
+# them there (Settings -> Environments -> staging) before this runs.
 
 on:
   push:
@@ -123,7 +132,10 @@ jobs:
       # picks it up from the environment automatically, no `railway
       # login`/`railway link` needed in a non-interactive runner.
       - name: Deploy backend service
-        run: railway up --service "$RAILWAY_SERVICE" --environment staging --ci
+        # --environment names Railway's own environment (see the header
+        # comment above) -- "production" is correct here even though this
+        # job and its secrets live under GitHub's "staging" Environment.
+        run: railway up --service "$RAILWAY_SERVICE" --environment production --ci
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_SERVICE: ${{ secrets.RAILWAY_SERVICE }}
