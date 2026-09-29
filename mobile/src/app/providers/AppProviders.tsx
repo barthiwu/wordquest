@@ -1,9 +1,12 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useLanguageStore } from '@/state/languageStore';
 import { useTipsStore } from '@/state/tipsStore';
 import { useThemeStore } from '@/state/themeStore';
+import { useAnalyticsQueueStore } from '@/state/analyticsQueueStore';
+import { flushAnalyticsQueue } from '@/services/analyticsClient';
 import { DEFAULT_LANGUAGE_CODE } from '@/constants/languages';
 import i18n, { initI18n } from '@/i18n';
 
@@ -43,6 +46,7 @@ export function AppProviders({ children }: PropsWithChildren) {
   const languageHydrated = useLanguageStore((s) => s.isHydrated);
   const hydrateTips = useTipsStore((s) => s.hydrate);
   const hydrateTheme = useThemeStore((s) => s.hydrate);
+  const hydrateAnalyticsQueue = useAnalyticsQueueStore((s) => s.hydrate);
 
   useEffect(() => {
     hydrateLanguage();
@@ -64,6 +68,23 @@ export function AppProviders({ children }: PropsWithChildren) {
   useEffect(() => {
     hydrateTheme();
   }, [hydrateTheme]);
+
+  // Telemetry spec §24-25: rehydrate the local analytics queue (events
+  // that never made it out before the app was last closed) and drain it
+  // once — then keep draining on every foreground, since that's exactly
+  // the moment a device that was offline is most likely to have
+  // regained connectivity.
+  useEffect(() => {
+    hydrateAnalyticsQueue().then(() => {
+      void flushAnalyticsQueue();
+    });
+    const subscription = AppState.addEventListener('change', (state: AppStateStatus) => {
+      if (state === 'active') {
+        void flushAnalyticsQueue();
+      }
+    });
+    return () => subscription.remove();
+  }, [hydrateAnalyticsQueue]);
 
   useEffect(() => {
     if (!languageHydrated) return;
