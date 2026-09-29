@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
-import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { darkColors, radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -47,7 +47,13 @@ export interface ArcadeHeroResultsProps {
  *
  * The ring is banded by accuracy rather than a single accent color, per
  * Barth: red under 50%, green 50–74%, "celestial gold" (theme.ts's
- * `glyph` token — the same gold used for the Glyph currency) at 75%+.
+ * `glyph` token — the same gold used for the Glyph currency) at 75%+
+ * -- in dark mode. Light mode swaps that top band for arcaneSoft instead
+ * (Barth, Sept 2026: red sitting next to gold read as too close together
+ * on the light/parchment palette -- the same red-vs-gold contrast issue
+ * already fixed for ScrambleQuest's countdown ring, see CountdownRing,
+ * but missed here when this results ring was consolidated into a shared
+ * component). Dark mode keeps the celestial-gold top band unchanged.
  * It fills in once on mount rather than looping/pulsing — this is a
  * results screen, not a live countdown (contrast CountdownRing).
  */
@@ -71,8 +77,12 @@ export function ArcadeHeroResults({
 
   const accuracy = totalCount > 0 ? Math.min(1, Math.max(0, correctCount / totalCount)) : 0;
   const percent = Math.round(accuracy * 100);
-  const ringColor =
-    accuracy < 0.5 ? colors.danger : accuracy < 0.75 ? colors.success : colors.glyph;
+  const isDarkMode = colors.background === darkColors.background;
+  // Light mode: no gold anywhere in this ring -- red and celestial gold
+  // read too close together on the parchment palette, so the top band
+  // uses arcaneSoft instead (dark mode keeps the original gold).
+  const topBandColor = isDarkMode ? colors.glyph : colors.arcaneSoft;
+  const ringColor = accuracy < 0.5 ? colors.danger : accuracy < 0.75 ? colors.success : topBandColor;
 
   const size = 176;
   const strokeWidth = 14;

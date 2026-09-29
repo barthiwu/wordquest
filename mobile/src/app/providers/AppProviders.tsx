@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useLanguageStore } from '@/state/languageStore';
 import { useTipsStore } from '@/state/tipsStore';
+import { useThemeStore } from '@/state/themeStore';
 import { DEFAULT_LANGUAGE_CODE } from '@/constants/languages';
 import i18n, { initI18n } from '@/i18n';
 
@@ -41,6 +42,7 @@ export function AppProviders({ children }: PropsWithChildren) {
   const languageCode = useLanguageStore((s) => s.code);
   const languageHydrated = useLanguageStore((s) => s.isHydrated);
   const hydrateTips = useTipsStore((s) => s.hydrate);
+  const hydrateTheme = useThemeStore((s) => s.hydrate);
 
   useEffect(() => {
     hydrateLanguage();
@@ -52,6 +54,16 @@ export function AppProviders({ children }: PropsWithChildren) {
   useEffect(() => {
     hydrateTips();
   }, [hydrateTips]);
+
+  // themeStore's light/dark preference (Sept 2026 bugfix: this hydrate
+  // was defined from the start but never actually invoked anywhere, so
+  // a returning player's chosen theme mode never survived an app
+  // restart -- always fell back to the 'dark' default state until they
+  // toggled again). Same fire-and-forget, non-blocking pattern as the
+  // hydrations above.
+  useEffect(() => {
+    hydrateTheme();
+  }, [hydrateTheme]);
 
   useEffect(() => {
     if (!languageHydrated) return;
