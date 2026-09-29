@@ -966,7 +966,7 @@ describe('WordDuelService', () => {
       });
     };
 
-    it('reveals synonym, then a null origin clue, then the 60%-letter hint, in that fixed order', async () => {
+    it('reveals synonym, then the 60%-letter hint, in that fixed order', async () => {
       seedActiveMatch();
 
       const afterFirst = await service.requestClue('u1', 'm1');
@@ -978,20 +978,14 @@ describe('WordDuelService', () => {
       expect(afterSecond.current?.cluesRevealed).toBe(2);
       expect(afterSecond.current?.clues).toEqual([
         { type: 'SYNONYM', text: 'coach' },
-        { type: 'ORIGIN', text: null }, // no etymology data exists in the corpus yet
+        { type: 'HINT', text: null },
       ]);
-      expect(afterSecond.current?.displayHint).toBe('_ _ _ _ _');
-
-      const afterThird = await service.requestClue('u1', 'm1');
-      expect(afterThird.current?.cluesRevealed).toBe(3);
-      expect(afterThird.current?.clues[2]).toEqual({ type: 'HINT', text: null });
       // 'train' is 5 letters; round(5 * 0.6) = 3 letters revealed, left-to-right.
-      expect(afterThird.current?.displayHint).toBe('T R A _ _');
+      expect(afterSecond.current?.displayHint).toBe('T R A _ _');
     });
 
-    it('throws BadRequestException once all 3 clues have been used', async () => {
+    it('throws BadRequestException once both clues have been used', async () => {
       seedActiveMatch();
-      await service.requestClue('u1', 'm1');
       await service.requestClue('u1', 'm1');
       await service.requestClue('u1', 'm1');
 

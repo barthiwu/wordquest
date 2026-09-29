@@ -136,11 +136,15 @@ export const WORD_DUEL_CONFIG = {
   // revised 2026-09-29 (Barth) from an automatic, elapsed-time reveal
   // to a player-triggered one -- the player taps a "Clues" button (see
   // WordDuelService.requestClue), same on-demand shape as ScrambleQuest's
-  // MAX_HINTS_PER_WORD/Quests' synonym reveal, just three fixed clue
-  // types in a fixed order (synonym, then origin/etymology, then a
-  // 60%-of-the-word letter hint) instead of N generic letter reveals.
-  MAX_CLUES_PER_WORD: 3,
-  // The word-duel HINT clue (the 3rd/last clue) reveals this fraction
+  // MAX_HINTS_PER_WORD/Quests' synonym reveal, just two fixed clue types
+  // in a fixed order (synonym, then a 60%-of-the-word letter hint)
+  // instead of N generic letter reveals. (A third clue type, ORIGIN/
+  // etymology, was removed 2026-09-29 per Barth -- the vocabulary
+  // corpus has zero origin/etymology data for any word, so it only ever
+  // showed a "not available yet" fallback; see word-duel.service.ts's
+  // git history for the removed implementation.)
+  MAX_CLUES_PER_WORD: 2,
+  // The word-duel HINT clue (the 2nd/last clue) reveals this fraction
   // of the word's letters at once, left-to-right, rounded to the
   // nearest letter -- same "never reveal the final letter" cap as
   // ScrambleQuest's MAX_HINTS_PER_WORD/hintRevealOrder.

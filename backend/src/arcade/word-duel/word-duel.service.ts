@@ -42,18 +42,19 @@ export interface WordDuelOpponentView {
   avatarUrl?: string | null;
 }
 
-/** One of this player's current word's three clues, in fixed reveal
- * order (spec, 2026-09-29 Barth): synonym, then origin/etymology, then a
- * hint that reveals HINT_CLUE_LETTER_FRACTION of the word's letters (see
+/** One of this player's current word's two clues, in fixed reveal order
+ * (spec, revised 2026-09-29 Barth: "Take off the Origin... Synonym and
+ * 60% letter hint is enough for clues button"): synonym, then a hint
+ * that reveals HINT_CLUE_LETTER_FRACTION of the word's letters (see
  * `displayHint` below). `text` is null when this word has no data for
- * that clue type to show -- e.g. no synonym recorded, or (currently
- * always -- see this file's clue-rollout note near requestClue) no
- * etymology data at all, since the vocabulary corpus has no
- * origin/etymology field yet. The HINT clue's own `text` is always null;
- * its effect is `displayHint` updating instead, so there's nothing
- * separate to show inline. */
+ * that clue type to show -- e.g. no synonym recorded. The HINT clue's
+ * own `text` is always null; its effect is `displayHint` updating
+ * instead, so there's nothing separate to show inline. (A third clue
+ * type, ORIGIN/etymology, existed briefly and was removed the same day
+ * -- the vocabulary corpus had zero origin/etymology data for any word,
+ * so it only ever showed a "not available yet" fallback.) */
 export interface WordDuelClueView {
-  type: 'SYNONYM' | 'ORIGIN' | 'HINT';
+  type: 'SYNONYM' | 'HINT';
   text: string | null;
 }
 
@@ -61,7 +62,7 @@ export interface WordDuelClueView {
  * display hint, never the target word itself (spec §6/§8), plus the
  * word's meaning (always shown, never gated -- 2026-09-29, Barth: "The
  * meaning of the word is supposed to appear normally") and whichever of
- * its three clues this player has revealed so far. Clues are player-
+ * its two clues this player has revealed so far. Clues are player-
  * triggered (WordDuelService.requestClue), not revealed automatically
  * over time — unlike the old behavior, matching ScrambleQuest's on-
  * demand hints/Quests' on-demand synonym reveal. */
@@ -69,7 +70,7 @@ export interface WordDuelCurrentWordView {
   /** The word's dictionary definition — always visible, not a clue. */
   meaning: string;
   /** Underscore-blanked letter positions, space-separated; only changes
-   * once the HINT clue (the 3rd clue) has been revealed. */
+   * once the HINT clue (the 2nd/last clue) has been revealed. */
   displayHint: string;
   cluesRevealed: number;
   maxClues: number;
@@ -483,14 +484,14 @@ export class WordDuelService {
     return this.prisma.word.findUniqueOrThrow({ where: { id: wordId } });
   }
 
-  /** Always exactly MAX_CLUES_PER_WORD (3: synonym, origin, hint) --
-   * unlike the old per-letter reveal, clue count no longer depends on
-   * the word's own length. */
+  /** Always exactly MAX_CLUES_PER_WORD (2: synonym, hint) -- unlike the
+   * old per-letter reveal, clue count no longer depends on the word's
+   * own length. */
   private maxCluesFor(): number {
     return WORD_DUEL_CONFIG.MAX_CLUES_PER_WORD;
   }
 
-  /** How many letters the HINT clue (the 3rd/last clue) reveals at
+  /** How many letters the HINT clue (the 2nd/last clue) reveals at
    * once, left-to-right -- HINT_CLUE_LETTER_FRACTION of the word's
    * length, rounded, and never the word's final letter (same "not
    * really a clue if it solves the word" reasoning as ScrambleQuest's
@@ -501,9 +502,9 @@ export class WordDuelService {
   }
 
   /** Blank/reveal row shown under the puzzle -- only reveals letters
-   * once the HINT clue (the 3rd clue) has actually been tapped;
-   * otherwise every position is blank, regardless of how many of the
-   * other two clues have been revealed. */
+   * once the HINT clue (the 2nd clue) has actually been tapped;
+   * otherwise every position is blank, regardless of whether the
+   * synonym clue has been revealed. */
   private buildDisplayHint(word: string, hintClueRevealed: boolean): string {
     const revealCount = hintClueRevealed ? this.hintLetterCountFor(word) : 0;
     return Array.from({ length: word.length }, (_, i) =>
@@ -513,26 +514,19 @@ export class WordDuelService {
 
   /**
    * Resolves the content of the Nth clue (0-indexed: 0=synonym,
-   * 1=origin/etymology, 2=hint), spec order per Barth (2026-09-29).
+   * 1=hint), spec order per Barth (2026-09-29, revised same day to drop
+   * the ORIGIN/etymology clue that used to sit at index 1 -- the
+   * vocabulary corpus had zero origin/etymology data for any word, so
+   * it only ever showed a "not available yet" fallback on the client;
+   * see this file's git history for the removed implementation).
    * `text` is null when this word has nothing to show for that slot:
    *  - SYNONYM: this word has no synonyms recorded (rare in the corpus,
    *    but not impossible).
-   *  - ORIGIN: ALWAYS null right now. The vocabulary corpus (Word model
-   *    / CSV seed data) has no origin/etymology field or content for
-   *    ANY word yet -- confirmed by checking both the Prisma schema and
-   *    the production CSV. This is a genuine content gap, not a bug in
-   *    this method: adding real etymology data is a separate, much
-   *    larger content project (a new schema field, plus sourcing/
-   *    writing or AI-generating and reviewing text for the ~10,000-word
-   *    corpus) that needs Barth's own go-ahead on scope/approach, not a
-   *    guess made here. The client shows a "not available yet"
-   *    fallback for this slot rather than fabricated content.
    *  - HINT: text is always null -- its effect is `displayHint`
    *    revealing letters instead, so there's no separate string here.
    */
   private resolveClue(index: number, synonyms: string[]): WordDuelClueView {
     if (index === 0) return { type: 'SYNONYM', text: synonyms[0] ?? null };
-    if (index === 1) return { type: 'ORIGIN', text: null };
     return { type: 'HINT', text: null };
   }
 
