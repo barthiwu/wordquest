@@ -1,4 +1,9 @@
-import { MIN_WORD_LENGTH, normalizeImportRecord, parseWordRecords } from './word-import';
+import {
+  MAX_WORD_LENGTH,
+  MIN_WORD_LENGTH,
+  normalizeImportRecord,
+  parseWordRecords,
+} from './word-import';
 
 const validRecord = {
   word: 'Adventure',
@@ -61,6 +66,29 @@ describe('parseWordRecords', () => {
     const result = parseWordRecords([{ ...validRecord, word: threeLetters }]);
     expect(result.errors).toHaveLength(0);
     expect(result.rows[0].word).toBe(threeLetters);
+  });
+
+  it('rejects a word longer than the 15-letter maximum (2026-09-30 decision, after alpha-test feedback that very long words were unguessable), continuing past it', () => {
+    const tooLong = 'Methylenedioxymethamphetamine'; // 29 letters -- an actual pre-cap vault entry
+    const result = parseWordRecords([
+      { ...validRecord, word: tooLong },
+      { ...validRecord, word: 'Beautiful' },
+    ]);
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0].word).toBe('Beautiful');
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toEqual({
+      line: 2,
+      reason: `"${tooLong}" is ${tooLong.length} letters — maximum is ${MAX_WORD_LENGTH}`,
+    });
+  });
+
+  it(`accepts a word exactly at the ${MAX_WORD_LENGTH}-letter maximum`, () => {
+    const fifteenLetters = 'Congratulations';
+    expect(fifteenLetters).toHaveLength(MAX_WORD_LENGTH);
+    const result = parseWordRecords([{ ...validRecord, word: fifteenLetters }]);
+    expect(result.errors).toHaveLength(0);
+    expect(result.rows[0].word).toBe(fifteenLetters);
   });
 
   it.each(['definition', 'partOfSpeech', 'exampleSentence'])(

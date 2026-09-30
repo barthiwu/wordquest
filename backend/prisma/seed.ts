@@ -77,6 +77,22 @@ const CLANS = [
  * don't have a meaningful "related word" in the first place -- Hint
  * stays gracefully unavailable for those, same as before. Automated,
  * not hand-edited -- a manual editorial pass would still improve on it.
+ *
+ * 2026-09-30 content-quality pass (Barth, after alpha-test feedback):
+ * an audit found the V21 batch had two mechanical WordNet-generation
+ * bugs -- 43% of words shared their exact definition text with at
+ * least one other word (up to 13 words reading identically), and 48%
+ * of example sentences didn't contain the headword at all (pulled from
+ * a different lemma in the same synset). Fixing this for the whole
+ * 10,000-word list is an ongoing hand-authored rewrite, tracked outside
+ * this repo. The same pass also introduced MAX_WORD_LENGTH (see
+ * src/content/word-import.ts): 56 words over the new 15-letter ceiling
+ * (the longest was "Methylenedioxymethamphetamine", 29 letters -- not
+ * a reasonable ask for a guessing game) were replaced in-place, same
+ * CSV ID, with shorter words skewed toward the 7-10 letter range. A
+ * live database already carrying the old long words needs
+ * scripts/deactivate-long-words.ts run once against it -- this seed
+ * alone does not remove/deactivate rows for words no longer in the CSV.
  */
 const WORD_CSV_FILES = ['vocabulary-production.csv'];
 

@@ -45,6 +45,20 @@ export interface WordImportParseResult {
  */
 export const MIN_WORD_LENGTH = 3;
 
+/**
+ * 2026-09-30 decision (Barth, after alpha-test feedback): the vault
+ * used to have no ceiling at all -- Daily Quest happily served 16-29
+ * letter words like "Methylenedioxymethamphetamine" (an actual row
+ * before this), which nobody was ever going to guess regardless of how
+ * much time they got. 15 letters is the new absolute ceiling for
+ * anything entering the vault, mirroring MIN_WORD_LENGTH's role as a
+ * hard floor -- existing 16+ letter rows were pruned and replaced with
+ * shorter words (skewed toward the 7-10 letter range) in the same
+ * pass that introduced this constant, and this check exists so a
+ * future CSV addition can't silently reintroduce the problem.
+ */
+export const MAX_WORD_LENGTH = 15;
+
 const VALID_DIFFICULTIES = new Set<WordDifficulty>(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']);
 // baseDifficulty is no longer a hard-required *column* — a file may omit it
 // entirely and supply cefrLevel and/or difficultyScore instead (see
@@ -286,6 +300,13 @@ export function parseWordRecords(rawRecords: Record<string, string>[]): WordImpo
       errors.push({
         line,
         reason: `"${word}" is only ${word.length} letters — minimum is ${MIN_WORD_LENGTH}`,
+      });
+      return;
+    }
+    if (word.length > MAX_WORD_LENGTH) {
+      errors.push({
+        line,
+        reason: `"${word}" is ${word.length} letters — maximum is ${MAX_WORD_LENGTH}`,
       });
       return;
     }
