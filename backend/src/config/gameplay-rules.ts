@@ -225,9 +225,15 @@ export const gameplayRules = {
     // wraparound was a real bug Barth hit in testing: "the boss battle
     // returned to the start of the words again after I played some").
     sharedSequenceLength: 30,
-    // Same reasoning as SCRAMBLE_QUEST_CONFIG.MIN_WORD_LENGTH (Boss
-    // Battle's letter-reveal clues need enough letters to work with).
-    minWordLength: 5,
+    // 2026-09-30 decision (Barth): same 3-letter floor as every other
+    // Arcade game now -- see arcade.config.ts's SCRAMBLE_QUEST_CONFIG
+    // comment (supersedes the original "needs more letters" reasoning
+    // that set this to 5).
+    minWordLength: 3,
+    // 2026-09-30 decision (Barth): capped at 10, same as every other
+    // Arcade game -- Daily Quest (quest.minWordLength above) is the one
+    // mode meant to use the vocabulary vault's full length range.
+    maxWordLength: 10,
     // Barth, Sept 2026: the battle event window is still a full hour
     // (battle-schedule.ts's nextBattleWindow), but no single player gets
     // the whole hour to answer -- each gets up to this long from the

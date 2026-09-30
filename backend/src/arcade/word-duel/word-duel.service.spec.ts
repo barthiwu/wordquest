@@ -392,6 +392,7 @@ describe('WordDuelService', () => {
         WORD_DUEL_CONFIG.WORDS_PER_MATCH,
         [],
         WORD_DUEL_CONFIG.MIN_WORD_LENGTH,
+        WORD_DUEL_CONFIG.MAX_WORD_LENGTH,
         // The EXAMPLE-clue sentence-quality filter (2026-09-30 spec).
         expect.any(Function),
       );

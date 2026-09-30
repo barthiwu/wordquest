@@ -740,6 +740,7 @@ export class BossBattleService {
       gameplayRules.bossBattle.sharedSequenceLength,
       excludeWordIds,
       gameplayRules.bossBattle.minWordLength,
+      gameplayRules.bossBattle.maxWordLength,
     );
 
     try {

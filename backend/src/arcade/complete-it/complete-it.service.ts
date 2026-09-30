@@ -178,6 +178,7 @@ export class CompleteItService {
       COMPLETE_IT_CONFIG.WORDS_PER_SESSION,
       [],
       COMPLETE_IT_CONFIG.MIN_WORD_LENGTH,
+      COMPLETE_IT_CONFIG.MAX_WORD_LENGTH,
       (c) => isCompleteItSentenceUsable(c.word.exampleSentence, c.word.word),
     );
     if (blankable.length === 0) {

@@ -68,9 +68,10 @@ export class ArcadeChallengeService {
     count: number,
     excludeWordIds: string[] = [],
     // Forwarded straight to WordsService.pickWordsForQuest -- each Arcade
-    // game passes its own config's MIN_WORD_LENGTH (see
-    // arcade/config/arcade.config.ts); undefined means no floor.
+    // game passes its own config's MIN_WORD_LENGTH/MAX_WORD_LENGTH (see
+    // arcade/config/arcade.config.ts); undefined means no floor/ceiling.
     minLength?: number,
+    maxLength?: number,
     filter?: (challenge: ArcadeChallenge) => boolean,
   ): Promise<ArcadeChallenge[]> {
     const accepted: ArcadeChallenge[] = [];
@@ -95,6 +96,7 @@ export class ArcadeChallengeService {
         batchSize,
         Array.from(seen),
         minLength,
+        maxLength,
       );
       if (wordIds.length === 0) break; // eligible pool exhausted
 

@@ -71,12 +71,19 @@ export const SCRAMBLE_QUEST_CONFIG = {
   TIMER_SECONDS: 30,
   MAX_HINTS_PER_WORD: 3, // each reveals the next letter, left to right
   WORDS_PER_SESSION: 20,
-  // 2026-09 decision (Vocabulary Vault short-word expansion): a scrambled
-  // 3-4 letter word gives almost no puzzle at all (e.g. "cat" scrambled
-  // is still trivially "cat" or "tac"), so ScrambleQuest floors at 5
-  // letters even though the vault now goes down to 3 (Complete It's own
-  // floor -- see COMPLETE_IT_CONFIG.MIN_WORD_LENGTH).
-  MIN_WORD_LENGTH: 5,
+  // 2026-09-30 decision (Barth): reaches all the way down to the vault's
+  // actual floor now, same as Complete It -- a scrambled 3-4 letter word
+  // is a lighter puzzle than a longer one, but it's still a puzzle, and
+  // Barth wants the shorter end of the vault in active rotation here too
+  // rather than reserved for Complete It alone. Superseded the original
+  // "floors at 5, too trivial below that" reasoning (see git history).
+  MIN_WORD_LENGTH: 3,
+  // 2026-09-30 decision (Barth): capped at 10 so Arcade never reaches
+  // into the long tail of the 7+ letter vault (Daily Quest's own
+  // territory -- see gameplayRules.quest.minWordLength) -- Daily Quest
+  // is the one mode meant to use the vocabulary vault's full length
+  // range.
+  MAX_WORD_LENGTH: 10,
 } as const;
 
 // ── Complete It ────────────────────────────────────────────────────────
@@ -105,12 +112,15 @@ export const COMPLETE_IT_CONFIG = {
   HINTS_ENABLED: true,
   HINT_PERCENTAGE_OF_WORD_LENGTH: 0.6,
   WORDS_PER_SESSION: 20,
-  // 2026-09 decision: the one Arcade game that reaches all the way down
-  // to the vault's actual floor -- a blanked-out short word ("_at") is
-  // still a real puzzle even at 3 letters, unlike ScrambleQuest/Word
-  // Duel/Boss Battle's letter-reveal mechanics, which need more letters
-  // to work with (their own MIN_WORD_LENGTH is 5).
+  // 2026-09 decision: reaches all the way down to the vault's actual
+  // floor -- a blanked-out short word ("_at") is still a real puzzle
+  // even at 3 letters. As of 2026-09-30 (Barth) every Arcade game
+  // shares this same 3-letter floor -- see MIN_WORD_LENGTH on
+  // SCRAMBLE_QUEST_CONFIG/WORD_DUEL_CONFIG and gameplayRules.bossBattle.
   MIN_WORD_LENGTH: 3,
+  // 2026-09-30 decision (Barth): same reasoning/value as every other
+  // Arcade game's MAX_WORD_LENGTH -- see SCRAMBLE_QUEST_CONFIG's comment.
+  MAX_WORD_LENGTH: 10,
 } as const;
 
 // ── Word Duel ──────────────────────────────────────────────────────────
@@ -161,10 +171,14 @@ export const WORD_DUEL_CONFIG = {
   // `timedOut` column, unlike ArcadeAnswer: a word Duel player is only
   // ever cut off by the match-wide endsAt, never a per-word deadline).
   WORD_TIME_REFERENCE_SECONDS: 20,
-  // Same reasoning as SCRAMBLE_QUEST_CONFIG.MIN_WORD_LENGTH -- Word
-  // Duel's progressive letter-clues need enough letters to be worth
-  // revealing one at a time.
-  MIN_WORD_LENGTH: 5,
+  // 2026-09-30 decision (Barth): same 3-letter floor as every other
+  // Arcade game now -- see SCRAMBLE_QUEST_CONFIG's comment (this
+  // supersedes the original "needs more letters for progressive
+  // clues to be worth it" reasoning that set this to 5).
+  MIN_WORD_LENGTH: 3,
+  // 2026-09-30 decision (Barth): same reasoning/value as every other
+  // Arcade game's MAX_WORD_LENGTH -- see SCRAMBLE_QUEST_CONFIG's comment.
+  MAX_WORD_LENGTH: 10,
 } as const;
 
 /**

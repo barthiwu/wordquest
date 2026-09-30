@@ -173,6 +173,7 @@ export class ScrambleQuestService {
       SCRAMBLE_QUEST_CONFIG.WORDS_PER_SESSION,
       [],
       SCRAMBLE_QUEST_CONFIG.MIN_WORD_LENGTH,
+      SCRAMBLE_QUEST_CONFIG.MAX_WORD_LENGTH,
     );
     if (picked.length === 0) {
       throw new BadRequestException('No words are available for ScrambleQuest right now.');

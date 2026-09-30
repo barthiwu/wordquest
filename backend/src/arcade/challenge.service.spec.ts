@@ -31,7 +31,7 @@ describe('ArcadeChallengeService.pickChallenges', () => {
     const result = await service.pickChallenges('u1', 2, [], 5);
 
     expect(wordsServiceMock.pickWordsForQuest).toHaveBeenCalledTimes(1);
-    expect(wordsServiceMock.pickWordsForQuest).toHaveBeenCalledWith('u1', 2, [], 5);
+    expect(wordsServiceMock.pickWordsForQuest).toHaveBeenCalledWith('u1', 2, [], 5, undefined);
     expect(result.map((c) => c.word.id)).toEqual(['a', 'b']);
     expect(wordsServiceMock.recordGlobalExposure).toHaveBeenCalledWith(['a', 'b']);
   });
@@ -49,7 +49,7 @@ describe('ArcadeChallengeService.pickChallenges', () => {
     ]);
 
     const isGood = (c: { word: { id: string } }) => c.word.id.startsWith('good');
-    const result = await service.pickChallenges('u1', 2, [], undefined, isGood);
+    const result = await service.pickChallenges('u1', 2, [], undefined, undefined, isGood);
 
     expect(result.map((c) => c.word.id)).toEqual(['good1', 'good2']);
     // Backfill call excludes every word already seen, good and bad alike.
@@ -58,6 +58,7 @@ describe('ArcadeChallengeService.pickChallenges', () => {
       'u1',
       expect.any(Number),
       expect.arrayContaining(['good1', 'bad1']),
+      undefined,
       undefined,
     );
   });
@@ -68,7 +69,7 @@ describe('ArcadeChallengeService.pickChallenges', () => {
     wordsServiceMock.pickWordsForQuest.mockResolvedValueOnce([]); // pool exhausted
 
     const isGood = (c: { word: { id: string } }) => c.word.id.startsWith('good');
-    await service.pickChallenges('u1', 2, [], undefined, isGood);
+    await service.pickChallenges('u1', 2, [], undefined, undefined, isGood);
 
     expect(wordsServiceMock.recordGlobalExposure).toHaveBeenCalledWith(['good1']);
   });
@@ -80,7 +81,7 @@ describe('ArcadeChallengeService.pickChallenges', () => {
     wordsServiceMock.pickWordsForQuest.mockResolvedValueOnce([]);
 
     const alwaysReject = () => false;
-    const result = await service.pickChallenges('u1', 5, [], undefined, alwaysReject);
+    const result = await service.pickChallenges('u1', 5, [], undefined, undefined, alwaysReject);
 
     expect(result).toEqual([]);
     expect(wordsServiceMock.recordGlobalExposure).not.toHaveBeenCalled();

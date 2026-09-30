@@ -84,7 +84,8 @@ export class WordsService {
 
     const activeWordCount = agg._count;
     const totalGlobalExposures = agg._sum.globalExposureCount ?? 0;
-    const expectedExposurePerWord = activeWordCount > 0 ? totalGlobalExposures / activeWordCount : 0;
+    const expectedExposurePerWord =
+      activeWordCount > 0 ? totalGlobalExposures / activeWordCount : 0;
     const targetExposuresPerWord = gameplayRules.adaptiveSelection.targetGlobalExposuresPerWord;
 
     const [wordsBelowExpected, wordsAtOrAboveTarget] = await Promise.all([
@@ -126,10 +127,16 @@ export class WordsService {
     count: number,
     excludeWordIds: string[] = [],
     // Floor on Word.length -- callers pass their own mode's minimum
-    // (Daily Quest: 7, ScrambleQuest/Word Duel/Boss Battle: 5, Complete
-    // It: 3 -- see each config's MIN_WORD_LENGTH). Undefined means no
-    // floor at all, for any caller that hasn't been updated.
+    // (Daily Quest: 7; every Arcade game -- ScrambleQuest/Word Duel/
+    // Boss Battle/Complete It -- 3 as of 2026-09-30, see each config's
+    // MIN_WORD_LENGTH). Undefined means no floor at all, for any caller
+    // that hasn't been updated.
     minLength?: number,
+    // Ceiling on Word.length -- 2026-09-30 decision (Barth): every
+    // Arcade game caps at 10 (see each config's MAX_WORD_LENGTH); Daily
+    // Quest passes undefined, deliberately using the vocabulary vault's
+    // full length range -- it's the one mode meant to.
+    maxLength?: number,
   ): Promise<string[]> {
     const masteries = await this.prisma.mastery.findMany({
       where: { userId },
@@ -181,6 +188,7 @@ export class WordsService {
     let pool: RankableWord[] = await this.fetchActivePool(
       [...defaultExcludedWordIds, ...excludeWordIds],
       minLength,
+      maxLength,
     );
 
     // Progressively relax the exclusions rather than ever returning an
@@ -192,10 +200,10 @@ export class WordsService {
     // active pool once literally everything is mastered or too-recently
     // shown.
     if (pool.length === 0 && excludeWordIds.length > 0) {
-      pool = await this.fetchActivePool(defaultExcludedWordIds, minLength);
+      pool = await this.fetchActivePool(defaultExcludedWordIds, minLength, maxLength);
     }
     if (pool.length === 0) {
-      pool = await this.fetchActivePool([], minLength);
+      pool = await this.fetchActivePool([], minLength, maxLength);
     }
 
     if (pool.length <= count) {
@@ -217,12 +225,20 @@ export class WordsService {
   private async fetchActivePool(
     excludeIds: string[],
     minLength?: number,
+    maxLength?: number,
   ): Promise<RankableWord[]> {
     return this.prisma.word.findMany({
       where: {
         isActive: true,
         ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}),
-        ...(minLength != null ? { length: { gte: minLength } } : {}),
+        ...(minLength != null || maxLength != null
+          ? {
+              length: {
+                ...(minLength != null ? { gte: minLength } : {}),
+                ...(maxLength != null ? { lte: maxLength } : {}),
+              },
+            }
+          : {}),
       },
       select: {
         id: true,

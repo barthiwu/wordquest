@@ -120,6 +120,7 @@ describe('CompleteItService', () => {
         20,
         [],
         3,
+        10,
         expect.any(Function),
       );
       expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
@@ -150,7 +151,7 @@ describe('CompleteItService', () => {
         data: expect.objectContaining({ wordsTotal: 1, wordIds: ['w1'] }),
       });
 
-      const qualityFilter = challengesMock.pickChallenges.mock.calls[0][4];
+      const qualityFilter = challengesMock.pickChallenges.mock.calls[0][5];
       // Contains the word AND reads like a real sentence -- passes.
       expect(
         qualityFilter({

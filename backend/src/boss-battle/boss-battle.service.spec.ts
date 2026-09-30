@@ -346,6 +346,7 @@ describe('BossBattleService', () => {
         gameplayRules.bossBattle.sharedSequenceLength,
         [],
         gameplayRules.bossBattle.minWordLength,
+        gameplayRules.bossBattle.maxWordLength,
       );
       expect(prismaMock.bossBattleGroup.create).toHaveBeenCalledWith({
         data: { battleId: 'b1', groupNumber: 1, status: 'LIVE', sharedWordIds: ['w1'] },
@@ -391,6 +392,7 @@ describe('BossBattleService', () => {
         gameplayRules.bossBattle.sharedSequenceLength,
         ['pending-1', 'pending-2'],
         gameplayRules.bossBattle.minWordLength,
+        gameplayRules.bossBattle.maxWordLength,
       );
     });
 
