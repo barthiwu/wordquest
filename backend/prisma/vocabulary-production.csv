@@ -94,7 +94,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 93,Behavior,The way a person or animal acts.,Noun,His behavior was respectful.,conduct,manner,A2,26,General,Very Common,,,activity;offense;easiness
 94,Belonging,A feeling of being accepted as part of a group.,Noun,Joining the club gave her a sense of belonging.,acceptance,inclusion,B1,44,Emotion,Common,,,happiness;comfortableness;closeness
 95,Biological,Relating to living organisms and their processes.,Adjective,The scientist studies biological changes in plants.,organic,physiological,B1,41,Academic,Common,,,biology;natural;begotten
-96,Boundary,A limit that separates one thing from another.,Noun,Healthy relationships need clear boundaries.,border,limit,B1,44,Travel & Places,Common,,,surface;outline;demarcation
+96,Boundary,A limit that separates one thing from another.,Noun,The old stone wall marks the boundary between the two farms.,border,limit,B1,44,Travel & Places,Common,,,surface;outline;demarcation
 97,Breakfast,The first meal of the day.,Noun,I usually eat breakfast at seven.,morning meal,,A1,13,General,Very Common,,,teatime;banquet;meal
 98,Brilliant,"Extremely clever, impressive, or excellent.",Adjective,She had a brilliant idea.,excellent,outstanding,B1,39,General,Common,,,brilliance;superior;intelligent
 99,Broadcasting,"The activity of sending programs by radio, television, or online media.",Noun,Broadcasting reaches a large audience.,transmission,airing,B2,61,Communication,Common,,,reception;television;wireless
@@ -502,7 +502,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 501,abandon,To leave something completely or give it up.,Verb,The team decided to abandon the old strategy and try a new approach.,leave,give up,B1,45,General,Common,"abandonment, abandoned",Often used when something is stopped permanently.,abandonment;discard;liquidize
 502,ability,The skill or power to do something.,Noun,Her ability to solve complex problems made her valuable to the company.,skill,capability,A2,25,General,Common,"able, unable, abilities",Usually followed by 'to' when describing an action.,quality;capableness;competence
 503,accurate,Correct and free from mistakes.,Adjective,The report must contain accurate information before publication.,correct,precise,B1,40,Academic,Common,"accuracy, accurately",Used when emphasizing correctness.,faithful;straight;surgical
-504,younger,Used of the younger of two persons of the same name especially used to distinguish a son from his father.,Adjective,John Junior.,jr.,,A2,27,General,Very Common,,,teenage;childly;girlish
+504,younger,Used of the younger of two persons of the same name especially used to distinguish a son from his father.,Adjective,"The judge referred to him as James Smith, the younger, to distinguish him from his father of the same name.",jr.,,A2,27,General,Very Common,,,teenage;childly;girlish
 505,ambitious,Having a strong desire to achieve success.,Adjective,The company created an ambitious plan for international expansion.,driven,determined,B2,60,Personal Development,Common,"ambition, ambitiously","Can describe goals, people, or projects.",ambition;pushful;aspirant
 506,abandoned,Forsaken by owner or inhabitants.,Adjective,Weed-grown yard of an abandoned farmhouse.,derelict,deserted,B2,55,General,Common,,,uninhabited;uninhibited
 507,absolutely,"Completely; totally, without any qualification.",Adverb,I absolutely love this song.,perfectly,utterly,A1,13,General,Very Common,,,absolute;complete;unmitigated
@@ -558,9 +558,9 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 557,alleged,Declared but not proved.,Adjective,Alleged abuses of housing benefits.,supposed,,B2,57,General,Common,,,declared;questionable
 558,allegedly,According to what has been alleged.,Adverb,He was on trial for allegedly murdering his wife.,supposedly,,C2,99,General,Rare,,,alleged;declared
 559,alliance,A connection based on kinship or marriage or common interest.,Noun,The shifting alliances within a large family.,bond,,B2,55,Academic,Common,,,connection;connexion;connectedness
-560,alongside,Side by side.,Adverb,Anchored close aboard another ship.,aboard,,B1,44,General,Common,,,
+560,alongside,Side by side.,Adverb,The two ships sailed alongside each other through the strait.,aboard,,B1,44,General,Common,,,
 561,already,Prior to a specified or implied time.,Adverb,She has already graduated.,previously,,A1,5,General,Very Common,,,
-562,alright,Without doubt (used to reinforce an assertion).,Adverb,It's expensive all right.,all right,,B2,66,General,Common,,,
+562,alright,Without doubt (used to reinforce an assertion).,Adverb,She said the plan would work out alright in the end.,all right,,B2,66,General,Common,,,
 563,alternate,Every second one of a series.,Adjective,The cleaning lady comes on alternate Wednesdays.,alternative,substitute,C2,93,General,Rare,,,secondary;cyclic;cyclical
 564,altogether,Informal terms for nakedness.,Noun,In the altogether.,raw,birthday suit,C2,98,Personal Development,Rare,,,nakedness;nudity;nudeness
 565,amateur,Engaging in an activity for pleasure rather than as a profession; not expertly done.,Adjective,The amateur astronomer spotted the comet before any observatory did.,recreational,unpaid,C1,76,General,Less Common,,,nonprofessional;unprofessional
@@ -626,7 +626,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 625,authorized,Sanctioned by established authority.,Adjective,The authorized biography.,authoritative,authorised,C2,92,General,Rare,,,approved;sanctioned;commissioned
 626,automatically,In a reflex manner.,Adverb,He answered automatically.,mechanically,,B1,39,General,Common,,,automatic;involuntary
 627,average,An intermediate scale value regarded as normal or usual.,Noun,He is about average in height.,norm,,A1,8,Academic,Very Common,,,statistic;mode;mean
-628,aviation,Travel via aircraft.,Noun,Air travel involves too much waiting in airports.,air travel,air,C1,82,General,Less Common,,,collection;assemblage;industry
+628,aviation,Travel via aircraft.,Noun,He built a career in commercial aviation after leaving the military.,air travel,air,C1,82,General,Less Common,,,collection;assemblage;industry
 629,awesome,Inspiring awe or admiration or wonder.,Adjective,The awesome complexity of the universe.,amazing,awe-inspiring,A2,30,General,Very Common,,,impressive
 630,awkward,Causing inconvenience.,Adjective,They arrived at an awkward time.,embarrassing,sticky,B2,64,General,Common,,,awkwardness;graceless;ungraceful
 631,background,A person's social heritage: previous experience or training.,Noun,He is a lawyer with a sports background.,ground,,A2,23,Personal Development,Very Common,,,heritage;prospect;panorama
@@ -640,7 +640,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 639,bearing,Relevant relation or interconnection.,Noun,Those issues have no bearing on our situation.,heading,aim,C1,76,Academic,Less Common,,,direction;tendency;relatedness
 640,becoming,"Flattering or suitable, especially describing appearance or behavior.",Adjective,The soft blue dress was quite becoming on her.,comely,comme il faut,A2,22,General,Very Common,becomingness,,proper;flattering
 641,beginning,The event consisting of the start of something.,Noun,The beginning of the war.,commencement,first,A1,12,Society & Culture,Very Common,begin,,happening;creation;conception
-642,behaviour,The action or reaction of something (as a machine or substance) under specified circumstances.,Noun,The behavior of small particles can be studied in experiments.,behavior,,B2,58,Personal Development,Common,,,activity;manners;citizenship
+642,behaviour,The action or reaction of something (as a machine or substance) under specified circumstances.,Noun,Engineers studied the behaviour of the alloy under extreme heat.,behavior,,B2,58,Personal Development,Common,,,activity;manners;citizenship
 643,believe,Accept as true; take to be true.,Verb,I believed his report.,think,consider,A1,6,Academic,Very Common,"believable, belief, believer",,understand;swallow;evaluate
 644,believing,The cognitive process that leads to convictions.,Noun,Seeing is believing.,credence,,C1,72,Academic,Less Common,,,perception;sorting;discrimination
 645,benefit,Something that aids or promotes well-being.,Noun,For the benefit of all.,welfare,,A2,22,Personal Development,Very Common,beneficial,,payment;perquisite;goodness
@@ -671,7 +671,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 670,calculated,Carefully planned or worked out with precision; deliberate.,Adjective,It was a calculated risk that paid off.,deliberate,measured,C2,94,General,Rare,,,intended
 671,calendar,A list or register of events (appointments or social events or court cases etc).,Noun,I have you on my calendar for next Monday.,list,listing,B2,63,Communication,Common,,,arrangement;organization;organisation
 672,campaign,A race between candidates for elective office.,Noun,I managed his campaign for governor.,political campaign,run,A1,12,Society & Culture,Very Common,,,venture;experiment;crusade
-673,cancelled,(of events) no longer planned or scheduled.,Adjective,The wedding is definitely off.,off,,C1,76,General,Less Common,,,
+673,cancelled,(of events) no longer planned or scheduled.,Adjective,The cancelled flight left dozens of passengers stranded overnight.,off,,C1,76,General,Less Common,,,
 674,capable,(usually followed by `of') having capacity or ability.,Adjective,Capable of winning.,open,subject,B1,46,General,Common,"capableness, capability",,capableness;capability;confident
 675,capacity,Capability to perform or produce.,Noun,Among his gifts is his capacity for true altruism.,capability,,A2,26,Personal Development,Very Common,capacitate,,capableness;resistance;activity
 676,captain,"The leader of a team, ship, or group, especially in sports or the military.",Noun,She was chosen as captain of the swim team.,chieftain,,A2,31,Society & Culture,Very Common,,,subaltern;marshal;captainship
@@ -679,7 +679,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 678,carefully,Taking care or paying attention.,Adverb,They watched carefully.,cautiously,,B1,44,General,Common,,,careful;protective;thorough
 679,carrier,Someone whose employment involves carrying something.,Noun,The bonds were transmitted by carrier.,bearer,toter,B2,64,Society & Culture,Common,carry,,tramcar;traveler;traveller
 680,catching,"The act of seizing or capturing something, or becoming infected with an illness.",Noun,The catching of the escaped parrot took the whole afternoon.,contracting,,C1,78,General,Less Common,,,playing;discovery;bowling
-681,category,A collection of things sharing a common attribute.,Noun,There are two classes of detergents.,class,family,B1,36,Society & Culture,Common,"categorial, categorical, categoric, categorize",,categorical;collection;assemblage
+681,category,A collection of things sharing a common attribute.,Noun,Each product on the shelf was sorted into its proper category.,class,family,B1,36,Society & Culture,Common,"categorial, categorical, categoric, categorize",,categorical;collection;assemblage
 682,catholic,Of or relating to or supporting Catholicism.,Adjective,The Catholic Church.,Roman,,B1,38,Academic,Common,Catholicism,,catholicity
 683,ceiling,The overhead upper surface of a covered space.,Noun,He hated painting the ceiling.,roof,cap,C1,80,General,Less Common,,,altitude;hallway;hall
 684,celebrate,Behave as expected during of holidays or rites.,Verb,Celebrate Christmas.,observe,keep,B1,41,Society & Culture,Common,"celebration, celebrant, celebrator",,celebration;commemorate;receive
@@ -687,25 +687,25 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 686,central,Of primary importance; forming the center of something.,Adjective,Trust is central to any good relationship.,cardinal,fundamental,A1,9,General,Very Common,center,,important;halfway;nuclear
 687,certain,Definite but not specified or identified.,Adjective,Set aside a certain sum each week.,sure,,A1,8,General,Very Common,,,convinced;positive;confident
 688,certainly,Definitely or positively (`sure' is sometimes used informally for `surely').,Adverb,She certainly is a hard worker.,surely,sure,A1,12,General,Very Common,,,certain;convinced;positive
-689,certificate,A formal declaration that documents a fact of relevance to finance and investment; the holder has a right to receive interest or dividends.,Noun,He held several valuable securities.,security,,B2,64,Business,Common,certify,,document;commission;convertible
+689,certificate,A formal declaration that documents a fact of relevance to finance and investment; the holder has a right to receive interest or dividends.,Noun,The certificate entitled its holder to a fixed dividend every quarter.,security,,B2,64,Business,Common,certify,,document;commission;convertible
 690,certified,Endorsed authoritatively as having met certain requirements.,Adjective,A certified public accountant.,certifiable,,C1,74,General,Less Common,,,authorized;authorised;credentialled
 691,chairman,"The person who leads a committee, board, or meeting (traditionally male-specific term).",Noun,The chairman called the meeting to order at nine sharp.,president,chairwoman,A2,22,Society & Culture,Very Common,chairmanship,,speaker;moderator
 692,challenging,Requiring full use of your abilities or resources.,Adjective,Performed the most challenging task without a mistake.,ambitious,,B2,65,General,Common,,,difficult;stimulating;hard
 693,chamber,An enclosed volume in the body.,Noun,The chambers of his heart were healthy.,bedroom,bedchamber,B1,43,Health & Wellness,Common,,,compound;enclosure;bombproof
 694,champion,Holding first place in a contest.,Adjective,A champion show dog.,prizewinning,,B1,45,General,Common,,,best
-695,championship,The status of being a champion.,Noun,He held the title for two years.,title,,B1,38,Personal Development,Common,,,contest;competition;eminence
+695,championship,The status of being a champion.,Noun,Winning the championship capped off an undefeated season.,title,,B1,38,Personal Development,Common,,,contest;competition;eminence
 696,changed,Made or become different in nature or form.,Adjective,Changed attitudes.,varied,,A1,10,General,Very Common,,,transformed;denaturized;denaturised
 697,channel,A path over which electrical signals can pass.,Noun,A channel is typically what you rent from a telephone company.,transmission channel,,A2,20,Communication,Very Common,channelize,,passage;limbers;interrogation
 698,channels,Official routes of communication.,Noun,You have to go through channels.,channel,line,B2,57,Communication,Common,,,interrogation;imparting;transmission
 699,chapter,A subdivision of a written work; usually numbered and titled.,Noun,He read a chapter every night before falling asleep.,section,subdivision,B1,44,Communication,Common,,,text;phase;stage
 700,charged,Of a particle or body or system; having a net amount of positive or negative electric charge.,Adjective,Charged particles.,supercharged,,B1,45,General,Common,,,positive;electropositive;negative
 701,charming,Pleasing or delighting.,Adjective,Endowed with charming manners.,magic,magical,C2,98,General,Rare,,,pleasing;supernatural
-702,charter,Engage for service under a term of contract.,Verb,We took an apartment on a quiet street.,lease,rent,C1,74,Business,Less Common,,,contract;undertake;license
-703,cheating,Not faithful to a spouse or lover.,Adjective,Adulterous husbands and wives.,adulterous,two-timing,C1,78,General,Less Common,,,unfaithful;unfair;unjust
+702,charter,Engage for service under a term of contract.,Verb,The film crew decided to charter a boat for the coastal shoot.,lease,rent,C1,74,Business,Less Common,,,contract;undertake;license
+703,cheating,Not faithful to a spouse or lover.,Adjective,Her cheating husband finally confessed to the affair.,adulterous,two-timing,C1,78,General,Less Common,,,unfaithful;unfair;unjust
 704,chemistry,The chemical composition and properties of a substance or object.,Noun,The chemistry of soil.,alchemy,,B2,59,Science & Technology,Common,,,chemical;substance;physics
 705,chinese,Of or pertaining to China or its peoples or cultures.,Adjective,Chinese food.,Taiwanese,Formosan,A1,12,Academic,Very Common,,,china
 706,christian,Relating to or characteristic of Christianity.,Adjective,Christian rites.,christlike,christly,A2,31,Academic,Very Common,"Christ, Christianity",,christianity;christ
-707,christianity,The collective body of Christians throughout the world and history (found predominantly in Europe and the Americas and Australia).,Noun,For a thousand years the Roman Catholic Church was the principal church of Christendom.,Christendom,,C1,79,Society & Culture,Less Common,Christian,,religion;faith;donatism
+707,christianity,The collective body of Christians throughout the world and history (found predominantly in Europe and the Americas and Australia).,Noun,Christianity spread rapidly across the Roman Empire in its first three centuries.,Christendom,,C1,79,Society & Culture,Less Common,Christian,,religion;faith;donatism
 708,chronic,Being long-lasting and recurrent or characterized by long suffering.,Adjective,Chronic indigestion.,continuing,,C1,78,General,Less Common,,,degenerative;long
 709,circuit,A journey or route all the way around a particular place or area.,Noun,We took a quick circuit of the park.,tour,,B1,43,General,Common,,,limiter;squelch;resistance
 710,circumstances,Your overall circumstances or condition in life (including everything that happens to you).,Noun,A victim of circumstances.,fortune,destiny,B1,35,Personal Development,Common,,,condition;failure;possession
@@ -725,20 +725,20 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 724,collapse,A natural event caused by something suddenly falling down or caving in.,Noun,The roof is in danger of collapse.,flop,,C1,80,Society & Culture,Less Common,,,breakdown;happening;subsidence
 725,collect,Call for and obtain payment of.,Verb,We collected over a million dollars in outstanding debts.,take in,,B2,58,Business,Common,"collectible, collector",,collection;scratch;collectible
 726,collected,"Calm and in control of one's emotions; also, brought together into one place.",Adjective,She remained collected despite the chaos around her.,gathered,,B1,45,General,Common,,,composed
-727,collection,Request for a sum of money.,Noun,An appeal to raise money for starving children.,solicitation,appeal,A1,13,Communication,Very Common,,,publication;reference;magazine
+727,collection,Request for a sum of money.,Noun,The church held a special collection to repair the roof.,solicitation,appeal,A1,13,Communication,Very Common,,,publication;reference;magazine
 728,colonial,Composed of many distinct individuals united to form a whole or colony.,Adjective,Coral is a colonial organism.,compound,,C1,82,General,Less Common,,,colony
 729,colored,Having color or a certain color; sometimes used in combination.,Adjective,Colored crepe paper.,coloured,colorful,C1,79,General,Less Common,,,blackened;monochromatic;trichromatic
-730,colours,A distinguishing emblem.,Noun,His tie proclaimed his school colors.,colors,,C1,72,General,Less Common,,,standard;emblem;totem
+730,colours,A distinguishing emblem.,Noun,The regiment proudly carried its colours into battle.,colors,,C1,72,General,Less Common,,,standard;emblem;totem
 731,combination,A sequence of numbers or letters that opens a combination lock.,Noun,He forgot the combination to the safe.,combining,compounding,B1,46,Society & Culture,Common,combinatorial,,combine;collection;assemblage
 732,combine,Put or add together.,Verb,Combine resources.,compound,,C2,91,Science & Technology,Rare,"combination, combining",,combining;feature;combination
 733,comfort,"A state of physical ease and freedom from pain or constraint; also, consolation in times of distress.",Noun,The blanket gave her comfort on the cold night.,comfortableness,,B2,55,Personal Development,Common,,,condition;pleasure;consolation
 734,command,The power or authority to command.,Noun,An admiral in command.,bid,bidding,A2,27,Personal Development,Very Common,,,commission;direction;injunction
 735,comment,A statement that expresses a personal opinion or belief or adds information.,Noun,From time to time she contributed a personal comment on his account.,remark,input,A2,31,Communication,Very Common,commentate,,statement;courtesy;mention
-736,commentary,A written explanation or criticism or illustration that is added to a book or other textual material.,Noun,He wrote an extended comment on the proposal.,comment,,C1,79,Communication,Less Common,"comment, commentate",,statement;annotation;commentate
+736,commentary,A written explanation or criticism or illustration that is added to a book or other textual material.,Noun,The professor's commentary on the poem filled the margins of every page.,comment,,C1,79,Communication,Less Common,"comment, commentate",,statement;annotation;commentate
 737,commission,A fee for services rendered based on a percentage of an amount received or collected or agreed to be paid (as distinguished from a salary).,Noun,He works on commission.,committee,,A2,30,Business,Very Common,,,authority;division;intelligence
 738,committed,"Bound or obligated, as under a pledge to a particular cause, action, or attitude.",Adjective,Committed church members.,attached,,B1,44,General,Common,committedness,,pledged;intended;bespoken
 739,commonly,In most cases; generally true.,Adverb,This herb is commonly used in Italian cooking.,normally,usually,B2,57,General,Common,,,chronic;regular;habitual
-740,commons,A piece of open land for recreational use in an urban area.,Noun,They went for a walk in the park.,park,common,C1,73,Travel & Places,Less Common,,,tract;parcel;funfair
+740,commons,A piece of open land for recreational use in an urban area.,Noun,Families gathered on the commons for the town's summer festival.,park,common,C1,73,Travel & Places,Less Common,,,tract;parcel;funfair
 741,commonwealth,"An independent nation or community, especially one formed voluntarily by its members for mutual benefit.",Noun,"Massachusetts is officially called a commonwealth, not a state.",state,nation,B2,60,Society & Culture,Common,,,province;country;power
 742,communicate,Transmit information.,Verb,Please communicate this message to all employees.,pass on,pass,C1,78,Communication,Less Common,"communicative, communicatory, communication, communicator",,communicative;communication;request
 743,communications,The discipline that studies the principles of transmiting information and the methods by which it is delivered (as print or radio or television etc.).,Noun,Communications is his major field of study.,communication theory,,B1,35,Academic,Common,,,discipline;subject;bailiwick
@@ -746,9 +746,9 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 745,compact,Have the property of being packable or of compacting easily.,Verb,This powder compacts easily.,pack,,C2,99,General,Rare,compaction,,arrange;bundle;wad
 746,companion,A person who spends time with or accompanies another.,Noun,Her dog has been her loyal companion for ten years.,comrade,fellow,C2,91,Society & Culture,Rare,companionship,,intimate;brother;girlfriend
 747,company,An institution created to conduct business.,Noun,He started the company in his garage.,caller,,A1,5,Society & Culture,Very Common,,,institution;establishment;religion
-748,comparable,Conforming in every respect.,Adjective,Boxes with corresponding dimensions.,corresponding,like,C2,96,General,Rare,,,comparability;parallel;equal
+748,comparable,Conforming in every respect.,Adjective,The two apartments were comparable in size and price.,corresponding,like,C2,96,General,Rare,,,comparability;parallel;equal
 749,compare,An act or instance of comparing (used chiefly in the phrase 'beyond compare').,Noun,Her skill on the violin was truly beyond compare.,comparison,equivalence,B1,45,Personal Development,Common,,,similitude;reflection;likeness
-750,comparing,The act of examining resemblances.,Noun,They made a comparison of noise levels.,comparison,,C2,91,General,Rare,compare,,examination;confrontation;likening
+750,comparing,The act of examining resemblances.,Noun,Comparing the two contracts revealed several hidden fees.,comparison,,C2,91,General,Rare,compare,,examination;confrontation;likening
 751,competition,A business relation in which two parties compete to gain customers.,Noun,Business competition can be fiendish at times.,contest,,A2,30,Academic,Very Common,,,championship;occasion;function
 752,complain,"Express complaints, discontent, displeasure, or unhappiness.",Verb,My mother complains all day.,kick,plain,C1,75,Communication,Less Common,"complaint, complainer",,complaint;protest;deplore
 753,complaining,Expressing dissatisfaction or annoyance.,Adjective,The complaining customer demanded a full refund.,complaintive,,C2,92,General,Rare,,,fretful;querulous;protestant
@@ -766,7 +766,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 765,concern,Something that interests you because it is important or affects you.,Noun,The safety of the ship is the captain's concern.,care,fear,A2,28,Academic,Very Common,,,interest;involvement;affairs
 766,concerned,Feeling or showing worry or solicitude.,Adjective,Concerned parents of youthful offenders.,interested,,A2,24,General,Very Common,,,obsessed;preoccupied;troubled
 767,concert,Settle by agreement.,Verb,Concert one's differences.,settle,determine,B1,38,Communication,Common,,,project;compromise;plan
-768,concluded,Having come or been brought to a conclusion.,Adjective,The harvesting was complete.,complete,ended,B2,59,General,Common,,,finished
+768,concluded,Having come or been brought to a conclusion.,Adjective,The concluded negotiations left both sides satisfied.,complete,ended,B2,59,General,Common,,,finished
 769,concrete,Cover with cement.,Verb,Concrete the walls.,cover,,B1,45,General,Common,,,concretion;solidify;consolidate
 770,condition,A state at a particular time.,Noun,A condition (or state) of disrepair.,status,,A2,32,Personal Development,Very Common,,,premise;premiss;assumption
 771,conditions,The prevailing context that influences the performance or the outcome of a process.,Noun,There were wide variations in the conditions of observation.,weather,,A1,13,Personal Development,Very Common,,,context;setting;circumstance
@@ -778,7 +778,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 777,confirmed,Of persons; not subject to change.,Adjective,A confirmed bachelor.,unchangeable,,A2,28,General,Very Common,,,official
 778,confused,Perplexed by many conflicting situations or statements; filled with bewilderment.,Adjective,Bewildered and confused.,baffled,befuddled,B1,43,General,Common,confusedness,,perplexed;incoherent
 779,confusion,Disorder resulting from a failure to behave predictably.,Noun,The army retreated in confusion.,confusedness,muddiness,C1,79,Personal Development,Less Common,,,disorder;demoralization;confuse
-780,congratulations,An expression of approval and commendation.,Noun,He always appreciated praise for his work.,praise,kudos,B2,55,Communication,Common,,,approval;commendation;recommendation
+780,congratulations,An expression of approval and commendation.,Noun,Congratulations poured in from friends and family after the announcement.,praise,kudos,B2,55,Communication,Common,,,approval;commendation;recommendation
 781,congressional,Of or relating to congress.,Adjective,Congressional hearing.,legislative,,C1,79,Academic,Less Common,,,congress
 782,connect,"Connect, fasten, or put together two or more pieces.",Verb,Can you connect the two loudspeakers?,link,tie,B2,57,General,Common,"connective, connector, connecter",,connective;interdepend;interconnect
 783,connected,Wired together to an alarm system.,Adjective,All the window alarms are connected.,affiliated,attached,A2,27,General,Very Common,connectedness,,related;conterminous;engaged
@@ -813,7 +813,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 812,contract,"To become smaller or shorter, especially of a muscle; also, to enter into a formal agreement.",Verb,Muscles contract when they are exercised.,compress,constrict,A2,29,General,Very Common,"contraction, contracture, contractor",,promise;charter;qualify
 813,contrary,Exact opposition.,Noun,Public opinion to the contrary he is not guilty.,reverse,opposite,C1,82,Academic,Less Common,,,opposition;conflict;inverse
 814,contrast,"The opposition or dissimilarity of things that are compared; ,.",Noun,In contrast to.,direct contrast,,B1,44,Academic,Common,,,opposition;comparison;comparing
-815,contribute,Bestow a quality on.,Verb,Her presence lends a certain cachet to the company.,lend,impart,B2,60,Business,Common,,,instill;transfuse;contribution
+815,contribute,Bestow a quality on.,Verb,Her calm presence seemed to contribute a sense of order to the chaotic room.,lend,impart,B2,60,Business,Common,,,instill;transfuse;contribution
 816,contributing,"Playing a part in causing something, along with other factors.",Adjective,Poor lighting was a contributing factor in the accident.,conducive,contributive,C2,96,General,Rare,,,causative
 817,control,Power to direct or determine.,Noun,Under control.,dominance,ascendance,A1,6,Personal Development,Very Common,,,authority;authorization;authorisation
 818,controlled,Restrained or managed or kept within certain bounds.,Adjective,Controlled emotions.,harnessed,,B1,35,General,Common,,,obsessed;disciplined;regimented
@@ -825,7 +825,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 824,conventional,Following accepted customs and proprieties.,Adjective,Conventional wisdom.,established,,B2,56,General,Common,conventionality,,received;orthodox;formulaic
 825,conversion,A change in the units or form of an expression:.,Noun,Conversion from Fahrenheit to Centigrade.,transition,changeover,C1,73,Academic,Less Common,,,convert;transformation;calculation
 826,convert,Change from one system to another or to a new plan or policy.,Verb,We converted from 220 to 110 Volt.,change over,,C2,93,Science & Technology,Rare,"conversion, converter",,conversion;decimalize;decimalise
-827,converted,Spiritually reborn or converted.,Adjective,A born-again Christian.,born-again,reborn,C1,77,General,Less Common,,,regenerate
+827,converted,Spiritually reborn or converted.,Adjective,The converted believer spoke openly about his change of heart.,born-again,reborn,C1,77,General,Less Common,,,regenerate
 828,conviction,(criminal law) a final judgment of guilty in a criminal case and the punishment that is imposed.,Noun,The conviction came as no surprise.,judgment of conviction,condemnation,C1,73,General,Less Common,convict,,sentence;belief
 829,convince,"Make (someone) agree, understand, or realize the truth or validity of something.",Verb,He had finally convinced several customers of the advantages of his product.,convert,win over,B2,67,Communication,Common,convincible,,prevail;influence;inveigle
 830,convinced,Persuaded of; very sure.,Adjective,Were convinced that it would be to their advantage to join.,positive,confident,B2,56,General,Common,,,certain;sure
@@ -854,7 +854,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 853,culture,(biology) the growing of microorganisms in a nutrient medium (such as gelatin or agar).,Noun,The culture of cells in a Petri dish.,civilization,civilisation,A1,11,General,Very Common,,,society;cultural;appreciation
 854,current,A flow of electricity through a conductor.,Noun,The current was measured in amperes.,electric current,,A1,7,Science & Technology,Very Common,,,torrent;resistance;induction
 855,currently,At this time or period; now.,Adverb,Currently they live in Connecticut.,presently,,A1,10,General,Very Common,,,current;existing;immediate
-856,curriculum,An integrated course of academic studies.,Noun,He was admitted to a new program at the university.,course of study,program,C2,92,Communication,Rare,curricular,,information;info
+856,curriculum,An integrated course of academic studies.,Noun,The new curriculum emphasized hands-on science experiments.,course of study,program,C2,92,Communication,Rare,curricular,,information;info
 857,custody,"The legal right or duty to care for someone, especially a child; also, imprisonment.",Noun,The parents share joint custody of their two children.,detention,detainment,C1,76,Personal Development,Less Common,,,constraint;solitary;incarceration
 858,cutting,The act of cutting something into parts.,Noun,His cutting of the cake made a terrible mess.,cut,,B1,46,General,Common,cut,,carving;drilling;digging
 859,damaged,Harmed or injured or spoiled.,Adjective,I won't buy damaged goods.,discredited,,B2,56,General,Common,,,battered;weakened;crumpled
@@ -869,7 +869,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 868,dedicated,Devoted to a cause or ideal or purpose.,Adjective,A dedicated dancer.,consecrated,consecrate,B1,36,General,Common,,,devoted;sacred;ordained
 869,default,Loss due to not showing up.,Noun,He lost the game by default.,nonpayment,nonremittal,B2,64,General,Common,,,absence;failure;capitulation
 870,defeated,"Those who have lost a contest, battle, or struggle (used as a collective noun, as in 'the defeated').",Noun,The treaty imposed harsh terms on the defeated.,discomfited,,C1,82,Society & Culture,Less Common,,,people
-871,defence,(sports) the team that is trying to prevent the other team from scoring.,Noun,His teams are always good on defense.,defense,defending team,B1,40,Society & Culture,Common,defend,,process;conversion;projection
+871,defence,(sports) the team that is trying to prevent the other team from scoring.,Noun,The team's defence held firm through the final minutes of the match.,defense,defending team,B1,40,Society & Culture,Common,defend,,process;conversion;projection
 872,defense,(military) military action or resources protecting a country against potential enemies.,Noun,They died in the defense of Stalingrad.,defence,defensive measure,A2,30,General,Very Common,,,protection;resistance;warfare
 873,defensive,Intended or appropriate for defending against or deterring aggression or attack.,Adjective,Defensive weapons.,justificative,justificatory,B2,57,General,Common,defend,,protective;apologetic;excusatory
 874,deficit,"The amount by which something, especially money, falls short of what is required.",Noun,The government is under pressure to reduce the budget deficit.,shortage,shortfall,C2,99,Personal Development,Rare,,,inadequacy;meagerness;leanness
@@ -890,7 +890,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 889,describe,To give an account or representation of in words.,Verb,Discreet Italian police described it in a manner typically continental.,report,account,B1,37,Communication,Common,"descriptive, description",,description;expound;exposit
 890,described,Represented in words especially with sharpness and detail.,Adjective,The vividly described wars.,delineated,represented,A1,12,General,Very Common,,,delineate
 891,deserve,Be worthy or deserving.,Verb,You deserve a promotion after all the hard work you have done.,merit,,B1,35,General,Common,,,
-892,deserved,Properly deserved.,Adjective,A merited success.,merited,,C1,73,General,Less Common,,,condign
+892,deserved,Properly deserved.,Adjective,She finally received the deserved recognition for years of hard work.,merited,,C1,73,General,Less Common,,,condign
 893,designed,Done or made or performed with purpose and intent.,Adjective,Style...is more than the deliberate and designed creation.,intentional,,A1,14,General,Very Common,,,fashioned
 894,designer,"A person who plans the look, function, or structure of something, such as clothing, products, or buildings.",Noun,The designer unveiled her new collection at fashion week.,intriguer,,B2,66,Society & Culture,Common,,,producer;mastermind;crafter
 895,desired,Wanted intensely.,Adjective,It produced the desired effect.,craved,,C1,83,General,Less Common,,,wanted
@@ -899,7 +899,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 898,destiny,The ultimate agency regarded as predetermining the course of events (often personified as a woman).,Noun,We are helpless in the face of destiny.,fate,,C1,79,Society & Culture,Less Common,,,happening;inevitable;doomsday
 899,destroy,"Do away with, cause the destruction or undoing of.",Verb,The fire destroyed the house.,destruct,,B1,39,Arts & Creativity,Common,"destructible, destructive, destruction, destroyer",,destruction;destroyer;dismantle
 900,destroyed,Spoiled or ruined or demolished.,Adjective,War left many cities destroyed.,ruined,,B1,46,General,Common,,,tattered;blighted;impoverished
-901,destruction,A final state.,Noun,He came to a bad end.,end,death,B2,58,Personal Development,Common,,,destroy;termination;conclusion
+901,destruction,A final state.,Noun,The hurricane left a trail of destruction across the coastline.,end,death,B2,58,Personal Development,Common,,,destroy;termination;conclusion
 902,detailed,Developed or executed with care and in minute detail.,Adjective,A detailed plan.,elaborate,elaborated,B1,40,General,Common,,,careful
 903,details,True confidential information.,Noun,After the trial he gave us the real details.,inside information,,A2,30,Communication,Very Common,,,information;respect;general
 904,detected,Perceived or discerned.,Adjective,The detected micrometeoritic material.,perceived,,C2,99,General,Rare,,,noticed;sensed;heard
@@ -907,7 +907,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 906,determine,Shape or influence; give direction to.,Verb,Experience often determines ability.,shape,mold,B1,45,Academic,Common,determinant,,determination;translate;enumerate
 907,develop,"Make something new, such as a product or a mental or artistic creation.",Verb,Her company developed a new kind of building material that withstands all kinds of weather.,evolve,germinate,A2,24,Arts & Creativity,Very Common,development,,program;programme;concoct
 908,developed,Being changed over time so as to be e.g. stronger or more complete or more useful.,Adjective,The developed qualities of the Hellenic outlook.,mature,matured,A2,29,General,Very Common,,,formulated;industrial
-909,developing,Processing a photosensitive material in order to make an image visible.,Noun,The development and printing of his pictures took only two hours.,development,,A2,28,Science & Technology,Very Common,develop,,processing;refining;refinement
+909,developing,Processing a photosensitive material in order to make an image visible.,Noun,The darkroom technician was still developing the negatives from the shoot.,development,,A2,28,Science & Technology,Very Common,develop,,processing;refining;refinement
 910,devices,An inclination or desire; used in the plural in the phrase `left to your own devices'.,Noun,Eventually the family left the house to the devices of this malevolent force.,device,,B1,35,Academic,Common,,,tendency;direction;disfavor
 911,devoted,Zealous in devotion or affection.,Adjective,A devoted husband and father.,dedicated,,C1,81,General,Less Common,devotedness,,
 912,diamond,A playing card in the minor suit that has one or more red rhombuses on it.,Noun,He led a small diamond.,adamant,,B2,66,General,Common,,,jewel;gem;carbon
@@ -943,7 +943,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 942,division,An army unit large enough to sustain combat.,Noun,Two infantry divisions were held in reserve.,part,section,A2,32,Society & Culture,Very Common,divisional,,conception;construct;quarter
 943,divorce,Get a divorce; formally terminate a marriage.,Verb,The couple divorced after only 6 months.,split up,,B2,58,Society & Culture,Common,"divorcement, divorcee",,separate;espouse;splinter
 944,document,Record in detail.,Verb,The parents documented every step of their child's development.,record,enter,B1,41,Communication,Common,"documentary, documentation",,documentary;documentation;confirm
-945,documentary,"Emphasizing or expressing things as perceived without distortion of personal feelings, insertion of fictional matter, or interpretation.",Adjective,Objective art.,objective,,B2,62,General,Common,,,document;existent;real
+945,documentary,"Emphasizing or expressing things as perceived without distortion of personal feelings, insertion of fictional matter, or interpretation.",Adjective,"The film took a documentary approach, presenting the events without embellishment.",objective,,B2,62,General,Common,,,document;existent;real
 946,dominant,Exercising influence or control.,Adjective,Television plays a dominant role in molding public opinion.,prevailing,prevalent,C1,75,General,Less Common,"dominance, dominate",,dominate;paramount;predominate
 947,downtown,The central area or commercial center of a town or city.,Noun,The heart of Birmingham's downtown.,business district,,B2,56,Travel & Places,Common,,,outskirt;quarter;fringe
 948,drawing,"An illustration that is drawn by hand and published in a book, magazine, or newspaper.",Noun,It is shown by the drawing in Fig. 7.,draftsmanship,drafting,B1,36,Communication,Common,draw,,artwork;graphics;representation
@@ -981,11 +981,11 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 980,embarrassing,Causing feelings of shame or awkwardness.,Adjective,It was embarrassing to trip in front of the whole class.,awkward,sticky,C1,72,General,Less Common,,,difficult;hard;unpleasant
 981,embrace,The state of taking in or encircling.,Noun,An island in the embrace of the sea.,embracing,embracement,C1,83,Personal Development,Less Common,,,clutches;squeeze;clasp
 982,emergency,A sudden unforeseen crisis (usually involving danger) that requires immediate action.,Noun,He never knew what to do in an emergency.,exigency,pinch,A2,25,Society & Culture,Very Common,emergent,,wakefulness;sleeplessness;drowsiness
-983,emerging,Coming to maturity.,Adjective,The rising generation.,rising,,C1,79,General,Less Common,,,future;nascent
+983,emerging,Coming to maturity.,Adjective,Investors were drawn to the emerging technology sector.,rising,,C1,79,General,Less Common,,,future;nascent
 984,emphasis,Special importance or significance.,Noun,The red light gave the central figure increased emphasis.,accent,,C1,79,Personal Development,Less Common,"emphatic, emphasize",,emphatic;importance;grandness
 985,employed,Having your services engaged for; or having a job especially one that pays wages or a salary.,Adjective,Most of our graduates are employed.,engaged,,B2,67,General,Common,,,working;hired;busy
 986,encounter,A casual or unexpected convergence.,Noun,There was a brief encounter in the hallway.,meeting,,B2,67,Society & Culture,Common,,,fighting;fencing;beating
-987,encouraged,Inspired with confidence.,Adjective,Felt bucked up by his success.,bucked up,,B2,62,General,Common,,,pleased
+987,encouraged,Inspired with confidence.,Adjective,She felt encouraged after her mentor praised the draft.,bucked up,,B2,62,General,Common,,,pleased
 988,encouraging,Giving courage or confidence or hope.,Adjective,Encouraging advances in medical research.,supporting,,C1,73,General,Less Common,,,helpful;reassuring;rallying
 989,endless,Tiresomely long; seemingly without end.,Adjective,Endless debates.,eternal,interminable,C1,81,General,Less Common,endlessness,,infinite;long
 990,engaged,Having ones attention or mind or energy engaged.,Adjective,Deeply engaged in conversation.,occupied,,B1,40,General,Common,,,involved;busy
@@ -1015,20 +1015,20 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1014,everyday,Used or happening routinely; ordinary.,Adjective,Cooking dinner is just part of our everyday routine.,mundane,quotidian,B1,43,General,Common,everydayness,,ordinary;informal
 1015,everywhere,To or in any or all places; ; ; ; ; (`everyplace' is used informally for `everywhere').,Adverb,You find fast food stores everywhere.,everyplace,all over,A2,28,General,Very Common,,,
 1016,exactly,In a manner that is completely accurate; precisely.,Adverb,The meeting starts exactly at noon.,precisely,just,A1,9,General,Very Common,,,skillful;meticulous;specific
-1017,examination,A set of questions or exercises evaluating skill or knowledge.,Noun,When the test was stolen the professor had to make a new set of questions.,exam,test,B2,67,Communication,Common,examine,,investigation;investigating;communication
+1017,examination,A set of questions or exercises evaluating skill or knowledge.,Noun,Students spent weeks preparing for the final examination.,exam,test,B2,67,Communication,Common,examine,,investigation;investigating;communication
 1018,examine,"Observe, check out, and look over carefully or inspect.",Verb,The customs agent examined the baggage.,see,,C1,81,General,Less Common,"examination, examiner",,examination;anatomize;scrutinise
 1019,example,An item of information that is typical of a class or group.,Noun,This patient provides a typical example of the syndrome.,illustration,instance,A1,7,Academic,Very Common,"exemplary, exemplify",,exemplify;information;exception
 1020,excellence,An outstanding feature; something in which something or someone excels.,Noun,A center of manufacturing excellence.,excellency,,C2,98,Academic,Rare,,,excellent;quality;civilization
 1021,exception,A person or thing excluded from a general statement or rule.,Noun,"Everyone passed the exam, with one exception.",exclusion,elision,B2,59,Academic,Common,except,,exceptional;example;illustration
 1022,excessive,"More than what is necessary, normal, or desirable.",Adjective,The fine seemed excessive for such a minor offense.,inordinate,undue,C2,92,General,Rare,"exceed, excessiveness",,exceed;excessiveness;immoderate
 1023,exchange,A mutual expression of views (especially an unpleasant one).,Noun,They had a bitter exchange.,interchange,,A2,21,Communication,Very Common,,,conversation;crystallizing;talking
-1024,excited,(of persons) excessively affected by emotion.,Adjective,He would become emotional over nothing at all.,aroused,emotional,A2,24,General,Very Common,,,agitated;thrilled;nervous
+1024,excited,(of persons) excessively affected by emotion.,Adjective,The children were too excited to sit still before the trip.,aroused,emotional,A2,24,General,Very Common,,,agitated;thrilled;nervous
 1025,excitement,A feeling of great enthusiasm or eagerness.,Noun,There was real excitement in the room before the announcement.,exhilaration,,C1,79,Emotion,Less Common,excite,,lightness;inflammation;fervour
 1026,exciting,Creating or arousing excitement.,Adjective,An exciting account of her trip.,electrifying,thrilling,B1,38,General,Common,,,glamourous;breathtaking;titillating
 1027,exclusive,Not divided or shared with others.,Adjective,They have exclusive use of the machine.,sole,,B1,37,General,Common,exclude,,privileged;unshared;exclusiveness
 1028,exclusively,Without any others being included or involved.,Adverb,He works for Mr. Smith exclusively.,entirely,solely,C1,74,General,Less Common,,,exclusive;unshared
 1029,executed,Put to death as punishment.,Adjective,Claimed the body of the executed traitor.,dead,,B2,66,General,Common,,,
-1030,execution,The act of performing; of doing something successfully; using knowledge as distinguished from merely possessing it.,Noun,They criticised his performance as mayor.,performance,carrying out,B2,64,General,Common,execute,,hanging;beheading;burning
+1030,execution,The act of performing; of doing something successfully; using knowledge as distinguished from merely possessing it.,Noun,Critics praised the flawless execution of the ballet's final act.,performance,carrying out,B2,64,General,Common,execute,,hanging;beheading;burning
 1031,exhausted,Drained of energy or effectiveness; extremely tired; completely exhausted.,Adjective,The day's shopping left her exhausted.,dog-tired,fagged,C2,96,General,Rare,,,tired
 1032,exhibit,"A public display of items, especially in a museum or gallery.",Noun,The museum's new exhibit features ancient Egyptian artifacts.,display,showing,C1,83,General,Less Common,,,evidence;testimony;presentation
 1033,exhibition,The act of exhibiting.,Noun,A remarkable exhibition of musicianship.,exposition,expo,B2,58,General,Common,exhibit,,presentation;demonstration;production
@@ -1044,14 +1044,14 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1043,exposed,With no protection or shield.,Adjective,The exposed northeast frontier.,open,,B1,40,General,Common,,,unprotected;unclothed
 1044,exposure,Vulnerability to the elements; to the action of heat or cold or wind or rain;  or.,Noun,Exposure to the weather.,vulnerability,,B1,45,Personal Development,Common,expose,,influence;suggestion;impingement
 1045,express,Public transport consisting of a fast train or bus that makes only a few scheduled stops.,Noun,He caught the express to New York.,limited,,A2,27,General,Very Common,,,motorbus;motorcoach;omnibus
-1046,expressed,Communicated in words.,Adjective,Frequently uttered sentiments.,uttered,verbalized,B1,40,General,Common,,,hardcore;declared;definitive
+1046,expressed,Communicated in words.,Adjective,Her clearly expressed concerns finally reached the board's attention.,uttered,verbalized,B1,40,General,Common,,,hardcore;declared;definitive
 1047,extended,Relatively long in duration; tediously protracted.,Adjective,An extended discussion.,drawn-out,lengthy,B1,44,General,Common,,,stretched;long;sprawly
 1048,extension,A mutually agreed delay in the date set for the completion of a job or payment of a debt.,Noun,They applied for an extension of the loan.,propagation,,B1,44,General,Common,,,expansion;stretch;retardation
 1049,extreme,The furthest or highest degree of something.,Noun,He carried it to extremes.,extremum,,B1,47,Personal Development,Common,,,lowness;quality;calibre
 1050,extremely,To a high degree or extent; favorably or with much respect.,Adverb,Extremely interesting.,highly,,A2,23,General,Very Common,,,extreme;advanced;graduate
 1051,fabulous,Extremely pleasing.,Adjective,A fabulous vacation.,fab,,C2,96,General,Rare,,,pleasing;fable;unreal
 1052,facility,A building or place that provides a particular service or is used for a particular industry.,Noun,The assembly plant is an enormous facility.,installation,,B1,47,General,Common,,,fluency;adeptness;adroitness
-1053,faculty,The body of teachers and administrators at a school.,Noun,The dean addressed the letter to the entire staff of the university.,staff,,B2,62,Society & Culture,Common,,,ability;understanding;sentiency
+1053,faculty,The body of teachers and administrators at a school.,Noun,The faculty voted to revise the graduation requirements.,staff,,B2,62,Society & Culture,Common,,,ability;understanding;sentiency
 1054,failing,A flaw or weak point.,Noun,He was quick to point out his wife's failings.,weakness,,B2,63,Personal Development,Common,fail,,fatigue;inadequacy;failure
 1055,failure,An act that fails.,Noun,His failure to pass the test.,loser,nonstarter,A2,25,General,Very Common,fail,,default;nonpayment;failing
 1056,faithful,Steadfast in affection or allegiance.,Adjective,Years of faithful service.,close,,C2,94,General,Rare,faithfulness,,truehearted;trustworthy;constant
@@ -1081,14 +1081,14 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1080,fitting,In harmony with the spirit of particular persons or occasion.,Adjective,We have come to dedicate a portion of that field...It is altogether fitting and proper that we should do this.,meet,,C2,95,General,Rare,fittingness,,proper;just
 1081,floating,Borne up by or suspended in a liquid.,Adjective,The ship is still floating.,aimless,drifting,C1,81,General,Less Common,,,afloat;unsettled
 1082,focused,"Giving one's full attention to a single task or goal, American spelling.",Adjective,She stayed focused throughout the entire exam.,focussed,,B1,44,General,Common,,,convergent
-1083,focusing,The concentration of attention or energy on something.,Noun,The focus of activity shifted to molecular biology.,focus,focussing,B2,56,Academic,Common,focus,,concentration;direction;roughness
+1083,focusing,The concentration of attention or energy on something.,Noun,Her focusing on the smallest details made the presentation flawless.,focus,focussing,B2,56,Academic,Common,focus,,concentration;direction;roughness
 1084,following,About to be mentioned or specified.,Adjective,The following items.,undermentioned,,A1,6,General,Very Common,,,succeeding
 1085,footage,Film that has been shot.,Noun,"They had stock footage of lightning, tornados, and hurricanes.",film,,B2,63,General,Common,,,positive;sequence;negative
 1086,forever,For a limitless time.,Adverb,No one can live forever.,everlastingly,eternally,A2,24,General,Very Common,,,permanent;lasting
 1087,forgive,Stop blaming or grant forgiveness.,Verb,She cannot forgive him for forgetting her birthday.,concede,yield,B2,56,Communication,Common,forgiver,,condone;justify;relieve
 1088,forgotten,Not noticed inadvertently.,Adjective,Her aching muscles forgotten she danced all night.,disregarded,,B2,56,General,Common,,,unnoticed
 1089,formation,An arrangement of people or things acting as a unit.,Noun,A defensive formation.,shaping,,B1,42,Society & Culture,Common,form,,arrangement;secondary;fabrication
-1090,formerly,At a previous time.,Adverb,At one time he loved her.,once,at one time,C1,74,General,Less Common,,,
+1090,formerly,At a previous time.,Adverb,The building was formerly a textile mill before it became lofts.,once,at one time,C1,74,General,Less Common,,,
 1091,formula,Something regarded as a normative example.,Noun,His formula for impressing visitors.,convention,normal,B1,45,Academic,Common,formularize,,primitive;formulate;direction
 1092,fortune,An unknown and unpredictable phenomenon that leads to a favorable outcome.,Noun,It was as if fortune guided his hand.,luck,,B2,63,Science & Technology,Common,,,treasure;pulsation;consequence
 1093,forward,"To send something, such as mail or a message, on to a further destination.",Verb,Please forward this email to the whole team.,send on,,A1,9,Travel & Places,Very Common,forwarding,,transport;railroad;dispatch
@@ -1102,7 +1102,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1101,function,What something is used for.,Noun,The function of an auger is to bore holes.,purpose,role,A2,23,Personal Development,Very Common,,,expansion;polynomial;operator
 1102,functional,Designed for or capable of a particular function or use.,Adjective,A style of writing in which every word is functional.,usable,useable,C1,74,General,Less Common,functionality,,structural;purpose;utilitarian
 1103,fundamental,Any factor that could be considered important to the understanding of a particular business.,Noun,"Fundamentals include a company's growth, revenues, earnings, management, and capital structure.",factor,,B2,61,Society & Culture,Common,,,harmonic;partial;parameter
-1104,funding,Financial resources provided to make some project possible.,Noun,The foundation provided support for the experiment.,support,financial support,B1,45,Business,Common,fund,,resource;finance;backing
+1104,funding,Financial resources provided to make some project possible.,Noun,The lab secured new funding to continue its research.,support,financial support,B1,45,Business,Common,fund,,resource;finance;backing
 1105,funeral,A ceremony at which a dead person is buried or cremated.,Noun,Hundreds of people attended his funeral.,ceremony,ceremonial,B2,58,Society & Culture,Common,"funereal, funerary",,exercise;induction;installation
 1106,further,"More distant in degree or extent; additional, often used for figurative or abstract distance.",Adjective,The matter requires further investigation before we proceed.,farther,,A1,7,General,Very Common,,,far
 1107,furthermore,In addition; besides (used to introduce a further point).,Adverb,"The plan is expensive. Furthermore, it hasn't been fully tested.",moreover,what is more,C1,75,General,Less Common,,,
@@ -1112,26 +1112,26 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1111,gathered,Brought together into one place or group.,Adjective,The gathered crowd waited eagerly for the announcement.,collected,,B2,66,General,Common,,,
 1112,gathering,"An occasion when people come together for a particular purpose, often social.",Noun,The family held a small gathering to celebrate the anniversary.,assembly,assemblage,B2,56,General,Common,gather,,concentration;convention;convening
 1113,general,A fact about the whole (as opposed to particular).,Noun,He discussed the general but neglected the particular.,fact,,A1,6,Academic,Very Common,,,executive;generalship;head
-1114,generally,Usually; as a rule.,Adverb,By and large it doesn't rain much here.,by and large,more often than not,A2,29,General,Very Common,,,general;widespread;overall
+1114,generally,Usually; as a rule.,Adverb,"Generally, the shop closes early on Sundays.",by and large,more often than not,A2,29,General,Very Common,,,general;widespread;overall
 1115,generate,Bring into existence.,Verb,The new manager generated a lot of problems.,bring forth,,C1,76,Arts & Creativity,Less Common,"generative, generation, generator",,generation;generator;develop
 1116,generic,Relating to or common to or descriptive of all members of a genus.,Adjective,The generic name.,nonproprietary,,C2,93,Academic,Rare,genus,,
 1117,genetic,"Relating to genes or heredity, especially traits passed from parent to offspring.",Adjective,The disease has a strong genetic component.,familial,hereditary,B2,60,General,Common,,,inheritable;heritable;gene
-1118,gentleman,A manservant who acts as a personal attendant to his employer.,Noun,Jeeves was Bertie Wooster's man.,valet,valet de chambre,C1,83,Society & Culture,Less Common,,,gentlemanly;man;don
+1118,gentleman,A manservant who acts as a personal attendant to his employer.,Noun,The old estate still employed a gentleman to see to the master's daily needs.,valet,valet de chambre,C1,83,Society & Culture,Less Common,,,gentlemanly;man;don
 1119,genuine,Not fake or counterfeit.,Adjective,A genuine Picasso.,echt,,B2,58,General,Common,genuineness,,veritable;existent;sincere
 1120,genuinely,In accordance with truth or fact or reality.,Adverb,A genuinely open society.,truly,really,C2,95,General,Rare,,,genuine;truthful;faithful
 1121,getting,The act of obtaining or receiving something.,Noun,The getting of the visa took nearly three months.,acquiring,,A1,5,General,Very Common,get,,acquisition;catching;contracting
 1122,girlfriend,Any female friend.,Noun,Mary and her girlfriend organized the party.,girl,,A2,27,Society & Culture,Very Common,,,intimate;brother;companion
 1123,glorious,Having or deserving or conferring glory.,Adjective,A long and glorious career.,brilliant,magnificent,C2,97,General,Rare,glory,,empyreal;sublime;celebrated
-1124,goodbye,A farewell remark.,Noun,They said their good-byes.,adieu,adios,B2,63,Communication,Common,,,farewell;afternoon;morning
-1125,goodness,That which is pleasing or valuable or useful.,Noun,Weigh the good against the bad.,good,,C2,91,Personal Development,Rare,good,,quality;optimum;soundness
+1124,goodbye,A farewell remark.,Noun,They exchanged a quick goodbye before the train pulled away.,adieu,adios,B2,63,Communication,Common,,,farewell;afternoon;morning
+1125,goodness,That which is pleasing or valuable or useful.,Noun,She believed in the fundamental goodness of people.,good,,C2,91,Personal Development,Rare,good,,quality;optimum;soundness
 1126,gorgeous,Dazzlingly beautiful.,Adjective,A gorgeous Victorian gown.,beautiful,,B2,59,General,Common,,,
 1127,governance,"The system or process by which an organization, institution, or country is directed and controlled.",Noun,The report criticized the company's weak corporate governance.,administration,governing body,C2,96,Society & Culture,Rare,,,executive;management;authorities
 1128,governing,The act of governing; exercising authority.,Noun,Regulations for the governing of state prisons.,government,governance,C2,92,General,Rare,govern,,legislation;legislating;lawmaking
 1129,gradually,In a gradual manner.,Adverb,The snake moved gradually toward its victim.,bit by bit,step by step,C1,77,General,Less Common,,,stepwise;gradual;gradational
 1130,graduate,Receive an academic degree upon completion of one's studies.,Verb,She graduated in 1990.,calibrate,,B1,41,Business,Common,graduation,,receive;have;confer
-1131,graduated,Marked with or divided into degrees.,Adjective,A calibrated thermometer.,calibrated,,C1,74,General,Less Common,,,
+1131,graduated,Marked with or divided into degrees.,Adjective,The scientist used a graduated cylinder to measure the liquid precisely.,calibrated,,C1,74,General,Less Common,,,
 1132,graduation,A line (as on a vessel or ruler) that marks a measurement.,Noun,The ruler had 16 graduations per inch.,commencement,,C2,98,Communication,Rare,graduate,,culmination;closing;exercise
-1133,granted,Acknowledged as a supposition.,Adjective,"Given the engine's condition, it is a wonder that it started.",given,,B1,46,General,Common,,,acknowledged
+1133,granted,Acknowledged as a supposition.,Adjective,"Granted, the plan has risks, but the potential reward is significant.",given,,B1,46,General,Common,,,acknowledged
 1134,graphic,Written or drawn or engraved.,Adjective,Graphic symbols.,graphical,in writing,C1,75,General,Less Common,,,written;expressed;explicit
 1135,graphics,"Visual images or designs, especially created digitally or used in print, film, or video.",Noun,The video game's graphics were praised for their realism.,artwork,art,C1,79,Communication,Less Common,,,drawing;illustration;publication
 1136,gravity,(physics) the force of attraction between all masses in the universe; especially the attraction of the earth's mass for bodies near its surface.,Noun,The more remote the body the less the gravity.,gravitation,gravitational attraction,C1,77,Science & Technology,Less Common,gravitate,,attraction;earnestness;sincerity
@@ -1168,17 +1168,17 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1167,hollywood,A flashy vulgar tone or atmosphere believed to be characteristic of the American film industry.,Noun,Some people in publishing think of theirs as a glamorous medium so they copy the glitter of Hollywood.,spirit,tone,B1,40,Personal Development,Common,,,feeling;flavour;filmdom
 1168,homeless,Someone unfortunate without housing.,Noun,A homeless was found murdered in Central Park.,homeless person,,B2,67,Society & Culture,Common,,,unfortunate;desperate;survivor
 1169,honestly,In a truthful and sincere manner.,Adverb,"Honestly, I don't think the plan will work.",candidly,frankly,A2,27,General,Very Common,,,sincere;honest;direct
-1170,honored,Having an illustrious reputation; respected.,Adjective,Our esteemed leader.,esteemed,prestigious,C2,95,General,Rare,,,reputable
+1170,honored,Having an illustrious reputation; respected.,Adjective,The honored guest was seated at the head of the table.,esteemed,prestigious,C2,95,General,Rare,,,reputable
 1171,hopefully,With hope; in a hopeful manner.,Adverb,We searched hopefully for a good position.,optimistically,,B1,37,General,Common,,,anticipative;optimistic;encouraging
 1172,horizon,The range of interest or activity that can be anticipated.,Noun,It is beyond the horizon of present knowledge.,view,purview,C2,98,Personal Development,Rare,,,perspective;compass;confines
 1173,horrible,Causing horror or intense dislike; very unpleasant.,Adjective,The car accident was a horrible sight.,atrocious,frightful,B1,45,General,Common,,,alarming
 1174,hostile,Troops belonging to the enemy's military forces.,Noun,The platoon ran into a pack of hostiles.,soldiery,troops,C2,98,Society & Culture,Rare,,,cavalry;horse;garrison
 1175,however,Used to introduce a statement that contrasts with what has just been said.,Adverb,"The plan sounds risky; however, it might just work.",nevertheless,withal,A1,5,General,Very Common,,,
-1176,hurting,A symptom of some physical hurt or disorder.,Noun,The patient developed severe pain and distension.,pain,,C2,93,Personal Development,Rare,hurt,,symptom
-1177,husband,Use cautiously and frugally.,Verb,I try to economize my spare time.,conserve,economize,A1,12,Business,Very Common,,,preserve;economise;save
+1176,hurting,A symptom of some physical hurt or disorder.,Noun,The hurting in his knee worsened after every run.,pain,,C2,93,Personal Development,Rare,hurt,,symptom
+1177,husband,Use cautiously and frugally.,Verb,They learned to husband their supplies through the long winter.,conserve,economize,A1,12,Business,Very Common,,,preserve;economise;save
 1178,identical,Exactly alike; incapable of being perceived as different.,Adjective,Rows of identical houses.,indistinguishable,,C1,77,General,Less Common,"identity, identicalness",,identity;identicalness;same
 1179,identified,Having the identity known or established.,Adjective,The identified bodies were released for burial.,known,,B1,45,General,Common,,,
-1180,identify,Recognize as being; establish the identity of someone or something.,Verb,She identified the man on the 'wanted' poster.,place,,B1,37,Academic,Common,"identifiable, identification, identity",,identification;identity;determine
+1180,identify,Recognize as being; establish the identity of someone or something.,Verb,Witnesses were asked to identify the suspect from a lineup.,place,,B1,37,Academic,Common,"identifiable, identification, identity",,identification;identity;determine
 1181,ignored,Disregarded.,Adjective,Her ignored advice.,neglected,unheeded,B2,66,General,Common,,,unnoticed
 1182,illegal,Prohibited by law or by official or accepted rules.,Adjective,An illegal chess move.,dirty,,A2,27,General,Very Common,illegality,,illicit;unlawful;bootleg
 1183,imagine,To form a mental image or concept of something not present to the senses.,Verb,Try to imagine what the city looked like a hundred years ago.,think,opine,A2,30,Academic,Very Common,,,imaginative;imagination;prefigure
@@ -1187,7 +1187,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1186,imperial,Relating to or associated with an empire.,Adjective,Imperial colony.,majestic,purple,C1,77,Academic,Less Common,empire,,
 1187,implement,Apply in a manner consistent with its purpose or design.,Verb,Implement a procedure.,enforce,apply,C1,78,Society & Culture,Less Common,implementation,,utilise;execute;squeeze
 1188,implementation,The act of accomplishing some aim or executing some order.,Noun,The agency was created for the implementation of the policy.,execution,carrying out,B2,63,General,Common,implement,,practice;infliction;enforcement
-1189,implemented,Forced or compelled or put in force.,Adjective,A life of enforced inactivity.,enforced,,C1,75,General,Less Common,,,
+1189,implemented,Forced or compelled or put in force.,Adjective,The newly implemented policy took effect on Monday.,enforced,,C1,75,General,Less Common,,,
 1190,importance,The quality of being important and worthy of note.,Noun,The importance of a well-balanced diet.,grandness,,B1,37,Personal Development,Common,important,,essentiality;urgency;significance
 1191,importantly,In an important way or to an important degree.,Adverb,"More importantly, Weber held that the manifold meaning attached to the event by the social scientist could alter his definition of the concrete event itself.",significantly,,C2,96,General,Rare,,,important;historic;primary
 1192,imposed,Set forth authoritatively as obligatory.,Adjective,The imposed taxation.,obligatory,,C1,83,General,Less Common,,,
@@ -1213,19 +1213,19 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1212,individual,Being or characteristic of a single thing or person.,Adjective,Individual drops of rain.,single,,A1,12,General,Very Common,individuality,,singular;respective;several
 1213,industrial,Of or relating to or resulting from industry.,Adjective,Industrial output.,postindustrial,,A2,26,Academic,Very Common,,,industry;developed;progressive
 1214,inevitable,An unavoidable event.,Noun,Don't argue with the inevitable.,destiny,fate,C2,97,Society & Culture,Rare,,,doomsday;karma;doom
-1215,infected,Containing or resulting from disease-causing organisms.,Adjective,A septic sore throat.,septic,,C2,91,General,Rare,,,purulent;contaminative;septicemic
+1215,infected,Containing or resulting from disease-causing organisms.,Adjective,The infected wound needed immediate medical attention.,septic,,C2,91,General,Rare,,,purulent;contaminative;septicemic
 1216,infection,"The invasion of the body by harmful microorganisms, causing disease.",Noun,The doctor prescribed antibiotics to treat the infection.,contagion,,B2,61,Communication,Common,"infectious, infect",,infectious;biliousness;deletion
 1217,infinite,The unlimited expanse in which everything is located.,Noun,The boundless regions of the infinite.,space,,C1,83,General,Less Common,,,attribute;location;cheerfulness
 1218,inflation,A general and progressive increase in prices.,Noun,In inflation everything gets more valuable except money.,rising prices,,C1,74,Science & Technology,Less Common,"inflationary, inflate",,explosion;globalization;globalisation
 1219,influential,Having or exercising influence or power.,Adjective,An influential newspaper.,prestigious,,C2,96,General,Rare,influence,,authoritative;important;powerful
 1220,informed,Having much knowledge or education.,Adjective,An informed public.,privy,,B1,45,General,Common,,,advised;educated;enlightened
 1221,initial,The first letter of a word (especially a person's name).,Noun,He refused to put the initials FRS after his name.,letter,,A2,26,Communication,Very Common,,,
-1222,initially,At the beginning.,Adverb,At first he didn't notice anything strange.,ab initio,,B1,42,General,Common,,,initial;first
+1222,initially,At the beginning.,Adverb,"Initially, the project seemed simple, but complications soon arose.",ab initio,,B1,42,General,Common,,,initial;first
 1223,initiative,"The ability to assess and start things independently; also, an official plan or strategy to address a problem.",Noun,She showed real initiative by fixing the issue before being asked.,inaugural,initiatory,B2,58,General,Common,initiate,,opening
 1224,injured,Harmed.,Adjective,Injured soldiers.,disjointed,dislocated,B1,41,General,Common,,,separated;wounded;lacerated
 1225,innocent,"Not guilty of a crime or wrongdoing; also, free from moral wrong.",Adjective,The jury found him innocent of all charges.,guiltless,clean-handed,B1,45,General,Common,innocence,,blameless;irreproachable;unimpeachable
 1226,innovative,Ahead of the times.,Adjective,Is British industry innovative enough?,advanced,forward-looking,C2,95,General,Rare,innovativeness,,progressive;original;innovate
-1227,inspector,An investigator who observes carefully.,Noun,The examiner searched for clues.,examiner,,B2,56,Society & Culture,Common,"inspectorship, inspect",,officer;inspect;canvasser
+1227,inspector,An investigator who observes carefully.,Noun,The inspector examined every inch of the crime scene.,examiner,,B2,56,Society & Culture,Common,"inspectorship, inspect",,officer;inspect;canvasser
 1228,inspired,Being of such surpassing excellence as to suggest inspiration by the gods.,Adjective,An inspired performance.,divine,elysian,B1,45,General,Common,,,glorious
 1229,install,Set up for use.,Verb,Install the washer and dryer.,instal,put in,C1,74,General,Less Common,"installment, installation, installing",,installation;installing;position
 1230,installation,"The act of setting up equipment or software for use; also, a large-scale artwork.",Noun,The installation of the new server took all afternoon.,installing,installment,C1,83,General,Less Common,install,,beginning;constitution;establishment
@@ -1284,11 +1284,11 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1283,lasting,Continuing to exist for a long time; enduring.,Adjective,The trip left a lasting impression on her.,durable,long-lasting,C2,93,General,Rare,lastingness,,standing;ageless;aeonian
 1284,laughing,Showing or feeling mirth or pleasure or happiness.,Adjective,Laughing children.,riant,,B1,46,General,Common,,,happy
 1285,laughter,The activity of laughing; the manifestation of joy or mirth or scorn.,Noun,He enjoyed the laughter of the crowd.,laugh,,C2,95,General,Rare,,,vocalization;activity;utterance
-1286,lawsuit,A comprehensive term for any proceeding in a court of law whereby an individual seeks a legal remedy.,Noun,The family brought suit against the landlord.,suit,case,C2,96,General,Rare,,,proceeding;adoption;bankruptcy
+1286,lawsuit,A comprehensive term for any proceeding in a court of law whereby an individual seeks a legal remedy.,Noun,The company faced a lawsuit over the defective product.,suit,case,C2,96,General,Rare,,,proceeding;adoption;bankruptcy
 1287,leaders,The body of people who lead a group.,Noun,The national leadership adopted his plan.,leadership,,A2,22,Society & Culture,Very Common,,,individual;someone;somebody
 1288,leading,Most important or influential; in the top position.,Adjective,She's a leading expert in climate science.,prima,star,A1,13,General,Very Common,,,superior;major
 1289,learned,Having or showing profound knowledge.,Adjective,A learned jurist.,erudite,,A2,21,General,Very Common,learnedness,,educated;scholarly
-1290,learning,The cognitive process of acquiring skill or knowledge.,Noun,The child's acquisition of language.,acquisition,,A2,30,Academic,Very Common,,,education;transfer;imprinting
+1290,learning,The cognitive process of acquiring skill or knowledge.,Noun,Lifelong learning kept her mind sharp well into retirement.,acquisition,,A2,30,Academic,Very Common,,,education;transfer;imprinting
 1291,lecture,A speech that is open to the public.,Noun,He attended a lecture on telecommunications.,public lecture,talk,C2,90,Communication,Rare,lectureship,,address;reproof;reproval
 1292,legally,In a legal manner.,Adverb,He acted legally.,lawfully,,C1,77,General,Less Common,,,legal
 1293,legendary,So celebrated as to having taken on the nature of a legend.,Adjective,The legendary exploits of the arctic trailblazers.,fabled,,C1,75,General,Less Common,,,known;legend;unreal
@@ -1300,7 +1300,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1299,library,A room where books are kept.,Noun,They had brandy in the library.,collection,aggregation,A2,20,General,Very Common,,,assemblage;room;house
 1300,license,"An official document or permission granting the right to do something, American spelling.",Noun,You need a license to drive in this state.,licence,,B1,40,Personal Development,Common,,,instrument;liberty;pass
 1301,licensed,Having official permission or a license to do something.,Adjective,He is a licensed electrician.,accredited,commissioned,C1,82,General,Less Common,,,authorized;authorised
-1302,lifetime,The period during which something is functional (as between birth and death).,Noun,The battery had a short life.,life,life-time,B2,57,General,Common,,,period;death;dying
+1302,lifetime,The period during which something is functional (as between birth and death).,Noun,The warranty covers the appliance for its entire lifetime.,life,life-time,B2,57,General,Common,,,period;death;dying
 1303,lighter,"A small handheld device used to produce a flame, typically for lighting cigarettes or candles.",Noun,He flicked the lighter twice before it caught.,light,igniter,C2,96,General,Rare,light,,kindling;fuel;firelighter
 1304,lighting,Having abundant light or illumination.,Noun,As long as the lighting was good.,light,,B2,64,Personal Development,Common,,,illumination;darkness;apparatus
 1305,limited,Small in range or scope.,Adjective,Limited war.,special,,A1,12,General,Very Common,,,restricted;minor;modest
@@ -1328,7 +1328,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1327,married,A person who is married.,Noun,We invited several young marrieds.,person,individual,A1,11,Society & Culture,Very Common,marry,,someone;somebody;mortal
 1328,martial,Of or relating to the armed forces.,Adjective,Martial law.,soldierly,soldierlike,C2,99,General,Rare,,,military
 1329,massive,"Very large in size, quantity, or degree.",Adjective,The company posted a massive profit this quarter.,monolithic,monumental,A2,26,General,Very Common,massiveness,,large;big;solid
-1330,matching,Intentionally matched.,Adjective,Curtains and walls were color coordinated.,coordinated,co-ordinated,C2,95,General,Rare,,,
+1330,matching,Intentionally matched.,Adjective,The twins wore matching outfits to the family reunion.,coordinated,co-ordinated,C2,95,General,Rare,,,
 1331,material,The tangible substance that goes into the makeup of a physical object.,Noun,Coal is a hard black material.,stuff,,A2,29,Science & Technology,Very Common,,,substance;information;element
 1332,maximum,"The greatest amount, extent, or degree possible.",Adjective,The elevator has a maximum capacity of eight people.,maximal,,B1,47,General,Common,,,supreme
 1333,meaning,"What is intended to be expressed or understood by something, such as a word or action.",Noun,The meaning of the poem became clear on a second reading.,significance,signification,A2,32,Communication,Very Common,mean,,message;content;substance
@@ -1370,7 +1370,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1369,moreover,"Used to introduce an additional fact or piece of information, especially one that strengthens an argument.",Adverb,"The product is affordable; moreover, it's built to last.",furthermore,what is more,C1,83,General,Less Common,,,
 1370,morning,The time period between dawn and noon.,Noun,I spent the morning running errands.,morn,morning time,A1,7,General,Very Common,,,daytime;farewell;greeting
 1371,motivated,Provided with a motive or given incentive for action.,Adjective,A highly motivated child can learn almost anything.,actuated,,C2,90,General,Rare,,,impelled;intended;driven
-1372,mountain,(often followed by `of') a large number or amount or extent.,Noun,A batch of letters.,batch,deal,A2,25,Academic,Very Common,,,mountainous;elevation;versant
+1372,mountain,(often followed by `of') a large number or amount or extent.,Noun,She had a mountain of paperwork to finish before the deadline.,batch,deal,A2,25,Academic,Very Common,,,mountainous;elevation;versant
 1373,mounted,Decorated with applied ornamentation; often used in combination.,Adjective,The trim brass-mounted carbine of the ranger.,adorned,decorated,B2,55,General,Common,,,affixed
 1374,movement,"The act of moving or changing position; also, an organized effort to promote a cause.",Noun,The dancer's movement across the stage was mesmerizing.,motion,move,A1,13,General,Very Common,move,,progress;progression;procession
 1375,multiple,The product of a quantity by an integer.,Noun,36 is a multiple of 9.,product,,A2,30,Academic,Very Common,,,quadruple;double;triple
@@ -1434,11 +1434,11 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1433,ordinary,The expected or commonplace condition or situation.,Noun,Not out of the ordinary.,condition,,B2,67,Personal Development,Common,,,justice;introversion;fortune
 1434,organic,Relating or belonging to the class of chemical compounds having a carbon basis.,Adjective,Hydrocarbons are organic compounds.,constituent,constitutional,B2,56,General,Common,,,integrated;structured;organism
 1435,organisation,"A structured group of people working together for a shared purpose, chiefly British spelling; also, the act of arranging things systematically.",Noun,The charity is a well-respected organisation helping refugees.,administration,governance,B2,58,Society & Culture,Common,organise,,executive;management;government
-1436,organised,Being a member of or formed into a labor union.,Adjective,Organized labor.,organized,unionized,C2,97,General,Rare,,,union
+1436,organised,Being a member of or formed into a labor union.,Adjective,The factory workers were organised into a single union local.,organized,unionized,C2,97,General,Rare,,,union
 1437,organized,Methodical and efficient in arrangement or function.,Adjective,How well organized she is.,organised,unionized,B1,41,General,Common,,,arranged;reorganized;reorganised
 1438,oriented,Adjusted or located in relation to surroundings or circumstances; sometimes used in combination.,Adjective,The house had its large windows oriented toward the ocean view.,orientated,,C2,92,General,Rare,,,adjusted;familiarized;directed
 1439,original,"The first form of something, from which copies or variations are made.",Noun,The museum keeps the original in a climate-controlled room.,archetype,pilot,A1,9,Academic,Very Common,,,creation;example;representation
-1440,originally,Before now.,Adverb,Why didn't you tell me in the first place?,in the first place,earlier,A2,27,General,Very Common,,,original;seminal;innovative
+1440,originally,Before now.,Adverb,The house was originally painted a bright shade of blue.,in the first place,earlier,A2,27,General,Very Common,,,original;seminal;innovative
 1441,otherwise,Other than as supposed or expected.,Adjective,The outcome was otherwise.,other,,A2,31,General,Very Common,,,
 1442,outcome,The way a situation or event finally turns out; a result.,Noun,The outcome of the election surprised everyone.,result,resultant,B2,59,Society & Culture,Common,,,conclusion;decision;consequence
 1443,outdoor,"Located, suited for, or taking place in the open air.",Adjective,Outdoor clothes.,out-of-door,outside,C1,75,General,Less Common,,,alfresco;exterior;outdoors
@@ -1450,7 +1450,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1449,overview,A general summary of a subject.,Noun,The treasurer gave a brief overview of the financial consequences.,summary,,C2,94,Communication,Rare,,,outline;abstract;capitulation
 1450,overwhelming,"Extremely intense or great in effect, leaving one unable to cope.",Adjective,The support from the community was overwhelming.,overpowering,,C2,97,General,Rare,,,irresistible;resistless;intense
 1451,pacific,Relating to or bordering the Pacific Ocean.,Adjective,Pacific islands.,peaceable,,B1,35,Academic,Common,,,peaceful
-1452,package,(computer science) written programs or procedures or rules and associated documentation pertaining to the operation of a computer system and that are stored in read/write memory.,Noun,The market for software is expected to expand.,software,software program,B1,44,Communication,Common,,,collection;assemblage;pack
+1452,package,(computer science) written programs or procedures or rules and associated documentation pertaining to the operation of a computer system and that are stored in read/write memory.,Noun,The new software package included a full suite of editing tools.,software,software program,B1,44,Communication,Common,,,collection;assemblage;pack
 1453,painful,Causing physical or psychological pain.,Adjective,Worked with painful slowness.,afflictive,sore,B2,62,General,Common,painfulness,,sensitive;poignant;agonized
 1454,painted,Coated with paint.,Adjective,Freshly painted lawn furniture.,motley,calico,B2,59,General,Common,,,finished;artificial;stained
 1455,painting,Graphic art consisting of an artistic composition made by applying paints to a surface.,Noun,A small painting by Picasso.,picture,,B1,47,General,Common,paint,,landscape;illumination;graphics
@@ -1460,7 +1460,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1459,parliamentary,Relating to or having the nature of a parliament.,Adjective,Parliamentary reform.,democratic,,C1,81,Academic,Less Common,parliament,,
 1460,partial,Being or affecting only a part; not total.,Adjective,A partial description of the suspect.,fond,,C1,82,General,Less Common,"part, partialness",,incomplete;partiality;colored
 1461,partially,In part; in some degree; not wholly.,Adverb,He was partially paralyzed.,partly,part,C1,79,General,Less Common,,,partial;incomplete;uncomplete
-1462,participate,Become a participant; be involved in.,Verb,Enter a race.,enter,,B2,67,Business,Common,"participatory, participation, participant",,participation;act;move
+1462,participate,Become a participant; be involved in.,Verb,Every student was encouraged to participate in the science fair.,enter,,B2,67,Business,Common,"participatory, participation, participant",,participation;act;move
 1463,participating,Taking part in an activity.,Adjective,The participating organizations.,active,,C1,79,General,Less Common,,,involved
 1464,particular,A fact about some part (as opposed to general).,Noun,He always reasons from the particular to the general.,specific,,A1,13,Academic,Very Common,,,portion;component;observation
 1465,particularly,To a distinctly greater extent or degree than is common.,Adverb,He was particularly fussy about spelling.,peculiarly,especially,A2,29,General,Very Common,,,particular;unusual;uncommon
@@ -1476,7 +1476,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1475,penalty,The disadvantage or painful consequences of an action or condition.,Noun,Neglected his health and paid the penalty.,punishment,penalization,B1,45,Personal Development,Common,,,medicine;detention;discipline
 1476,peoples,The human beings of a particular nation or community or ethnic group.,Noun,The indigenous peoples of Australia.,people,,B2,55,Society & Culture,Common,,,humanity;humankind;individual
 1477,perceived,Detected by instinct or inference rather than by recognized perceptual cues.,Adjective,A perceived threat.,sensed,,C1,83,General,Less Common,,,detected
-1478,percentage,Assets belonging to or due to or contributed by an individual person or group.,Noun,He wanted his share in cash.,share,portion,B1,42,Business,Common,,,proportion;interest;allotment
+1478,percentage,Assets belonging to or due to or contributed by an individual person or group.,Noun,She receives a small percentage of every sale as commission.,share,portion,B1,42,Business,Common,,,proportion;interest;allotment
 1479,perception,A way of conceiving something.,Noun,Luther had a new perception of the Bible.,percept,,C1,81,Academic,Less Common,,,representation;pattern;intersection
 1480,perfect,To make something completely free from flaws; to improve to the highest standard.,Verb,She spent years trying to perfect her recipe for sourdough.,hone,,A1,8,Science & Technology,Very Common,"perfectible, perfection, perfecter",,improve;ameliorate;optimise
 1481,perfectly,In a way that is completely without fault; exactly.,Adverb,The dress fit her perfectly.,absolutely,utterly,B1,46,General,Common,,,perfect;complete;unmitigated
@@ -1487,10 +1487,10 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1486,permission,Approval to do something.,Noun,He asked permission to leave.,license,permit,B1,41,Communication,Common,,,approval;commendation;consent
 1487,personal,Concerning or affecting a particular person or his or her private life and personality.,Adjective,A personal favor.,individualized,individualised,A1,8,General,Very Common,,,individual;private;subjective
 1488,personally,As yourself.,Adverb,"Speaking personally, I would not want to go.",individually,,B1,37,General,Common,,,personal;individualised;individual
-1489,personnel,Group of people willing to obey orders.,Noun,A public force is necessary to give security to the rights of citizens.,force,,B1,38,Society & Culture,Common,,,organization;organisation;constabulary
+1489,personnel,Group of people willing to obey orders.,Noun,Military personnel were deployed to assist with the flood relief.,force,,B1,38,Society & Culture,Common,,,organization;organisation;constabulary
 1490,philosophy,Any personal belief about how to live or how to deal with a situation.,Noun,Self-indulgence was his only philosophy.,doctrine,ism,B1,42,Academic,Common,"philosophical, philosopher",,philosophical;humanities;dialectic
 1491,physically,In accord with physical laws.,Adverb,It is physically impossible.,bodily,,B2,63,General,Common,,,physical
-1492,physician,A licensed medical practitioner.,Noun,I felt so bad I went to see my doctor.,doctor,doc,C1,81,Society & Culture,Less Common,,,resident;allergist;angiologist
+1492,physician,A licensed medical practitioner.,Noun,Her physician recommended more rest and a change in diet.,doctor,doc,C1,81,Society & Culture,Less Common,,,resident;allergist;angiologist
 1493,physics,The science of matter and energy and their interactions.,Noun,His favorite subject was physics.,natural philosophy,,B2,57,Academic,Common,"physical, physicist",,physical;mechanics;chemistry
 1494,picking,The quantity of a crop that is harvested.,Noun,He sent the first picking of berries to the market.,pick,,B2,66,Academic,Common,,,production;application;covering
 1495,picture,A visual representation (of an object or scene or person or abstraction) produced on a surface.,Noun,They showed us the pictures of their wedding.,image,icon,A1,9,General,Very Common,"pictural, depict",,representation;semblance;graphic
@@ -1499,7 +1499,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1498,plastic,A card (usually plastic) that assures a seller that the person using it has a satisfactory credit rating and that the issuer will see to it that the seller receives payment for the merchandise delivered.,Noun,Do you take plastic?,credit card,charge card,B1,41,Business,Common,,,precipitate;password;countersign
 1499,platform,A raised horizontal surface.,Noun,The speaker mounted the platform.,program,,A2,28,General,Very Common,,,document;flooring;copyright
 1500,pleasant,Affording pleasure; being in harmony with your taste or likings.,Adjective,We had a pleasant evening together.,grateful,,C1,76,General,Less Common,"pleasance, pleasantness, please",,beautiful;sweetness;pleasance
-1501,pleased,Feeling pleasurable satisfaction over something by which you measures your self-worth.,Adjective,Proud of their child.,proud of,,B2,66,General,Common,,,chuffed;encouraged;contented
+1501,pleased,Feeling pleasurable satisfaction over something by which you measures your self-worth.,Adjective,She was pleased with how the presentation turned out.,proud of,,B2,66,General,Common,,,chuffed;encouraged;contented
 1502,pleasure,A fundamental feeling that is hard to define but that people desire to experience.,Noun,He was tingling with pleasure.,pleasance,,B1,37,Emotion,Common,please,,feeling;comfort;delight
 1503,pointed,Direct and obvious in meaning or reference; often unpleasant.,Adjective,A pointed critique.,direct,,B1,44,General,Common,pointedness,,spinous;barreled;spikelike
 1504,political,Involving or characteristic of politics or parties or politicians.,Adjective,Calling a meeting is a political act in itself.,governmental,,A1,7,General,Very Common,,,politics;semipolitical
@@ -1568,7 +1568,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1567,profession,The body of people in a learned occupation.,Noun,The news spread rapidly through the medical profession.,professing,,C2,91,Society & Culture,Rare,,,occupation;business;literature
 1568,profile,An analysis (often in graphical form) representing the extent to which something exhibits various characteristics.,Noun,A biochemical profile of blood.,visibility,,A2,22,Communication,Very Common,,,chart;plot
 1569,program,A system of projects or services intended to meet a public need.,Noun,He proposed an elaborate program of public works.,programme,,A1,7,Academic,Very Common,,,thought;project;projection
-1570,programme,An announcement of the events that will occur as part of a theatrical or sporting event.,Noun,You can't tell the players without a program.,program,,B1,37,Communication,Common,,,announcement;promulgation;information
+1570,programme,An announcement of the events that will occur as part of a theatrical or sporting event.,Noun,Ushers handed out a programme listing the evening's performances.,program,,B1,37,Communication,Common,,,announcement;promulgation;information
 1571,progress,forward or onward movement toward a destination or goal.,Noun,The team made steady progress on the new app throughout the month.,advancement,,A2,23,General,Very Common,,,development;forwarding;promotion
 1572,progressive,Favoring or promoting progress.,Adjective,Progressive schools.,reformist,,B2,60,General,Common,progressiveness,,modernised;advanced;innovative
 1573,project,"cause an image or event to appear, or convey a quality outwardly and forcefully.",Verb,She projected confidence as she walked onto the stage.,protrude,jut,A1,8,Communication,Very Common,,,communicate;projection;overhang
@@ -1616,10 +1616,10 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1615,rainbow,An illusory hope.,Noun,Chasing rainbows.,promise,hope,C2,99,Academic,Rare,,,bow;arc;sky
 1616,raising,the act of lifting or bringing something to a higher position or level.,Noun,The raising of the flag marked the start of the ceremony.,elevation,lift,B2,66,Society & Culture,Common,raise,,upbringing;climbing;mounting
 1617,ranging,Wandering freely.,Adjective,At night in bed...his slowly ranging thoughts...encountered her.,roaming,,C1,79,General,Less Common,,,
-1618,ranking,Having a higher rank.,Adjective,Superior officer.,superior,higher-ranking,C1,79,General,Less Common,,,senior
+1618,ranking,Having a higher rank.,Adjective,The ranking officer took charge of the operation.,superior,higher-ranking,C1,79,General,Less Common,,,senior
 1619,rapidly,"At a very fast rate, especially describing change or growth.",Adverb,The city's population has grown rapidly over the last decade.,quickly,speedily,B2,60,General,Common,,,rapid;fast
 1620,reading,The cognitive process of understanding a written linguistic message.,Noun,His main reading was detective stories.,indication,,A1,9,Academic,Very Common,read,,language;perusing;studying
-1621,realise,Earn on some commercial or business transaction; earn as salary or wages.,Verb,How much do you make a month in your new job?,gain,take in,B2,55,Business,Common,,,acquire;get;profit
+1621,realise,Earn on some commercial or business transaction; earn as salary or wages.,Verb,The sale of the property helped them realise a substantial profit.,gain,take in,B2,55,Business,Common,,,acquire;get;profit
 1622,realised,"Achieved or made real, especially a goal or ambition, chiefly British spelling.",Adjective,"After years of effort, her dream of opening a bakery was finally realised.",accomplished,completed,C2,97,General,Rare,,,complete
 1623,realistic,Aware or expressing awareness of things as they really are.,Adjective,A realistic description.,naturalistic,,C1,84,General,Less Common,realist,,practical;pragmatic;virtual
 1624,reality,All of your experiences that determine how things appear to you.,Noun,For them demons were as much a part of reality as trees were.,world,,A2,31,Academic,Very Common,,,experience;reliving;reminder
@@ -1629,7 +1629,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1628,received,Conforming to the established language usage of educated native speakers;  (American);  (British).,Adjective,Received standard English is sometimes called the King's English.,standard,,A1,9,General,Very Common,,,acceptable;classical;conventional
 1629,recently,In the recent past.,Adverb,He was in Paris recently.,late,lately,A1,12,General,Very Common,,,recent;past
 1630,reception,The manner in which something is greeted.,Noun,She did not expect the cold reception she received from her superiors.,response,,C1,75,Communication,Less Common,receptionist,,greeting;salutation;receive
-1631,recognised,Provided with a secure reputation.,Adjective,A recognized authority.,recognized,,C2,99,General,Rare,,,established;acknowledged;constituted
+1631,recognised,Provided with a secure reputation.,Adjective,She was a widely recognised expert in marine biology.,recognized,,C2,99,General,Rare,,,established;acknowledged;constituted
 1632,recognize,Accept (someone) to be what is claimed or accept his power and authority.,Verb,We do not recognize your gods.,acknowledge,recognise,B1,40,Academic,Common,,,cognize;espouse;embrace
 1633,recognized,Officially acknowledged or identified as valid or true.,Adjective,She is a recognized expert in marine biology.,accepted,recognised,B1,40,General,Common,,,acknowledged;established;constituted
 1634,recommend,Push for something.,Verb,The travel agent recommended strongly that we not travel on Thanksgiving Day.,urge,advocate,B1,46,Communication,Common,recommendation,,propose;suggest;proposition
@@ -1649,7 +1649,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1648,regularly,In a regular manner.,Adverb,Letters arrived regularly from his children.,on a regular basis,,B1,40,General,Common,,,regular;standard;uniform
 1649,regulation,A principle or condition that customarily governs behavior.,Noun,Short haircuts were the regulation.,rule,,B2,57,Academic,Common,regulate,,conception;construct;guideline
 1650,regulatory,Restricting according to rules or principles.,Adjective,A regulatory gene.,regulative,,C1,75,General,Less Common,regulate,,restrictive
-1651,rejected,Rebuffed (by a lover) without warning.,Adjective,Jilted at the altar.,jilted,spurned,B2,58,General,Common,,,unloved
+1651,rejected,Rebuffed (by a lover) without warning.,Adjective,The rejected suitor never fully recovered from the heartbreak.,jilted,spurned,B2,58,General,Common,,,unloved
 1652,related,Being connected either logically or causally or by shared characteristics.,Adjective,Painting and the related arts.,related to,,A1,10,General,Very Common,relatedness,,corresponding;affiliated;attached
 1653,relation,"A connection or association between two or more things; also, a family member, used similarly to relative.",Noun,There's a clear relation between diet and energy levels.,relative,,B2,63,Society & Culture,Common,relationship,,fucking;screwing;attribute
 1654,relative,A person connected to another by blood or marriage; a family member.,Noun,Several relatives flew in for the wedding.,relation,,B1,43,Society & Culture,Common,,,individual;someone;somebody
@@ -1671,7 +1671,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1670,replacing,The act of furnishing an equivalent person or thing in the place of another.,Noun,Replacing the star will not be easy.,replacement,,C1,73,General,Less Common,replace,,exchange;weaning;substitution
 1671,reported,Made known or told about; especially presented in a formal account.,Adjective,His reported opinion.,reportable,,A1,13,General,Very Common,,,according;notifiable
 1672,reportedly,According to reports or other information.,Adverb,She was reportedly his mistress for many years.,supposedly,,C2,91,General,Rare,,,reported;according;notifiable
-1673,reporting,The news as presented by reporters for newspapers or radio or television.,Noun,They accused the paper of biased coverage of race relations.,coverage,reportage,B1,39,Communication,Common,report,,account;news;story
+1673,reporting,The news as presented by reporters for newspapers or radio or television.,Noun,The station's reporting on the election was widely praised.,coverage,reportage,B1,39,Communication,Common,report,,account;news;story
 1674,represent,Be representative or typical for.,Verb,This period is represented by Beethoven.,correspond,,B1,36,Society & Culture,Common,representative,,representation;epitomise;personify
 1675,representation,A body of legislators that serve in behalf of some constituency.,Noun,A Congressional vacancy occurred in the representation from California.,delegacy,agency,B2,60,Society & Culture,Common,represent,,content;intersection;example
 1676,representative,Serving to represent or typify.,Adjective,Representative moviegoers.,typical,,B1,37,General,Common,represent,,emblematical;symbolic;allegoric
@@ -1700,7 +1700,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1699,restricted,Subject to restriction or subjected to restriction.,Adjective,Of restricted importance.,qualified,,C1,80,General,Less Common,,,limited;confined;classified
 1700,retained,Kept possession of or continued to have something.,Adjective,She retained her title as champion for the third year running.,maintained,,C2,99,General,Rare,,,preserved
 1701,retreat,(military) withdrawal of troops to a more favorable position to escape the enemy's superior forces or after a defeat.,Noun,The disorderly retreat of French troops.,retirement,,C2,92,General,Rare,,,country;sanctum;pullback
-1702,revenge,Take revenge for a perceived wrong.,Verb,He wants to avenge the murder of his brother.,avenge,retaliate,B2,65,Business,Common,,,penalize;execute;scourge
+1702,revenge,Take revenge for a perceived wrong.,Verb,He vowed to revenge his brother's murder.,avenge,retaliate,B2,65,Business,Common,,,penalize;execute;scourge
 1703,reverse,A relation of direct opposition.,Noun,We thought Sue was older than Bill but just the reverse was true.,contrary,opposite,B2,58,Academic,Common,,,opposition;machine;conflict
 1704,revised,Improved or brought up to date.,Adjective,A revised edition.,altered,,C2,90,General,Rare,,,amended
 1705,revolution,A drastic and far-reaching change in ways of thinking and behaving.,Noun,The industrial revolution was also a cultural revolution.,rotation,gyration,B1,38,Society & Culture,Common,"revolutionary, revolutionist, revolutionize, revolutionise",,revolutionary;revolutionize;alteration
@@ -1721,7 +1721,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1720,schedule,Plan for an activity or event.,Verb,I've scheduled a concert next week.,plan,,A2,28,Academic,Very Common,scheduling,,calendar;program;programme
 1721,scheduled,Planned or scheduled for some certain time or times.,Adjective,The scheduled meeting.,regular,,B1,45,General,Common,,,
 1722,science,A particular branch of scientific knowledge.,Noun,The science of genetics.,scientific discipline,,A1,9,Academic,Very Common,scientist,,discipline;subject;bailiwick
-1723,scoring,Evaluation of performance by assigning a grade or score.,Noun,What he disliked about teaching was all the grading he had to do.,marking,grading,B2,59,General,Common,score,,evaluation;rating
+1723,scoring,Evaluation of performance by assigning a grade or score.,Noun,The judges' scoring of the routine sparked some controversy.,marking,grading,B2,59,General,Common,score,,evaluation;rating
 1724,scottish,Of or relating to or characteristic of Scotland or its people or culture or its English dialect or Gaelic language.,Adjective,`Scottish' tends to be the more formal term as in `The Scottish Symphony' or `Scottish authors' or `Scottish mountains'.,Scots,Scotch,B1,47,Academic,Common,,,scotland
 1725,scratch,(golf) a handicap of zero strokes.,Noun,A golfer who plays at scratch should be able to achieve par on a course.,abrasion,scrape,C1,84,Personal Development,Less Common,,,depression;impression;imprint
 1726,screaming,"a loud, high-pitched cry, typically expressing fear, pain, or excitement.",Noun,The screaming from the roller coaster could be heard across the park.,scream,shriek,B2,60,Communication,Common,scream,,shrieking;screech;shouting
@@ -1729,7 +1729,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1728,searching,Diligent and thorough in inquiry or investigation.,Adjective,A searching investigation of their past dealings.,inquisitory,probing,B2,59,General,Common,,,intelligent;inquiring
 1729,secondary,Being of second rank or importance or value; not direct or immediate.,Adjective,The stone will be hauled to a secondary crusher.,lowly,petty,B1,39,General,Common,,,auxiliary;supplementary;utility
 1730,section,A self-contained part of a larger composition (written or musical).,Noun,He always turns first to the business section.,subdivision,,A1,13,Communication,Very Common,,,writing;music;slice
-1731,seeking,The act of searching for something.,Noun,A quest for diamonds.,quest,,B1,36,General,Common,seek,,hunting;attempt;endeavour
+1731,seeking,The act of searching for something.,Noun,Their seeking of the lost treasure lasted nearly a decade.,quest,,B1,36,General,Common,seek,,hunting;attempt;endeavour
 1732,seemingly,"Giving the impression of being a certain way, though this may not be true.",Adverb,He remained seemingly calm despite the chaos around him.,apparently,ostensibly,C2,95,General,Rare,,,seeming;superficial
 1733,segment,One of several parts or pieces that fit with others to constitute a whole object.,Noun,Finished the final segment of the road.,section,,B2,55,General,Common,,,portion;subdivision;straightaway
 1734,selfish,Concerned chiefly or only with yourself and your advantage to the exclusion of others.,Adjective,Selfish men were...trying to make capital for themselves out of the sacred cause of civil rights.,egotistic,egotistical,C2,94,General,Rare,selfishness,,ungenerous;narcissistic;inconsiderate
@@ -1761,7 +1761,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1760,shortly,In a short time from now; soon.,Adverb,The doctor will be with you shortly.,soon,presently,B1,43,General,Common,,,discourteous
 1761,shoulder,The part of a garment that covers or fits over the shoulder.,Noun,An ornamental gold braid on the shoulder of his uniform.,berm,,B1,41,General,Common,,,teres;armpit;axilla
 1762,showing,"A public display or presentation of something, such as art or a film.",Noun,The gallery's private showing was open only to collectors.,display,exhibit,A2,31,General,Very Common,show,,screening;viewing;presentation
-1763,signature,A distinguishing style.,Noun,This room needs a woman's touch.,touch,,C1,73,Personal Development,Less Common,,,endorsement;countersign;autograph
+1763,signature,A distinguishing style.,Noun,The chef's signature dish became the restaurant's most popular order.,touch,,C1,73,Personal Development,Less Common,,,endorsement;countersign;autograph
 1764,significance,The quality of being significant.,Noun,Do not underestimate the significance of nuclear power.,import,implication,C1,81,Personal Development,Less Common,significant,,importance;consequence;meaning
 1765,significantly,In a statistically significant way.,Adverb,The two groups differed significantly.,importantly,,B1,39,General,Common,,,significant;evidentiary;probatory
 1766,silence,The state of being silent (as when no one is speaking).,Noun,There was a shocked silence.,muteness,,B1,44,Personal Development,Common,silent,,condition;stillness;intensity
@@ -1841,7 +1841,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1840,suicide,The act of killing yourself.,Noun,It is a crime to commit suicide.,self-destruction,self-annihilation,B1,46,General,Common,suicidal,,killing;poisoning;suffocation
 1841,suitable,Meant or adapted for an occasion or use.,Adjective,A tractor suitable (or fit) for heavy duty.,suited,,B2,57,General,Common,"suitableness, suitability",,suitability;eligible;suitableness
 1842,summary,A brief statement that presents the main points in a concise form.,Noun,He gave a summary of the conclusions.,sum-up,,B2,58,Communication,Common,"summarize, summarise",,summarise;statement;outline
-1843,sunshine,The rays of the sun.,Noun,The shingles were weathered by the sun and wind.,sunlight,sun,C1,84,Science & Technology,Less Common,,,weather;conditions;elements
+1843,sunshine,The rays of the sun.,Noun,The garden thrived in the warm sunshine all summer.,sunlight,sun,C1,84,Science & Technology,Less Common,,,weather;conditions;elements
 1844,superior,Of high or superior quality or performance.,Adjective,Superior wisdom derived from experience.,superscript,,B1,44,General,Common,superiority,,surpassing;topnotch;supreme
 1845,support,The activity of providing for or maintaining by supplying with money or necessities.,Noun,His support kept the family together.,reinforcement,reenforcement,A1,6,General,Very Common,,,activity;sustentation;sustainment
 1846,supported,Sustained or maintained by aid (as distinct from physical support).,Adjective,A club entirely supported by membership dues.,subsidized,subsidised,A2,27,General,Very Common,,,underslung;underhung;suspended
@@ -1869,8 +1869,8 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1868,swedish,Of or relating to or characteristic of Sweden or its people or culture or language.,Adjective,The Swedish King.,Scandinavian,,C1,78,Academic,Less Common,,,sweden
 1869,swimming,The act of swimming; :.,Noun,It was the swimming they enjoyed most.,swim,,B2,66,General,Common,swim,,floating;surfboarding;aquatics
 1870,syndrome,A complex of concurrent things.,Noun,Every word has a syndrome of meanings.,complex,composite,C1,76,Academic,Less Common,,,symptom;disease;hybrid
-1871,talented,Endowed with talent or talents.,Adjective,A gifted writer.,gifted,,B2,63,General,Common,,,
-1872,talking,An exchange of ideas via conversation.,Noun,Let's have more work and less talk around here.,talk,,A1,7,Communication,Very Common,talk,,conversation;chatter;malarky
+1871,talented,Endowed with talent or talents.,Adjective,The talented young violinist impressed the entire orchestra.,gifted,,B2,63,General,Common,,,
+1872,talking,An exchange of ideas via conversation.,Noun,Their talking carried on late into the night.,talk,,A1,7,Communication,Very Common,talk,,conversation;chatter;malarky
 1873,teacher,A personified abstraction that teaches.,Noun,Books were his teachers.,instructor,,A2,32,Academic,Very Common,teach,,abstract;academic;principal
 1874,teaching,The profession of a teacher.,Noun,He prepared for teaching while still in college.,instruction,pedagogy,A2,26,General,Very Common,,,education;tutelage;lecture
 1875,technical,Of or relating to technique or proficiency in a practical skill.,Adjective,His technical innovation was his brushwork.,proficient,,A2,24,Academic,Very Common,"technique, technicality",,technique;technicality
@@ -1886,7 +1886,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1885,testing,The act of subjecting to experimental test in order to determine how well something works.,Noun,They agreed to end the testing of atomic weapons.,examination,,A2,28,General,Very Common,test,,experiment;experimentation;scrutiny
 1886,thailand,A country of southeastern Asia that extends southward along the Isthmus of Kra to the Malay Peninsula.,Noun,Thailand is the official name of the former Siam.,Kingdom of Thailand,Siam,C1,77,Travel & Places,Less Common,,,mekong;nan;ping
 1887,theater,A region in which active military operations are in progress.,Noun,He served in the Vietnam theater for three years.,field,field of operations,B2,60,Travel & Places,Common,,,building;edifice;communication
-1888,theatre,A building where theatrical performances or motion-picture shows can be presented.,Noun,The house was full.,theater,house,B1,40,General,Common,,,building;edifice;communication
+1888,theatre,A building where theatrical performances or motion-picture shows can be presented.,Noun,They spent the evening at the local theatre watching a new play.,theater,house,B1,40,General,Common,,,building;edifice;communication
 1889,therapy,(medicine) the act of caring for someone (as by medication or remedial training etc.).,Noun,Heat therapy gave the best relief.,treatment,,B1,40,General,Common,"therapeutic, therapeutical, therapist",,therapeutical;dressing;bandaging
 1890,therefore,(used to introduce a logical conclusion) from that fact or reason or as a result.,Adverb,Therefore X must be true.,hence,thence,A2,32,General,Very Common,,,subsequent
 1891,thinking,The process of using one's mind to consider or reason about something.,Noun,A bit of quiet thinking helped her solve the puzzle.,thought,thought process,A1,7,Academic,Very Common,think,,explanation;planning;preparation
@@ -1895,7 +1895,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1894,threatened,(of flora or fauna) likely in the near future to become endangered.,Adjective,"The spotted owl is a threatened species, not yet an endangered one.",vulnerable,,B2,59,General,Common,,,
 1895,threatening,Expressing or indicating an intention to cause harm; menacing.,Adjective,He received a threatening email from an anonymous sender.,baleful,forbidding,C1,80,General,Less Common,,,alarming;cloudy
 1896,through,Having finished or arrived at completion.,Adjective,"After the treatment, the patient is through except for follow-up.",done,through with,A1,5,General,Very Common,,,finished;direct
-1897,throughout,From first to last.,Adverb,The play was excellent end-to-end.,end-to-end,,A1,13,General,Very Common,,,
+1897,throughout,From first to last.,Adverb,The audience remained silent throughout the entire performance.,end-to-end,,A1,13,General,Very Common,,,
 1898,thunder,"make a loud, deep, resonant noise, as thunder does.",Verb,The waterfall seemed to thunder over the cliff edge.,roar,,C2,90,Travel & Places,Rare,,,move;shout;bawl
 1899,together,Mentally and emotionally stable.,Adjective,She's really together.,unneurotic,,A1,6,General,Very Common,togetherness,,
 1900,tomorrow,The day after today.,Noun,What are our tasks for tomorrow?,day,,A1,12,General,Very Common,,,hereafter;yesterday;future
@@ -1910,7 +1910,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1909,trained,Shaped or conditioned or disciplined by training; often used as a combining form.,Adjective,A trained mind.,disciplined,,B1,36,General,Common,,,housebroken;drilled
 1910,training,The process of teaching a person or animal a particular skill or type of behavior.,Noun,The new hires undergo two weeks of training before starting.,education,breeding,A1,8,Personal Development,Very Common,,,activity;exercise;practice
 1911,transfer,"the movement of something or someone from one place, position, or owner to another.",Noun,Her transfer to the Chicago office starts next month.,transferee,,A2,26,Society & Culture,Very Common,,,movement;airlift;connection
-1912,transformation,The act of changing in form or shape or appearance.,Noun,A photograph is a translation of a scene onto a two-dimensional surface.,translation,,C1,78,General,Less Common,transform,,alteration;improvement;advance
+1912,transformation,The act of changing in form or shape or appearance.,Noun,The caterpillar's transformation into a butterfly fascinated the children.,translation,,C1,78,General,Less Common,transform,,alteration;improvement;advance
 1913,transformed,Given a completely different form or appearance.,Adjective,Shocked to see the transformed landscape.,changed,,C2,97,General,Rare,,,
 1914,transit,Pass across (a sign or house of the zodiac) or pass across (the disk of a celestial body or the meridian of a place).,Verb,The comet will transit on September 11.,pass,,C1,78,Travel & Places,Less Common,,,transition;infiltrate;trespass
 1915,transition,Cause to convert or undergo a transition.,Verb,The company had to transition the old practices to modern technology.,convert,,B1,44,Science & Technology,Common,,,diphthongise;switch;shift
@@ -1921,7 +1921,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1920,treasure,Accumulated wealth in the form of money or jewels etc.,Noun,The pirates hid their treasure on a small island in the West Indies.,hoarded wealth,,C1,83,Business,Less Common,,,fortune;valuable;wealth
 1921,treated,Subjected to a physical (or chemical) treatment or action or agent.,Adjective,The sludge of treated sewage can be used as fertilizer.,tempered,hardened,A2,26,General,Very Common,,,proofed;processed;bandaged
 1922,tremendous,"Extremely great in amount, scale, or intensity.",Adjective,The concert was a tremendous success.,enormous,,C2,99,General,Rare,,,extraordinary;large;big
-1923,tribute,Payment extorted by gangsters on threat of violence.,Noun,Every store in the neighborhood had to pay him protection.,protection,,C1,73,General,Less Common,,,approval;commendation;payment
+1923,tribute,Payment extorted by gangsters on threat of violence.,Noun,Every shop owner in the district had to pay tribute to the local gang.,protection,,C1,73,General,Less Common,,,approval;commendation;payment
 1924,trigger,"To cause something to start happening, often suddenly.",Verb,Loud noises can trigger his anxiety.,trip,actuate,C1,73,Arts & Creativity,Less Common,,,initiate;pioneer;discharge
 1925,trouble,A source of difficulty.,Noun,One trouble after another delayed the job.,problem,,A2,23,Academic,Very Common,troublous,,difficulty;perturbation;handicap
 1926,trusted,(of persons) worthy of trust or confidence.,Adjective,A sure (or trusted) friend.,sure,,C1,78,General,Less Common,,,
@@ -1964,7 +1964,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1963,veteran,A serviceman who has seen considerable active service.,Noun,The veterans laughed at the new recruits.,veteran soldier,,C1,78,Society & Culture,Less Common,,,officer;volunteer;serviceman
 1964,victorian,Of or relating to Queen Victoria of Great Britain or to the age in which she ruled.,Adjective,Victorian morals.,priggish,prim,C2,93,Academic,Rare,Victoria,,proper
 1965,victory,"an act of defeating an opponent or overcoming a difficulty in a battle, game, or other contest.",Noun,The team celebrated their victory with a parade through downtown.,triumph,,A2,25,Society & Culture,Very Common,victorious,,success;conclusion;checkmate
-1966,viewing,A vigil held over a corpse the night before burial.,Noun,There's no weeping at an Irish wake.,wake,,C2,98,General,Rare,,,display;screening;showing
+1966,viewing,A vigil held over a corpse the night before burial.,Noun,Family and friends gathered for the viewing the night before the funeral.,wake,,C2,98,General,Rare,,,display;screening;showing
 1967,violation,"an act of breaking or failing to comply with a rule, law, or agreement.",Noun,Parking here without a permit is a violation of city code.,infringement,,C1,73,General,Less Common,violate,,offense;wrongdoing;misconduct
 1968,violence,An act of aggression (as one against a person who resists).,Noun,He may accomplish by craft in the long run what he cannot do by force and violence in the short one.,force,,A2,24,General,Very Common,violent,,intensity;plundering;pillage
 1969,violent,Acting with or marked by or resulting from great force or energy or emotional intensity.,Adjective,A violent attack.,fierce,tearing,B1,44,General,Common,violence,,convulsive;ruffianly;furious
@@ -1979,8 +1979,8 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1978,weakness,"a quality or feature regarded as a disadvantage or fault, or lack of physical strength.",Noun,Public speaking has always been a weakness of mine.,helplessness,impuissance,C1,80,Personal Development,Less Common,weak,,fatigue;inadequacy;failing
 1979,wealthy,Having an abundant supply of money or possessions of value.,Adjective,Wealthy corporations.,affluent,flush,C1,78,General,Less Common,"wealth, wealthiness",,wealthiness;wealth;rich
 1980,wearing,Producing exhaustion.,Adjective,The visit was especially wearing.,exhausting,tiring,A2,21,General,Very Common,,,effortful
-1981,website,A computer connected to the internet that maintains a series of web pages on the World Wide Web.,Noun,The Israeli web site was damaged by hostile hackers.,web site,internet site,A1,10,Communication,Very Common,,,computer;portal;chatroom
-1982,wedding,The act of marrying; the nuptial ceremony.,Noun,Their marriage was conducted in the chapel.,marriage,marriage ceremony,A2,22,General,Very Common,wed,,ceremony;ceremonial;exercise
+1981,website,A computer connected to the internet that maintains a series of web pages on the World Wide Web.,Noun,The company redesigned its website to be more mobile-friendly.,web site,internet site,A1,10,Communication,Very Common,,,computer;portal;chatroom
+1982,wedding,The act of marrying; the nuptial ceremony.,Noun,Their wedding was held in a small garden overlooking the sea.,marriage,marriage ceremony,A2,22,General,Very Common,wed,,ceremony;ceremonial;exercise
 1983,welcome,The state of being welcome.,Noun,Don't outstay your welcome.,acceptance,,A1,13,Personal Development,Very Common,,,greeting;salutation;hospitality
 1984,western,"situated in, moving toward, or characteristic of the west.",Adjective,They settled in a small western town near the mountains.,westerly,,A1,12,General,Very Common,westernize,,occidental;hesperian;occident
 1985,whatever,One or some or every or all without specification.,Adjective,Give me whatever peaches you don't want.,any,whatsoever,A1,9,General,Very Common,,,some
@@ -1989,7 +1989,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 1988,willing,Disposed or inclined toward.,Adjective,A willing participant.,uncoerced,unforced,A2,26,General,Very Common,willingness,,consenting;disposed;inclined
 1989,winning,Succeeding with great difficulty.,Noun,Winning is not everything.,success,,A1,13,General,Very Common,win,,passing;qualifying;overturn
 1990,witness,Be a witness to.,Verb,She witnessed the accident and had to testify in court.,find,see,B1,40,General,Common,witnesser,,experience;discover;watch
-1991,wondering,Showing curiosity.,Adjective,If someone saw a man climbing a light post they might get inquisitive.,inquisitive,speculative,B1,39,General,Common,,,curious
+1991,wondering,Showing curiosity.,Adjective,The child gave the toy a wondering look before reaching for it.,inquisitive,speculative,B1,39,General,Common,,,curious
 1992,working,Actively engaged in paid work.,Adjective,The working population.,on the job,,A1,6,General,Very Common,,,employed;practical
 1993,worried,Afflicted with or marked by anxious uneasiness or trouble or grief.,Adjective,Worried parents.,disquieted,distressed,B1,45,General,Common,,,troubled;uneasy
 1994,worrying,The act of moving something by repeated tugs or pushes.,Noun,Vigorous worrying finally loosened the saw.,badgering,torment,C2,93,General,Rare,,,agitation;teasing;ribbing
@@ -2003,101 +2003,101 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 2002,Abasement,A low or downcast state.,Noun,Each confession brought her into an attitude of abasement.,degradation,abjection,B1,27,General,Common,,,humiliation;degeneracy;corruption
 2003,Abaxial,Facing away from the axis of an organ or organism.,Adjective,The abaxial surface of a leaf is the underside or side facing away from the stem.,dorsal,,B2,47,General,Less Common,,,
 2004,Abbreviated,"Made shorter than the original, while keeping the essential parts.",Verb,We only had time for an abbreviated version of the tour.,abridge,foreshorten,B2,34,General,Less Common,,,decrease;expurgate;condense
-2005,Abducting,Take away to an undisclosed location against their will and usually in order to extract a ransom.,Verb,The industrialist's son was kidnapped.,kidnap,nobble,B2,47,General,Less Common,,,attract;stretch;seize
+2005,Abducting,Take away to an undisclosed location against their will and usually in order to extract a ransom.,Verb,The gang was accused of abducting the businessman's son for ransom.,kidnap,nobble,B2,47,General,Less Common,,,attract;stretch;seize
 2006,Aberrant,"departing from an accepted standard, moral norm, or usual pattern; abnormal.",Adjective,The scientist noted an aberrant reading on the third test.,deviant,deviate,B1,16,General,Common,,,aberrancy;aberrance;abnormal
 2007,Abhorrent,"inspiring disgust and hatred; utterly repugnant, especially on moral grounds.",Adjective,Slavery is abhorrent to modern moral standards.,detestable,obscene,B2,34,General,Less Common,,,offensive;abhorrence;abhor
 2008,Abiding,"Lasting for a long time; enduring, especially of a feeling or belief.",Verb,She has an abiding love of classical music.,digest,endure,B1,16,Academic,Common,,,continue;overstay;outstay
 2009,Abjectly,In a hopeless resigned manner.,Adverb,She shrugged her shoulders abjectly.,resignedly,,B2,34,General,Less Common,,,abject;hopeless
 2010,Ablutionary,Cleansing the body by washing; especially ritual washing of e.g. hands.,Adjective,Ablutionary rituals.,cleansing,,B2,47,General,Less Common,,,purifying;ablution
-2011,Abnegate,"Deny oneself (something); restrain, especially from indulging in some pleasure.",Verb,She denied herself wine and spirits.,deny,,B2,47,Business,Less Common,,,control;contain;moderate
+2011,Abnegate,"Deny oneself (something); restrain, especially from indulging in some pleasure.",Verb,He chose to abnegate every luxury during his year of austerity.,deny,,B2,47,Business,Less Common,,,control;contain;moderate
 2012,Abolish,Do away with.,Verb,Slavery was abolished in the mid-19th century in America and in Russia.,get rid of,,A2,11,Society & Culture,Very Common,,,abolition;abolishable;abolishment
 2013,Abolition,The act of abolishing a system or practice or institution (especially abolishing slavery).,Noun,The abolition of capital punishment.,abolishment,,A2,10,General,Very Common,,,abolish;termination;conclusion
 2014,Abominably,"in a way that is very unpleasant, shocking, or of extremely poor quality.",Adverb,The hotel staff treated the guests abominably during the storm.,detestably,repulsively,B2,47,General,Less Common,,,offensive;abominable
 2015,Abominate,feel disgust and hatred for; detest utterly.,Verb,She abominates cruelty to animals in any form.,abhor,loathe,B2,47,Emotion,Less Common,,,abominable;abomination;abominator
 2016,Aborigine,"A member of a people who were the original inhabitants of a region, especially (capitalized) an Indigenous Australian.",Noun,The museum exhibit honors Aborigine art and culture.,native,indigen,A2,13,Society & Culture,Very Common,,,individual;someone;somebody
 2017,Abounding,existing in large numbers or amounts; abundant.,Verb,The garden was abounding with butterflies in early summer.,abound,burst,B2,34,General,Less Common,,,feature;involve;possess
-2018,Abrasive,Sharply disagreeable; rigorous.,Adjective,The harsh facts of court delays.,harsh,,B2,47,General,Less Common,,,disagreeable;abrade;abrasiveness
+2018,Abrasive,Sharply disagreeable; rigorous.,Adjective,His abrasive tone during the meeting put everyone on edge.,harsh,,B2,47,General,Less Common,,,disagreeable;abrade;abrasiveness
 2019,Abridge,To shorten a piece of writing while keeping its main ideas.,Verb,The publisher decided to abridge the novel for younger readers.,foreshorten,abbreviate,B2,47,General,Less Common,,,decrease;expurgate;condense
 2020,Abridged,"Shortened, especially a book or text, while keeping its main content.",Adjective,She read the abridged edition over the weekend.,abridge,foreshorten,B2,34,General,Less Common,,,decrease;expurgate;condense
-2021,Abruptly,Quickly and without warning.,Adverb,He stopped suddenly.,suddenly,short,A2,7,General,Very Common,,,emergent;explosive;abrupt
+2021,Abruptly,Quickly and without warning.,Adverb,The meeting ended abruptly when the fire alarm went off.,suddenly,short,A2,7,General,Very Common,,,emergent;explosive;abrupt
 2022,Absently,In a way that shows one's mind is elsewhere; without full attention.,Adverb,She stared absently out the window during the lecture.,abstractedly,inattentively,B1,15,General,Common,,,absent;inattentive
 2023,Absentmindedly,"In a forgetful or preoccupied manner, without conscious attention.",Adverb,He absentmindedly left his keys in the front door again.,absently,abstractedly,B2,34,General,Less Common,,,absentminded;inattentive
-2024,Absoluteness,The quality of being complete or utter or extreme.,Noun,The starkness of his contrast between justice and fairness was open to many objections.,starkness,utterness,B1,27,General,Common,,,boundary;absolute;uttermost
+2024,Absoluteness,The quality of being complete or utter or extreme.,Noun,The absoluteness of his refusal left no room for negotiation.,starkness,utterness,B1,27,General,Common,,,boundary;absolute;uttermost
 2025,Absolved,Grant remission of a sin to.,Verb,The priest absolved him and told him to say ten Hail Mary's.,shrive,absolve,B2,47,Communication,Less Common,,,forgive;relieve;condone
 2026,Absorbent,able to soak up liquid or other substances easily.,Adjective,She wiped the spill with an absorbent paper towel.,absorptive,,B2,47,General,Less Common,,,receptive;absorbency;absorb
 2027,Absorptive,"relating to or characterized by the capacity to absorb, especially in a scientific or physiological context.",Adjective,The small intestine has a highly absorptive lining that takes in nutrients.,absorbent,,B2,34,General,Less Common,,,receptive;absorb;absorptivity
 2028,Abstain,Choose not to consume.,Verb,I abstain from alcohol.,refrain,desist,B2,34,Health & Wellness,Less Common,,,forbear;teetotal;abstinent
 2029,Abstemious,Marked by temperance in indulgence.,Adjective,Abstemious with the use of adverbs.,light,,B2,47,General,Less Common,,,ascetical;austere;temperate
-2030,Abstentious,Self-restraining; not indulging an appetite especially for food or drink.,Adjective,Not totally abstinent but abstemious.,abstinent,,B2,47,General,Less Common,,,abstention
-2031,Abstracted,Consider apart from a particular case or instance.,Verb,Let's abstract away from this particular example.,abstract,,B1,23,Academic,Common,,,consider;idealize;idealise
-2032,Abstracter,Existing only in the mind; separated from embodiment.,Adjective,Abstract words like `truth' and `justice'.,abstract,,B2,47,General,Less Common,,,ideological;conceptual;ideal
+2030,Abstentious,Self-restraining; not indulging an appetite especially for food or drink.,Adjective,He kept an abstentious diet throughout the fasting season.,abstinent,,B2,47,General,Less Common,,,abstention
+2031,Abstracted,Consider apart from a particular case or instance.,Verb,The researcher abstracted the general principle from dozens of individual cases.,abstract,,B1,23,Academic,Common,,,consider;idealize;idealise
+2032,Abstracter,Existing only in the mind; separated from embodiment.,Adjective,The philosopher's argument grew abstracter with every passing chapter.,abstract,,B2,47,General,Less Common,,,ideological;conceptual;ideal
 2033,Abstractionist,"Relating to or characteristic of abstract art, which does not attempt to represent external reality.",Adjective,The gallery's new wing focuses on abstractionist painting from the 1950s.,abstract,nonfigurative,B2,47,General,Less Common,,,nonrepresentational
 2034,Abstruse,"difficult to understand; obscure, especially because expressed in complex or technical language.",Adjective,The professor's abstruse lecture on quantum theory lost most of the class.,deep,recondite,B2,47,General,Less Common,,,abstrusity;abstruseness;esoteric
 2035,Abstrusity,the quality of being difficult to understand; obscurity of meaning.,Noun,The abstrusity of the legal document made it nearly impossible for a layperson to parse.,reconditeness,abstruseness,B2,47,Academic,Less Common,,,abstruse;wisdom
 2036,Abundance,a very large quantity of something; plentifulness.,Noun,The market was overflowing with an abundance of fresh fruit.,copiousness,teemingness,A2,8,General,Very Common,,,quantity;plentifulness;overabundance
-2037,Abysmal,Resembling an abyss in depth; so deep as to be unmeasurable.,Adjective,The abyssal depths of the ocean.,abyssal,unfathomable,B1,27,General,Common,,,immeasurable;unmeasurable;immensurable
-2038,Abysmally,In a terrible manner.,Adverb,She sings terribly.,terribly,atrociously,B2,47,General,Less Common,,,bad
+2037,Abysmal,Resembling an abyss in depth; so deep as to be unmeasurable.,Adjective,The team's performance this season has been simply abysmal.,abyssal,unfathomable,B1,27,General,Common,,,immeasurable;unmeasurable;immensurable
+2038,Abysmally,In a terrible manner.,Adverb,The new policy failed abysmally within its first month.,terribly,atrociously,B2,47,General,Less Common,,,bad
 2039,Accelerate,To increase in speed; to make something happen sooner or faster.,Verb,The car began to accelerate as it merged onto the highway.,speed up,speed,B1,16,General,Common,,,accelerator;sharpen;condense
 2040,Accelerator,the pedal in a vehicle that controls its speed by regulating fuel to the engine.,Noun,She pressed the accelerator gently as the light turned green.,accelerator pedal,gas pedal,B1,16,Science & Technology,Common,,,accelerate;airplane;aeroplane
 2041,Accenting,"Giving special emphasis or prominence to something, especially a sound, syllable, or design detail.",Verb,"The designer used gold trim, accenting the room's dark wood furniture.",stress,emphasize,B2,35,Communication,Less Common,,,express;background;underscore
-2042,Acceptably,In an acceptable (but not outstanding) manner.,Adverb,She plays tennis tolerably.,tolerably,so-so,B2,47,General,Less Common,,,acceptable;unexceptionable;unimpeachable
+2042,Acceptably,In an acceptable (but not outstanding) manner.,Adverb,"The repair was done acceptably, though not perfectly.",tolerably,so-so,B2,47,General,Less Common,,,acceptable;unexceptionable;unimpeachable
 2043,Acceptant,willing to accept or receive something; open and receptive.,Adjective,The committee was acceptant of new proposals from junior staff.,acceptive,,B2,47,General,Less Common,,,acceptance;receptive;accept
 2044,Acceptive,"inclined to accept, especially readily and without resistance.",Adjective,He was acceptive of the criticism and used it to improve his work.,acceptant,,B2,47,General,Less Common,,,receptive;accept;open
 2045,Accession,Something added to what you already have.,Noun,The librarian shelved the new accessions.,addition,,B2,47,Business,Less Common,,,increase;broadening;relaxation
 2046,Acclaim,Enthusiastic public praise or approval.,Noun,The film received widespread critical acclaim.,acclamation,plaudits,B1,19,Communication,Common,,,approval;commendation;permission
 2047,Acclamation,"A loud, enthusiastic expression of approval, often shown by a group all at once.",Noun,The new chairman was elected by acclamation.,acclaim,plaudits,B2,35,Communication,Less Common,,,approval;commendation;permission
-2048,Acclimatise,Get used to a certain climate.,Verb,They never acclimatized in Egypt.,acclimatize,acclimate,B2,47,General,Less Common,,,climate;focalise;readjust
-2049,Acclivity,An upward slope or grade (as in a road).,Noun,The car couldn't make it up the rise.,ascent,rise,B2,47,General,Less Common,,,incline;upgrade;mountainside
+2048,Acclimatise,Get used to a certain climate.,Verb,It took the climbers several days to acclimatise to the thin mountain air.,acclimatize,acclimate,B2,47,General,Less Common,,,climate;focalise;readjust
+2049,Acclivity,An upward slope or grade (as in a road).,Noun,The road climbed a steep acclivity just past the old mill.,ascent,rise,B2,47,General,Less Common,,,incline;upgrade;mountainside
 2050,Accommodating,willing to fulfill the needs or wishes of others; obliging.,Verb,The hotel staff were extremely accommodating when our flight was delayed.,suit,accommodate,B1,27,General,Common,,,naturalise;transcribe;anglicise
-2051,Accommodative,Helpful in bringing about a harmonious adaptation.,Adjective,The warden was always accommodating in allowing visitors in.,accommodating,,B2,47,General,Less Common,,,accommodate;helpful;complaisant
-2052,Accompaniment,Something added to complete or embellish or make perfect.,Noun,A fine wine is a perfect complement to the dinner.,complement,,A2,11,General,Very Common,,,accompany;happening;associate
+2051,Accommodative,Helpful in bringing about a harmonious adaptation.,Adjective,The landlord took an accommodative approach to the tenants' requests.,accommodating,,B2,47,General,Less Common,,,accommodate;helpful;complaisant
+2052,Accompaniment,Something added to complete or embellish or make perfect.,Noun,The pianist provided a gentle accompaniment to the singer's melody.,complement,,A2,11,General,Very Common,,,accompany;happening;associate
 2053,Accordant,in agreement or harmony with something.,Adjective,Her actions were accordant with the values she preached.,agreeable,conformable,B2,48,General,Less Common,,,accordance;consentaneous;unanimous
 2054,Accoutered,Provided with necessary articles of equipment for a specialized purpose (especially military).,Adjective,Troops accoutered for battle.,accoutred,,B2,48,General,Less Common,,,equipped;equipt
-2055,Accredit,Grant credentials to.,Verb,The Regents officially recognized the new educational institution.,recognize,recognise,B2,48,Society & Culture,Less Common,,,license;licence;certify
-2056,Accrued,Grow by addition.,Verb,The interest accrues.,accrue,,B1,23,General,Common,,,increase;devolve;light
+2055,Accredit,Grant credentials to.,Verb,The board voted to accredit the new nursing program.,recognize,recognise,B2,48,Society & Culture,Less Common,,,license;licence;certify
+2056,Accrued,Grow by addition.,Verb,Interest accrued steadily on the unpaid balance each month.,accrue,,B1,23,General,Common,,,increase;devolve;light
 2057,Acculturation,"the process of adopting the cultural traits or social patterns of another group, typically the dominant one.",Noun,Acculturation helped the immigrant family adapt quickly to their new country.,socialization,socialisation,B2,35,General,Less Common,,,breeding;fosterage;nurture
 2058,Accumulative,growing or increasing by the continuous addition of new material or amounts.,Adjective,Interest in the account has an accumulative effect over many years.,cumulative,,B2,48,General,Less Common,,,accumulate;additive;acquisitive
-2059,Accusative,Containing or expressing accusation.,Adjective,An accusitive forefinger.,accusatory,accusing,B2,48,General,Less Common,,,accuse;inculpatory;inculpative
+2059,Accusative,Containing or expressing accusation.,Adjective,He answered in an accusative tone that startled the whole room.,accusatory,accusing,B2,48,General,Less Common,,,accuse;inculpatory;inculpative
 2060,Accused,Charged with a wrongdoing or crime.,Verb,He was accused of stealing from the register.,accuse,impeach,A2,6,Communication,Very Common,,,upbraid;besmirch;incriminate
 2061,Accusing,"Charging someone with wrongdoing, especially with a look or tone that conveys blame.",Verb,She shot him an accusing glance across the table.,accuse,impeach,A2,11,Communication,Very Common,,,upbraid;besmirch;incriminate
-2062,Accustom,Make psychologically or physically used (to something).,Verb,She became habituated to the background music.,habituate,,B2,48,General,Less Common,,,change;alter;modify
+2062,Accustom,Make psychologically or physically used (to something).,Verb,It took weeks to accustom herself to the new time zone.,habituate,,B2,48,General,Less Common,,,change;alter;modify
 2063,Acerbate,make bitter or sharp in temper or tone; embitter.,Verb,Years of unfair treatment began to acerbate his outlook on the company.,embitter,envenom,B2,48,Emotion,Less Common,,,acerbity;resent;change
 2064,Acetify,convert into vinegar or acetic acid through fermentation.,Verb,"Exposed to air, the wine began to acetify into vinegar.",acidify,,B2,48,General,Less Common,,,acetum;turn;bitter
 2065,Acetylise,chiefly British spelling of 'acetylize'; introduce an acetyl group into a compound.,Verb,The chemist began to acetylise the sample before running the test.,acetylate,acetylize,B2,48,General,Less Common,,,change;alter;modify
 2066,Acetylize,"introduce an acetyl group into a compound, chiefly American spelling.",Verb,Researchers acetylize the protein to study how it changes function.,acetylate,acetylise,B2,48,General,Less Common,,,acetyl;change;alter
 2067,Acherontic,"gloomy and infernal, as if belonging to the river Acheron of the underworld.",Adjective,The cave's acherontic darkness seemed to swallow every beam of light.,acheronian,stygian,B2,48,General,Less Common,,,dark
-2068,Achromatic,Having no hue.,Adjective,Neutral colors like black or white.,neutral,,B2,48,General,Less Common,,,achromatize;whitish;silverish
+2068,Achromatic,Having no hue.,Adjective,The lens was designed to produce an achromatic image free of color fringing.,neutral,,B2,48,General,Less Common,,,achromatize;whitish;silverish
 2069,Achromatize,"To remove colour from something, especially in optics or photography.",Verb,The lens was designed to achromatize the image and reduce colour fringing.,achromatise,,B2,48,General,Less Common,,,achromatic;change;alter
 2070,Acidify,make or become acidic in chemical composition.,Verb,Carbon dioxide dissolving in seawater can acidify the ocean over time.,acetify,,B2,48,General,Less Common,,,acid;acidification;turn
-2071,Acknowledgment,The state or quality of being recognized or acknowledged.,Noun,The partners were delighted with the recognition of their work.,recognition,acknowledgement,B1,27,General,Common,,,acknowledge;acceptance;annotation
-2072,Acoustical,Of or relating to the science of acoustics.,Adjective,Acoustic properties of a hall.,acoustic,,B1,23,General,Common,,,acoustics
+2071,Acknowledgment,The state or quality of being recognized or acknowledged.,Noun,The letter included a brief acknowledgment of everyone who had helped.,recognition,acknowledgement,B1,27,General,Common,,,acknowledge;acceptance;annotation
+2072,Acoustical,Of or relating to the science of acoustics.,Adjective,The engineers ran acoustical tests to reduce noise in the concert hall.,acoustic,,B1,23,General,Common,,,acoustics
 2073,Acquaintance,A person with whom you are acquainted.,Noun,I have trouble remembering the names of all my acquaintances.,friend,,A2,11,Society & Culture,Very Common,,,information;relationship;stimulant
-2074,Acquiesce,To agree or express agreement.,Verb,The Maestro assented to the request for an encore.,assent,accede,B1,23,Communication,Common,,,acquiescence;bargain;acquiescent
-2075,Acquiescence,Agreement with a statement or proposal to do something.,Noun,He gave his assent eagerly.,assent,,B1,16,Communication,Common,,,acquiesce;acceptance;agreement
+2074,Acquiesce,To agree or express agreement.,Verb,"After hours of debate, the committee finally chose to acquiesce.",assent,accede,B1,23,Communication,Common,,,acquiescence;bargain;acquiescent
+2075,Acquiescence,Agreement with a statement or proposal to do something.,Noun,His silence was taken as quiet acquiescence to the plan.,assent,,B1,16,Communication,Common,,,acquiesce;acceptance;agreement
 2076,Acquiring,"The act of obtaining or coming to possess something, often through effort or purchase.",Noun,Acquiring the rare painting took years of negotiation.,getting,,A2,9,General,Very Common,,,acquire;catching;contracting
 2077,Acreage,An area of ground used for some particular purpose (such as building or farming).,Noun,He wanted some acreage to build on.,land area,,A2,9,General,Very Common,,,section;area;expanse
-2078,Acridness,Extreme bitterness.,Noun,The acridity of alkali.,acridity,,B2,48,General,Less Common,,,unpalatableness;bitterness;bitter
+2078,Acridness,Extreme bitterness.,Noun,The acridness of the smoke stung everyone's eyes.,acridity,,B2,48,General,Less Common,,,unpalatableness;bitterness;bitter
 2079,Acrobatic,"involving spectacular gymnastic feats of balance, agility, or coordination.",Adjective,The circus performer's acrobatic leap across the tightrope drew gasps.,athletic,gymnastic,B1,27,General,Common,,,acrobatics;active
 2080,Activate,To make something start working or become active.,Verb,Press the button to activate the alarm.,trip,actuate,B1,27,Arts & Creativity,Common,,,initiate;pioneer;undertake
 2081,Activating,Making something start working or become active.,Verb,Activating the security system takes just a few seconds.,trip,actuate,B2,35,Arts & Creativity,Less Common,,,initiate;pioneer;undertake
-2082,Actualise,Make real or concrete; give reality or substance to.,Verb,Our ideas must be substantiated into actions.,realize,realise,B2,48,Arts & Creativity,Less Common,,,express;incarnate;represent
+2082,Actualise,Make real or concrete; give reality or substance to.,Verb,The grant finally allowed her to actualise years of careful planning.,realize,realise,B2,48,Arts & Creativity,Less Common,,,express;incarnate;represent
 2083,Actuate,To cause a machine or mechanism to start moving or operating.,Verb,A small motor is used to actuate the door lock.,trip,trigger,B2,35,Arts & Creativity,Less Common,,,initiate;pioneer;impress
 2084,Actuated,"Caused to start moving, operating, or acting.",Verb,The valve is actuated by a rise in pressure.,trip,actuate,B1,27,Arts & Creativity,Common,,,initiate;pioneer;impress
 2085,Aculeate,Having or resembling a stinger or barb.,Adjective,Aculeate insects such as bees and wasps.,aculeated,,B2,48,General,Less Common,,,aculeus
-2086,Acutely,Changing suddenly in direction and degree.,Adverb,The road twists sharply after the light.,sharply,sharp,B1,16,General,Common,,,acute;perceptive;subacute
-2087,Acylglycerol,An ester of glycerol and fatty acids that occurs naturally as fats and fatty oils.,Noun,Fresh fats contain glycerides of fatty acids and very little free acid.,glyceride,,B2,48,Science & Technology,Less Common,,,fat;glycerite;glycerole
+2086,Acutely,Changing suddenly in direction and degree.,Adverb,She was acutely aware of every eye in the room.,sharply,sharp,B1,16,General,Common,,,acute;perceptive;subacute
+2087,Acylglycerol,An ester of glycerol and fatty acids that occurs naturally as fats and fatty oils.,Noun,Triglycerides are the most common type of acylglycerol found in the body.,glyceride,,B2,48,Science & Technology,Less Common,,,fat;glycerite;glycerole
 2088,Adamantine,"utterly unyielding or firm, as hard and unbreakable as a diamond.",Adjective,"Her adamantine resolve never wavered, no matter how much they pleaded.",adamant,inexorable,B2,48,General,Less Common,,,hard
-2089,Adaptative,Having a capacity for adaptation.,Adjective,The adaptive coloring of a chameleon.,adaptive,,B2,48,General,Less Common,,,accommodative;adapt;reconciling
+2089,Adaptative,Having a capacity for adaptation.,Adjective,The species developed an adaptative trait to survive the harsher climate.,adaptive,,B2,48,General,Less Common,,,accommodative;adapt;reconciling
 2090,Adaxial,"situated on or facing toward the axis of a plant organ, such as the upper surface of a leaf.",Adjective,The adaxial side of the leaf is usually darker and glossier than the underside.,ventral,,B2,48,General,Less Common,,,
 2091,Addlebrained,confused or unable to think clearly; foolish.,Adjective,His addlebrained excuse for missing the deadline fooled no one.,addlepated,puddingheaded,B2,48,General,Less Common,,,confused
-2092,Adducting,Draw a limb towards the body.,Verb,Adduct the thigh muscle.,adduct,,B2,48,General,Less Common,,,attract;stretch;pull
+2092,Adducting,Draw a limb towards the body.,Verb,The physical therapist watched closely while adducting the patient's arm during the exercise.,adduct,,B2,48,General,Less Common,,,attract;stretch;pull
 2093,Adenoid,A collection of lymphatic tissue in the throat behind the uvula (on the posterior wall and roof of the nasopharynx).,Noun,Hypertrophy of the pharyngeal tonsils is called adenoids.,pharyngeal tonsil,luschka's tonsil,B2,48,Health & Wellness,Less Common,,,adenoidal;throat;pharynx
 2094,Adeptness,Skill or proficiency at doing something.,Noun,Her adeptness with numbers made her the team's go-to analyst.,adroitness,deftness,B2,48,Academic,Less Common,,,fluency;facility;quickness
-2095,Adequateness,The quality of being able to meet a need satisfactorily:.,Noun,He questioned the adequacy of the usual sentimental interpretation of the Golden Rule.,adequacy,,B2,48,General,Less Common,,,adequate;satisfactoriness;acceptability
-2096,Adhesion,The property of sticking together (as of glue and wood) or the joining of surfaces of different composition.,Noun,The mutual adhesiveness of cells.,adhesiveness,adherence,B1,27,General,Common,,,pathology;symphysis;synechia
+2095,Adequateness,The quality of being able to meet a need satisfactorily:.,Noun,The committee questioned the adequateness of the current safety measures.,adequacy,,B2,48,General,Less Common,,,adequate;satisfactoriness;acceptability
+2096,Adhesion,The property of sticking together (as of glue and wood) or the joining of surfaces of different composition.,Noun,The new glue provided far better adhesion than the old formula.,adhesiveness,adherence,B1,27,General,Common,,,pathology;symphysis;synechia
 2097,Adiposeness,The state of being fat or having excess body fat (rare medical term).,Noun,The report noted a link between diet and adiposeness in the study group.,adiposity,fattiness,B2,48,General,Less Common,,,blubber;avoirdupois;adipose
 2098,Adiposity,"Excess accumulation of fat in the body, the more common medical term.",Noun,Doctors track adiposity as one measure of metabolic health.,adiposeness,fattiness,B2,48,General,Less Common,,,blubber;avoirdupois;adipose
-2099,Adjective,Of or relating to or functioning as an adjective.,Adjective,Adjectival syntax.,adjectival,,B1,27,General,Common,,,
+2099,Adjective,Of or relating to or functioning as an adjective.,Adjective,"In grammar, an adjective clause modifies a noun in the sentence.",adjectival,,B1,27,General,Common,,,
 2100,Adjudge,Declare to be.,Verb,She was declared incompetent.,declare,hold,B2,48,Communication,Less Common,,,evaluate;certify;formalize
 2101,Adjunct,"added to something else as a supplementary, rather than essential, part.",Adjective,She teaches as an adjunct professor alongside her full-time job.,accessory,ancillary,B1,15,General,Common,,,supportive;subordinate
 2102,Adjuvant,"serving to aid or enhance the effect of a primary treatment or substance, especially in medicine.",Adjective,Doctors recommended adjuvant chemotherapy after the surgery.,accessory,adjunct,B2,48,General,Less Common,,,helpful;supportive
