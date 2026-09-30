@@ -2750,21 +2750,21 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 2749,Blithesome,"cheerful, carefree, and merry, especially in an old-fashioned or poetic sense.",Adjective,The blithesome tune drifted through the open windows of the dance hall.,blithe,lighthearted,B2,52,General,Less Common,,,cheerful
 2750,Blizzard,A series of unexpected and unpleasant occurrences.,Noun,A rash of bank robberies.,rash,,A2,13,Society & Culture,Very Common,,,stations;progression;succession
 2751,Blockaded,"Had access cut off by a blockade, an obstruction set up to prevent entry or exit.",Verb,The rebel forces blockaded the port to stop supplies from getting through.,obstruct,blockade,B2,52,Society & Culture,Less Common,,,prevent;obturate;forefend
-2752,Blockage,An obstruction in a pipe or tube.,Noun,We had to call a plumber to clear out the blockage in the drainpipe.,block,closure,B2,52,Science & Technology,Less Common,,,stopper;stopple;obstacle
-2753,Bloodbath,Indiscriminate slaughter.,Noun,A bloodbath took place when the leaders of the plot surrendered.,bloodletting,bloodshed,B2,52,General,Less Common,,,slaughter;massacre;carnage
+2752,Blockage,"something that obstructs or blocks a passage, pipe, or channel.",Noun,A blockage in the pipe caused the sink to back up.,block,closure,B2,52,Science & Technology,Less Common,,,stopper;stopple;obstacle
+2753,Bloodbath,an event involving widespread violence and killing.,Noun,The battle turned into a bloodbath within the first hour.,bloodletting,bloodshed,B2,52,General,Less Common,,,slaughter;massacre;carnage
 2754,Blooded,Of unmixed ancestry.,Adjective,Full-blooded Native American.,full-blooded,full-blood,B2,36,General,Less Common,,,purebred
-2755,Bloodletting,Indiscriminate slaughter.,Noun,A bloodbath took place when the leaders of the plot surrendered.,bloodbath,bloodshed,B2,52,General,Less Common,,,therapy;dressing;bandaging
+2755,Bloodletting,"the historical medical practice of draining blood from a patient, or figuratively, widespread violent killing.",Noun,Doctors once relied on bloodletting to treat almost any illness.,bloodbath,bloodshed,B2,52,General,Less Common,,,therapy;dressing;bandaging
 2756,Bloodshed,The shedding of blood resulting in murder.,Noun,He avenged the bloodshed of his kinsmen.,gore,,B1,23,General,Common,,,slaying;execution;lynching
-2757,Bloodsucking,Of plants or persons; having the nature or habits of a parasite or leech; living off another.,Adjective,A wealthy class parasitic upon the labor of the masses.,parasitic,parasitical,B2,52,General,Less Common,,,dependent
-2758,Bloomers,Underpants worn by women.,Noun,She was afraid that her bloomers might have been showing.,pants,drawers,B2,52,Science & Technology,Less Common,,,underpants;flower;pantie
+2757,Bloodsucking,"feeding on blood, as certain insects and parasites do, or figuratively exploiting others.",Adjective,The bloodsucking mosquitoes made the campsite nearly unbearable.,parasitic,parasitical,B2,52,General,Less Common,,,dependent
+2758,Bloomers,"loose, wide underpants historically worn by women, gathered at the knee.",Noun,The museum displayed a pair of Victorian bloomers from the 1890s.,pants,drawers,B2,52,Science & Technology,Less Common,,,underpants;flower;pantie
 2759,Blooming,The organic process of bearing flowers.,Noun,You will stop all bloom if you let the flowers go to seed.,bloom,,A2,10,Nature,Very Common,,,
-2760,Blossoming,Produce or yield flowers.,Verb,The cherry tree bloomed.,bloom,blossom,B2,52,General,Less Common,,,develop;progress;incubate
+2760,Blossoming,"producing flowers, or figuratively developing and flourishing.",Verb,The cherry trees were blossoming all across the park by April.,bloom,blossom,B2,52,General,Less Common,,,develop;progress;incubate
 2761,Blubber,"the fat of whales and other marine mammals, or, informally, excess body fat.",Noun,A thick layer of blubber keeps the whale warm in freezing waters.,fatness,fat,B2,36,General,Less Common,,,adiposity;adiposeness;fattiness
 2762,Blueness,Blue color or pigment; resembling the color of the clear sky in the daytime.,Noun,He had eyes of bright blue.,blue,,B2,52,General,Less Common,,,cerulean;complementary;aqua
 2763,Blueprint,Something intended as a guide for making something else.,Noun,A blueprint for a house.,design,pattern,B2,36,Academic,Less Common,,,program;programme;photograph
 2764,Bluffly,In a blunt direct manner.,Adverb,He spoke bluntly.,bluntly,brusquely,B2,52,General,Less Common,,,bluff;direct
 2765,Blunted,Make less intense.,Verb,Blunted emotions.,blunt,,B2,36,General,Less Common,,,desensitise;enfeeble;cripple
-2766,Bluntness,Without sharpness or clearness of edge or point.,Noun,The dullness of the pencil made his writing illegible.,dullness,,B1,28,General,Common,,,configuration;keenness;roundness
+2766,Bluntness,"the quality of being direct and plainspoken, sometimes to the point of rudeness, or lacking a sharp edge.",Noun,"Her bluntness caught him off guard, but he appreciated the honesty.",dullness,,B1,28,General,Common,,,configuration;keenness;roundness
 2767,Blushful,Having a red face from embarrassment or shame or agitation or emotional upset.,Adjective,The blushing boy was brought before the Principal.,blushing,red-faced,B2,52,General,Less Common,,,discomposed;chromatic
 2768,Blushing,"Turning red in the face, usually from embarrassment or shyness.",Verb,She was blushing after everyone sang happy birthday to her.,blush,crimson,B1,19,Health & Wellness,Common,,,discolor;discolour;melanize
 2769,Blusterous,Blowing in violent and abrupt bursts.,Adjective,Blustering (or blusterous) winds of Patagonia.,blustering,blustery,B2,52,General,Less Common,,,bluster;stormy
@@ -2776,7 +2776,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 2775,Bodiless,Having no physical body; existing without material form.,Adjective,"In the story, the ghost is a bodiless spirit haunting the manor.",discorporate,unembodied,B2,52,General,Less Common,,,immaterial;incorporeal;unbodied
 2776,Boiling,Come to the boiling point and change from a liquid to vapor.,Verb,Water boils at 100 degrees Celsius.,boil,,A2,11,General,Very Common,,,turn;change;simmer
 2777,Boisterous,"Noisy, energetic, and full of high spirits.",Adjective,The boisterous crowd cheered every play.,rambunctious,robustious,B2,36,General,Less Common,,,spirited;boisterousness;disorderly
-2778,Boldness,The trait of being willing to undertake things that involve risk or danger.,Noun,The proposal required great boldness.,daring,hardiness,B1,23,General,Common,,,audaciousness;competitiveness;bold
+2778,Boldness,willingness to take risks and confront danger or difficulty; courage.,Noun,Her boldness in confronting the board impressed even her critics.,daring,hardiness,B1,23,General,Common,,,audaciousness;competitiveness;bold
 2779,Bollock,informal British term for a testicle.,Noun,He winced when the football hit him squarely in the bollock.,testis,testicle,B2,52,Health & Wellness,Less Common,,,ballock;gonad;cobblers
 2780,Bolshevik,"Relating to the Bolsheviks, the revolutionary communist faction that seized power in Russia in 1917.",Adjective,The film dramatizes the chaos of the Bolshevik revolution.,bolshevist,bolshevistic,B2,52,General,Less Common,,,bolshevism
 2781,Bolshevist,"Relating to or characteristic of Bolshevism, a less common adjectival form of Bolshevik.",Adjective,The pamphlet outlined core Bolshevist economic policy.,bolshevik,bolshevistic,B2,52,General,Less Common,,,bolshevism
@@ -2784,83 +2784,83 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 2783,Bolster,Support and strengthen.,Verb,Bolster morale.,bolster up,,B1,23,General,Common,,,reenforce;reinforce;prop
 2784,Bombardment,"a persistent and overwhelming onslaught, especially of information or criticism.",Noun,The constant bombardment of ads on the app finally drove her to delete it.,barrage,outpouring,B2,36,Communication,Less Common,,,language;onslaught;signing
 2785,Bombastically,In a turgid manner.,Adverb,He lectured bombastically about his theories.,turgidly,,B2,52,General,Less Common,,,bombastic;rhetorical
-2786,Bombilate,Make a buzzing sound.,Verb,Bees were buzzing around the hive.,buzz,bombinate,B2,52,General,Less Common,,,bombilation;sound
-2787,Bombinate,Make a buzzing sound.,Verb,Bees were buzzing around the hive.,buzz,bombilate,B2,52,General,Less Common,,,bombination;sound
+2786,Bombilate,an uncommon variant of 'bombinate'; to make a continuous humming or buzzing sound.,Verb,The old refrigerator seemed to bombilate all through the night.,buzz,bombinate,B2,52,General,Less Common,,,bombilation;sound
+2787,Bombinate,"make a droning, buzzing sound, as bees do.",Verb,Flies began to bombinate around the open jar of jam.,buzz,bombilate,B2,52,General,Less Common,,,bombination;sound
 2788,Bombing,Throw bombs at or attack with bombs.,Verb,The Americans bombed Dresden.,bombard,bomb,B1,17,Business,Common,,,atomize;atomise;surprise
-2789,Bombshell,A shocking surprise.,Noun,News of the attack came like a bombshell.,thunderbolt,thunderclap,B2,52,General,Less Common,,,surprise;attraction;peripetia
-2790,Bonderise,Coat with a substance that will prevent corrosion.,Verb,Bonderize steel.,bonderize,,B2,52,General,Less Common,,,surface;coat
-2791,Bonderize,Coat with a substance that will prevent corrosion.,Verb,Bonderize steel.,bonderise,,B2,52,General,Less Common,,,surface;coat
+2789,Bombshell,a sudden and unwelcome piece of news that causes shock or upheaval.,Noun,The CEO's resignation was a bombshell no one saw coming.,thunderbolt,thunderclap,B2,52,General,Less Common,,,surprise;attraction;peripetia
+2790,Bonderise,chiefly British spelling of 'bonderize'; treat metal with a phosphate coating to prevent rust.,Verb,The factory would bonderise every steel panel before painting.,bonderize,,B2,52,General,Less Common,,,surface;coat
+2791,Bonderize,"treat metal with a protective phosphate coating to prevent corrosion, chiefly American spelling.",Verb,Workers bonderize the car frames before they're sent to the paint shop.,bonderise,,B2,52,General,Less Common,,,surface;coat
 2792,Bonkers,Informal or slang terms for mentally irregular.,Adjective,It used to drive my husband balmy.,balmy,barmy,B2,52,General,Less Common,,,insane
 2793,Bookish,Characterized by diligent study and fondness for reading.,Adjective,A bookish farmer who always had a book in his pocket.,studious,,B2,36,General,Less Common,,,bookishness;scholarly
 2794,Boorish,"Rude, ill-mannered, and insensitive in behavior.",Adjective,His boorish jokes made the dinner party uncomfortable for everyone.,loutish,neanderthal,B2,36,General,Less Common,,,boorishness;unrefined
-2795,Bootleg,Distributed or sold illicitly.,Adjective,The black economy pays no taxes.,black,black-market,B2,52,General,Less Common,,,illegal
+2795,Bootleg,"made, sold, or distributed illegally, especially referring to alcohol or unauthorized recordings.",Adjective,The vendor was arrested for selling bootleg copies of the movie.,black,black-market,B2,52,General,Less Common,,,illegal
 2796,Bootlegging,Sell illicit products such as drugs or alcohol.,Verb,They were bootlegging whiskey.,bootleg,,B2,36,Business,Less Common,,,produce;sell;make
 2797,Bootlick,To behave obsequiously toward someone in authority for personal gain (informal).,Verb,He would bootlick the manager just to get better shifts.,fawn,toady,B2,52,Communication,Less Common,,,truckle;bootlicker;flatter
 2798,Boozing,"Informal for drinking alcohol, especially frequently or to excess.",Noun,The reunion turned into a weekend of boozing and old stories.,drink,drinking,B2,52,General,Less Common,,,intemperateness;intemperance
 2799,Bordered,Extend on all sides of simultaneously; encircle.,Verb,The forest surrounds my property.,surround,environ,B1,28,General,Common,,,contact;enclose;inclose
-2800,Borderland,District consisting of the area on either side of a border or boundary of a country or an area.,Noun,The Welsh marches between England and Wales.,border district,march,B2,52,Travel & Places,Less Common,,,territory;mandatory;jurisdiction
-2801,Boringly,In a tedious manner.,Adverb,Boringly slow work.,tediously,tiresomely,B2,52,General,Less Common,,,boring;uninteresting
+2800,Borderland,a region lying along the border between two countries or areas.,Noun,The borderland between the two nations had long been a site of conflict.,border district,march,B2,52,Travel & Places,Less Common,,,territory;mandatory;jurisdiction
+2801,Boringly,in a way that lacks interest or excitement.,Adverb,The lecture droned on boringly for nearly two hours.,tediously,tiresomely,B2,52,General,Less Common,,,boring;uninteresting
 2802,Bosomed,Hide in one's bosom.,Verb,She bosomed his letters.,bosom,,B2,52,General,Less Common,,,conceal;harbour;obstruct
 2803,Botanical,Of or relating to plants or botany.,Adjective,Botanical garden.,botanic,,B2,36,General,Less Common,,,botany
-2804,Botheration,Something or someone that causes trouble; a source of unhappiness.,Noun,Washing dishes was a nuisance before we got a dish washer.,annoyance,bother,B2,52,Academic,Less Common,,,nuisance;irritant;concern
+2804,Botheration,"an informal, old-fashioned term for annoyance or trouble.",Noun,What a botheration it is to lose your keys right before leaving!,annoyance,bother,B2,52,Academic,Less Common,,,nuisance;irritant;concern
 2805,Bothered,Take the trouble to do something; concern oneself.,Verb,He did not trouble to call his mother on her birthday.,trouble oneself,trouble,A2,8,Society & Culture,Very Common,,,antagonise;repulse;strive
 2806,Bottomed,Provide with a bottom or a seat.,Verb,Bottom the chairs.,bottom,,B2,52,Business,Less Common,,,provide;furnish;connect
 2807,Bouffant,Being puffed out; used of hair style or clothing.,Adjective,A bouffant skirt.,puffy,,B1,28,General,Common,,,large;big
-2808,Bouldered,Abounding in rocks or stones.,Adjective,Rocky fields.,rocky,bouldery,B2,52,General,Less Common,,,rough;unsmooth
-2809,Bouldery,Abounding in rocks or stones.,Adjective,Rocky fields.,rocky,bouldered,B2,52,General,Less Common,,,boulder;rough;unsmooth
+2808,Bouldered,covered or strewn with large rocks.,Adjective,The bouldered slope made the final stretch of the hike slow going.,rocky,bouldery,B2,52,General,Less Common,,,rough;unsmooth
+2809,Bouldery,a less common variant of 'bouldered'; full of large rocks.,Adjective,The bouldery riverbed made wading across nearly impossible.,rocky,bouldered,B2,52,General,Less Common,,,boulder;rough;unsmooth
 2810,Bounded,Move forward by leaps and bounds.,Verb,The horse bounded across the meadow.,jump,leap,A2,11,General,Very Common,,,rebound;ricochet;overleap
-2811,Boundless,"Seemingly boundless in amount, number, degree, or especially extent.",Adjective,Unbounded enthusiasm.,unbounded,limitless,B1,28,General,Common,,,infinite;boundlessness
+2811,Boundless,having no limits; infinite or unrestrained.,Adjective,The toddler seemed to have boundless energy from morning to night.,unbounded,limitless,B1,28,General,Common,,,infinite;boundlessness
 2812,Bounteous,"abundant or generous, especially describing a plentiful supply, in a literary or old-fashioned register.",Adjective,The farmers celebrated a bounteous harvest after the rainy summer.,big,bighearted,B2,52,General,Less Common,,,generous;bounty;bounteousness
 2813,Bourgeois,Conforming to the standards and conventions of the middle class.,Adjective,A bourgeois mentality.,conservative,materialistic,B1,23,General,Common,,,capitalist;capitalistic
 2814,Bourgeon,"To grow or increase rapidly; to sprout or bud (literary, alternate spelling of burgeon).",Verb,New businesses began to bourgeon along the revitalized waterfront.,shoot,spud,B2,52,General,Less Common,,,germinate;ankylose;ancylose
-2815,Bowdleriser,A person who edits a text by removing obscene or offensive words or passages.,Noun,Thomas Bowdler was a famous expurgator.,expurgator,bowdlerizer,B2,52,Society & Culture,Less Common,,,bowdlerise;editor;subeditor
-2816,Bowdlerizer,A person who edits a text by removing obscene or offensive words or passages.,Noun,Thomas Bowdler was a famous expurgator.,expurgator,bowdleriser,B2,52,Society & Culture,Less Common,,,bowdlerize;editor;subeditor
+2815,Bowdleriser,chiefly British spelling of 'bowdlerizer'; a person who removes offensive or obscene material from a text.,Noun,"The editor acted as a bowdleriser, cutting every profane line from the play.",expurgator,bowdlerizer,B2,52,Society & Culture,Less Common,,,bowdlerise;editor;subeditor
+2816,Bowdlerizer,"a person who removes obscene or offensive passages from a text, chiefly American spelling.",Noun,The publisher hired a bowdlerizer to prepare a version suitable for schools.,expurgator,bowdleriser,B2,52,Society & Culture,Less Common,,,bowdlerize;editor;subeditor
 2817,Bowling,Engage in the sport of bowling.,Verb,My parents like to bowl on Friday nights.,bowl,,B2,52,Business,Less Common,,,precipitate;wheel;roll
 2818,Boyishly,Like a boy.,Adverb,He smiled boyishly at his fiancee.,boylike,,B2,53,General,Less Common,,,boyish;young;immature
 2819,Brabble,To quarrel noisily over trivial matters (archaic).,Verb,The two merchants would brabble over prices every market day.,quibble,niggle,B2,53,Communication,Less Common,,,contend;quarrel;dispute
 2820,Bracket,Place into brackets.,Verb,Please bracket this remark.,bracket out,,B2,36,Communication,Less Common,,,support;sustain;hold
 2821,Braggart,Exhibiting self-importance.,Adjective,Big talk.,boastful,bragging,B2,53,General,Less Common,,,proud
-2822,Brahman,A member of a social and cultural elite (especially a descendant of an old New England family).,Noun,A Boston brahman.,brahmin,,B2,53,Society & Culture,Less Common,,,baronet;aristocrat;patrician
-2823,Brahmin,A member of a social and cultural elite (especially a descendant of an old New England family).,Noun,A Boston brahman.,brahman,,B2,53,Society & Culture,Less Common,,,baronet;brahminic;brahminical
+2822,Brahman,"a member of the highest, priestly caste in traditional Hindu society.",Noun,"As a Brahman, he was expected to study the sacred texts from a young age.",brahmin,,B2,53,Society & Culture,Less Common,,,baronet;aristocrat;patrician
+2823,Brahmin,"a member of a socially or culturally elite family, especially an old New England one, by extension from the Hindu caste term.",Noun,"Her family, old Boston Brahmin stock, had lived in the same house for generations.",brahman,,B2,53,Society & Culture,Less Common,,,baronet;brahminic;brahminical
 2824,Braiding,Make by braiding or interlacing.,Verb,Lace a tablecloth.,braid,lace,B2,36,Arts & Creativity,Less Common,,,decorate;embellish;weave
 2825,Brainiac,"A highly intelligent person, especially one skilled in science or technical subjects (informal).",Noun,The whole class relied on the resident brainiac before every test.,genius,mastermind,B2,53,Society & Culture,Less Common,,,intellectual;intellect
-2826,Brainpower,Mental ability.,Noun,He's got plenty of brains but no common sense.,brain,learning ability,B2,53,Academic,Less Common,,,intelligence;breadth;comprehensiveness
-2827,Brainwashed,"Persuade completely, often through coercion.",Verb,The propaganda brainwashed many people.,brainwash,,B2,53,Communication,Less Common,,,prevail;influence;convert
-2828,Brainwashing,"Persuade completely, often through coercion.",Verb,The propaganda brainwashed many people.,brainwash,,B2,36,Communication,Less Common,,,prevail;influence;convert
+2826,Brainpower,intellectual capacity or capability; mental strength.,Noun,Solving the puzzle took real brainpower and patience.,brain,learning ability,B2,53,Academic,Less Common,,,intelligence;breadth;comprehensiveness
+2827,Brainwashed,"made to adopt radically different beliefs through coercive, systematic manipulation.",Verb,The cult brainwashed its members into cutting off contact with their families.,brainwash,,B2,53,Communication,Less Common,,,prevail;influence;convert
+2828,Brainwashing,"the coercive, systematic process of persuading someone to abandon their beliefs for another set.",Verb,Investigators studied the group's brainwashing techniques for years.,brainwash,,B2,36,Communication,Less Common,,,prevail;influence;convert
 2829,Braising,Cook in liquid.,Verb,Braise beef.,braise,,B2,53,General,Less Common,,,cook;steam;stew
-2830,Branched,Grow and send out branches or branch-like structures.,Verb,These plants ramify early and get to be very large.,ramify,branch,B1,28,General,Common,,,separate;arborize;develop
-2831,Branching,Grow and send out branches or branch-like structures.,Verb,These plants ramify early and get to be very large.,ramify,branch,B2,36,General,Less Common,,,separate;arborize;develop
+2830,Branched,"divided into separate parts or paths, like the limbs of a tree.",Verb,The old oak had branched into three massive limbs by the time it was fifty.,ramify,branch,B1,28,General,Common,,,separate;arborize;develop
+2831,Branching,in the process of dividing or extending into multiple parts.,Verb,The company is branching into a completely new market this year.,ramify,branch,B2,36,General,Less Common,,,separate;arborize;develop
 2832,Branded,Labeled someone or something with a negative or defining description.,Verb,The press branded him a traitor after the leak.,stigmatize,stigmatise,B1,28,Society & Culture,Common,,,describe;delineate;asterisk
 2833,Brandish,Move or swing back and forth.,Verb,She waved her gun.,flourish,wave,B2,53,General,Less Common,,,exhibit;display;ostentate
 2834,Brashly,In a brash cheeky manner.,Adverb,"Brashly, she asked for a rebate.",cheekily,nervily,B2,53,General,Less Common,,,forward;brash
 2835,Brattle,Make a rattling sound.,Verb,Clattering dishes.,clatter,clack,B2,53,General,Less Common,,,scraunch;crackle;screech
-2836,Breadth,The capacity to understand a broad range of topics.,Noun,A teacher must have a breadth of knowledge of the subject.,comprehensiveness,largeness,A2,13,Academic,Very Common,,,intelligence;dimension;narrowness
-2837,Breadthways,In the direction of the breadth.,Adverb,Cut the cloth breadthwise.,breadthwise,broadwise,B2,53,General,Less Common,,,
+2836,Breadth,"the extent or range of something, such as knowledge or subject matter.",Noun,"The professor's breadth of knowledge spanned history, physics, and art.",comprehensiveness,largeness,A2,13,Academic,Very Common,,,intelligence;dimension;narrowness
+2837,Breadthways,in the direction of the breadth or width of something.,Adverb,Fold the fabric breadthways before cutting it into strips.,breadthwise,broadwise,B2,53,General,Less Common,,,
 2838,Breakage,"Damage caused by something being broken, or the items broken.",Noun,The moving company charges extra for any breakage during transport.,break,breaking,B2,36,General,Less Common,,,reimbursement;costs;allowance
 2839,Breakout,"An escape from confinement, or a sudden emergence of talent or success.",Noun,Her performance in the film was her big breakout role.,break,jailbreak,B2,53,General,Less Common,,,evasion;getaway;prisonbreak
-2840,Breastfeed,Give suck to.,Verb,The wetnurse suckled the infant.,suckle,suck,B2,53,Health & Wellness,Less Common,,,malnourish;breakfast;regurgitate
+2840,Breastfeed,feed a baby milk directly from the breast.,Verb,She chose to breastfeed her daughter for the first six months.,suckle,suck,B2,53,Health & Wellness,Less Common,,,malnourish;breakfast;regurgitate
 2841,Breathed,Drew air into and expelled it from the lungs.,Verb,She breathed a sigh of relief when the plane finally landed.,breathe,take a breath,A2,11,Health & Wellness,Very Common,,,suspire;hiccough;survive
 2842,Breathtaking,Tending to cause suspension of regular breathing.,Adjective,A breathless flight.,breathless,,B1,23,General,Common,,,exciting
 2843,Brethren,"Fellow members of a group, especially a religious community; an old plural form of 'brothers' (formal, archaic).",Noun,The monk addressed his brethren before the evening prayer.,brother,blood brother,A2,12,Society & Culture,Very Common,,,sect;stepbrother
-2844,Bribable,Capable of being corrupted.,Adjective,Corruptible judges.,corruptible,dishonest,B2,53,General,Less Common,,,corrupt;bribe
-2845,Brickly,Having little elasticity; hence easily cracked or fractured or snapped.,Adjective,Brittle bones.,brittle,brickle,B2,53,General,Less Common,,,breakable
-2846,Bridgehead,An area in hostile territory that has been captured and is held awaiting further troops and supplies.,Noun,An attempt to secure a bridgehead behind enemy lines.,foothold,,B1,28,Travel & Places,Common,,,station;beachhead;airhead
+2844,Bribable,willing or able to be influenced or corrupted through the offer of a bribe.,Adjective,The reporter uncovered evidence that the official was bribable.,corruptible,dishonest,B2,53,General,Less Common,,,corrupt;bribe
+2845,Brickly,"a rare or dialectal term describing something hard and brittle, like a brick.",Adjective,The old mortar had gone brickly and crumbled at the slightest touch.,brittle,brickle,B2,53,General,Less Common,,,breakable
+2846,Bridgehead,"a secure position seized within enemy territory, from which further advances can be made.",Noun,Troops established a bridgehead on the far side of the river before dawn.,foothold,,B1,28,Travel & Places,Common,,,station;beachhead;airhead
 2847,Briefing,Give essential information to someone.,Verb,The reporters were briefed about the President's plan to invade.,brief,,B1,28,Communication,Common,,,instruct;apprise;apprize
 2848,Brightly,With brightness.,Adverb,The stars shone brilliantly.,brilliantly,bright,B1,15,General,Common,,,lustrous;nacreous;opalescent
 2849,Brilliance,A light within the field of vision that is brighter than the brightness to which the eyes are adapted.,Noun,A glare of sunlight.,glare,blaze,B1,19,General,Common,,,brilliant;splendor;glisten
-2850,Brimful,Filled to capacity.,Adjective,A brimful cup.,brimfull,brimming,B2,36,General,Less Common,,,full
-2851,Brimfull,Filled to capacity.,Adjective,A brimful cup.,brimful,brimming,B2,53,General,Less Common,,,full
+2850,Brimful,filled to the brim; completely full.,Adjective,The pitcher was brimful of fresh lemonade for the picnic.,brimfull,brimming,B2,36,General,Less Common,,,full
+2851,Brimfull,an alternate spelling of 'brimful'; filled to the very top.,Adjective,Her heart felt brimfull of gratitude after the surprise party.,brimful,brimming,B2,53,General,Less Common,,,full
 2852,Brisken,Become brisk.,Verb,Business brisked up.,brisk,brisk up,B2,53,General,Less Common,,,accelerate;quicken;speed
 2853,Bristle,"show sudden anger or indignation, or, as hair, stand upright.",Verb,He began to bristle at the reporter's blunt question.,abound,burst,B1,23,General,Common,,,feature;involve;possess
-2854,Bristly,Very irritable.,Adjective,Bristly exchanges between the White House and the press.,prickly,splenetic,B2,53,General,Less Common,,,bristle;bristliness;armed
-2855,Brittle,Having little elasticity; hence easily cracked or fractured or snapped.,Adjective,Brittle bones.,brickle,brickly,B1,23,General,Common,,,brittleness;breakable;coldhearted
-2856,Broadband,Responding to or operating at a wide band of frequencies.,Adjective,A broadband antenna.,wideband,,B2,53,General,Less Common,,,network
+2854,Bristly,"covered with short, stiff hairs, or figuratively easily irritated and quick to react.",Adjective,The bristly cactus needles caught on her sleeve.,prickly,splenetic,B2,53,General,Less Common,,,bristle;bristliness;armed
+2855,Brittle,hard but liable to break or snap easily.,Adjective,The dry autumn leaves were brittle underfoot.,brickle,brickly,B1,23,General,Common,,,brittleness;breakable;coldhearted
+2856,Broadband,"relating to a telecommunications system that transmits data over a wide range of frequencies at high speed, especially internet access.",Adjective,The village finally got broadband internet last year.,wideband,,B2,53,General,Less Common,,,network
 2857,Broadening,Make broader.,Verb,Broaden the road.,broaden,,A2,11,General,Very Common,,,increase;territorialise;stretch
 2858,Broadsheet,"A large-format newspaper, traditionally associated with serious journalism.",Noun,She prefers reading the broadsheet over the tabloids.,circular,handbill,B2,53,Communication,Less Common,,,advertising;commercial;throwaway
-2859,Broadwise,In the direction of the breadth.,Adverb,Cut the cloth breadthwise.,breadthwise,breadthways,B2,53,General,Less Common,,,
-2860,Brobdingnagian,Unusually great in size or amount or degree or especially extent or scope.,Adjective,Huge government spending.,huge,immense,B2,53,General,Less Common,,,brobdingnag;large;big
+2859,Broadwise,an older or less common variant of 'breadthways'; across the width of something.,Adverb,The plank was cut broadwise to fit the narrow doorway.,breadthwise,breadthways,B2,53,General,Less Common,,,
+2860,Brobdingnagian,"gigantic in size, from the land of giants in Gulliver's Travels.",Adjective,The new stadium's Brobdingnagian scale dwarfed everything around it.,huge,immense,B2,53,General,Less Common,,,brobdingnag;large;big
 2861,Broiled,Cook under a broiler.,Verb,Broil fish.,broil,oven broil,B1,28,General,Common,,,barbeque;grill;heat
-2862,Bromidic,Dull and tiresome but with pretensions of significance or originality.,Adjective,Bromidic sermons.,corny,platitudinal,B2,53,General,Less Common,,,bromide;unoriginal
+2862,Bromidic,"dull, unoriginal, and predictable, like a stale platitude.",Adjective,His bromidic advice about 'following your dreams' offered nothing new.,corny,platitudinal,B2,53,General,Less Common,,,bromide;unoriginal
 2863,Brooding,"Hang over, as of something threatening, dark, or menacing.",Verb,The terrible vision brooded over her all day long.,brood,hover,A2,8,General,Very Common,,,worry;care;hang
 2864,Brotherhood,"A feeling of friendship and loyalty among people, or a group united by shared interests or beliefs.",Noun,The veterans described an unbreakable sense of brotherhood.,fraternity,sodality,B1,15,Society & Culture,Common,,,relationship;brother;stratum
 2865,Brotherly,Like or characteristic of or befitting a brother.,Adjective,Brotherly feelings.,brotherlike,fraternal,B1,28,General,Common,,,brother
@@ -2871,18 +2871,18 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 2870,Brushed,"Rub with a brush, or as if with a brush.",Verb,Johnson brushed the hairs from his jacket.,brush,,A2,7,General,Very Common,,,osculate;rub;touch
 2871,Brusque,Marked by rude or peremptory shortness.,Adjective,Try to cultivate a less brusque manner.,brusk,curt,B2,53,General,Less Common,,,brusqueness;discourteous
 2872,Brutalise,"make someone cruel, violent, or indifferent to suffering, chiefly British spelling.",Verb,Years of abuse can brutalise a child into repeating the same cruelty.,brutalize,animalize,B2,53,General,Less Common,,,mistreat;maltreat;mollycoddle
-2873,Brutally,In a vicious manner.,Adverb,He was viciously attacked.,viciously,savagely,B1,28,General,Common,,,inhumane
+2873,Brutally,in a savagely violent or harsh way.,Adverb,The critic brutally panned the film's weak script.,viciously,savagely,B1,28,General,Common,,,inhumane
 2874,Brutish,"resembling a brute; coarse, unfeeling, and lacking refinement or intelligence.",Adjective,His brutish manners embarrassed everyone at the dinner table.,beastly,bestial,B2,53,General,Less Common,,,inhumane
 2875,Bubbling,"Form, produce, or emit bubbles.",Verb,The soup was bubbling.,bubble,,B1,23,General,Common,,,breathe;radiate;emanate
-2876,Buckram,Rigidly formal.,Adjective,A starchy manner.,starchy,stiff,B2,53,General,Less Common,,,formal
-2877,Buddhist,Of or relating to or supporting Buddhism.,Adjective,Buddhist sculpture.,buddhistic,,B1,19,General,Common,,,buddhism
-2878,Buddhistic,Of or relating to or supporting Buddhism.,Adjective,Buddhist sculpture.,buddhist,,B2,53,General,Less Common,,,buddhism
+2876,Buckram,"stiffly formal or precise in manner, from the stiff fabric of the same name.",Adjective,His buckram manners made the dinner party feel unbearably stiff.,starchy,stiff,B2,53,General,Less Common,,,formal
+2877,Buddhist,"relating to or following Buddhism, the religion and philosophy founded by the Buddha.",Adjective,The monastery follows strict Buddhist traditions dating back centuries.,buddhistic,,B1,19,General,Common,,,buddhism
+2878,Buddhistic,a less common variant of 'Buddhist'; relating to Buddhism.,Adjective,Her buddhistic approach to conflict emphasized patience over confrontation.,buddhist,,B2,53,General,Less Common,,,buddhism
 2879,Buffeted,"struck repeatedly and forcefully, especially by wind or waves.",Verb,The tent was buffeted by strong gusts all through the night.,buffet,knock about,B1,28,General,Common,,,strike;hit;batter
 2880,Buffoonish,"Behaving in a silly or ridiculous way, like a clown or fool.",Adjective,His buffoonish antics got a few laughs but little respect.,clownish,clownlike,B2,53,General,Less Common,,,humorous;humourous
 2881,Buirdly,Muscular and heavily built.,Adjective,A beefy wrestler.,beefy,burly,B2,53,General,Less Common,,,robust
 2882,Bulletproof,Without flaws or loopholes.,Adjective,An ironclad contract.,unassailable,unshakable,B2,53,General,Less Common,,,incontestable;incontestible;armored
 2883,Bullying,"seeking to harm, intimidate, or coerce someone perceived as vulnerable.",Verb,The school introduced a new policy after several reports of bullying.,strong-arm,bully,B2,36,Emotion,Less Common,,,inveigle;ballyrag;intimidate
-2884,Bulwark,An embankment built around a space for defensive purposes.,Noun,They stormed the ramparts of the city.,rampart,wall,B1,17,Science & Technology,Common,,,barrier;railing;fencing
+2884,Bulwark,"a defensive wall, or figuratively something that provides strong protection or support.",Noun,A free press serves as a bulwark against government overreach.,rampart,wall,B1,17,Science & Technology,Common,,,barrier;railing;fencing
 2885,Bumpkinly,Awkwardly simple and provincial.,Adjective,Bumpkinly country boys.,hick,rustic,B2,53,General,Less Common,,,provincial;bumpkin
 2886,Bungled,"Carried out clumsily or incompetently, making mistakes.",Verb,The robbers bungled the getaway and were caught within minutes.,botch,bodge,B2,36,Society & Culture,Less Common,,,miscarry;mishandle;founder
 2887,Bunglesome,Difficult to handle or manage especially because of shape.,Adjective,An awkward bundle to carry.,awkward,clumsy,B2,53,General,Less Common,,,unmanageable;unwieldy
@@ -2891,14 +2891,14 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 2890,Burbling,"Making a bubbling, murmuring sound, especially of flowing water.",Verb,A small stream kept burbling past their campsite all night.,ripple,babble,B2,53,General,Less Common,,,sound;gurgle
 2891,Burdensome,Not easily borne; wearing.,Adjective,The burdensome task of preparing the income tax return.,onerous,taxing,B2,36,General,Less Common,,,burdensomeness;heavy
 2892,Burlesque,Make a parody of.,Verb,The students spoofed the teachers.,spoof,parody,B1,28,Communication,Common,,,impersonate;caricature;mock
-2893,Burnished,Polish and make shiny.,Verb,Buff the wooden floors.,buff,burnish,B2,36,General,Less Common,,,furbish;simonize;polish
+2893,Burnished,"polished by rubbing, giving a smooth, shiny surface.",Verb,The armor was burnished until it gleamed like a mirror.,buff,burnish,B2,36,General,Less Common,,,furbish;simonize;polish
 2894,Burster,A quantity of explosive to be set off at one time.,Noun,This cartridge has a powder charge of 50 grains.,charge,bursting charge,B2,53,Science & Technology,Less Common,,,explosive;burst;shot
 2895,Burundian,Of or relating to or characteristic of Burundi or its people.,Adjective,The Burundi capital.,burundi,,B2,53,General,Less Common,,,
-2896,Bustier,(of a woman's body) having a large bosom and pleasing curves.,Adjective,Hollywood seems full of curvaceous blondes.,bosomy,busty,B2,53,General,Less Common,,,shapely
+2896,Bustier,having a fuller bust or bosom.,Adjective,The tailor adjusted the dress to better fit her bustier figure.,bosomy,busty,B2,53,General,Less Common,,,shapely
 2897,Bustling,Move or cause to move energetically or busily.,Verb,The cheerleaders bustled about excitingly before their performance.,bustle,bustle about,B2,36,General,Less Common,,,hotfoot;move;rush
 2898,Busyness,The state of being or appearing to be actively engaged in an activity.,Noun,They manifested all the busyness of a pack of beavers.,hum,,B2,36,General,Less Common,,,activity;operation;behavior
 2899,Butcher,Kill (animals) usually for food consumption.,Verb,They slaughtered their only goat to survive the winter.,slaughter,,A2,12,General,Very Common,,,butchery;kill;cut
-2900,Butcherly,Poorly done.,Adjective,A botchy piece of work.,botchy,unskillful,B2,53,General,Less Common,,,butcher;unskilled;bloody
+2900,Butcherly,"crude and clumsy, as if hacked apart rather than done skillfully.",Adjective,The butcherly repair job left the fence more crooked than before.,botchy,unskillful,B2,53,General,Less Common,,,butcher;unskilled;bloody
 2901,Butterfingered,"Lacking physical movement skills, especially with the hands.",Adjective,A bumbling mechanic.,bumbling,bungling,B2,53,General,Less Common,,,maladroit
 2902,Buttery,Unpleasantly and excessively suave or ingratiating in manner or speech.,Adjective,Buttery praise.,fulsome,oily,B2,36,General,Less Common,,,insincere;butter;fatty
 2903,Buttoned,Provide with buttons.,Verb,Button a shirt.,button,,B2,36,General,Less Common,,,add;sew;stitch
@@ -2912,40 +2912,40 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 2911,Cacophonous,Having an unpleasant sound.,Adjective,As cacophonous as a henyard.,cacophonic,,B2,53,General,Less Common,,,guttural;jangling;rending
 2912,Cadaveric,Of or relating to a cadaver or corpse.,Adjective,We had long anticipated his cadaverous end.,cadaverous,,B2,53,General,Less Common,,,cadaver
 2913,Cadenced,Marked by a rhythmical cadence.,Adjective,The cadenced crunch of marching feet.,cadent,,B2,53,General,Less Common,,,rhythmic;rhythmical
-2914,Cajolingly,In a cajoling manner.,Adverb,"`Come here,' she said coaxingly.",coaxingly,,B2,53,General,Less Common,,,
+2914,Cajolingly,in a way that persuades someone gently through flattery or coaxing.,Adverb,"She spoke cajolingly, hoping to talk her brother into sharing his dessert.",coaxingly,,B2,53,General,Less Common,,,
 2915,Calamitous,(of events) having extremely unfortunate or dire consequences; bringing ruin.,Adjective,The stock market crashed on Black Friday.,black,disastrous,B1,28,General,Common,,,unfortunate;calamity
 2916,Calceiform,Of slipper-shaped blossoms.,Adjective,The calceiform lip of certain orchids.,calceolate,,B2,53,General,Less Common,,,calceus
 2917,Calculate,Have faith or confidence in.,Verb,You can count on me to help you any time.,count,bet,B1,19,Academic,Common,,,calculus;calculation;extract
-2918,Calculative,Used of persons.,Adjective,The most calculating and selfish men in the community.,calculating,conniving,B2,53,General,Less Common,,,calculate;hard
-2919,Calculus,A hard lump produced by the concretion of mineral salts; found in hollow organs or ducts of the body.,Noun,Renal calculi can be very painful.,concretion,,B2,53,General,Less Common,,,outcropping;intrusion;calculous
+2918,Calculative,"given to careful calculation and planning, especially in a self-interested way.",Adjective,His calculative approach to friendships always left her a little uneasy.,calculating,conniving,B2,53,General,Less Common,,,calculate;hard
+2919,Calculus,"a hard, stone-like mass that can form in the body, such as a kidney stone, from mineral deposits.",Noun,The X-ray revealed a small calculus lodged in his kidney.,concretion,,B2,53,General,Less Common,,,outcropping;intrusion;calculous
 2920,Calefactive,Serving to heat.,Adjective,A heating pad is calefactory.,calefactory,,B2,53,General,Less Common,,,hot
 2921,Calendered,"Press between rollers or plates so as to smooth, glaze, or thin into sheets.",Verb,Calender paper.,calender,,B2,53,General,Less Common,,,press;iron
 2922,Calendrical,Relating to or characteristic of or used in a calendar or time measurement.,Adjective,Calendric systems.,calendric,,B2,53,General,Less Common,,,calendar;calender
-2923,Calibrate,Make fine adjustments or divide into marked intervals for optimal measuring.,Verb,Calibrate an instrument.,graduate,fine-tune,B2,53,General,Less Common,,,correct;calibration;adjust
-2924,Calibrated,Make fine adjustments or divide into marked intervals for optimal measuring.,Verb,Calibrate an instrument.,calibrate,graduate,B1,23,General,Common,,,correct;adjust;set
+2923,Calibrate,adjust an instrument or method precisely to a standard or scale.,Verb,Technicians calibrate the scale every morning before the store opens.,graduate,fine-tune,B2,53,General,Less Common,,,correct;calibration;adjust
+2924,Calibrated,adjusted precisely against a known standard.,Verb,The thermometer was carefully calibrated before the experiment began.,calibrate,graduate,B1,23,General,Common,,,correct;adjust;set
 2925,Calibre,A degree or grade of excellence or worth.,Noun,The quality of students has risen.,quality,caliber,B1,28,General,Common,,,lowness;extreme;intensity
 2926,Calling,Assign a specified (usually proper) proper name to.,Verb,They named their son David.,name,call,A2,5,Communication,Very Common,,,nickname;baptize;christen
 2927,Callipygous,Pertaining to or having finely developed buttocks.,Adjective,The quest for the callipygian ideal.,callipygian,,B2,53,General,Less Common,,,shapely
-2928,Callous,Emotionally hardened.,Adjective,A callous indifference to suffering.,indurate,pachydermatous,A2,13,General,Very Common,,,toughened;callosity;callousness
+2928,Callous,showing an insensitive or cruel disregard for others' feelings.,Adjective,His callous remark about her weight left her speechless.,indurate,pachydermatous,A2,13,General,Very Common,,,toughened;callosity;callousness
 2929,Calloused,Having calluses; having skin made tough and thick through wear.,Adjective,Calloused skin.,callous,thickened,B1,28,General,Common,,,toughened;tough
 2930,Calming,Having a soothing effect that reduces stress or worry.,Adjective,The calming music helped her fall asleep.,calm,calm down,B1,28,Emotion,Common,,,comfort;console;compose
-2931,Caloric,Relating to or associated with heat.,Adjective,Thermal movements of molecules.,thermal,thermic,B1,23,General,Common,,,calorie;heat
+2931,Caloric,"relating to heat or calories, especially in the context of food energy.",Adjective,The label lists the caloric content of each serving.,thermal,thermic,B1,23,General,Common,,,calorie;heat
 2932,Calving,Release ice.,Verb,The icebergs and glaciers calve.,calve,break up,B1,23,General,Common,,,separate;deliver;dismember
 2933,Cambrian,Of or relating to or characteristic of Wales or its people or their language.,Adjective,The Welsh coast.,welsh,,B2,53,General,Less Common,,,cambria
 2934,Camouflaged,Disguise by camouflaging; exploit the natural surroundings to disguise something.,Verb,The troops camouflaged themselves before they went into enemy territory.,camouflage,,B1,28,General,Common,,,disguise;mask;masquerade
-2935,Campanular,Shaped like a bell or campana.,Adjective,Campanulate flowers of the genus Campanula.,campanulate,campanulated,B2,53,General,Less Common,,,campana
-2936,Campanulated,Shaped like a bell or campana.,Adjective,Campanulate flowers of the genus Campanula.,campanulate,campanular,B2,53,General,Less Common,,,campana
-2937,Canalise,Direct the flow of.,Verb,Channel information towards a broad audience.,channel,canalize,B2,53,General,Less Common,,,provide;furnish;channelize
-2938,Canalize,Direct the flow of.,Verb,Channel information towards a broad audience.,channel,canalise,B2,53,General,Less Common,,,provide;furnish;channelize
+2935,Campanular,shaped like a bell.,Adjective,The flower's campanular petals hung gracefully from the stem.,campanulate,campanulated,B2,53,General,Less Common,,,campana
+2936,Campanulated,a less common variant of 'campanular'; bell-shaped.,Adjective,The lampshade had a campanulated design reminiscent of Victorian fixtures.,campanulate,campanular,B2,53,General,Less Common,,,campana
+2937,Canalise,"chiefly British spelling of 'canalize'; direct something, such as energy or water, along a particular course.",Verb,Engineers worked to canalise the river to prevent seasonal flooding.,channel,canalize,B2,53,General,Less Common,,,provide;furnish;channelize
+2938,Canalize,"direct the flow of something, such as water or effort, into a particular channel.",Verb,The coach tried to canalize the team's frustration into a stronger second half.,channel,canalise,B2,53,General,Less Common,,,provide;furnish;channelize
 2939,Candidly,"In an open and direct way, without holding back one's true opinion.",Adverb,She spoke candidly about her struggles with anxiety.,honestly,frankly,B1,28,General,Common,,,sincere;candid;direct
-2940,Cannily,With foresight.,Adverb,"More presciently than they superiors, these workers grasped the economic situation.",presciently,,B2,53,General,Less Common,,,discerning;canny;smart
+2940,Cannily,"in a shrewd, careful way, especially showing good judgment.",Adverb,She cannily timed her resignation to coincide with the company's best quarter.,presciently,,B2,53,General,Less Common,,,discerning;canny;smart
 2941,Cannulise,"To insert a cannula (thin tube) into a vein or body cavity, chiefly British spelling.",Verb,The nurse had to cannulise his arm before starting the IV drip.,cannulate,cannulize,B2,53,General,Less Common,,,introduce;implant;intubate
 2942,Cannulize,"To insert a cannula into a vein or cavity, American spelling of cannulise.",Verb,The paramedics moved quickly to cannulize the patient's vein.,cannulate,cannulise,B2,53,General,Less Common,,,introduce;implant;intubate
 2943,Canonical,Appearing in a biblical canon.,Adjective,A canonical book of the Christian New Testament.,canonic,,B2,53,General,Less Common,,,canon
 2944,Canonised,Treat as a sacred person.,Verb,He canonizes women.,canonize,canonise,B2,53,Communication,Less Common,,,glorify;proclaim;adjudge
-2945,Canonized,Declare (a dead person) to be a saint.,Verb,"After he was shown to have performed a miracle, the priest was canonized.",canonize,canonise,B1,28,Communication,Common,,,adjudge;glorify;proclaim
+2945,Canonized,officially declared a saint by the Church.,Verb,The nun was canonized decades after her death.,canonize,canonise,B1,28,Communication,Common,,,adjudge;glorify;proclaim
 2946,Cantering,Ride at a canter.,Verb,The men cantered away.,canter,,B2,53,General,Less Common,,,pace;gallop;prance
-2947,Cantillate,Recite with musical intonation; recite as a chant or a psalm.,Verb,The rabbi chanted a prayer.,chant,intone,B2,53,Communication,Less Common,,,harmonize;vocalise;cantillation
+2947,Cantillate,"chant or intone a religious text, especially in Jewish or liturgical tradition.",Verb,The cantor began to cantillate the ancient Hebrew verses.,chant,intone,B2,53,Communication,Less Common,,,harmonize;vocalise;cantillation
 2948,Canulate,"To insert a cannula into the body, alternate spelling of cannulate.",Verb,The surgeon prepared to canulate the artery before the procedure.,cannulate,cannulize,B2,53,General,Less Common,,,introduce;implant;cannulise
 2949,Canvasser,"A person who goes door-to-door or contacts people to gather opinions, votes, or support.",Noun,A canvasser knocked on our door asking about the upcoming election.,pollster,poll taker,B2,53,Society & Culture,Less Common,,,suppliant;requester;inspector
 2950,Capableness,The quality of being capable -- physically or intellectually or legally.,Noun,He worked to the limits of his capability.,capability,,B2,53,General,Less Common,,,capable;compass;ability
@@ -2957,11 +2957,11 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 2956,Capitular,Of or pertaining to an ecclesiastical chapter.,Adjective,Capitular estates.,capitulary,,B2,53,General,Less Common,,,chapter
 2957,Capitulation,The act of surrendering (usually under agreed conditions).,Noun,They were protected until the capitulation of the fort.,fall,surrender,B1,28,General,Common,,,document;summary;copyright
 2958,Caprice,A sudden desire.,Noun,He bought it on an impulse.,impulse,whim,B2,53,Emotion,Less Common,,,wishing;ambition;aspiration
-2959,Capriciously,Unpredictably.,Adverb,The weather has been freakishly variable.,freakishly,,B2,53,General,Less Common,,,unpredictable;capricious
-2960,Capsize,Overturn accidentally.,Verb,Don't rock the boat or it will capsize!,turtle,turn turtle,B2,53,General,Less Common,,,overturn;upend
-2961,Capsizing,Overturn accidentally.,Verb,Don't rock the boat or it will capsize!,capsize,turtle,B2,53,General,Less Common,,,overturn;upend
-2962,Capsulise,Put in a short or concise form; reduce in volume.,Verb,Capsulize the news.,encapsulate,capsule,B2,54,General,Less Common,,,enclose;condense;concentrate
-2963,Captious,Tending to find and call attention to faults.,Adjective,A captious pedant.,faultfinding,,B2,36,General,Less Common,,,critical;caption
+2959,Capriciously,"in a way that is impulsive and unpredictable, changing suddenly without reason.",Adverb,"The judge ruled capriciously, and the verdict shocked the courtroom.",freakishly,,B2,53,General,Less Common,,,unpredictable;capricious
+2960,Capsize,"overturn in the water, especially describing a boat.",Verb,A sudden wave caused the canoe to capsize.,turtle,turn turtle,B2,53,General,Less Common,,,overturn;upend
+2961,Capsizing,in the process of overturning in water.,Verb,The crew barely avoided capsizing in the rough seas.,capsize,turtle,B2,53,General,Less Common,,,overturn;upend
+2962,Capsulise,chiefly British spelling of 'capsulize'; summarize something briefly and concisely.,Verb,The editor asked him to capsulise the report into a single paragraph.,encapsulate,capsule,B2,54,General,Less Common,,,enclose;condense;concentrate
+2963,Captious,quick to point out trivial faults or raise petty objections.,Adjective,His captious remarks about the menu annoyed the whole table.,faultfinding,,B2,36,General,Less Common,,,critical;caption
 2964,Captivated,So interested or charmed by something that it holds your full attention.,Adjective,The children sat captivated as she told the story.,capture,enamour,B1,28,Emotion,Common,,,attract;becharm;fascinate
 2965,Captivating,So charming or interesting that it holds your attention completely.,Adjective,Her captivating performance earned a standing ovation.,capture,enamour,B1,28,Emotion,Common,,,attract;becharm;fascinate
 2966,Captive,Giving or marked by complete attention to.,Adjective,That engrossed look or rapt delight.,absorbed,engrossed,B1,17,General,Common,,,captivity;unfree;attentive
@@ -2981,34 +2981,34 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 2980,Carinated,Having a ridge or shaped like a ridge or suggesting the keel of a ship.,Adjective,A carinate sepal.,ridged,carinate,B2,54,General,Less Common,,,
 2981,Carload,"The amount that a car or railway car can carry; informally, a large amount.",Noun,They hauled a carload of firewood back from the farm.,boatload,shipload,B1,23,General,Common,,,gathering;assemblage;multitude
 2982,Caroling,Sing carols.,Verb,They went caroling on Christmas Day.,carol,,B2,54,Arts & Creativity,Less Common,,,sing;solmizate;troll
-2983,Carousing,"Engage in boisterous, drunken merrymaking.",Verb,They were out carousing last night.,carouse,roister,B1,28,Society & Culture,Common,,,wassail;revel;racket
+2983,Carousing,"drinking alcohol and enjoying oneself with others in a noisy, lively way.",Verb,They spent the night carousing at the pub until closing time.,carouse,roister,B1,28,Society & Culture,Common,,,wassail;revel;racket
 2984,Carpetbag,Presumptuously seeking success or a position in a new locality.,Adjective,A carpetbag stranger.,carpetbagging,,B2,54,General,Less Common,,,carpetbagger;expedient
 2985,Carpeted,"Cover completely, as if with a carpet.",Verb,Flowers carpeted the meadows.,carpet,,B1,23,General,Common,,,submerge;overwhelm;blanket
 2986,Carriage,Characteristic way of bearing one's body.,Noun,Stood with good posture.,bearing,posture,A2,9,General,Very Common,,,sleeper;railcar;smoker
-2987,Carting,Draw slowly or heavily.,Verb,Haul stones.,haul,hale,B2,54,General,Less Common,,,transport;attract;stretch
+2987,Carting,"transporting something in a cart or vehicle, often over a short distance.",Verb,He spent the afternoon carting firewood from the shed to the porch.,haul,hale,B2,54,General,Less Common,,,transport;attract;stretch
 2988,Carving,Form by carving.,Verb,Carve a flower from the ice.,carve,,B1,15,General,Common,,,sculpture;scratch;engrave
 2989,Cascades,A succession of stages or operations or processes or units.,Noun,Progressing in severity as though a cascade of genetic damage was occurring.,cascade,,B2,36,Society & Culture,Less Common,,,northwest;adams;ranier
-2990,Cashable,Able to be converted into ready money or the equivalent.,Adjective,A cashable check.,redeemable,,B2,54,General,Less Common,,,convertible;exchangeable;cash
-2991,Castellated,Having or resembling repeated square indentations like those in a battlement.,Adjective,A crenelated molding.,embattled,battlemented,B2,54,General,Less Common,,,fancy
+2990,Cashable,"able to be exchanged for money, especially a check or voucher.",Adjective,The coupon is cashable at any participating store.,redeemable,,B2,54,General,Less Common,,,convertible;exchangeable;cash
+2991,Castellated,having battlements or turrets like a castle.,Adjective,The castellated walls of the old fortress still stand today.,embattled,battlemented,B2,54,General,Less Common,,,fancy
 2992,Casting,Put or send forth.,Verb,She threw the flashlight beam into the corner.,project,cast,B1,19,Arts & Creativity,Common,,,send;direct;give
-2993,Castled,Having or resembling repeated square indentations like those in a battlement.,Adjective,A crenelated molding.,embattled,battlemented,B2,54,General,Less Common,,,fancy
-2994,Castrated,Deprive of strength or vigor.,Verb,The Senate emasculated the law.,emasculate,castrate,B2,54,General,Less Common,,,abridge;foreshorten;shorten
+2993,Castled,"built or fortified in the style of a castle, or occupied by a castle.",Adjective,The castled hilltop dominated the skyline for miles.,embattled,battlemented,B2,54,General,Less Common,,,fancy
+2994,Castrated,"surgically deprived of the testicles, or figuratively, deprived of power or force.",Verb,The bull was castrated to make him easier to handle.,emasculate,castrate,B2,54,General,Less Common,,,abridge;foreshorten;shorten
 2995,Casuistic,Of or relating to or practicing casuistry.,Adjective,Overly subtle casuistic reasoning.,casuistical,,B2,54,General,Less Common,,,casuistry
 2996,Cataclysm,"a large-scale, violent event, or a sudden and drastic political or social upheaval.",Noun,The war was a cataclysm that reshaped the entire region.,calamity,catastrophe,B2,54,General,Less Common,,,cataclysmal;deposit;inundation
 2997,Cataclysmal,Severely destructive.,Adjective,Cataclysmic nuclear war.,cataclysmic,,B2,54,General,Less Common,,,cataclysm;destructive
-2998,Catacorner,Slanted across a polygon on a diagonal line.,Adjective,Set off in a catty-corner direction across the vacant lot.,cata-cornered,catercorner,B2,54,General,Less Common,,,oblique
+2998,Catacorner,a regional variant of 'catercorner'; diagonally opposite.,Adjective,The bakery sits catacorner from the old courthouse.,cata-cornered,catercorner,B2,54,General,Less Common,,,oblique
 2999,Catalogue,A complete list of things; usually arranged systematically.,Noun,It does not pretend to be a catalog of his achievements.,catalog,,A2,12,Communication,Very Common,,,listing;list;discography
-3000,Catamenia,The monthly discharge of blood from the uterus of nonpregnant women from puberty to menopause; --Hippocrates; --Aristotle.,Noun,The women were sickly and subject to excessive menstruation.,menstruation,menses,B2,54,Nature,Less Common,,,discharge;emission;expelling
-3001,Catapultian,Of or like a catapult.,Adjective,A catapultic kind of action.,catapultic,,B2,54,General,Less Common,,,catapult
-3002,Catapultic,Of or like a catapult.,Adjective,A catapultic kind of action.,catapultian,,B2,54,General,Less Common,,,catapult
-3003,Catastrophic,Extremely harmful; bringing physical or financial ruin.,Adjective,A catastrophic depression.,ruinous,,B1,17,General,Common,,,harmful
+3000,Catamenia,an older medical term for menstruation.,Noun,Early physicians tracked a patient's catamenia as part of a general health record.,menstruation,menses,B2,54,Nature,Less Common,,,discharge;emission;expelling
+3001,Catapultian,a rare variant of 'catapultic'; relating to or resembling a catapult.,Adjective,The device used a catapultian mechanism to launch the payload.,catapultic,,B2,54,General,Less Common,,,catapult
+3002,Catapultic,"relating to or resembling a catapult, especially in its sudden, forceful motion.",Adjective,The ride's catapultic launch pressed everyone back into their seats.,catapultian,,B2,54,General,Less Common,,,catapult
+3003,Catastrophic,"involving or causing sudden, widespread, and often disastrous damage.",Adjective,The earthquake caused catastrophic damage across the entire region.,ruinous,,B1,17,General,Common,,,harmful
 3004,Catechistic,Of or relating to or resembling a rigorous catechism.,Adjective,The catechistic method.,catechetic,,B2,54,General,Less Common,,,catechism
 3005,Categoreme,A categorematic expression; a term capable of standing alone as the subject or predicate of a logical proposition.,Noun,Names are called categorems.,categorem,,B2,54,Communication,Less Common,,,subject;categorematic;term
 3006,Categorical,Not modified or restricted by reservations.,Adjective,A categorical denial.,categoric,flat,B1,23,General,Common,,,category;unqualified
-3007,Categorically,In an unqualified manner.,Adverb,He flatly denied the charges.,flatly,unconditionally,B2,36,General,Less Common,,,categorical;unqualified
-3008,Categorised,Place into or assign to a category.,Verb,Children learn early on to categorize.,categorize,categorise,B2,54,Academic,Less Common,,,compare;theorize;calculate
-3009,Categorized,Place into or assign to a category.,Verb,Children learn early on to categorize.,categorize,categorise,B2,36,Academic,Less Common,,,compare;theorize;calculate
-3010,Catercorner,Slanted across a polygon on a diagonal line.,Adjective,Set off in a catty-corner direction across the vacant lot.,catacorner,cata-cornered,B2,54,General,Less Common,,,oblique
+3007,Categorically,"in a way that is absolute and clear, without exceptions or qualifications.",Adverb,The spokesperson categorically denied the rumors.,flatly,unconditionally,B2,36,General,Less Common,,,categorical;unqualified
+3008,Categorised,chiefly British spelling of 'categorized'; placed into a particular category or class.,Verb,The books were categorised by genre on the new shelving system.,categorize,categorise,B2,54,Academic,Less Common,,,compare;theorize;calculate
+3009,Categorized,"placed into a particular category or class, chiefly American spelling.",Verb,Each expense is categorized automatically by the accounting software.,categorize,categorise,B2,36,Academic,Less Common,,,compare;theorize;calculate
+3010,Catercorner,situated diagonally opposite something across an intersection or square.,Adjective,Their new house is catercorner from the elementary school.,catacorner,cata-cornered,B2,54,General,Less Common,,,oblique
 3011,Catering,"Give what is desired or needed, especially support, food or sustenance.",Verb,The hostess provided lunch for all the guests.,provide,supply,B1,23,Health & Wellness,Common,,,give;ply
 3012,Catheterize,Insert a catheter into (a body part).,Verb,Catheterize the patient's bladder.,catheterise,,B2,54,General,Less Common,,,enclose;inclose;introduce
 3013,Cattish,Marked by or arising from malice.,Adjective,A catty remark.,bitchy,catty,B2,54,General,Less Common,,,malicious
@@ -3022,19 +3022,19 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 3021,Cautiousness,The tendency to be careful and avoid risk.,Noun,Her natural cautiousness kept her from investing in anything too risky.,caution,carefulness,B2,54,General,Less Common,,,cautious;attentiveness;mindfulness
 3022,Cavalry,Troops trained to fight on horseback.,Noun,500 horse led the attack.,horse cavalry,horse,A2,6,Society & Culture,Very Common,,,trooper;hostile;friendly
 3023,Cavernous,Filled with vascular sinuses and capable of becoming distended and rigid as the result of being filled with blood.,Adjective,Erectile tissue.,erectile,,B2,36,General,Less Common,,,expansive;cavern;hollow
-3024,Ceaselessly,With unflagging resolve.,Adverb,Dance inspires him ceaselessly to strive higher and higher toward the shining pinnacle of perfection that is the goal of every artiste.,endlessly,incessantly,B2,36,General,Less Common,,,infinite;continuous;ceaseless
+3024,Ceaselessly,"continuously, without ever stopping.",Adverb,The waves crashed ceaselessly against the rocky shore.,endlessly,incessantly,B2,36,General,Less Common,,,infinite;continuous;ceaseless
 3025,Celestial,Of or relating to the sky.,Adjective,Celestial map.,heavenly,,A2,12,General,Very Common,,,sky;heaven
 3026,Celluloid,A medium that disseminates moving pictures.,Noun,Theater pieces transferred to celluloid.,film,cinema,B2,54,Communication,Less Common,,,vehicle;thermoplastic;medium
 3027,Censoring,"Subject to political, religious, or moral censorship.",Verb,This magazine is censored by the government.,censor,,B2,54,Academic,Less Common,,,criminalise;illegalize;measure
 3028,Centenary,Of or relating to or completing a period of 100 years.,Adjective,Centennial celebration.,centennial,,B2,36,General,Less Common,,,century
 3029,Centered,Center upon.,Verb,Her entire attention centered on her children.,focus on,center on,A2,8,General,Very Common,,,pertain;concern;involve
 3030,Centerfield,The piece of ground in the outfield directly ahead of the catcher.,Noun,He hit the ball to deep center.,center field,center,B2,54,Science & Technology,Less Common,,,position;forward;tract
-3031,Centerpiece,The central or most important feature.,Noun,Education was the centerpiece of the Democratic Party's political platform.,centrepiece,,B2,54,Academic,Less Common,,,feature;characteristic;decoration
+3031,Centerpiece,"the most important or attractive feature of something, or a decorative item at the center of a table, chiefly American spelling.",Noun,A vase of fresh flowers served as the centerpiece for the table.,centrepiece,,B2,54,Academic,Less Common,,,feature;characteristic;decoration
 3032,Centralised,"Brought under the control of a single central authority, chiefly British spelling.",Verb,The company centralised its purchasing decisions at headquarters.,centralize,centralise,B2,54,General,Less Common,,,change;alter;modify
 3033,Centralize,To bring something under the control of a single central authority or location.,Verb,The new system will centralize all customer data in one database.,centralise,concentrate,B2,54,General,Less Common,,,centralization;change;alter
 3034,Centralized,"Brought under the control of a single authority or place, American spelling.",Verb,The centralized power grid made outages harder to isolate.,centralize,centralise,A2,11,General,Very Common,,,change;alter;modify
-3035,Centrepiece,The central or most important feature.,Noun,Education was the centerpiece of the Democratic Party's political platform.,centerpiece,,B2,54,Academic,Less Common,,,feature;characteristic;decoration
-3036,Centripetal,Of a nerve fiber or impulse originating outside and passing toward the central nervous system.,Adjective,Sensory neurons.,receptive,sensory,B2,54,General,Less Common,,,
+3035,Centrepiece,"the most important or central feature of something, chiefly British spelling.",Noun,The new stadium became the centrepiece of the city's Olympic bid.,centerpiece,,B2,54,Academic,Less Common,,,feature;characteristic;decoration
+3036,Centripetal,"directed or moving toward a center, such as a nerve impulse traveling toward the central nervous system, or a physical force pulling inward.",Adjective,The centripetal force kept the spinning ball on its circular path.,receptive,sensory,B2,54,General,Less Common,,,
 3037,Cerebral,Involving intelligence rather than emotions or instinct.,Adjective,A cerebral approach to the problem.,intellectual,,A2,12,General,Very Common,,,cerebrum
 3038,Cerebration,"The act of thinking, especially deliberate mental effort (formal).",Noun,The essay required hours of careful cerebration.,thinking,thought,B2,54,Academic,Less Common,,,explanation;planning;preparation
 3039,Ceremonial,A formal event performed on a special occasion.,Noun,A ceremony commemorating Pearl Harbor.,ceremony,ceremonial occasion,B1,23,General,Common,,,occasion;function;exercise
@@ -3052,10 +3052,10 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 3051,Chanceful,Of uncertain outcome; especially fraught with risk.,Adjective,"An extremely dicey future on a brave new world of liquid nitrogen, tar, and smog.",chancy,dicey,B2,54,General,Less Common,,,dangerous;unsafe
 3052,Changeable,Capable of or tending to change in form or quality or nature.,Adjective,A mutable substance.,mutable,,B1,17,General,Common,,,changeableness;unstable;erratic
 3053,Changeableness,The quality of being changeable; having a marked tendency to change.,Noun,The changeableness of the weather.,changeability,,B2,54,General,Less Common,,,changeable;quality;variance
-3054,Changeless,Not subject or susceptible to change or variation in form or quality or nature.,Adjective,"The view of that time was that all species were immutable, created by God.",immutable,,B2,54,General,Less Common,,,changelessness;invariable
+3054,Changeless,remaining the same over time; unchanging.,Adjective,The small mountain village seemed changeless across the generations.,immutable,,B2,54,General,Less Common,,,changelessness;invariable
 3055,Changing,Cause to change; make different; cause a transformation.,Verb,The advent of the automobile may have altered the growth pattern of the city.,change,alter,A2,5,General,Very Common,,,
 3056,Channelize,Make a channel for; provide with a channel.,Verb,Channelize the country for better transportation.,channelise,,B2,54,Arts & Creativity,Less Common,,,control;command;canalize
-3057,Chanted,Recite with musical intonation; recite as a chant or a psalm.,Verb,The rabbi chanted a prayer.,chant,intone,B1,15,Communication,Common,,,verbalize;verbalise;harmonize
+3057,Chanted,"recited or sung in a rhythmic, repetitive way.",Verb,The crowd chanted the team's name as they took the field.,chant,intone,B1,15,Communication,Common,,,verbalize;verbalise;harmonize
 3058,Chantlike,Uttered in a monotonous cadence or rhythm as in chanting.,Adjective,Their chantlike intoned prayers.,intoned,singsong,B2,54,General,Less Common,,,rhythmic;rhythmical
 3059,Chapped,Crack due to dehydration.,Verb,My lips chap in this dry weather.,chap,,B2,54,General,Less Common,,,crack;craze;alligator
 3060,Frontier,"The border between two countries, or the edge of what is known or explored.",Noun,The explorers pushed past the frontier into uncharted land.,border,boundary,B1,30,Travel & Places,Common,,,
@@ -3064,20 +3064,20 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 3063,Characterless,Lacking distinct or individual characteristics; dull and uninteresting.,Adjective,Women dressed in nondescript clothes.,nondescript,,B2,54,General,Less Common,,,ordinary
 3064,Charismatic,Possessing an extraordinary ability to attract.,Adjective,A charismatic leader.,magnetic,,B2,54,General,Less Common,,,attractive;charisma
 3065,Charmed,Delighted and attracted by someone's charm or appeal.,Adjective,The whole room was charmed by his easy sense of humour.,capture,enamour,B1,23,Emotion,Common,,,attract;control;command
-3066,Charnel,Gruesomely indicative of death or the dead.,Adjective,A charnel smell came from the chest filled with dead men's bones.,ghastly,sepulchral,B2,54,General,Less Common,,,offensive
+3066,Charnel,"relating to death or dead bodies, especially evoking a place where corpses or bones are deposited.",Adjective,The catacombs had a charnel silence that made visitors speak in whispers.,ghastly,sepulchral,B2,54,General,Less Common,,,offensive
 3067,Chartless,"Not recorded on any map or chart; unexplored (rare, literary).",Adjective,The old sailors feared the chartless waters beyond the reef.,uncharted,unmapped,B2,54,General,Less Common,,,unknown
-3068,Chassis,Alternative names for the body of a human being.,Noun,Leonardo studied the human body.,human body,physical body,B2,36,Health & Wellness,Less Common,,,individual;someone;somebody
+3068,Chassis,"the base frame of a vehicle, or, informally, a person's physical build or body.",Noun,He joked that years at the gym had given him quite the chassis.,human body,physical body,B2,36,Health & Wellness,Less Common,,,individual;someone;somebody
 3069,Chasten,"To discipline or correct someone, often making them humbler as a result.",Verb,The harsh defeat seemed to chasten the once-arrogant team.,chastise,castigate,B2,54,Communication,Less Common,,,trounce;reproof;lecture
 3070,Chastening,"Having a humbling or restraining effect, especially after a failure.",Verb,It was a chastening experience to lose the election so badly.,chastise,castigate,B2,54,Communication,Less Common,,,trounce;reproof;lecture
 3071,Chastise,"To scold or reprimand someone severely, sometimes with punishment.",Verb,The teacher chastised the students for cheating on the test.,castigate,objurgate,B2,54,Communication,Less Common,,,trounce;reproof;lecture
 3072,Chatter,Click repeatedly or uncontrollably.,Verb,Chattering teeth.,click,,A2,13,General,Very Common,,,sound;chattering;cut
-3073,Chattily,In a chatty manner.,Adverb,"`when I was a girl,' she said chattily, `I used to ride a bicycle'.",volubly,,B2,54,General,Less Common,,,communicative;chatty;voluble
-3074,Cheaply,In a stingy manner.,Adverb,Their rich uncle treated them rather chintzily.,stingily,chintzily,B1,23,General,Common,,,parsimonious;penurious;miserly
+3073,Chattily,"in a casual, talkative, friendly way.",Adverb,She chattily filled the silence during the long car ride.,volubly,,B2,54,General,Less Common,,,communicative;chatty;voluble
+3074,Cheaply,at a low cost; inexpensively.,Adverb,You can furnish a whole apartment cheaply at the flea market.,stingily,chintzily,B1,23,General,Common,,,parsimonious;penurious;miserly
 3075,Checkmate,Place an opponent's king under an attack from which it cannot escape and thus ending the game.,Verb,Kasparov checkmated his opponent after only a few moves.,mate,,B2,54,Business,Less Common,,,trounce;vanquish;eliminate
 3076,Checkout,The act of inspecting or verifying.,Noun,They made a check of their equipment.,check,check-out procedure,B2,54,General,Less Common,,,inspection;review
-3077,Cheerfulness,The quality of being cheerful and dispelling gloom.,Noun,Flowers added a note of cheerfulness to the drab room.,cheer,sunniness,B2,36,General,Less Common,,,attribute;temperament;happiness
-3078,Cheering,Encouragement in the form of cheers from spectators.,Noun,It's all over but the shouting.,shouting,,B2,36,Communication,Less Common,,,encouragement;fosterage;promotion
-3079,Cheerless,Causing sad feelings of gloom and inadequacy.,Adjective,The economic outlook is depressing.,depressing,uncheerful,B2,54,General,Less Common,,,disconsolate;unhappy;sunniness
+3077,Cheerfulness,the state of being noticeably happy and optimistic.,Noun,"Her cheerfulness never wavered, even on the gloomiest days.",cheer,sunniness,B2,36,General,Less Common,,,attribute;temperament;happiness
+3078,Cheering,"loud shouts of approval or encouragement, especially from a crowd.",Noun,The cheering from the stands grew louder with every point scored.,shouting,,B2,36,Communication,Less Common,,,encouragement;fosterage;promotion
+3079,Cheerless,lacking warmth or cheer; bleak and depressing.,Adjective,The cheerless waiting room had nothing but gray walls and old magazines.,depressing,uncheerful,B2,54,General,Less Common,,,disconsolate;unhappy;sunniness
 3080,Cheeseparing,Giving or spending with reluctance.,Adjective,Our cheeseparing administration.,close,near,B2,54,General,Less Common,,,ungenerous;stingy
 3081,Chemosorption,Adsorption (especially when irreversible) by means of chemical instead of physical forces.,Noun,Chemisorption of gaseous nitrogen on iron catalysts.,chemisorption,,B2,54,Nature,Less Common,,,chemisorb;adsorption
 3082,Cherubic,Having a sweet nature befitting an angel or cherub.,Adjective,An angelic smile.,angelic,angelical,B2,54,General,Less Common,,,loveable;lovable
@@ -3088,14 +3088,14 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 3087,Childly,Befitting a young child.,Adjective,Childlike charm.,childlike,,B2,54,General,Less Common,,,child;young;immature
 3088,Chiller,Excitation that makes your hair stand up or that chills your bones.,Noun,The movie was an old-fashioned hair-raiser.,hair-raiser,,B2,54,General,Less Common,,,excitement;excitation;thrill
 3089,Chilliness,The property of being moderately cold.,Noun,The chilliness of early morning.,coolness,nip,B2,54,General,Less Common,,,coldness;frigidity;frigidness
-3090,Chimeral,Being or relating to or like a chimera.,Adjective,His Utopia is not as chimeric commonwealth but a practical improvement on what already exists.,chimeric,chimerical,B2,54,General,Less Common,,,chimera
-3091,Chimerical,Being or relating to or like a chimera.,Adjective,His Utopia is not as chimeric commonwealth but a practical improvement on what already exists.,chimeric,chimeral,B2,54,General,Less Common,,,chimera;unrealistic
-3092,Chinked,Make or emit a high sound.,Verb,Tinkling bells.,tinkle,tink,B2,36,General,Less Common,,,stopper;stopple;sound
+3090,Chimeral,a less common variant of 'chimerical'; existing only as an illusion or fantasy.,Adjective,His chimeral plans for instant wealth never survived contact with reality.,chimeric,chimerical,B2,54,General,Less Common,,,chimera
+3091,Chimerical,"highly unrealistic; imaginary or fantastical, like the mythical chimera.",Adjective,The startup's chimerical promises attracted investors who should have known better.,chimeric,chimeral,B2,54,General,Less Common,,,chimera;unrealistic
+3092,Chinked,"made a light, ringing sound, like metal or glass striking together.",Verb,The coins chinked together as he counted them out on the table.,tinkle,tink,B2,36,General,Less Common,,,stopper;stopple;sound
 3093,Chipper,"Having a cheerful, lively, and self-confident air.",Adjective,"Looking chipper, like a man...diverted by his own wit.",debonair,debonaire,B2,36,General,Less Common,,,cheerful
 3094,Chipping,Break off (a piece from a whole).,Verb,Her tooth chipped.,chip,chip off,B1,15,General,Common,,,separate;dismember;segment
 3095,Chirrup,Make high-pitched sounds.,Verb,The birds were chirping in the bushes.,peep,cheep,B2,54,Communication,Less Common,,,utter;emit
-3096,Chitchat,Talk socially without exchanging too much information.,Verb,The men were sitting in the cafe and shooting the breeze.,chew the fat,shoot the breeze,B2,54,Communication,Less Common,,,contend;interview;question
-3097,Chivalrously,In a gallant manner.,Adverb,He gallantly offered to take her home.,gallantly,,B2,54,General,Less Common,,,courteous;chivalrous
+3096,Chitchat,"engage in light, casual conversation about unimportant matters.",Verb,They chitchat by the coffee machine every morning before work starts.,chew the fat,shoot the breeze,B2,54,Communication,Less Common,,,contend;interview;question
+3097,Chivalrously,"in a courteous, honorable way, especially toward women, in the manner of a medieval knight.",Adverb,He chivalrously held the door and carried her bags to the car.,gallantly,,B2,54,General,Less Common,,,courteous;chivalrous
 3098,Curtain,A piece of cloth hung to cover a window or separate parts of a room.,Noun,She pulled the curtain shut to block out the morning sun.,drape,blind,A1,9,General,Very Common,,,
 3099,Chockablock,Packed full to capacity.,Adjective,Chowder chockablock with pieces of fish.,chock-full,chockful,B2,54,General,Less Common,,,full
 3100,Choiceness,The quality of being very good indeed.,Noun,The inn is distinguished by the fineness of its cuisine.,fineness,,B2,54,General,Less Common,,,ingenuity;choice;superiority
@@ -3184,7 +3184,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 3183,Coalescing,Coming together and combining into a single mass or whole.,Verb,Storm clouds were coalescing rapidly over the mountains.,blend,flux,B2,55,General,Less Common,,,federalize;federalise;converge
 3184,Coarseness,Language or humor that is down-to-earth.,Noun,The saltiness of their language was inappropriate.,saltiness,,B2,36,Communication,Less Common,,,roughness;style;raggedness
 3185,Coaxing,Persuading someone gently and persistently to do something.,Verb,It took some coaxing to get the toddler into the car seat.,wheedle,cajole,B2,36,Communication,Less Common,,,prevail;influence;convert
-3186,Coaxingly,In a cajoling manner.,Adverb,"`Come here,' she said coaxingly.",cajolingly,,B2,55,General,Less Common,,,
+3186,Coaxingly,"in a gentle, persuasive way meant to encourage someone to do something.",Adverb,"He held out the treat coaxingly, trying to lure the nervous cat closer.",cajolingly,,B2,55,General,Less Common,,,
 3187,Cobwebby,So thin as to transmit light.,Adjective,A hat with a diaphanous veil.,diaphanous,filmy,B2,55,General,Less Common,,,unclean;cobweb;thin
 3188,Cockamamy,"Ludicrous, foolish.",Adjective,Gave me a cockamamie reason for not going.,cockamamie,goofy,B2,55,General,Less Common,,,foolish
 3189,Cockeyed,Turned or twisted toward one side.,Adjective,A...youth with a gorgeous red necktie all awry.,askew,awry,B2,36,General,Less Common,,,crooked;foolish
@@ -3318,7 +3318,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 3317,Concoct,Prepare or cook by mixing ingredients.,Verb,Concoct a strange mixture.,cook up,,B2,56,Arts & Creativity,Less Common,,,amalgamate;prepare;intermix
 3318,Concomitant,Following or accompanying as a consequence.,Adjective,"An excessive growth of bureaucracy, with attendant problems.",attendant,consequent,B2,56,General,Less Common,,,subsequent;concomitance
 3319,Concord,"To be in agreement or harmony with something (rare, formal verb form).",Verb,Her account of events concords closely with the police report.,harmonize,harmonise,A2,10,General,Very Common,,,correspond;arrange;consist
-3320,Concretion,A hard lump produced by the concretion of mineral salts; found in hollow organs or ducts of the body.,Noun,Renal calculi can be very painful.,calculus,,B2,56,General,Less Common,,,activity;outcropping;intrusion
+3320,Concretion,"a hard mass formed by the gradual accumulation of matter, especially mineral deposits, in a rock or in the body.",Noun,Geologists found strange spherical concretions embedded in the cliffside.,calculus,,B2,56,General,Less Common,,,activity;outcropping;intrusion
 3321,Concretize,Become specific.,Verb,The idea concretized in her mind.,concretise,,B2,56,General,Less Common,,,specify;narrow;change
 3322,Concurrent,Occurring or operating at the same time.,Adjective,A series of coincident events.,coincident,coincidental,A2,13,General,Very Common,,,synchronous;synchronic;concurrence
 3323,Concurrently,Overlapping in duration.,Adverb,Concurrently with the conference an exhibition of things associated with Rutherford was held.,at the same time,,B2,37,General,Less Common,,,concurrent;synchronous;synchronic
@@ -3333,7 +3333,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 3332,Condolence,An expression of sympathy with another's grief.,Noun,They sent their condolences.,commiseration,,B2,56,Communication,Less Common,,,acknowledgment;regrets;farewell
 3333,Condone,"Excuse, overlook, or make allowances for; be lenient with.",Verb,Excuse someone's behavior.,excuse,,B2,56,Communication,Less Common,,,forgive;justify;condonation
 3334,Conducive,Making a particular outcome more likely to happen.,Adjective,A quiet room is more conducive to studying.,contributing,contributive,B1,28,General,Common,,,conduce;causative
-3335,Confabulate,Talk socially without exchanging too much information.,Verb,The men were sitting in the cafe and shooting the breeze.,chew the fat,shoot the breeze,B2,56,Communication,Less Common,,,concoct;mythologise;contend
+3335,Confabulate,"engage in informal conversation, or, in a clinical sense, fabricate false memories believed to be true.",Verb,The old friends would confabulate for hours whenever they met.,chew the fat,shoot the breeze,B2,56,Communication,Less Common,,,concoct;mythologise;contend
 3336,Confection,Make into a confection.,Verb,This medicine is home-confected.,confect,comfit,B2,56,Arts & Creativity,Less Common,,,compound;confuse;assemble
 3337,Confederate,Form a group or unite.,Verb,The groups banded together.,band together,,A2,8,Society & Culture,Very Common,,,associate;federalize;federalise
 3338,Confessedly,as one openly admits; by one's own admission.,Adverb,"He was, confessedly, not the best cook in the family.",true,admittedly,B2,56,General,Less Common,,,
@@ -3433,7 +3433,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 3432,Contingent,A temporary military unit.,Noun,The peacekeeping force includes one British contingent.,detail,,B1,23,Society & Culture,Common,,,gathering;assemblage;force
 3433,Contorted,Twisted (especially as in pain or struggle).,Adjective,His mad contorted smile.,writhed,writhen,B1,23,General,Common,,,crooked
 3434,Contortion,A tortuous and twisted shape or position.,Noun,They built a tree house in the tortuosities of its boughs.,tortuosity,tortuousness,B2,37,General,Less Common,,,projection;jutting;broadening
-3435,Contraband,Distributed or sold illicitly.,Adjective,The black economy pays no taxes.,bootleg,black,B2,37,General,Less Common,,,illegal
+3435,Contraband,"prohibited by law from being imported, exported, or possessed.",Adjective,Customs agents seized a shipment of contraband cigarettes at the border.,bootleg,black,B2,37,General,Less Common,,,illegal
 3436,Contraceptive,used or acting to prevent pregnancy.,Adjective,She discussed contraceptive options with her doctor.,prophylactic,antifertility,B2,37,General,Less Common,,,protective
 3437,Contracting,"The act of acquiring a disease, or entering into a formal agreement.",Noun,Contracting the flu during finals week was the worst timing possible.,catching,,B1,23,General,Common,,,contract;acquiring;getting
 3438,Contraction,The process or result of becoming smaller or pressed together.,Noun,The contraction of a gas on cooling.,compression,condensation,A2,9,General,Very Common,,,contract;shortening;shrinking
@@ -3613,7 +3613,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 3612,Curtail,Place restrictions on.,Verb,Curtail drinking in school.,restrict,curb,B1,20,General,Common,,,circumscribe;confine;abridge
 3613,Curtailment,The act of withholding or withdrawing some book or writing from publication or circulation.,Noun,A suppression of the newspaper.,suppression,,C1,57,General,Uncommon,,,curtail;immobilization;immobilisation
 3614,Curtainless,Not provided with curtains.,Adjective,"Blank, curtainless windows stared back at her.",uncurtained,,C1,57,General,Uncommon,,,
-3615,Curvaceous,(of a woman's body) having a large bosom and pleasing curves.,Adjective,Hollywood seems full of curvaceous blondes.,bosomy,busty,C1,57,General,Uncommon,,,curvaceousness;shapely
+3615,Curvaceous,"having a shapely, curved figure.",Adjective,The dress was designed to flatter a curvaceous silhouette.,bosomy,busty,C1,57,General,Uncommon,,,curvaceousness;shapely
 3616,Curvilineal,Characterized by or following a curved line.,Adjective,Curvilinear tracery.,curvilinear,,C1,57,General,Uncommon,,,curved
 3617,Curvilinear,Characterized by or following a curved line.,Adjective,Curvilinear tracery.,curvilineal,,C1,57,General,Uncommon,,,curved
 3618,Cushion,A mechanical damper; absorbs energy of sudden impulses.,Noun,The old car needed a new set of shocks.,shock absorber,shock,A2,12,Science & Technology,Very Common,,,suspension;backing;blanket
@@ -4175,7 +4175,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4174,Dramatise,Put into dramatic form.,Verb,Adopt a book for a screenplay.,dramatize,adopt,C1,61,Arts & Creativity,Uncommon,,,compose;represent;poetise
 4175,Dramatize,Put into dramatic form.,Verb,Adopt a book for a screenplay.,dramatise,adopt,B1,24,Arts & Creativity,Common,,,compose;represent;poetise
 4176,Draughts,A serving of drink (usually alcoholic) drawn from a keg.,Noun,They served beer on draft.,draft,draught,B1,29,Health & Wellness,Common,,,potation;checkerboard;drink
-4177,Drawers,Underpants worn by women.,Noun,She was afraid that her bloomers might have been showing.,bloomers,pants,B1,17,Science & Technology,Common,,,underpants;pantie;panty
+4177,Drawers,an old-fashioned term for underpants.,Noun,"Grandma still calls her underwear drawers, a word from her childhood.",bloomers,pants,B1,17,Science & Technology,Common,,,underpants;pantie;panty
 4178,Dreaded,Be afraid or scared of; be frightened of.,Verb,I fear the winters in Moscow.,fear,dread,B1,29,Emotion,Common,,,
 4179,Dreadfully,Of a dreadful kind.,Adverb,There was a dreadfully bloody accident on the road this morning.,awfully,horribly,B2,38,General,Less Common,,,alarming;dreadful;unpleasant
 4180,Dreamfully,In a dreamy manner.,Adverb,"`She would look beautiful in the new dress,' Tommy said dreamily.",dreamily,moonily,C1,61,General,Uncommon,,,inattentive
@@ -4208,7 +4208,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4207,Dubitable,Open to doubt or suspicion.,Adjective,The candidate's doubtful past.,doubtful,dubious,C1,61,General,Uncommon,,,questionable
 4208,Ducking,To move (the head or body) quickly downwards or away.,Verb,"Before he could duck, another stone struck him.",duck,,B1,24,General,Common,,,move;dive;plunge
 4209,Ductile,"Capable of being drawn out into a thin wire without breaking, as certain metals.",Adjective,Copper is prized for being both ductile and an excellent conductor.,malleable,pliable,C1,61,General,Uncommon,,,manipulable;tractable;ductility
-4210,Dullness,Without sharpness or clearness of edge or point.,Noun,The dullness of the pencil made his writing illegible.,bluntness,,B2,38,General,Less Common,,,retardation;foolishness;craziness
+4210,Dullness,"the quality of lacking sharpness, brightness, or interest.",Noun,The dullness of the old knife made it useless for slicing tomatoes.,bluntness,,B2,38,General,Less Common,,,retardation;foolishness;craziness
 4211,Dumbfounded,So shocked or confused that you're left speechless.,Adjective,He was dumbfounded when he opened the door and saw everyone there.,perplex,vex,C1,61,Academic,Uncommon,,,confuse;befuddle;bedevil
 4212,Dumbstricken,As if struck dumb with astonishment and surprise.,Adjective,A circle of policement stood dumbfounded by her denial of having seen the accident.,dumbfounded,dumfounded,C1,61,General,Uncommon,,,surprised
 4213,Dumfounded,As if struck dumb with astonishment and surprise.,Adjective,A circle of policement stood dumbfounded by her denial of having seen the accident.,dumbfounded,flabbergasted,C1,61,General,Uncommon,,,surprised
@@ -4300,7 +4300,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4299,Emanate,Give out (breath or an odor).,Verb,The chimney exhales a thick smoke.,exhale,give forth,C1,62,Health & Wellness,Uncommon,,,breathe;address;approach
 4300,Emancipated,Free from traditional social restraints.,Adjective,An emancipated young woman pursuing her career.,liberated,,B1,29,General,Common,,,free
 4301,Emancipator,Someone who frees others from bondage.,Noun,Lincoln is known as the Great Emancipator.,manumitter,,C1,62,Society & Culture,Uncommon,,,emancipate;liberator
-4302,Emasculated,Deprive of strength or vigor.,Verb,The Senate emasculated the law.,emasculate,castrate,B2,38,General,Less Common,,,sterilize;desexualize;enfeeble
+4302,Emasculated,"deprived of strength, vigor, or effectiveness, especially in a figurative sense.",Verb,The amendment emasculated the original bill's strongest provisions.,emasculate,castrate,B2,38,General,Less Common,,,sterilize;desexualize;enfeeble
 4303,Embarrassed,"Feeling or showing embarrassment, self-consciousness, shame, or awkwardness.",Verb,He was embarrassed after tripping in front of the whole class.,obstruct,blockade,A2,12,Society & Culture,Very Common,,,disconcert;prevent;discombobulate
 4304,Embattled,Fortify by furnishing with battlements for defense.,Verb,An embattled castle.,embattle,,B2,38,Business,Less Common,,,prepare;sandwich;fortify
 4305,Embellish,Be beautiful to look at.,Verb,Flowers adorned the tables everywhere.,deck,adorn,C1,62,General,Uncommon,,,embellishment;overstate;hyperbolize
@@ -4334,7 +4334,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4333,Empyreal,Of or relating to the sky or heavens.,Adjective,The empyrean sphere.,empyrean,,C1,62,General,Uncommon,,,glorious
 4334,Enabling,Render capable or able for some task.,Verb,This skill will enable you to find a job on Wall Street.,enable,,A2,8,General,Very Common,,,empower;change;alter
 4335,Enamour,To fill someone with a strong feeling of love or admiration.,Verb,Her passion for the project began to enamour the whole team.,capture,trance,C1,62,Emotion,Uncommon,,,attract;becharm;fascinate
-4336,Encapsulate,Put in a short or concise form; reduce in volume.,Verb,Capsulize the news.,capsule,capsulize,C1,62,General,Uncommon,,,enclose;inclose;condense
+4336,Encapsulate,"express the essential features of something concisely, or enclose something in a capsule.",Verb,Her speech managed to encapsulate the team's entire mission in two minutes.,capsule,capsulize,C1,62,General,Uncommon,,,enclose;inclose;condense
 4337,Enceinte,In an advanced stage of pregnancy.,Adjective,Was big with child.,big,expectant,C1,62,General,Uncommon,,,pregnant
 4338,Enchained,Bound with chains.,Adjective,Enchained demons strained in anger to gnaw on his bones.,chained,,B2,38,General,Less Common,,,bound
 4339,Enchanted,So delighted or charmed that it feels almost magical.,Adjective,She was enchanted by the fairy lights strung through the garden.,capture,enamour,B1,17,Emotion,Common,,,delight;attract;transport
@@ -4680,7 +4680,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4679,Fattened,Make fat or plump.,Verb,We will plump out that poor starving child.,fatten,fat,C1,64,Health & Wellness,Uncommon,,,change;alter;modify
 4680,Fattiness,"The quality of containing or consisting of fat, informal, often of food.",Noun,The fattiness of the sauce made the dish feel especially rich.,adiposity,adiposeness,C1,64,General,Uncommon,,,blubber;avoirdupois;fatty
 4681,Fatuousness,A ludicrous folly.,Noun,The crowd laughed at the absurdity of the clown's behavior.,absurdity,fatuity,C1,64,General,Uncommon,,,foolishness;fatuous;folly
-4682,Faultfinding,Tending to find and call attention to faults.,Adjective,A captious pedant.,captious,,C1,64,General,Uncommon,,,critical;judgmental
+4682,Faultfinding,habitually looking for and criticizing small mistakes or defects.,Adjective,Her faultfinding boss made even minor errors feel like disasters.,captious,,C1,64,General,Uncommon,,,critical;judgmental
 4683,Faultless,Without fault or error.,Adjective,Faultless logic.,immaculate,impeccable,B2,39,General,Less Common,,,perfect
 4684,Favorably,Showing approval.,Adverb,He reviewed the play favorably.,favourably,,A2,8,General,Very Common,,,approbative;complimentary;affirmatory
 4685,Favourable,Encouraging or approving or pleasing.,Adjective,A favorable reply.,favorable,,C1,64,General,Uncommon,,,approbative;complimentary;affirmatory
@@ -4788,7 +4788,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4787,Floridity,"An overly elaborate or ornate style, especially in speech or writing.",Noun,The critic mocked the novel's floridity of language.,flamboyance,floridness,C1,65,General,Uncommon,,,ornateness;showiness;elaborateness
 4788,Floridness,"The quality of being excessively ornate, flowery, or elaborate.",Noun,Even fans admitted the floridness of his prose could be exhausting.,flamboyance,floridity,C1,65,General,Uncommon,,,ornateness;showiness;florid
 4789,Flourish,(music) a short lively tune played on brass instruments.,Noun,He entered to a flourish of trumpets.,fanfare,tucket,B1,17,Communication,Common,,,embellishment;gesture;motion
-4790,Flowered,Produce or yield flowers.,Verb,The cherry tree bloomed.,bloom,blossom,B1,24,General,Common,,,develop;progress;incubate
+4790,Flowered,produced blooms; bore flowers.,Verb,The garden flowered early after such a mild winter.,bloom,blossom,B1,24,General,Common,,,develop;progress;incubate
 4791,Flowerless,Without flower or bloom and not producing seeds.,Adjective,A flowerless plant.,nonflowering,,C1,65,General,Uncommon,,,
 4792,Flowery,Marked by elaborate rhetoric and elaborated with decorative details.,Adjective,A flowery speech.,ornate,,C1,65,General,Uncommon,,,flower;rhetorical
 4793,Fluctuate,Move or sway in a rising and falling or wavelike pattern.,Verb,The line on the monitor vacillated.,vacillate,waver,C1,65,General,Uncommon,,,fluctuation;move;displace
@@ -4813,7 +4813,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4812,Foolish,Having or revealing stupidity.,Adjective,Ridiculous anserine behavior.,anserine,dopy,A2,7,General,Very Common,,,foolishness;cockamamy;cockeyed
 4813,Foolishness,The quality of being unwise or lacking good sense.,Noun,Investing his savings in that scheme was pure foolishness.,folly,craziness,B1,30,Academic,Common,,,foolish;fatuousness;dullness
 4814,Footfall,The sound of a step of someone walking.,Noun,He heard footsteps on the porch.,footstep,step,B2,39,General,Less Common,,,sound
-4815,Foothold,An area in hostile territory that has been captured and is held awaiting further troops and supplies.,Noun,An attempt to secure a bridgehead behind enemy lines.,bridgehead,,C1,65,Travel & Places,Uncommon,,,support;beachhead;airhead
+4815,Foothold,"a secure initial position from which further progress can be made, literally or figuratively.",Noun,The startup finally gained a foothold in the competitive software market.,bridgehead,,C1,65,Travel & Places,Uncommon,,,support;beachhead;airhead
 4816,Footling,"To waste time on trivial matters, chiefly British informal usage.",Verb,Stop footling about and get to the point.,loiter,lounge,C1,65,General,Uncommon,,,act;behave
 4817,Footnote,add a note at the bottom of a page giving additional information or a source.,Verb,The editor asked him to footnote every statistic in the report.,annotate,,B1,24,Arts & Creativity,Common,,,compose;poetise;dramatize
 4818,Footrace,A race run on foot.,Noun,She broke the record for the half-mile run.,foot race,run,C1,65,General,Uncommon,,,race;marathon;steeplechase
@@ -4892,7 +4892,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4891,Fraternity,"A group of people sharing a common profession or interests, especially a college social organization.",Noun,He joined a fraternity during his freshman year.,brotherhood,sodality,B1,15,Society & Culture,Common,,,society;stratum;brother
 4892,Fraught,"Filled with or accompanied by something undesirable, especially tension or danger.",Adjective,The negotiations were fraught with tension from the very first meeting.,pregnant,,C1,66,General,Uncommon,,,troubled;full
 4893,Frazzle,Wear away by rubbing.,Verb,The friction frayed the sleeve.,fray,,C1,66,General,Uncommon,,,exhaust;break;wear
-4894,Freakishly,Unpredictably.,Adverb,The weather has been freakishly variable.,capriciously,,C1,66,General,Uncommon,,,unpredictable;freakish
+4894,Freakishly,"in a strange, unusual, or abnormal way.",Adverb,The weather turned freakishly cold for the middle of summer.,capriciously,,C1,66,General,Uncommon,,,unpredictable;freakish
 4895,Freebee,Something that is free (usually provided as part of a promotional scheme).,Noun,The road map was a freebie.,freebie,,C1,66,Business,Uncommon,,,contribution;present;portion
 4896,Freehand,Done by hand without mechanical aids or devices.,Adjective,A freehand drawing.,freehanded,,B1,24,General,Common,,,original
 4897,Freeing,Relieve from.,Verb,Rid the house of pests.,rid,free,B1,24,Business,Common,,,cleanse;relieve;parole
@@ -4939,7 +4939,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4938,Fundamentals,Principles from which other truths can be derived.,Noun,First you must learn the fundamentals.,basics,fundamental principle,B1,17,Academic,Common,,,principle;conservation;factor
 4939,Fundraise,Raise money for a cause or project.,Verb,We are fundraising for AIDS research.,fund-raise,fund raise,C1,66,Business,Uncommon,,,raise
 4940,Funnies,An account of an amusing incident (usually with a punch line).,Noun,She told a funny story.,funny story,good story,C1,66,Communication,Uncommon,,,newspaper;cartoon;sketch
-4941,Furbish,Polish and make shiny.,Verb,Buff the wooden floors.,buff,burnish,C1,66,General,Uncommon,,,simonize;polish;smooth
+4941,Furbish,"clean, polish, or renovate something to make it look new again.",Verb,They spent the weekend trying to furbish the old brass fixtures.,buff,burnish,C1,66,General,Uncommon,,,simonize;polish;smooth
 4942,Furious,Marked by extreme and violent energy.,Adjective,A ferocious beating.,ferocious,fierce,A2,12,General,Very Common,,,violent;furiousness;fury
 4943,Furlough,"Dismiss, usually for economic reasons.",Verb,She was laid off together with hundreds of other workers when the company downsized.,lay off,,B1,30,Society & Culture,Common,,,countenance;tolerate;privilege
 4944,Furnish,"To supply or equip something with what is needed, especially furniture.",Verb,They furnished the apartment entirely with secondhand finds.,supply,provide,A2,6,Business,Very Common,,,furniture;furnishing;give
@@ -4950,7 +4950,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 4949,Furtively,In a furtive manner.,Adverb,The soldiers were furtively crawling through the night.,on the sly,,B2,39,General,Less Common,,,furtive;concealed
 4950,Futurist,Of or relating to futurism.,Adjective,Futurist art.,futuristic,,C1,66,General,Uncommon,,,futurism
 4951,Gainsay,Take exception to.,Verb,She challenged his claims.,challenge,dispute,C1,66,Communication,Uncommon,,,contest;contend;question
-4952,Gallantly,In a gallant manner.,Adverb,He gallantly offered to take her home.,chivalrously,,C1,66,General,Uncommon,,,courteous;gallant
+4952,Gallantly,"in a brave, honorable, and courteous way.",Adverb,The soldier gallantly volunteered to lead the dangerous mission.,chivalrously,,C1,66,General,Uncommon,,,courteous;gallant
 4953,Gallantry,"Courageous behavior, especially in battle; also, polite attentiveness toward women.",Noun,The medal was awarded for gallantry under fire.,heroism,valor,B1,24,General,Common,,,courtesy;valorousness;valiance
 4954,Galvanic,Pertaining to or producing electric current by chemical action.,Adjective,A galvanic cell.,voltaic,,B1,30,General,Common,,,exciting;galvanism
 4955,Galvanise,"To shock or excite someone into taking action, chiefly British spelling.",Verb,The speech managed to galvanise the entire crowd into volunteering.,startle,galvanize,C1,66,Emotion,Uncommon,,,surface;galvaniser;galvanisation
@@ -5165,7 +5165,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5164,Hardcover,Having a hard back or cover.,Adjective,Hardback books.,hardbacked,hardback,C1,67,General,Uncommon,,,backed
 5165,Hardening,The process of becoming hard or solid by cooling or drying or crystallization.,Noun,The hardening of concrete.,solidifying,solidification,C1,67,Nature,Uncommon,,,activity;symptom;calcification
 5166,Hardhearted,Devoid of feeling for others.,Adjective,An unfeeling wretch.,stonyhearted,unfeeling,C1,67,General,Uncommon,,,granitic;obdurate;hardheartedness
-5167,Hardiness,The trait of being willing to undertake things that involve risk or danger.,Noun,The proposal required great boldness.,boldness,daring,C1,67,General,Uncommon,,,strength;audaciousness;muscularity
+5167,Hardiness,"the ability to endure difficult conditions, such as harsh weather or hardship.",Noun,The plant's hardiness allows it to survive even a brutal winter.,boldness,daring,C1,67,General,Uncommon,,,strength;audaciousness;muscularity
 5168,Hardline,Firm and uncompromising.,Adjective,A hard-line policy.,hard-line,,C1,67,General,Uncommon,,,uncompromising;sturdy;inflexible
 5169,Hardness,The quality of being difficult to do.,Noun,He assigned a series of problems of increasing hardness.,ruggedness,,B1,30,General,Common,,,consistency;consistence;firmness
 5170,Hardwareman,Someone who sells hardware.,Noun,In England they call a hardwareman an ironmonger.,ironmonger,,C1,67,Society & Culture,Uncommon,,,trader;bargainer;dealer
@@ -5181,7 +5181,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5180,Hatchel,Comb with a heckle.,Verb,Heckle hemp or flax.,heckle,hackle,C1,68,General,Uncommon,,,comb;roach;currycomb
 5181,Hateful,Characterized by malice.,Adjective,A hateful thing to do.,mean,,B1,24,General,Common,,,execrable;offensive;undesirable
 5182,Haughty,Arrogantly proud and looking down on other people.,Adjective,The haughty waiter barely acknowledged them.,disdainful,imperious,B1,30,General,Common,,,haughtiness;proud
-5183,Hauling,Draw slowly or heavily.,Verb,Haul stones.,haul,hale,B1,20,General,Common,,,transport;piggyback;attract
+5183,Hauling,"pulling or transporting something with effort, especially something heavy.",Verb,The truck was hauling gravel to the new construction site.,haul,hale,B1,20,General,Common,,,transport;piggyback;attract
 5184,Haunting,Follow stealthily or recur constantly and spontaneously to.,Verb,Her ex-boyfriend stalked her.,haunt,stalk,A2,12,General,Very Common,,,pursue;follow;preoccupy
 5185,Hawkish,Disposed to warfare or hard-line policies.,Adjective,Militant nations.,militant,warlike,C1,68,General,Uncommon,,,hawkishness;unpeaceful
 5186,Hazardous,Involving risk or danger.,Adjective,Skydiving is a hazardous sport.,risky,wild,B1,17,General,Common,,,dangerous;hazard;hazardousness
@@ -5384,7 +5384,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5383,Immaturely,In an immature manner.,Adverb,His teenage son still behaves very immaturely.,jejunely,,C1,69,General,Uncommon,,,puerile;childish;immature
 5384,Immeasurable,Too large or great to be measured; immense.,Adjective,Her contribution to the project was immeasurable.,unmeasurable,immensurable,B1,30,General,Common,,,abysmal;limitless;illimitable
 5385,Immediacy,Lack of an intervening or mediating agency.,Noun,The immediacy of television coverage.,immediateness,,A2,12,General,Very Common,,,directness;downrightness;insight
-5386,Immense,Unusually great in size or amount or degree or especially extent or scope.,Adjective,Huge government spending.,huge,vast,A2,8,General,Very Common,,,immenseness;immensity;large
+5386,Immense,"extremely large in size, extent, or degree.",Adjective,The library housed an immense collection of rare manuscripts.,huge,vast,A2,8,General,Very Common,,,immenseness;immensity;large
 5387,Immensurable,"Impossible to measure; immeasurable (archaic, rare).",Adjective,The poet described the immensurable expanse of the night sky.,immeasurable,unmeasurable,C1,69,General,Uncommon,,,abysmal;limitless;illimitable
 5388,Imminent,Close in time; about to occur.,Adjective,Retribution is at hand.,at hand,close at hand,B1,24,General,Common,,,imminency;imminence;close
 5389,Immingle,"To mix or blend together intimately (rare, literary).",Verb,The two rivers immingle just south of the old bridge.,blend,intermix,C1,69,General,Uncommon,,,amalgamate;compound;combine
@@ -5399,7 +5399,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5398,Immunity,The state of not being susceptible.,Noun,Unsusceptibility to rust.,unsusceptibility,,A2,14,General,Very Common,,,condition;status;immune
 5399,Immunized,"Made immune to a disease, American spelling.",Verb,The clinic immunized over a hundred children this week.,immunize,immunise,C1,69,Health & Wellness,Uncommon,,,protect;surround;preserve
 5400,Immurement,The state of being imprisoned.,Noun,He was held in captivity until he died.,captivity,imprisonment,C1,69,General,Uncommon,,,detention;custody;constraint
-5401,Immutable,Not subject or susceptible to change or variation in form or quality or nature.,Adjective,"The view of that time was that all species were immutable, created by God.",changeless,,B2,40,General,Less Common,,,immutableness;immutability
+5401,Immutable,unable to be changed; fixed and permanent.,Adjective,The laws of physics are considered immutable across the universe.,changeless,,B2,40,General,Less Common,,,immutableness;immutability
 5402,Immutably,In a way that cannot be changed.,Adverb,The law was immutably fixed once passed by both chambers.,unalterably,unchangeably,C1,69,General,Uncommon,,,immutable;changeless;unchanging
 5403,Impacted,Have an effect upon.,Verb,Will the new rules affect me?,affect,impact,B1,30,General,Common,,,squeeze;influence;distort
 5404,Impairment,A reduction in the normal function of a body part or sense.,Noun,Years of loud concerts left him with permanent hearing impairment.,disability,disablement,B2,40,General,Less Common,,,alteration;desolation;disintegration
@@ -5496,7 +5496,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5495,Incased,"Enclose in, or as if in, a case.",Verb,My feet were encased in mud.,encase,incase,C1,70,General,Uncommon,,,enclose;inclose;package
 5496,Incendiarism,Malicious burning to destroy property.,Noun,The British term for arson is fire-raising.,arson,fire-raising,C1,70,General,Uncommon,,,burning;combustion;lighting
 5497,Incertain,Lacking or indicating lack of confidence or assurance.,Adjective,Uncertain of his convictions.,uncertain,unsure,B2,40,General,Less Common,,,groping;doubtful;confidence
-5498,Incessantly,With unflagging resolve.,Adverb,Dance inspires him ceaselessly to strive higher and higher toward the shining pinnacle of perfection that is the goal of every artiste.,endlessly,ceaselessly,B1,31,General,Common,,,infinite;continuous;incessant
+5498,Incessantly,without interruption; constantly and often annoyingly.,Adverb,The baby cried incessantly through the entire flight.,endlessly,ceaselessly,B1,31,General,Common,,,infinite;continuous;incessant
 5499,Inchoate,Only partly in existence; imperfectly formed.,Adjective,Incipient civil disorder.,incipient,,C1,70,General,Uncommon,,,early
 5500,Incidentally,Introducing a different topic; in point of fact.,Adverb,"Incidentally, I won't go to the party.",by the way,by the bye,A2,8,General,Very Common,,,parenthetical;peripheral;secondary
 5501,Incipience,Beginning to exist or to be apparent.,Noun,He placed the incipience of democratic faith at around 1850.,incipiency,,B2,40,General,Less Common,,,incipient;beginning;kickoff
@@ -5612,7 +5612,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5611,Inflammation,The state of being emotionally aroused and worked up.,Noun,His face was flushed with excitement and his hands trembled.,excitement,excitation,B2,40,General,Less Common,,,fervour;inflame;symptom
 5612,Inflated,Exaggerate or make bigger.,Verb,The charges were inflated.,inflate,blow up,B1,25,General,Common,,,increase;develop;expand
 5613,Inflict,Impose something unpleasant.,Verb,The principal visited his rage on the students.,bring down,visit,B1,20,Communication,Common,,,infliction;communicate;intrude
-5614,Infliction,Something or someone that causes trouble; a source of unhappiness.,Noun,Washing dishes was a nuisance before we got a dish washer.,annoyance,bother,B1,25,Academic,Common,,,protection;inflict;wrongdoing
+5614,Infliction,"the act of imposing something unpleasant, such as pain or punishment, on someone.",Noun,The infliction of such a harsh penalty seemed unfair for a first offense.,annoyance,bother,B1,25,Academic,Common,,,protection;inflict;wrongdoing
 5615,Informal,Not officially recognized or controlled.,Adjective,An informal agreement.,loose,,A2,7,General,Very Common,,,unceremonial;everyday;formalness
 5616,Informally,With the use of colloquial expressions.,Adverb,This building is colloquially referred to as The Barn.,colloquially,conversationally,B1,18,General,Common,,,informal;unceremonial;everyday
 5617,Informing,"Impart knowledge of some fact, state or affairs, or event to.",Verb,I informed him of his rights.,inform,,B1,20,Communication,Common,,,communicate;intercommunicate;change
@@ -5922,7 +5922,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5921,Laciniate,Having edges irregularly and finely slashed.,Adjective,A laciniate leaf.,fringed,,C1,72,General,Uncommon,,,rough
 5922,Lackluster,Lacking brilliance or vitality.,Adjective,A dull lackluster life.,lacklustre,lusterless,C1,72,General,Uncommon,,,dull
 5923,Laconic,Brief and to the point; effectively cut short.,Adjective,A crisp retort.,crisp,curt,C1,72,General,Uncommon,,,concise
-5924,Lactate,Give suck to.,Verb,The wetnurse suckled the infant.,breastfeed,suckle,B1,31,Health & Wellness,Common,,,malnourish;breakfast;regurgitate
+5924,Lactate,"produce milk from the mammary glands, especially in the period after giving birth.",Verb,New mothers typically begin to lactate within days of delivery.,breastfeed,suckle,B1,31,Health & Wellness,Common,,,malnourish;breakfast;regurgitate
 5925,Lactose,A sugar comprising one glucose molecule linked to a galactose molecule; occurs only in milk.,Noun,Cow's milk contains about 4.7% lactose.,milk sugar,,C1,72,Science & Technology,Uncommon,,,disaccharide;maltose;sucrose
 5926,Ladened,Remove with or as if with a ladle.,Verb,Ladle the water out of the bowl.,ladle,lade,C1,72,General,Uncommon,,,withdraw;overload;overcharge
 5927,Laicise,Reduce to lay status.,Verb,Laicize the parochial schools.,laicize,,C1,72,General,Uncommon,,,change;alter;modify
@@ -5943,7 +5943,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5942,Lapidify,Change into stone.,Verb,The wood petrified with time.,petrify,,C1,72,General,Uncommon,,,fossilize;fossilise
 5943,Lapsing,Pass into a specified state or condition.,Verb,He sank into nirvana.,sink,pass,B2,41,General,Less Common,,,conclude;disappear;move
 5944,Laputan,Not practical or realizable; speculative.,Adjective,Airy theories about socioeconomic improvement.,airy,impractical,C1,72,General,Uncommon,,,laputa;utopian
-5945,Largeness,The capacity to understand a broad range of topics.,Noun,A teacher must have a breadth of knowledge of the subject.,breadth,comprehensiveness,C1,72,Academic,Uncommon,,,comprehensive;intelligence;sharpness
+5945,Largeness,"the quality of being great in size, scope, or importance.",Noun,The largeness of the task overwhelmed the small team at first.,breadth,comprehensiveness,C1,72,Academic,Uncommon,,,comprehensive;intelligence;sharpness
 5946,Lashing,"A beating given with a whip, or a sharp scolding.",Noun,He received a lashing for breaking curfew.,flog,welt,B1,31,General,Common,,,scourge;belabour;lambaste
 5947,Lastingness,Permanence by virtue of the power to resist stress or force.,Noun,They advertised the durability of their products.,durability,enduringness,C1,72,General,Uncommon,,,lasting;imperishableness;strength
 5948,Latinise,"To give a Latin form to a word or name, chiefly British spelling.",Verb,Renaissance scholars would latinise their own names for scholarly works.,romanize,romanise,C1,72,Communication,Uncommon,,,transcribe;convert;islamize
@@ -5966,7 +5966,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5965,Leastwise,If nothing else (`leastwise' is informal and `leastways' is colloquial).,Adverb,At least he survived.,at least,leastways,C1,72,General,Uncommon,,,
 5966,Leavening,An influence that works subtly to lighten or modify something.,Noun,His sermons benefited from a leavening of humor.,leaven,,B2,41,Academic,Less Common,,,substance;imponderable;sourdough
 5967,Leaving,Go away from a place.,Verb,At what time does your train leave?,leave,go forth,A2,5,General,Very Common,,,abandon;scarper;tarry
-5968,Leechlike,Of plants or persons; having the nature or habits of a parasite or leech; living off another.,Adjective,A wealthy class parasitic upon the labor of the masses.,parasitic,parasitical,C1,72,General,Uncommon,,,dependent
+5968,Leechlike,"clinging persistently to someone and draining their resources, like a leech.",Adjective,His leechlike dependence on his roommate's generosity finally wore thin.,parasitic,parasitical,C1,72,General,Uncommon,,,dependent
 5969,Leeward,Toward the wind.,Adverb,They were sailing leeward.,upwind,,C1,72,General,Uncommon,,,
 5970,Leftover,"not used up or eaten, especially describing food kept for later.",Adjective,We had leftover pasta for lunch the next day.,left over,left,C1,73,General,Uncommon,,,unexhausted
 5971,Legalize,To make something officially allowed under the law.,Verb,The state was one of the first to legalize the sale of the product.,legalise,decriminalize,C1,73,Society & Culture,Uncommon,,,countenance;tolerate;furlough
@@ -6166,7 +6166,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 6165,Marbleized,"Given a pattern resembling marble, American spelling.",Verb,The cake had a marbleized swirl of chocolate and vanilla.,marbleize,marbleise,B2,41,General,Less Common,,,impress;imprint;level
 6166,Marbles,The basic human power of intelligent thought and perception.,Noun,He used his wits to get ahead.,wits,,B1,25,Academic,Common,,,intelligence;breadth;comprehensiveness
 6167,Marches,The act of marching; walking with regular steps (especially in a procession of some kind).,Noun,It was a long march.,march,marching,A2,12,General,Very Common,,,italy;italia
-6168,Marchland,District consisting of the area on either side of a border or boundary of a country or an area.,Noun,The Welsh marches between England and Wales.,borderland,border district,C1,74,Travel & Places,Uncommon,,,territory;mandatory;jurisdiction
+6168,Marchland,"a historical term for a border territory, especially one under military rule, from 'march' meaning boundary.",Noun,The medieval marchland was governed by a lord loyal to the crown.,borderland,border district,C1,74,Travel & Places,Uncommon,,,territory;mandatory;jurisdiction
 6169,Marginal,At or constituting a border or edge.,Adjective,The marginal strip of beach.,fringy,,A2,6,General,Very Common,,,peripheral;minimal;minimum
 6170,Marginalise,"Relegate to a lower or outer edge, as of specific groups of people.",Verb,We must not marginalize the poor in our society.,marginalize,,C1,74,Society & Culture,Uncommon,,,communicate;patronize;patronise
 6171,Marginalize,"Relegate to a lower or outer edge, as of specific groups of people.",Verb,We must not marginalize the poor in our society.,marginalise,,C1,74,Society & Culture,Uncommon,,,communicate;patronize;patronise
@@ -6247,10 +6247,10 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 6246,Mendicancy,"The practice or condition of begging for a living (formal, rare).",Noun,The friars took a vow that included mendicancy.,beggary,mendicity,C1,74,General,Uncommon,,,pauperization;begging;importunity
 6247,Mendicity,"The state or practice of begging, an alternate form of mendicancy (rare, formal).",Noun,Victorian laws sought to punish mendicity in the city streets.,beggary,mendicancy,C1,74,General,Uncommon,,,pauperization;indigence;need
 6248,Menstrual,Of or relating to menstruation or the menses.,Adjective,Menstrual period.,catamenial,,C1,74,General,Uncommon,,,menstruation
-6249,Menstruation,The monthly discharge of blood from the uterus of nonpregnant women from puberty to menopause; --Hippocrates; --Aristotle.,Noun,The women were sickly and subject to excessive menstruation.,menses,menstruum,B2,41,Nature,Less Common,,,discharge;emission;expelling
+6249,Menstruation,the monthly discharge of blood and tissue from the uterus in women of reproductive age.,Noun,The app helps users track their menstruation cycle each month.,menses,menstruum,B2,41,Nature,Less Common,,,discharge;emission;expelling
 6250,Mensurable,Capable of being measured.,Adjective,Measurable depths.,measurable,,C1,74,General,Uncommon,,,magnitude
 6251,Mensuration,"The branch of mathematics dealing with measurement of lengths, areas, and volumes (formal, technical).",Noun,The surveying course covered basic mensuration techniques.,measurement,measuring,C1,74,General,Uncommon,,,activity;mensurate
-6252,Mentality,Mental ability.,Noun,He's got plenty of brains but no common sense.,brain,brainpower,B1,25,Academic,Common,,,attitude;intelligence;respect
+6252,Mentality,"a particular way of thinking, or a person's characteristic attitude or outlook.",Noun,The team's winning mentality carried them through the toughest games.,brain,brainpower,B1,25,Academic,Common,,,attitude;intelligence;respect
 6253,Mephistophelean,"Resembling Mephistopheles, the devil of the Faust legend; cunningly and charmingly evil (literary).",Adjective,The actor's Mephistophelean charm made the villain oddly likable.,devilish,diabolic,C1,74,General,Uncommon,,,mephistopheles;evil
 6254,Mercantile,Profit oriented.,Adjective,A commercial book.,mercenary,moneymaking,C1,75,General,Uncommon,,,commercial;mercantilism
 6255,Mercerise,"To treat cotton thread or fabric with a chemical process to strengthen it and add sheen, chiefly British spelling.",Verb,The factory would mercerise the cotton before dyeing it.,mercerize,,C1,75,General,Uncommon,,,process;treat
@@ -6681,7 +6681,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 6680,Occidental,Denoting or characteristic of countries of Europe and the western hemisphere.,Adjective,Occidental civilization.,hesperian,,B1,31,General,Common,,,western;occident
 6681,Occidentalize,Make western in character.,Verb,The country was Westernized after it opened up.,occidentalise,westernize,C1,78,General,Uncommon,,,change;alter;modify
 6682,Occluded,Block passage through.,Verb,Obstruct the path.,obstruct,obturate,B1,21,General,Common,,,suffocate;congest;inhibit
-6683,Occlusion,An obstruction in a pipe or tube.,Noun,We had to call a plumber to clear out the blockage in the drainpipe.,blockage,block,B1,31,Science & Technology,Common,,,seizure;attack;thromboembolism
+6683,Occlusion,"the closing off of a passage, especially a blood vessel or duct, often in a medical context.",Noun,The surgeon identified an occlusion in the patient's coronary artery.,blockage,block,B1,31,Science & Technology,Common,,,seizure;attack;thromboembolism
 6684,Occupancy,The act of occupying or taking possession of a building.,Noun,Occupation of a building without a certificate of occupancy is illegal.,occupation,moving in,B1,21,General,Common,,,residence;acquiring;getting
 6685,Oceanic,Relating to or occurring or living in or frequenting the open ocean.,Adjective,Oceanic islands like Bermuda.,pelagic,,C1,78,General,Uncommon,,,unlimited;limitless;ocean
 6686,Odoriferous,Emitting an odor.,Adjective,Odorous salt pork and weevily hardtack.,odorous,,C1,78,General,Uncommon,,,unsavory;unsavoury;offensive
@@ -6870,7 +6870,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 6869,Oxygenize,"Impregnate, combine, or supply with oxygen.",Verb,Oxygenate blood.,oxygenate,oxygenise,C1,79,General,Uncommon,,,change;alter;modify
 6870,Oxyhemoglobin,The bright red hemoglobin that is a combination of hemoglobin and oxygen from the lungs.,Noun,Oxyhemoglobin transports oxygen to the cells of the body.,oxyhaemoglobin,,C1,79,Science & Technology,Uncommon,,,hemoglobin;haemoglobin
 6871,Pacemaker,A leading instance in its field.,Noun,The new policy will be a pacesetter in community relations.,pacesetter,,B2,42,Academic,Less Common,,,exemplar;example;pattern
-6872,Pachydermatous,Emotionally hardened.,Adjective,A callous indifference to suffering.,callous,indurate,C1,79,General,Uncommon,,,pachyderm;insensitive
+6872,Pachydermatous,"having thick skin, literally or figuratively; not easily offended or moved.",Adjective,Years in politics had left him pachydermatous to even the harshest criticism.,callous,indurate,C1,79,General,Uncommon,,,pachyderm;insensitive
 6873,Pacification,The act of appeasing someone or causing someone to be more favorably inclined.,Noun,A wonderful skill in the pacification of crying infants.,mollification,,C1,79,General,Uncommon,,,calming;alliance;convention
 6874,Packaging,A message issued in behalf of some product or cause or idea or person or institution.,Noun,The packaging of new ideas.,promotion,publicity,A2,14,Communication,Very Common,,,package;business;message
 6875,Padding,"Walk heavily and firmly, as when weary, or through mud.",Verb,Mules plodded in a circle around a grindstone.,slog,footslog,B1,25,General,Common,,,overstate;hyperbolize;hyperbolise
@@ -7079,7 +7079,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7078,Phratry,"A group of clans claiming descent from a common ancestor, especially in traditional societies (anthropology term).",Noun,The anthropologist studied how marriage rules varied between each phratry.,family,family line,C2,80,Society & Culture,Rare,,,lineage;descent;ancestry
 7079,Phyletic,Of or relating to the evolutionary development of organisms.,Adjective,Phylogenetic development.,phylogenetic,,C2,80,General,Rare,,,phylogeny
 7080,Physiologic,Of or consistent with an organism's normal functioning.,Adjective,Physiologic functions.,physiological,,B1,32,General,Common,,,physiology
-7081,Physique,Alternative names for the body of a human being.,Noun,Leonardo studied the human body.,human body,physical body,B1,32,Health & Wellness,Common,,,individual;someone;somebody
+7081,Physique,"the form, size, and development of a person's body.",Noun,The gymnast's lean physique came from years of rigorous training.,human body,physical body,B1,32,Health & Wellness,Common,,,individual;someone;somebody
 7082,Picayune,(informal) small and of little importance.,Adjective,A fiddling sum of money.,fiddling,footling,B2,43,General,Less Common,,,unimportant
 7083,Pickaxe,A heavy iron tool with a wooden handle and a curved head that is pointed on both ends.,Noun,They used picks and sledges to break the rocks.,pick,pickax,B2,43,Science & Technology,Less Common,,,chisel;axe;gouge
 7084,Pictorial,Pertaining to or consisting of pictures.,Adjective,Pictorial perspective.,pictural,,B1,18,General,Common,,,picture;realistic
@@ -7126,7 +7126,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7125,Plastering,"Cover conspicuously or thickly, as by pasting something on.",Verb,The demonstrators plastered the hallways with posters.,plaster,beplaster,B2,43,General,Less Common,,,cover
 7126,Plasticise,"Make plastic, as by the addition of a plasticizer.",Verb,Plasticized PVC.,plasticize,,C2,81,General,Rare,,,change;plasticiser;alter
 7127,Plating,Coat with a layer of metal.,Verb,Plate spoons with silver.,plate,,C2,81,General,Rare,,,surface;goldplate;silverplate
-7128,Platitudinal,Dull and tiresome but with pretensions of significance or originality.,Adjective,Bromidic sermons.,bromidic,corny,C2,81,General,Rare,,,unoriginal
+7128,Platitudinal,"consisting of trite, overused remarks presented as though they were meaningful.",Adjective,The speech was full of platitudinal phrases that said very little.,bromidic,corny,C2,81,General,Rare,,,unoriginal
 7129,Plaudit,"An expression of strong approval or praise (formal, often used in plural).",Noun,The chef earned plaudits from every major food critic in the city.,acclaim,acclamation,C2,81,Communication,Rare,,,approval;commendation;permission
 7130,Plausibly,In a way that seems reasonable or likely to be true.,Adverb,He plausibly explained why he had missed the deadline.,credibly,believably,C2,81,General,Rare,,,plausible;presumptive;likely
 7131,Playact,Perform on a stage or theater.,Verb,She acts in this play.,act,play,C2,81,Arts & Creativity,Rare,,,perform;represent;conduct
@@ -7280,7 +7280,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7279,Preposterous,Utterly absurd or contrary to reason or common sense.,Adjective,It's preposterous to think we could finish the project overnight.,absurd,cockeyed,B1,18,General,Common,,,foolish
 7280,Preposterously,In a way that is utterly contrary to reason or common sense.,Adverb,The rent for the tiny apartment was preposterously high.,laughably,ridiculously,C2,82,General,Rare,,,humorous;humourous
 7281,Prerogative,an exclusive right or power belonging to a person by virtue of rank or office.,Noun,Pardoning criminals is the prerogative of the president alone.,privilege,perquisite,B2,43,General,Less Common,,,preemption;accession;admission
-7282,Presciently,With foresight.,Adverb,"More presciently than they superiors, these workers grasped the economic situation.",cannily,,C2,82,General,Rare,,,discerning;prescient;smart
+7282,Presciently,in a way that shows knowledge of events before they happen.,Adverb,He presciently warned investors about the crash months in advance.,cannily,,C2,82,General,Rare,,,discerning;prescient;smart
 7283,Prescription,A drug that is available only with written instructions from a doctor or dentist to a pharmacist.,Noun,He told the doctor that he had been taking his prescription regularly.,prescription drug,prescription medicine,B1,18,Science & Technology,Common,,,direction;instruction;medicine
 7284,Prescriptive,Pertaining to giving directives or rules.,Adjective,Prescriptive grammar is concerned with norms of or rules for correct usage.,normative,,B2,43,General,Less Common,,,prescribe
 7285,Presently,In the near future.,Adverb,The doctor will soon be here.,soon,shortly,A2,5,General,Very Common,,,present;existing;immediate
@@ -7450,7 +7450,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7449,Punitive,Inflicting punishment.,Adjective,Punitive justice.,punitory,,B2,43,General,Less Common,,,retaliatory;retributive;retributory
 7450,Punitory,Inflicting punishment.,Adjective,Punitive justice.,punitive,,C2,83,General,Rare,,,retaliatory;retributive;retributory
 7451,Punting,(football) a kick in which the football is dropped from the hands and kicked before it touches the ground.,Noun,The punt traveled 50 yards.,punt,,C2,83,General,Rare,,,kicking;kick;boot
-7452,Purchasable,Capable of being corrupted.,Adjective,Corruptible judges.,corruptible,bribable,C2,83,General,Rare,,,corrupt;available
+7452,Purchasable,"able to be bought, or figuratively, able to have one's loyalty bought.",Adjective,"His silence, it turned out, was entirely purchasable for the right price.",corruptible,bribable,C2,83,General,Rare,,,corrupt;available
 7453,Purging,Oust politically.,Verb,Deng Xiao Ping was purged several times throughout his lifetime.,purge,,B1,32,Society & Culture,Common,,,oppress;discharge;whitewash
 7454,Purifying,"Remove impurities from, increase the concentration of, and separate through the process of distillation.",Verb,Purify the water.,purify,sublimate,B2,43,General,Less Common,,,improve;ameliorate;better
 7455,Puritanical,"Having strict moral or religious views, especially about pleasure and self-indulgence.",Adjective,Her puritanical upbringing made her uneasy at the beach party.,priggish,prim,B2,43,General,Less Common,,,puritanism;puritan;proper
@@ -7523,7 +7523,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7522,Rambling,Continue talking or writing in a desultory manner.,Verb,This novel rambles on and jogs.,ramble on,ramble,B1,32,General,Common,,,continue;proceed;locomote
 7523,Rambunctious,"Uncontrollably exuberant and full of energy, especially of children or animals.",Adjective,The rambunctious puppy knocked over the lamp again.,boisterous,robustious,C2,83,General,Rare,,,disorderly
 7524,Rampant,Rearing on left hind leg with forelegs elevated and head usually in profile.,Adjective,A lion rampant.,rearing,,B1,21,General,Common,,,vertical;ramp;uncontrolled
-7525,Rampart,An embankment built around a space for defensive purposes.,Noun,They stormed the ramparts of the city.,bulwark,wall,B1,32,Science & Technology,Common,,,embankment;merlon;bailey
+7525,Rampart,"a defensive wall or bank of earth, typically forming part of a fortification.",Noun,The soldiers patrolled the ancient rampart surrounding the old city.,bulwark,wall,B1,32,Science & Technology,Common,,,embankment;merlon;bailey
 7526,Ranching,Manage or run a ranch.,Verb,Her husband is ranching in Arizona.,ranch,,C2,83,Society & Culture,Rare,,,farm
 7527,Randomised,Arrange in random order.,Verb,Randomize the order of the numbers.,randomize,randomise,C2,83,General,Rare,,,disarrange
 7528,Randomize,Arrange in random order.,Verb,Randomize the order of the numbers.,randomise,,C2,83,General,Rare,,,randomization;disarrange
@@ -7615,7 +7615,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7614,Recurrence,Happening again (especially at regular intervals).,Noun,The return of spring.,return,,B2,43,General,Less Common,,,recurrent;repetition;sequence
 7615,Recurrent,"occurring often or repeatedly at intervals, especially a problem or symptom.",Adjective,The engineer traced the recurrent glitch back to a faulty sensor.,perennial,repeated,B1,21,General,Common,,,recurrence;recur;continual
 7616,Recycle,Use again after processing.,Verb,We must recycle the cardboard boxes.,reprocess,reuse,C2,83,Health & Wellness,Rare,,,recycling;utilise;recover
-7617,Redeemable,Able to be converted into ready money or the equivalent.,Adjective,A cashable check.,cashable,,C2,83,General,Rare,,,convertible;exchangeable;recoverable
+7617,Redeemable,"able to be exchanged for goods, money, or a reward, or able to be saved from fault.",Adjective,The gift card is redeemable online or in any physical store.,cashable,,C2,83,General,Rare,,,convertible;exchangeable;recoverable
 7618,Redemptional,Of or relating to or resulting in redemption.,Adjective,A redemptive theory about life.,redemptive,redemptory,C2,83,General,Rare,,,redemption
 7619,Redemptive,Of or relating to or resulting in redemption.,Adjective,A redemptive theory about life.,redemptional,redemptory,B2,43,General,Less Common,,,redeem;redemption;good
 7620,Redevelopment,The act of improving by renewing and restoring.,Noun,They are pursuing a general program of renovation to the entire property.,renovation,overhaul,B1,18,General,Common,,,improvement;modernisation;melioration
@@ -7876,7 +7876,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7875,Robustious,"Boisterously vigorous or robust, often in a rough or unrefined way (rare, archaic).",Adjective,The tavern was filled with robustious laughter and clinking mugs.,boisterous,rambunctious,C2,85,General,Rare,,,disorderly
 7876,Rockbound,Abounding in or bordered by rocky cliffs or scarps.,Adjective,The rock-ribbed coast of Maine.,rock-ribbed,,B2,44,General,Less Common,,,rough;unsmooth
 7877,Roguish,Playful in an appealingly bold way.,Adjective,A roguish grin.,devilish,rascally,C2,85,General,Rare,,,roguishness;playful;dishonest
-7878,Roister,"Engage in boisterous, drunken merrymaking.",Verb,They were out carousing last night.,carouse,riot,C2,85,Society & Culture,Rare,,,wassail;roisterer;revel
+7878,Roister,"engage in noisy, boisterous celebration or merrymaking.",Verb,The sailors would roister in the tavern after months at sea.,carouse,riot,C2,85,Society & Culture,Rare,,,wassail;roisterer;revel
 7879,Roleplaying,Perform on a stage or theater.,Verb,She acts in this play.,act,play,A2,8,Arts & Creativity,Very Common,,,perform;represent;conduct
 7880,Rollick,Play boisterously.,Verb,The children frolicked in the garden.,frolic,lark,C2,85,General,Rare,,,disport;play;fool
 7881,Rollicking,Play boisterously.,Verb,The children frolicked in the garden.,frolic,lark,B2,44,General,Less Common,,,disport;play;fool
@@ -7913,7 +7913,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7912,Ruggedise,Produce in a version designed to withstand rough usage.,Verb,Detroit ruggedized the family car.,ruggedize,,C2,85,General,Rare,,,strengthen;confirm;reenforce
 7913,Ruggedize,Produce in a version designed to withstand rough usage.,Verb,Detroit ruggedized the family car.,ruggedise,,C2,85,General,Rare,,,strengthen;confirm;reenforce
 7914,Ruination,An irrecoverable state of devastation and destruction.,Noun,You have brought ruin on this entire family.,ruin,,C2,85,General,Rare,,,desolation;destruction;wrecking
-7915,Ruinous,Extremely harmful; bringing physical or financial ruin.,Adjective,A catastrophic depression.,catastrophic,,B2,44,General,Less Common,,,ruin;harmful;destructive
+7915,Ruinous,causing severe and irreparable financial or physical harm.,Adjective,The lawsuit's ruinous legal fees bankrupted the small business.,catastrophic,,B2,44,General,Less Common,,,ruin;harmful;destructive
 7916,Rumbling,A loud low dull continuous noise.,Noun,They heard the rumbling of thunder.,rumble,grumble,B1,33,General,Common,,,noise
 7917,Ruminate,"To think deeply and at length about something, often repeatedly.",Verb,She tended to ruminate on old mistakes long after they mattered.,chew over,think over,C2,85,Academic,Rare,,,ruminative;consider;question
 7918,Ruminative,"Given to deep, often repetitive thought or contemplation.",Adjective,His ruminative pauses made the interview feel unusually slow.,brooding,broody,C2,85,General,Rare,,,ruminate;thoughtful
@@ -7936,7 +7936,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7935,Safekeeping,The responsibility of a guardian or keeper.,Noun,He left his car in my keeping.,guardianship,keeping,B2,44,General,Less Common,,,responsibility;obligation;requirement
 7936,Sagacious,Acutely insightful and wise.,Adjective,Much too perspicacious to be taken in by such a spurious argument.,perspicacious,sapient,C2,85,General,Rare,,,politic;sagaciousness;wise
 7937,Sagging,Cause to sag.,Verb,The children sagged their bottoms down even more comfortably.,sag,sag down,B1,22,General,Common,,,sink;drop;bag
-7938,Sainted,Declare (a dead person) to be a saint.,Verb,"After he was shown to have performed a miracle, the priest was canonized.",canonize,canonise,B2,44,Communication,Less Common,,,reverence;venerate;adjudge
+7938,Sainted,"declared or regarded as a saint, or, informally, held in very high esteem.",Verb,Her sainted grandmother was remembered fondly by the whole town.,canonize,canonise,B2,44,Communication,Less Common,,,reverence;venerate;adjudge
 7939,Saintly,Marked by utter benignity; resembling or befitting an angel or saint.,Adjective,Angelic beneficence.,angelic,angelical,C2,85,General,Rare,,,saint;saintliness;good
 7940,Salacious,Treating sexual matters in an excessive or offensive way; lascivious.,Adjective,The magazine ran a salacious story about the celebrity's divorce.,lubricious,lustful,B1,33,General,Common,,,salaciousness;salacity;sexy
 7941,Salaried,Receiving or eligible for compensation.,Adjective,Salaried workers.,compensated,remunerated,B2,44,General,Less Common,,,paid
@@ -8006,7 +8006,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8005,Scented,Catch the scent of; get wind of.,Verb,The dog nosed out the drugs.,scent,nose,B1,18,General,Common,,,perfume;aromatize;radiate
 8006,Sceptically,With scepticism; in a sceptical manner.,Adverb,He looked at her sceptically.,skeptically,,C2,86,General,Rare,,,sceptical;distrustful
 8007,Schematise,Give conventional form to.,Verb,Some art forms schematise designs into geometrical patterns.,schematize,,C2,86,General,Rare,,,schematisation;change;alter
-8008,Scheming,Used of persons.,Adjective,The most calculating and selfish men in the community.,calculating,calculative,B1,26,General,Common,,,hard;artful
+8008,Scheming,given to making secret and often devious plans.,Adjective,The scheming courtier plotted for years to seize the throne.,calculating,calculative,B1,26,General,Common,,,hard;artful
 8009,Schismatical,Of or relating to or involved in or characteristic of schism.,Adjective,Schismatic sects.,schismatic,,C2,86,General,Rare,,,schism
 8010,Schmaltzy,"Overly sentimental, especially in music or movies.",Adjective,He loves schmaltzy love songs from the 1980s.,bathetic,drippy,C2,86,General,Rare,,,emotional
 8011,Schmear,(Yiddish) a batch of things that go together.,Noun,He bought the whole schmeer.,schmeer,shmear,C2,86,Society & Culture,Rare,,,batch;clutch
@@ -8113,7 +8113,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8112,Sensitivity,(physiology) responsiveness to external stimuli; the faculty of sensation.,Noun,Sensitivity to pain.,sensitiveness,sensibility,A2,6,Academic,Very Common,,,sensitive;sentiency;sense
 8113,Sensitized,"Made more responsive or sensitive to a stimulus, especially an allergen.",Verb,Repeated exposure had sensitized her skin to the detergent.,sensitize,sensitise,B1,33,General,Common,,,change;alter;modify
 8114,Sensorial,Involving or derived from the senses.,Adjective,Sensory experience.,sensory,,C2,87,General,Rare,,,sense
-8115,Sensory,Of a nerve fiber or impulse originating outside and passing toward the central nervous system.,Adjective,Sensory neurons.,centripetal,receptive,A2,11,General,Very Common,,,afferent
+8115,Sensory,"relating to sensation or the physical senses, such as sight, hearing, or touch.",Adjective,The therapy uses sensory play to help children with tactile sensitivities.,centripetal,receptive,A2,11,General,Very Common,,,afferent
 8116,Sensually,In a sultry and sensual manner.,Adverb,The belly dancer mover sensually among the tables.,sultrily,,C2,87,General,Rare,,,sensual;hot
 8117,Sententiously,In a pithy sententious manner.,Adverb,She expressed herself pithily.,pithily,,C2,87,General,Rare,,,sententious;concise
 8118,Sentiency,The faculty through which the external world is apprehended.,Noun,In the dark he had to depend on touch and on his senses of smell and hearing.,sense,sensation,C2,87,Academic,Rare,,,faculty;sensitivity;understanding
@@ -8121,7 +8121,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8120,Sentimental,"Showing or causing tender, often nostalgic, feelings.",Adjective,She kept the ticket stub for sentimental reasons.,bathetic,drippy,A2,8,General,Very Common,,,sentiment;emotional;sentimentality
 8121,Sentimentalize,Look at with sentimentality or turn into an object of sentiment.,Verb,Don't sentimentalize the past events.,sentimentalise,,B2,44,General,Less Common,,,misrepresent;distort;pretend
 8122,Separatist,Having separated or advocating separation from another entity or policy or attitude.,Adjective,A breakaway faction.,breakaway,fissiparous,C2,87,General,Rare,,,independent
-8123,Sepulchral,Gruesomely indicative of death or the dead.,Adjective,A charnel smell came from the chest filled with dead men's bones.,charnel,ghastly,C2,87,General,Rare,,,offensive;sepulchre
+8123,Sepulchral,"relating to a tomb or burial, or having a deep, hollow, gloomy quality suggestive of death.",Adjective,His sepulchral voice echoed eerily through the empty cathedral.,charnel,ghastly,C2,87,General,Rare,,,offensive;sepulchre
 8124,Sequent,In regular succession without gaps.,Adjective,Serial concerts.,consecutive,sequential,C2,87,General,Rare,,,ordered;subsequent
 8125,Sequentially,"In a fixed order, one after another.",Adverb,The files are numbered sequentially from one to a hundred.,consecutive,,C2,87,General,Rare,,,ordered;sequential
 8126,Sequestered,"Requisition forcibly, as of enemy property.",Verb,The estate was sequestered.,sequester,,C2,87,Business,Rare,,,condemn;garnishee;withdraw
@@ -8196,7 +8196,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8195,Shortening,Make shorter than originally intended; reduce or retrench in length or duration.,Verb,He shortened his trip due to illness.,shorten,,B1,26,General,Common,,,truncate;curtail;foreshorten
 8196,Shortsighted,Lacking foresight or scope.,Adjective,A short view of the problem.,short,unforesightful,B1,18,General,Common,,,improvident;shortsightedness
 8197,Shouted,Utter in a loud voice; talk in a loud voice (usually denoting characteristic manner of speaking).,Verb,My grandmother is hard of hearing--you'll have to shout.,shout,,A2,5,Communication,Very Common,,,verbalize;verbalise;thunder
-8198,Shouting,Encouragement in the form of cheers from spectators.,Noun,It's all over but the shouting.,cheering,,A2,6,Communication,Very Common,,,encouragement;fosterage;promotion
+8198,Shouting,"loud calling out, whether in celebration, anger, or urgency.",Noun,The shouting from the argument next door kept the whole floor awake.,cheering,,A2,6,Communication,Very Common,,,encouragement;fosterage;promotion
 8199,Shoveller,A worker who shovels.,Noun,A shoveler of coal.,shoveler,,C2,87,Society & Culture,Rare,,,worker;duck;anas
 8200,Showery,(of weather) wet by periods of rain.,Adjective,Showery weather.,rainy,,C2,87,General,Rare,,,shower;wet
 8201,Showiness,"The quality of being excessively bright, elaborate, or attention-grabbing.",Noun,The showiness of the mansion's gold fixtures struck visitors as tasteless.,flamboyance,floridness,C2,87,General,Rare,,,ornateness;floridity;showy
@@ -8469,7 +8469,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8468,Splendid,Having great beauty and splendor.,Adjective,A glorious spring morning.,glorious,resplendent,A2,7,General,Very Common,,,beautiful;superior
 8469,Splendidly,"In a magnificent, impressive, or excellent manner.",Adverb,The garden was splendidly decorated for the wedding.,excellently,magnificently,B1,22,General,Common,,,splendid;superior;impressive
 8470,Splendor,The quality of being magnificent or splendid or grand.,Noun,For magnificence and personal service there is the Queen's hotel.,magnificence,brilliance,A2,14,General,Very Common,,,glisten;sparkle;grandness
-8471,Splenetic,Very irritable.,Adjective,Bristly exchanges between the White House and the press.,bristly,prickly,B2,45,General,Less Common,,,spleen
+8471,Splenetic,"bad-tempered and irritable, especially in a spiteful way.",Adjective,His splenetic reply to the mild criticism surprised everyone at the table.,bristly,prickly,B2,45,General,Less Common,,,spleen
 8472,Splinter,A small thin sharp bit or wood or glass or metal.,Noun,He got a splinter in his finger.,sliver,,B1,22,General,Common,,,splintery;bit;chip
 8473,Splintering,Withdraw from an organization or communion.,Verb,"After the break up of the Soviet Union, many republics broke away.",secede,splinter,C2,89,Society & Culture,Rare,,,separate;dissever;divorce
 8474,Splinterproof,Resistant to shattering or splintering.,Adjective,Shatterproof automobile windows.,shatterproof,splinterless,C2,89,General,Rare,,,unbreakable
@@ -8544,7 +8544,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8543,Standardized,Cause to conform to standard or norm.,Verb,The weights and measures were standardized.,standardize,standardise,B1,22,General,Common,,,regulate;regularize;measure
 8544,Standoffish,Lacking cordiality; unfriendly.,Adjective,A standoffish manner.,offish,,C2,89,General,Rare,,,unapproachable;standoffishness
 8545,Standstill,A complete stop of activity or movement.,Noun,The blizzard brought the entire city to a standstill.,deadlock,dead end,B2,45,General,Less Common,,,situation;urgency;impasse
-8546,Starchy,Rigidly formal.,Adjective,A starchy manner.,stiff,buckram,B1,33,General,Common,,,farinaceous;starch;amylaceous
+8546,Starchy,excessively formal and stiff in behavior.,Adjective,The old headmaster's starchy demeanor intimidated every new student.,stiff,buckram,B1,33,General,Common,,,farinaceous;starch;amylaceous
 8547,Stargazer,Someone indifferent to the busy world.,Noun,In the Odyssey Homer tells of lotus-eaters who live in dreamy indolence.,lotus-eater,,C2,89,Society & Culture,Rare,,,stargaze;daydreamer;woolgatherer
 8548,Starred,Feature as the star.,Verb,The movie stars Dustin Hoffman as an autistic man.,star,,B1,33,General,Common,,,feature;perform;execute
 8549,Startled,Surprised suddenly and slightly; alarmed briefly.,Verb,The loud bang startled the whole office.,startle,galvanize,A2,7,Emotion,Very Common,,,shock;floor;move
@@ -8587,7 +8587,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8586,Stimulant,That stimulates.,Adjective,Stimulant phenomena.,stimulating,,B2,45,General,Less Common,,,stimulate
 8587,Stimulated,Act as a stimulant.,Verb,The book stimulated her imagination.,stimulate,excite,A2,14,General,Very Common,,,quicken;solicit;encourage
 8588,Stimulating,Act as a stimulant.,Verb,The book stimulated her imagination.,stimulate,excite,A2,11,General,Very Common,,,quicken;solicit;encourage
-8589,Stingily,In a stingy manner.,Adverb,Their rich uncle treated them rather chintzily.,cheaply,chintzily,C2,90,General,Rare,,,parsimonious;penurious;miserly
+8589,Stingily,"in an ungenerous or miserly way, especially with money.",Adverb,He stingily refused to leave even a small tip.,cheaply,chintzily,C2,90,General,Rare,,,parsimonious;penurious;miserly
 8590,Stinker,A person who is deemed to be despicable or contemptible.,Noun,Only a rotter would do that.,rotter,dirty dog,C2,90,Society & Culture,Rare,,,jimhickey;stink;thing
 8591,Stinking,Be extremely bad in quality or in one's performance.,Verb,This term paper stinks!,stink,,B1,33,General,Common,,,smell;reek;salute
 8592,Stinkpot,A person who is deemed to be despicable or contemptible.,Noun,Only a rotter would do that.,rotter,dirty dog,C2,90,Society & Culture,Rare,,,sternotherus
@@ -8746,7 +8746,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8745,Sunbaked,Dried out by heat or excessive exposure to sunlight.,Adjective,A vast desert all adust.,adust,baked,B2,45,General,Less Common,,,tempered;treated;toughened
 8746,Sunglasses,Spectacles that are darkened or polarized to protect the eyes from the glare of the sun.,Noun,He was wearing a pair of mirrored shades.,dark glasses,shades,C2,91,Science & Technology,Rare,,,glasses;spectacles;specs
 8747,Sunnily,In a cheerful manner.,Adverb,"`I'll do the dishes,' he said pleasantly.",pleasantly,cheerily,C2,91,General,Rare,,,sunny;nice;cheerful
-8748,Sunniness,The quality of being cheerful and dispelling gloom.,Noun,Flowers added a note of cheerfulness to the drab room.,cheerfulness,cheer,C2,91,General,Rare,,,lightness;attribute;temperament
+8748,Sunniness,"a bright, cheerful disposition or outlook.",Noun,The sunniness of the new intern lifted the whole office's mood.,cheerfulness,cheer,C2,91,General,Rare,,,lightness;attribute;temperament
 8749,Sunroof,An automobile roof having a sliding or raisable panel.,Noun,`sunshine-roof' is a British term for `sunroof'.,sunshine-roof,,C2,91,Science & Technology,Rare,,,machine;roof;car
 8750,Suntanned,(of skin) having a tan color from exposure to the sun.,Adjective,A young bronzed Apollo.,bronzed,tanned,C2,91,General,Rare,,,brunet;brunette
 8751,Superannuated,Too old to be useful.,Adjective,He left the house...for the support of twelve superannuated wool carders.,overage,overaged,C2,91,General,Rare,,,old;noncurrent
@@ -8908,7 +8908,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8907,Teasing,"Playfully mocking or making fun of someone, usually without malice.",Noun,The siblings' teasing never seemed to bother their little brother.,tease,ribbing,B1,26,General,Common,,,badgering;worrying;torment
 8908,Teatime,A light midafternoon meal of tea and sandwiches or cakes.,Noun,An Englishman would interrupt a war to have his afternoon tea.,tea,afternoon tea,C2,92,Health & Wellness,Rare,,,breakfast;banquet;meal
 8909,Technological,Of or relating to a practical subject that is organized according to scientific principles.,Adjective,Technical college.,technical,,A2,7,General,Very Common,,,technology;scientific
-8910,Tediously,In a tedious manner.,Adverb,Boringly slow work.,boringly,tiresomely,B2,33,General,Less Common,,,tedious;uninteresting
+8910,Tediously,"in a slow, tiresome way that requires excessive time and effort.",Adverb,She tediously entered each receipt into the spreadsheet by hand.,boringly,tiresomely,B2,33,General,Less Common,,,tedious;uninteresting
 8911,Teemingness,the state of being full to overflowing with living things or activity.,Noun,The teemingness of the coral reef amazed the divers.,abundance,copiousness,C2,92,General,Rare,,,quantity;plentifulness;overabundance
 8912,Teentsy,(used informally) very small.,Adjective,A wee tot.,bitty,bittie,C2,92,General,Rare,,,small;little
 8913,Teetotal,Practicing complete abstinence from alcoholic beverages.,Adjective,He's been dry for ten years.,dry,,C2,92,General,Rare,,,sober
@@ -8971,7 +8971,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8970,Thereafter,From that time on.,Adverb,Thereafter he never called again.,thenceforth,,A2,7,General,Very Common,,,
 8971,Therein,(formal) in or into that thing or place.,Adverb,They can read therein what our plans are.,in this,in that,A2,11,General,Very Common,,,
 8972,Thereunder,Under that.,Adverb,The headings and the items listed thereunder.,under that,under it,B2,45,General,Less Common,,,
-8973,Thermal,Relating to or associated with heat.,Adjective,Thermal movements of molecules.,thermic,caloric,A2,6,General,Very Common,,,heat
+8973,Thermal,"relating to or caused by heat, or designed to retain heat.",Adjective,She wore thermal underwear to stay warm on the ski slopes.,thermic,caloric,A2,6,General,Very Common,,,heat
 8974,Thermodynamic,Of or concerned with thermodynamics.,Adjective,The thermodynamic limit.,thermodynamical,,B2,34,General,Less Common,,,thermodynamics
 8975,Thermoset,Having the property of becoming permanently hard and rigid when heated or cured.,Adjective,The phenol resins and plastics were the original synthetic thermosetting materials.,thermosetting,,C2,92,General,Rare,,,
 8976,Thicken,Make thick or thicker.,Verb,Thicken the sauce.,inspissate,,B2,45,General,Less Common,,,thickener;thickening;change
@@ -9007,7 +9007,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9006,Throwaway,A cheaply produced leaflet or flyer meant to be read once and discarded.,Noun,He tossed the throwaway from the car windshield straight into the recycling bin.,circular,handbill,C2,92,Communication,Rare,,,advertising;commercial;broadsheet
 9007,Thudding,Make a dull sound.,Verb,The knocker thudded against the front door.,thud,thump,B2,45,General,Less Common,,,connect;sound;hit
 9008,Thumping,Move rhythmically.,Verb,Her heart was beating fast.,beat,pound,B1,19,General,Common,,,palpitate;pulsate;move
-9009,Thunderclap,A shocking surprise.,Noun,News of the attack came like a bombshell.,bombshell,thunderbolt,C2,92,General,Rare,,,surprise;peripetia;stunner
+9009,Thunderclap,"a sudden, startling event, likened to the loud crack of thunder.",Noun,The news of the merger hit the office like a thunderclap.,bombshell,thunderbolt,C2,92,General,Rare,,,surprise;peripetia;stunner
 9010,Thundering,"moving or sounding with a loud, heavy, rumbling noise.",Verb,A thundering herd of horses crossed the plain.,thunder,,B2,34,General,Less Common,,,move;shout;bawl
 9011,Thwarted,"Hinder or prevent (the efforts, plans, or desires) of.",Verb,What ultimately frustrated every challenger was Ruth's amazing September surge.,thwart,queer,B1,22,Society & Culture,Common,,,prevent;disappoint;obstruct
 9012,Thwartwise,"Placed or lying across something; crosswise (rare, nautical term).",Adjective,The old ship's beams ran thwartwise across the hull for extra support.,cross,transverse,C2,92,General,Rare,,,crosswise
@@ -9024,7 +9024,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9023,Timeworn,Repeated too often; overfamiliar through overuse.,Adjective,Bromidic sermons.,banal,commonplace,B2,46,General,Less Common,,,unoriginal
 9024,Timidly,In a shy or timid or bashful manner.,Adverb,He smiled shyly.,shyly,bashfully,B2,46,General,Less Common,,,confidence;bashful;fearful
 9025,Tincture,An indication that something has been present.,Noun,There wasn't a trace of evidence for the claim.,trace,vestige,B2,46,Communication,Less Common,,,indication;indicant;mordant
-9026,Tinkling,Make or emit a high sound.,Verb,Tinkling bells.,tinkle,tink,B2,34,General,Less Common,,,sound
+9026,Tinkling,"making a light, high-pitched ringing sound.",Verb,The wind chimes kept tinkling softly on the porch all afternoon.,tinkle,tink,B2,34,General,Less Common,,,sound
 9027,Tinseled,Impart a cheap brightness to.,Verb,His tinseled image of Hollywood.,tinsel,,C2,92,Business,Rare,,,contribute;decorate;embellish
 9028,Tinting,Color lightly.,Verb,Her greying hair was tinged blond.,tint,tinct,C2,92,General,Rare,,,colorize;colorise;colourize
 9029,Tiredly,In a weary manner.,Adverb,He walked around tiredly.,wearily,,B2,34,General,Less Common,,,careworn;raddled;drooping
@@ -9250,7 +9250,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9249,Unblock,Make (assets) available.,Verb,Release the holdings in the dictator's bank account.,unfreeze,free,C2,94,General,Rare,,,unstuff;play
 9250,Unblushing,Feeling no shame.,Adjective,A shameless imposter.,shameless,,B2,46,General,Less Common,,,unashamed
 9251,Unbolted,Undo the bolt of.,Verb,Unbolt the door.,unbolt,,C2,94,General,Rare,,,open;undo;uncork
-9252,Unbounded,"Seemingly boundless in amount, number, degree, or especially extent.",Adjective,Unbounded enthusiasm.,boundless,limitless,B2,46,General,Less Common,,,infinite;unboundedness
+9252,Unbounded,not limited or restrained; unrestricted in extent.,Adjective,His unbounded ambition drove him to start three companies before thirty.,boundless,limitless,B2,46,General,Less Common,,,infinite;unboundedness
 9253,Unbowed,Erect in posture.,Adjective,Sit straight.,straight,unbent,C2,94,General,Rare,,,vertical;erect;upright
 9254,Unbraced,Undo the ties of.,Verb,They untied the prisoner.,untie,unbrace,C2,94,General,Rare,,,unloose;disentangle;disconnect
 9255,Unbranching,Without branches.,Adjective,A tree with an unbranched trunk.,unbranched,,C2,94,General,Rare,,,branchless
@@ -9266,7 +9266,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9265,Unchangeably,In a manner that remains fixed and constant.,Adverb,The old customs remained unchangeably the same for generations.,unalterably,unassailably,C2,94,General,Rare,,,changeless;confirmed;permanent
 9266,Unchanging,Showing little if any change.,Adjective,A static population.,static,stable,B2,34,General,Less Common,,,consistent;unchangingness
 9267,Uncharted,Not mapped or recorded; unfamiliar or unexplored.,Adjective,The expedition ventured into uncharted territory.,chartless,unmapped,B1,27,General,Common,,,unknown
-9268,Uncheerful,Causing sad feelings of gloom and inadequacy.,Adjective,The economic outlook is depressing.,depressing,cheerless,C2,94,General,Rare,,,disconsolate;unhappy;cheerfulness
+9268,Uncheerful,not cheerful; lacking in brightness or positive spirit.,Adjective,His uncheerful expression made it clear the meeting had gone badly.,depressing,cheerless,C2,94,General,Rare,,,disconsolate;unhappy;cheerfulness
 9269,Unchristlike,Not becoming to or like a Christian.,Adjective,Ashamed to have to recognize how unchristianly his assumptions and motives are.,unchristianly,,C2,94,General,Rare,,,
 9270,Uncivil,Lacking civility or good manners.,Adjective,Want nothing from you but to get away from your uncivil tongue.,rude,,B2,46,General,Less Common,,,civility
 9271,Uncivilized,"lacking the customs, order, or refinement associated with organized society.",Adjective,"He called their table manners uncivilized, though it was mostly a joke.",barbarian,barbaric,C2,94,General,Rare,,,noncivilized;noncivilised
@@ -9286,7 +9286,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9285,Uncomplicated,Lacking complexity.,Adjective,Small and uncomplicated cars for those really interested in motoring.,unsophisticated,,C2,94,General,Rare,,,simple;easy
 9286,Lighthouse,A tower with a bright light that warns and guides ships near the coast.,Noun,The old lighthouse still guides fishing boats safely into the harbour.,beacon tower,,A2,16,Travel & Places,Common,,,
 9287,Uncompromising,Not making concessions.,Adjective,Took an uncompromising stance in the peace talks.,sturdy,inflexible,B1,19,General,Common,,,hardline
-9288,Unconditionally,In an unqualified manner.,Adverb,He flatly denied the charges.,flatly,categorically,B2,34,General,Less Common,,,unqualified;unconditional
+9288,Unconditionally,without any conditions or limitations attached.,Adverb,"She loved her children unconditionally, no matter what they did.",flatly,categorically,B2,34,General,Less Common,,,unqualified;unconditional
 9289,Unconformist,Not conforming to some norm or socially approved pattern of behavior or thought.,Adjective,Their rabidly nonconformist deportment has made them legendary.,nonconformist,,C2,94,General,Rare,,,
 9290,Uncongenial,Not suitable to your tastes or needs.,Adjective,The uncongenial roommates were always fighting.,incompatible,,C2,94,General,Rare,,,disagreeable;unfriendly;uncongeniality
 9291,Unconquerable,Incapable of being surmounted or excelled.,Adjective,Insuperable odds.,insuperable,,B2,46,General,Less Common,,,invincible;unbeatable;insurmountable
@@ -9592,7 +9592,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9591,Unsheathed,Draw from a sheath or scabbard.,Verb,The knight unsheathed his sword.,unsheathe,,C2,96,General,Rare,,,draw;pull
 9592,Unshorn,Not sheared.,Adjective,A grizzly unshorn beard.,unsheared,,C2,96,General,Rare,,,
 9593,Unsighted,Unable to see; --Kenneth Jernigan.,Adjective,A person is blind to the extent that he must devise alternative techniques to do efficiently those things he would do with sight if he had normal vision.,blind,,C2,96,General,Rare,,,blindfolded;eyeless;sightless
-9594,Unskillful,Poorly done.,Adjective,A botchy piece of work.,botchy,butcherly,C2,96,General,Rare,,,unskillfulness
+9594,Unskillful,lacking skill or proficiency; done poorly or clumsily.,Adjective,His unskillful attempt at parallel parking blocked half the street.,botchy,butcherly,C2,96,General,Rare,,,unskillfulness
 9595,Unsloped,In a vertical position; not sloping.,Adjective,An upright post.,upright,,B2,46,General,Less Common,,,vertical;perpendicular
 9596,Unsnarl,Extricate from entanglement.,Verb,Can you disentangle the cord?,disentangle,straighten out,C2,96,General,Rare,,,unsnarling;unravel;systematize
 9597,Unsnarling,Extricate from entanglement.,Verb,Can you disentangle the cord?,disentangle,unsnarl,C2,96,General,Rare,,,unravel;systematize;systemize
@@ -9780,7 +9780,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9779,Vibrant,Vigorous and animated.,Adjective,A vibrant group that challenged the system.,vivacious,,B1,16,General,Common,,,spirited;vibrate;reverberant
 9780,Vibration,"A rapid, continuous back-and-forth or oscillating motion.",Noun,The vibration of the washing machine rattled the floor.,shaking,shakiness,B1,19,General,Common,,,movement;motility;palpitation
 9781,Vicinity,A surrounding or nearby region.,Noun,The plane crashed in the vicinity of Asheville.,locality,neighborhood,B1,16,Travel & Places,Common,,,section;scenery;outskirts
-9782,Viciously,In a vicious manner.,Adverb,He was viciously attacked.,brutally,savagely,C2,98,General,Rare,,,vicious;inhumane
+9782,Viciously,in a deliberately cruel or violent manner.,Adverb,The dog viciously lunged at the mail carrier through the fence.,brutally,savagely,C2,98,General,Rare,,,vicious;inhumane
 9783,Victimise,"To single someone out for cruel or unjust treatment, chiefly British spelling.",Verb,Managers must not victimise employees who raise safety concerns.,victimize,,C2,98,Society & Culture,Rare,,,victimiser;deceive;penalize
 9784,Victimiser,A person who victimizes others.,Noun,"I thought we were partners, not victim and victimizer.",victimizer,,C2,98,Society & Culture,Rare,,,victimise;decadent;destroyer
 9785,Victimize,"To single someone out for unfair or cruel treatment, American spelling.",Verb,The law protects workers from being victimized for reporting fraud.,victimise,,B2,47,Society & Culture,Less Common,,,deceive;penalize;aggrieve
@@ -9829,7 +9829,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9828,Voiding,Making a document or agreement legally invalid.,Verb,Voiding the warranty was an unintended result of the repair.,invalidate,annul,C2,98,Society & Culture,Rare,,,reverse;overturn;nullify
 9829,Volatility,The trait of being unpredictably irresolute.,Noun,The volatility of the market drove many investors away.,unpredictability,,C2,98,General,Rare,,,irresolution;indecisiveness;indecision
 9830,Volitionally,In a willing manner.,Adverb,I willingly accept.,willingly,,C2,98,General,Rare,,,consenting;disposed;inclined
-9831,Volubly,In a chatty manner.,Adverb,"`when I was a girl,' she said chattily, `I used to ride a bicycle'.",chattily,,C2,98,General,Rare,,,communicative;voluble;chatty
+9831,Volubly,"speaking fluently, rapidly, and at great length.",Adverb,"He volubly explained every detail of his trip, barely pausing for breath.",chattily,,C2,98,General,Rare,,,communicative;voluble;chatty
 9832,Volumetric,Of or relating to measurement by volume.,Adjective,Volumetric analysis.,volumetrical,,B2,34,General,Less Common,,,volumeter
 9833,Voluminous,Marked by repeated turns and bends.,Adjective,A tortuous road up the mountain.,tortuous,twisting,B1,27,General,Common,,,crooked;voluminousness;volume
 9834,Voluptuous,Having strong sexual appeal.,Adjective,Juicy barmaids.,juicy,luscious,B1,27,General,Common,,,voluptuousness;sexy;shapely
@@ -9926,7 +9926,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9925,Wholeness,An undivided or unbroken completeness or totality with nothing wanting.,Noun,The integrity of the nervous system is required for normal development.,integrity,unity,B2,34,General,Less Common,,,vitality;condition;whole
 9926,Whopping,Hit hard.,Verb,The teacher whacked the boy.,whack,wham,B2,47,General,Less Common,,,hit
 9927,Wickedness,Absence of moral or spiritual values.,Noun,The powers of darkness.,iniquity,darkness,B1,27,General,Common,,,violation;condition;depravity
-9928,Wideband,Responding to or operating at a wide band of frequencies.,Adjective,A broadband antenna.,broadband,,C2,99,General,Rare,,,
+9928,Wideband,"relating to a system or signal that operates across a wide range of frequencies, especially in radio or electronics.",Adjective,The radio uses a wideband receiver to pick up signals across many channels.,broadband,,C2,99,General,Rare,,,
 9929,Widowed,Cause to be without a spouse.,Verb,The war widowed many women in the former Yugoslavia.,widow,,B1,19,General,Common,,,leave
 9930,Wildcat,"Unofficial or unauthorized, especially describing a labor strike not sanctioned by a union.",Adjective,Workers staged a wildcat strike over the sudden schedule change.,unauthorized,unauthorised,B1,22,General,Common,,,unsound;unofficial
 9931,Wildness,A feeling of extreme emotional intensity.,Noun,The wildness of his anger.,abandon,,B2,47,Emotion,Less Common,,,passion;intensity;fervour
