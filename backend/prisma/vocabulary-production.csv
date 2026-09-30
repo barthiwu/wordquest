@@ -8936,8 +8936,8 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8935,Tenderise,"To make meat more tender, especially by pounding or marinating, chiefly British spelling.",Verb,She used a mallet to tenderise the tough cut of beef.,tender,tenderize,C2,92,General,Rare,,,tenderisation;tenderiser;change
 8936,Tenderize,"To make meat softer and easier to chew, American spelling.",Verb,Marinating overnight helps tenderize the steak.,tender,tenderise,C2,92,General,Rare,,,tenderization;tenderizer;change
 8937,Tenderized,"Made softer and easier to chew, especially through pounding or marinating.",Verb,The tenderized chicken cooked much faster than usual.,tender,tenderize,C2,92,General,Rare,,,change;alter;modify
-8938,Tenebrific,Dark and gloomy.,Adjective,A tenebrous cave.,tenebrous,tenebrious,C2,92,General,Rare,,,dark
-8939,Tenebrous,Dark and gloomy.,Adjective,A tenebrous cave.,tenebrific,tenebrious,B2,45,General,Less Common,,,dark
+8938,Tenebrific,producing or causing darkness and gloom.,Adjective,The tenebrific fog swallowed the streetlamps one by one.,tenebrous,tenebrious,C2,92,General,Rare,,,dark
+8939,Tenebrous,"dark and gloomy, especially describing a shadowy place.",Adjective,"They pressed deeper into the tenebrous cave, torches flickering.",tenebrific,tenebrious,B2,45,General,Less Common,,,dark
 8940,Tensile,"Relating to or capable of being stretched, especially describing a material's resistance to being pulled apart.",Adjective,Steel cables are chosen for bridges because of their high tensile strength.,ductile,malleable,B1,19,General,Common,,,tension;formed
 8941,Tensity,"a rare, more formal variant of 'tension'; the state of being stretched or strained.",Noun,The physical therapist explained how the tensity in his calf muscles was causing the pain.,tension,tenseness,C2,92,General,Rare,,,condition;tense;status
 8942,Tenting,"camping in a tent, or covering something with a tent-like structure.",Verb,The family went tenting by the lake for the entire weekend.,camp,encamp,B2,45,General,Less Common,,,populate;neighbor;neighbour
@@ -8963,20 +8963,20 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8962,Thankfully,In a thankful manner; with thanks.,Adverb,He accepted thankfully my apologies.,gratefully,,C2,92,General,Rare,,,thankful;appreciative;glad
 8963,Thanksgiving,A short prayer of thanks before a meal.,Noun,Their youngest son said grace.,grace,blessing,A2,13,Communication,Very Common,,,collect;supplication;november
 8964,Thawing,The process whereby heat changes something from a solid to a liquid.,Noun,The power failure caused a refrigerator melt that was a disaster.,thaw,melt,B2,33,Nature,Less Common,,,heating;warming;weather
-8965,Thenceforth,From that time on.,Adverb,Thereafter he never called again.,thereafter,,B2,33,General,Less Common,,,
+8965,Thenceforth,from that point in time onward (a formal or literary term).,Adverb,"He broke his promise once, and thenceforth she trusted no word he said.",thereafter,,B2,33,General,Less Common,,,
 8966,Theoretic,Concerned primarily with theories or hypotheses rather than practical considerations.,Adjective,Theoretical science.,theoretical,,C2,92,General,Rare,,,speculative;divinatory;hypothetic
 8967,Theorize,"To form a systematic set of ideas to explain a phenomenon, based on general principles.",Verb,Physicists theorize that dark matter makes up most of the universe's mass.,speculate,theorise,B2,33,Academic,Less Common,,,anticipate;explicate;formulate
 8968,Therapeutical,Relating to or involved in therapy.,Adjective,Therapeutic approach to criminality.,therapeutic,,C2,92,General,Rare,,,therapy
 8969,Thereabout,Near that time or date.,Adverb,Come at noon or thereabouts.,thereabouts,,C2,92,General,Rare,,,
-8970,Thereafter,From that time on.,Adverb,Thereafter he never called again.,thenceforth,,A2,7,General,Very Common,,,
+8970,Thereafter,after that point in time; from then on.,Adverb,"The treaty was signed in spring, and peace held thereafter for a decade.",thenceforth,,A2,7,General,Very Common,,,
 8971,Therein,(formal) in or into that thing or place.,Adverb,They can read therein what our plans are.,in this,in that,A2,11,General,Very Common,,,
 8972,Thereunder,Under that.,Adverb,The headings and the items listed thereunder.,under that,under it,B2,45,General,Less Common,,,
 8973,Thermal,"relating to or caused by heat, or designed to retain heat.",Adjective,She wore thermal underwear to stay warm on the ski slopes.,thermic,caloric,A2,6,General,Very Common,,,heat
 8974,Thermodynamic,Of or concerned with thermodynamics.,Adjective,The thermodynamic limit.,thermodynamical,,B2,34,General,Less Common,,,thermodynamics
 8975,Thermoset,Having the property of becoming permanently hard and rigid when heated or cured.,Adjective,The phenol resins and plastics were the original synthetic thermosetting materials.,thermosetting,,C2,92,General,Rare,,,
 8976,Thicken,Make thick or thicker.,Verb,Thicken the sauce.,inspissate,,B2,45,General,Less Common,,,thickener;thickening;change
-8977,Thickener,Any material used to thicken.,Noun,Starch is used in cooking as a thickening.,thickening,,C2,92,Science & Technology,Rare,,,thicken;material;stuff
-8978,Thickening,Any material used to thicken.,Noun,Starch is used in cooking as a thickening.,thickener,,B2,45,Science & Technology,Less Common,,,material;projection;stuff
+8977,Thickener,a substance added to a liquid to make it thicker.,Noun,Cornstarch is a common thickener used in gravies and sauces.,thickening,,C2,92,Science & Technology,Rare,,,thicken;material;stuff
+8978,Thickening,"a substance or agent that makes something thicker, or the process itself.",Noun,The chef added a thickening of flour and butter to the simmering stew.,thickener,,B2,45,Science & Technology,Less Common,,,material;projection;stuff
 8979,Thickset,"having a stocky, muscular build, especially broad through the shoulders and chest.",Adjective,The thickset wrestler easily overpowered his taller opponent.,compact,heavyset,C2,92,General,Rare,,,short;little;concentrated
 8980,Thieving,"the practice or habit of stealing, especially persistently or as a way of life.",Noun,The magpie's thieving nature makes it steal shiny objects from open windows.,larceny,theft,B1,22,General,Common,,,skimming;shrinkage;stealing
 8981,Thingamajig,A casual word for an object whose proper name has slipped your mind.,Noun,There's a thingamajig in the drawer that should fix this.,doodad,doohickey,C2,92,Science & Technology,Rare,,,whatchamacallum;whatsis;stuff
@@ -8986,12 +8986,12 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 8985,Thinned,Make thin or thinner.,Verb,Thin the solution.,thin,,B2,45,General,Less Common,,,detract;shorten;subtract
 8986,Thinness,"the quality of having little width, thickness, or bulk.",Noun,The thinness of the ice made the crossing dangerous.,tenuity,slenderness,B2,45,General,Less Common,,,dimension;scrawniness;slimness
 8987,Thinning,The act of diluting something.,Noun,The cutting of whiskey with water.,cutting,,B2,34,General,Less Common,,,thin;dilution
-8988,Thirster,A person with a strong desire for something.,Noun,A longer for money.,longer,yearner,C2,92,Society & Culture,Rare,,,individual;someone;somebody
+8988,Thirster,someone who has an intense craving or thirst for something.,Noun,"A thirster for adventure, she left her desk job within the year.",longer,yearner,C2,92,Society & Culture,Rare,,,individual;someone;somebody
 8989,Thirstiness,Strong desire for something (not food or drink).,Noun,A thirst for knowledge.,hunger,hungriness,C2,92,General,Rare,,,dryness;drought;thirsty
 8990,Thither,To or toward that place; away from the speaker.,Adverb,Go there around noon!,there,,B2,45,General,Less Common,,,
 8991,Thorough,"Complete, with careful attention to every detail.",Adjective,She gave the apartment a thorough cleaning before moving out.,exhaustive,thoroughgoing,A2,7,General,Very Common,,,careful;complete;thoroughness
 8992,Thoroughgoing,Complete and extending to every part; comprehensive (formal).,Adjective,The company underwent a thoroughgoing review of its safety procedures.,exhaustive,thorough,B2,34,General,Less Common,,,complete;unmitigated
-8993,Thoughtless,Without care or thought for others.,Adjective,The thoughtless saying of a great princess on being informed that the people had no bread; `Let them eat cake'.,uncaring,unthinking,B1,27,General,Common,,,unconsidered;thoughtlessness;unreflective
+8993,Thoughtless,careless or inconsiderate of others' feelings.,Adjective,It was thoughtless of him to cancel at the last minute without calling.,uncaring,unthinking,B1,27,General,Common,,,unconsidered;thoughtlessness;unreflective
 8994,Thrashing,"Moving about violently and wildly, or beating someone or something repeatedly.",Verb,The fish kept thrashing on the deck until it was released.,convulse,thresh,C2,92,General,Rare,,,belabour;lambaste;trounce
 8995,Threaded,moved carefully through a narrow or crowded space (past tense of 'thread').,Verb,She threaded her way through the crowded market stalls.,weave,wind,B1,22,General,Common,,,locomote;travel;move
 8996,Threads,Any long object resembling a thin line.,Noun,A mere ribbon of land.,ribbon,thread,A2,14,General,Very Common,,,worsted;filling;metallic
@@ -9023,15 +9023,15 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9022,Tilling,"Work land as by ploughing, harrowing, and manuring, in order to make it ready for cultivation.",Verb,Till the soil.,till,,B2,46,Arts & Creativity,Less Common,,,process;cultivate;overwork
 9023,Timeworn,Repeated too often; overfamiliar through overuse.,Adjective,Bromidic sermons.,banal,commonplace,B2,46,General,Less Common,,,unoriginal
 9024,Timidly,In a shy or timid or bashful manner.,Adverb,He smiled shyly.,shyly,bashfully,B2,46,General,Less Common,,,confidence;bashful;fearful
-9025,Tincture,An indication that something has been present.,Noun,There wasn't a trace of evidence for the claim.,trace,vestige,B2,46,Communication,Less Common,,,indication;indicant;mordant
+9025,Tincture,a slight trace or tinge of a quality or color.,Noun,There was a tincture of doubt in his otherwise confident voice.,trace,vestige,B2,46,Communication,Less Common,,,indication;indicant;mordant
 9026,Tinkling,"making a light, high-pitched ringing sound.",Verb,The wind chimes kept tinkling softly on the porch all afternoon.,tinkle,tink,B2,34,General,Less Common,,,sound
 9027,Tinseled,Impart a cheap brightness to.,Verb,His tinseled image of Hollywood.,tinsel,,C2,92,Business,Rare,,,contribute;decorate;embellish
 9028,Tinting,Color lightly.,Verb,Her greying hair was tinged blond.,tint,tinct,C2,92,General,Rare,,,colorize;colorise;colourize
-9029,Tiredly,In a weary manner.,Adverb,He walked around tiredly.,wearily,,B2,34,General,Less Common,,,careworn;raddled;drooping
+9029,Tiredly,in a manner showing physical tiredness or fatigue.,Adverb,She rubbed her eyes tiredly after the overnight shift.,wearily,,B2,34,General,Less Common,,,careworn;raddled;drooping
 9030,Tireless,having or showing great effort or energy without ever seeming to tire.,Adjective,The tireless volunteers worked through the night to rebuild the shelter.,indefatigable,unflagging,B1,22,General,Common,,,diligent;tirelessness;energetic
 9031,Tiresome,"Causing weariness or boredom, especially through repetition.",Adjective,His tiresome complaints made the meeting drag on forever.,boring,deadening,B1,27,General,Common,,,tiresomeness;uninteresting
-9032,Titillated,Excite pleasurably or erotically.,Verb,A titillating story appeared in the usually conservative magazine.,titillate,,C2,92,Emotion,Rare,,,delight;vellicate;affright
-9033,Titillating,Excite pleasurably or erotically.,Verb,A titillating story appeared in the usually conservative magazine.,titillate,,B2,46,Emotion,Less Common,,,delight;vellicate;affright
+9032,Titillated,excited pleasurably or provocatively (past tense).,Verb,The gossip column titillated readers with rumors about the senator's affair.,titillate,,C2,92,Emotion,Rare,,,delight;vellicate;affright
+9033,Titillating,currently exciting pleasurably or provocatively.,Verb,The tabloid ran a titillating headline about the scandal.,titillate,,B2,46,Emotion,Less Common,,,delight;vellicate;affright
 9034,Tittering,Laugh nervously.,Verb,The girls giggled when the rock star came into the classroom.,giggle,titter,C2,92,Health & Wellness,Rare,,,convulse;laugh;bellylaugh
 9035,Titular,Of or relating to a legal title to something.,Adjective,Titulary rights.,titulary,,B2,46,General,Less Common,,,title
 9036,Toasted,Make brown and crisp by heating.,Verb,Toast bread.,crispen,toast,B2,34,General,Less Common,,,wassail;decorate;heat
@@ -9070,8 +9070,8 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9069,Towelling,Wipe with a towel.,Verb,Towel your hair dry.,towel,,C2,92,General,Rare,,,wipe;squeegee;whisk
 9070,Towering,"rising to a great height, especially in a way that dominates the surroundings.",Verb,The skyscraper was towering over every other building downtown.,loom,tower,A2,10,General,Very Common,,,rise;lift;rear
 9071,Township,An administrative division of a county.,Noun,The town is responsible for snow removal.,town,,A2,14,Travel & Places,Very Common,,,country;reservation;reserve
-9072,Traceable,Capable of being traced or tracked.,Adjective,A traceable riverbed.,trackable,,B1,27,General,Common,,,attributable
-9073,Trackable,Capable of being traced or tracked.,Adjective,A traceable riverbed.,traceable,,C2,92,General,Rare,,,
+9072,Traceable,able to be traced back to a source or origin.,Adjective,The virus outbreak was traceable to a single contaminated batch.,trackable,,B1,27,General,Common,,,attributable
+9073,Trackable,"able to be monitored or followed in real time, especially using a tracking device.",Adjective,The shipment is trackable online from the moment it leaves the warehouse.,traceable,,C2,92,General,Rare,,,
 9074,Tracked,Carry on the feet and deposit.,Verb,Track mud into the house.,track,,B1,27,General,Common,,,introduce;monitor;supervise
 9075,Trackless,Having no marked tracks or trails; untouched.,Adjective,The explorers pushed into trackless wilderness.,pathless,roadless,B2,46,General,Less Common,,,inaccessible;unaccessible
 9076,Tractile,"Capable of being drawn out or extended, especially into threads (rare, formal).",Adjective,The tractile fibers of the plant were spun into a fine thread.,ductile,malleable,C2,92,General,Rare,,,formed
@@ -9080,16 +9080,16 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9079,Traduce,Speak unfavorably about.,Verb,She badmouths her husband everywhere.,badmouth,malign,C2,93,Communication,Rare,,,besmirch;traducement;traducer
 9080,Tragicomic,Manifesting both tragic and comic aspects.,Adjective,The tragicomic disparity...between's man's aspirations and his accomplishments.,tragicomical,,B2,46,General,Less Common,,,tragicomedy;sad
 9081,Trailing,To lag or linger behind.,Verb,But in so many other areas we still are dragging.,drag,trail,A2,14,General,Very Common,,,lag;dawdle;pursue
-9082,Traitorously,In a disloyal and faithless manner.,Adverb,He behaved treacherously.,faithlessly,treacherously,C2,93,General,Rare,,,traitorous;disloyal
+9082,Traitorously,in a manner that betrays trust or loyalty.,Adverb,He traitorously leaked the company's secrets to a rival firm.,faithlessly,treacherously,C2,93,General,Rare,,,traitorous;disloyal
 9083,Tramcar,A four-wheeled wagon that runs on tracks in a mine.,Noun,A tramcar carries coal out of a coal mine.,tram,,C2,93,Science & Technology,Rare,,,carrier;wagon;waggon
 9084,Trammel,Catch in or as if in a trap.,Verb,The men trap foxes.,trap,entrap,B2,46,General,Less Common,,,capture;control;contain
 9085,Trample,The sound of heavy treading or stomping.,Noun,He heard the trample of many feet.,trampling,,B1,27,General,Common,,,sound
 9086,Tranquil,(of a body of water) free from disturbance by heavy waves.,Adjective,A ribbon of sand between the angry sea and the placid bay.,placid,quiet,B2,34,General,Less Common,,,composed;tranquility;tranquillity
 9087,Tranquilize,"To make someone calm, often with a sedative drug.",Verb,The vet had to tranquilize the frightened horse.,calm,calm down,C2,93,Emotion,Rare,,,comfort;console;compose
 9088,Tranquilizing,"Making someone calm, often with a sedative.",Verb,The tranquilizing effect of the medicine lasted for hours.,calm,calm down,C2,93,Emotion,Rare,,,comfort;console;compose
-9089,Tranquillising,"Making someone calm, usually with a sedative.",Verb,The nurse administered a tranquillising injection.,calm,calm down,C2,93,Emotion,Rare,,,comfort;console;compose
-9090,Tranquillizing,"Making someone calm, usually with a sedative.",Verb,The vet described the tranquillizing dose needed for the dog.,calm,calm down,C2,93,Emotion,Rare,,,comfort;console;compose
-9091,Transalpine,On or relating to or characteristic of the region or peoples beyond the Alps from Italy (or north of the Alps).,Adjective,Ancient transalpine Gaul was an area northwest of the Alps and included modern France and Belgium.,ultramontane,,C2,93,General,Rare,,,tramontane
+9089,Tranquillising,"chiefly British spelling; currently making someone calm, usually through a sedative.",Verb,The nurse administered a tranquillising injection.,calm,calm down,C2,93,Emotion,Rare,,,comfort;console;compose
+9090,Tranquillizing,"a British-spelling variant using the American '-izing' form; currently making someone calm, usually through a sedative.",Verb,The vet described the tranquillizing dose needed for the dog.,calm,calm down,C2,93,Emotion,Rare,,,comfort;console;compose
+9091,Transalpine,situated or occurring on the other side of the Alps from Italy; crossing the Alps.,Adjective,Hannibal's transalpine crossing with his war elephants stunned the Romans.,ultramontane,,C2,93,General,Rare,,,tramontane
 9092,Transcendental,Existing outside of or not in accordance with nature.,Adjective,Find transcendental motives for sublunary action.,nonnatural,otherworldly,B1,27,General,Common,,,supernatural;transcendentalism
 9093,Transcribe,Rewrite in a different script.,Verb,The Sanskrit text had to be transliterated.,transliterate,,B2,46,Communication,Less Common,,,transcription;rewrite;romanize
 9094,Transcription,a written or printed version of spoken material.,Noun,The court reporter provided a full transcription of the trial testimony.,recording,,B2,34,General,Less Common,,,transcribe;reading;writing
@@ -9103,7 +9103,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9102,Transgress,"go beyond the limits set by a law, rule, or moral code.",Verb,He knew he would transgress a boundary his family held sacred.,offend,infract,C2,93,Society & Culture,Rare,,,conflict;trespass;intrude
 9103,Transient,Lasting a very short time.,Adjective,The ephemeral joys of childhood.,ephemeral,passing,B1,27,General,Common,,,impermanent;temporary;transiency
 9104,Transitivize,Make transitive.,Verb,Adding `out' to many verbs transitivizes them.,transitivise,,C2,93,General,Rare,,,transitive;change;alter
-9105,Translatable,Capable of being changed in substance as if by alchemy.,Adjective,Is lead really transmutable into gold?,convertible,transformable,C2,93,General,Rare,,,commutable
+9105,Translatable,capable of being translated into another language or form.,Adjective,The poem's wordplay made it barely translatable into French.,convertible,transformable,C2,93,General,Rare,,,commutable
 9106,Translate,Restate (words) from one language into another language.,Verb,I have to translate when my in-laws from Austria visit the U.S.,interpret,render,A2,8,Communication,Very Common,,,translation;reiterate;ingeminate
 9107,Translucent,Allowing light to pass through diffusely.,Adjective,Translucent amber.,semitransparent,,B1,27,General,Common,,,translucency;translucence;clear
 9108,Translunary,"situated beyond the moon, or, figuratively, wildly fanciful or unearthly.",Adjective,Who can imagine a translunary visitor strolling through Times Square?,translunar,superlunar,C2,93,General,Rare,,,moon;heavenly
@@ -9111,7 +9111,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9110,Transmitted,Transfer to another.,Verb,Communicate a disease.,convey,transmit,A2,13,Business,Very Common,,,express;communicate;conduct
 9111,Transmitter,Someone who transmits a message.,Noun,Return to sender.,sender,,B1,22,Society & Culture,Common,,,carrier;invigorator;retardent
 9112,Transmogrify,"To transform something in a surprising or magical way, often humorously.",Verb,The children loved how the story's magic could transmogrify a pumpkin into a golden carriage.,metamorphose,transfigure,C2,93,General,Rare,,,reverse;desecrate;interchange
-9113,Transmutable,Capable of being changed in substance as if by alchemy.,Adjective,Is lead really transmutable into gold?,convertible,transformable,C2,93,General,Rare,,,transmutability;commutable
+9113,Transmutable,"capable of being changed in substance or form, as if by alchemy.",Adjective,Medieval alchemists believed base metals were transmutable into gold.,convertible,transformable,C2,93,General,Rare,,,transmutability;commutable
 9114,Transnational,"extending or operating across national borders, especially describing issues or movements.",Adjective,Climate change is fundamentally a transnational problem requiring global cooperation.,multinational,,C2,93,General,Rare,,,international
 9115,Transparent,"Allowing light to pass through so objects behind can be seen clearly; also, easy to understand or detect.",Adjective,The company promised transparent reporting of its finances.,crystalline,crystal clear,A2,9,General,Very Common,,,transparency;transparentness;transparence
 9116,Transpiring,Exude water vapor.,Verb,Plants transpire.,transpire,,B1,22,General,Common,,,evaporate;vaporize;vaporise
@@ -9122,18 +9122,18 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9121,Transversal,"Lying or extending across something; crosswise, especially in geometry.",Adjective,The transversal line crosses both parallel lines in the diagram.,cross,transverse,C2,93,General,Rare,,,crosswise
 9122,Transverse,Situated or extending across something rather than along its length.,Adjective,The bridge relies on transverse beams for added stability.,cross,transversal,B1,22,General,Common,,,crosswise
 9123,Trapping,Place in a confining or embarrassing position.,Verb,He was trapped in a difficult situation.,trap,pin down,B2,34,Society & Culture,Less Common,,,confine;capture;trammel
-9124,Travelable,Capable of being traversed.,Adjective,Highway crews soon had the roads travelable.,traversable,,C2,93,General,Rare,,,passable
+9124,Travelable,suitable or safe to travel on or through.,Adjective,"After the plows came through, the roads were finally travelable again.",traversable,,C2,93,General,Rare,,,passable
 9125,Traveled,"moved or journeyed from one place to another (past tense, American spelling).",Verb,She traveled across three countries during her gap year.,travel,go,A2,6,General,Very Common,,,navigate;commute;journey
-9126,Traversable,Capable of being traversed.,Adjective,Highway crews soon had the roads travelable.,travelable,,C2,93,General,Rare,,,passable
+9126,Traversable,"capable of being crossed or traveled across, especially describing difficult terrain.",Adjective,The canyon proved traversable only along a narrow goat path.,travelable,,C2,93,General,Rare,,,passable
 9127,Treacherous,Dangerously unstable and unpredictable.,Adjective,Treacherous winding roads.,unreliable,,B1,16,General,Common,,,dangerous;unsafe;treachery
 9128,Treasonable,"constituting or involving betrayal of one's country, especially punishable as treason.",Adjective,The general's treasonable dealings with the enemy were later exposed.,faithless,traitorous,B2,46,General,Less Common,,,disloyal
-9129,Treasonably,In a disloyal and faithless manner.,Adverb,He behaved treacherously.,faithlessly,traitorously,C2,93,General,Rare,,,treasonable;disloyal
+9129,Treasonably,"in a manner that betrays one's country or sovereign, especially by aiding an enemy.",Adverb,The general was accused of acting treasonably by surrendering the fort without a fight.,faithlessly,traitorously,C2,93,General,Rare,,,treasonable;disloyal
 9130,Treasured,Hold dear.,Verb,I prize these old photographs.,prize,value,B2,34,Business,Less Common,,,consider;recognize;recognise
 9131,Trembles,Move or jerk quickly and involuntarily up and down or sideways.,Verb,His hands were trembling when he signed the document.,tremble,,B2,46,General,Less Common,,,shudder;convulse;jactitate
 9132,Tremendously,To a very great degree; enormously.,Adverb,The new policy helped tremendously.,enormously,hugely,A2,11,General,Very Common,,,tremendous;extraordinary;large
 9133,Trenchant,"Having keenness and forcefulness and penetration in thought, expression, or intellect.",Adjective,Searching insights.,searching,,B1,22,General,Common,,,intelligent;effective;trenchancy
 9134,Trespass,Enter unlawfully on someone's property.,Verb,Don't trespass on my land!,intrude,,C2,93,Society & Culture,Rare,,,transgress;infract;conflict
-9135,Triangular,Having three sides.,Adjective,A trilateral figure.,trilateral,three-sided,B1,19,General,Common,,,triangle;triangularity;angular
+9135,Triangular,having the shape of a triangle; three-sided.,Adjective,"The road sign was triangular, warning drivers of the curve ahead.",trilateral,three-sided,B1,19,General,Common,,,triangle;triangularity;angular
 9136,Tributary,A smaller river or stream that flows into a larger one.,Noun,The Missouri River is the longest tributary of the Mississippi.,conducive,contributing,C2,93,General,Rare,,,secondary;obligated
 9137,Trichromatic,Having or involving three colors.,Adjective,Trichromatic vision.,trichrome,tricolor,C2,93,General,Rare,,,colored;coloured;colorful
 9138,Trickily,"in a way involving deception or requiring careful, delicate handling.",Adverb,"The negotiations proceeded trickily, with each side wary of the other's motives.",craftily,cunningly,C2,93,General,Rare,,,tricky;artful
@@ -9141,7 +9141,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9140,Triclinic,"of a crystal system with three unequal axes intersecting at oblique angles, none at right angles.",Adjective,Plagioclase feldspar forms triclinic crystals with no right-angle symmetry.,anorthic,,C2,93,General,Rare,,,
 9141,Tricuspid,Having three cusps or points (especially a molar tooth).,Adjective,Tricuspid molar.,tricuspidate,,C2,93,General,Rare,,,angular;angulate
 9142,Trifling,Consider not very seriously.,Verb,He is trifling with her.,dally,trifle,B2,34,Academic,Less Common,,,deplete;exhaust;squander
-9143,Trilateral,Having three sides.,Adjective,A trilateral figure.,triangular,three-sided,C2,93,General,Rare,,,reciprocal;mutual;multilateral
+9143,Trilateral,"involving three parties or sides, especially in a formal agreement or negotiation (a more technical or legal term).",Adjective,The trilateral talks brought representatives from all three nations to the table.,triangular,three-sided,C2,93,General,Rare,,,reciprocal;mutual;multilateral
 9144,Trilling,"Pronounce with a trill, of the phoneme `r'.",Verb,Some speakers trill their r's.,trill,,C2,93,Communication,Rare,,,pronounce;enounce;enunciate
 9145,Trimmed,Remove the edges from and cut down to the desired size.,Verb,Pare one's fingernails.,pare,trim,B1,22,General,Common,,,decorate;embellish;cut
 9146,Trimming,A decoration or adornment on a garment.,Noun,The trimming on a hat.,trim,passementerie,B2,34,Science & Technology,Less Common,,,decoration;braiding;embellishment
@@ -9197,7 +9197,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9196,Tyrolese,Of or relating to or characteristic of the Tyrol or its people.,Adjective,Tyrolean yodeling.,tyrolean,,C2,93,General,Rare,,,tyrol
 9197,Ulterior,Lying beyond what is openly revealed or avowed (especially being kept in the background or deliberately concealed).,Adjective,Subterranean motives for murder.,subterranean,subterraneous,C2,93,General,Rare,,,distant;covert;remote
 9198,Ultimacy,"The state or degree of being ultimate; the final or most extreme in degree or size or time or distance,.",Noun,The ultimacy of these social values.,ultimateness,,C2,93,General,Rare,,,quickening;resultant;elevation
-9199,Ultramontane,On or relating to or characteristic of the region or peoples beyond the Alps from Italy (or north of the Alps).,Adjective,Ancient transalpine Gaul was an area northwest of the Alps and included modern France and Belgium.,transalpine,,C2,93,General,Rare,,,ultramontanism;tramontane;transmontane
+9199,Ultramontane,"situated beyond the Alps, especially referring to lands north of Italy, or, historically, supporting papal authority over national churches.",Adjective,The bishops from the ultramontane provinces urged stronger loyalty to Rome.,transalpine,,C2,93,General,Rare,,,ultramontanism;tramontane;transmontane
 9200,Ululation,"a long, wavering, high-pitched vocal sound, often made in mourning or celebration in certain cultures.",Noun,The ululation of the mourners carried across the village square.,howl,howling,C2,93,Communication,Rare,,,vocalization;ululate;utterance
 9201,Umbrage,"A feeling of offense or annoyance, especially at a perceived slight (formal, often 'take umbrage').",Noun,She took umbrage at his careless comment about her cooking.,offense,offence,C2,93,Emotion,Rare,,,hackles;outrage;umbrageous
 9202,Umpirage,"The role or authority of an umpire; officiating in a sport (formal, rare).",Noun,The cricket match relied on careful umpirage to settle the close calls.,officiation,officiating,C2,93,General,Rare,,,deciding;arbitration;alternative
@@ -9205,33 +9205,33 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9204,Unacceptable,Not satisfactory or allowable.,Adjective,The coach called the team's effort unacceptable.,impossible,insufferable,B2,46,General,Less Common,,,unacceptableness;unsatisfactory;unacceptability
 9205,Unaccepted,Not conforming to standard usage.,Adjective,The following use of `access' was judged unacceptable by a panel of linguists; `You can access your cash at any of 300 automatic tellers'.,unacceptable,,C2,93,General,Rare,,,nonstandard
 9206,Unaccompanied,Without anybody else or anything else.,Adverb,The child stayed home alone.,alone,solo,B1,27,General,Common,,,isolated;stranded;solitary
-9207,Unaccountable,Not to be accounted for or explained.,Adjective,Perceptible only as unaccountable influences that hinder progress.,unexplainable,,B2,46,General,Less Common,,,inexplicable;incomprehensible;irresponsible
-9208,Unachievably,In an unattainable manner or to an unattainable degree.,Adverb,This house is unattainably expensive.,unattainably,,C2,93,General,Rare,,,impossible;unachievable
+9207,Unaccountable,"impossible to account for or justify, especially describing a strange occurrence.",Adjective,Her sudden change of heart was utterly unaccountable to her friends.,unexplainable,,B2,46,General,Less Common,,,inexplicable;incomprehensible;irresponsible
+9208,Unachievably,to a degree that cannot be achieved or accomplished.,Adverb,The startup set its sales targets unachievably high for the first quarter.,unattainably,,C2,93,General,Rare,,,impossible;unachievable
 9209,Unadapted,Not having adapted to new conditions.,Adjective,Several unadjusted refugees.,unadjusted,,C2,93,General,Rare,,,unmodified;maladjusted
 9210,Unadulterated,Without qualification; used informally as (often pejorative) intensifiers.,Adjective,An arrant fool.,arrant,complete,B2,46,General,Less Common,,,pure;unmitigated
 9211,Unadvised,Without careful prior deliberation or counsel.,Adjective,Ill-advised efforts.,ill-advised,,C2,93,General,Rare,,,foolish;imprudent;uninformed
 9212,Unaesthetic,"not pleasing to look at; lacking artistic or visual appeal, chiefly American spelling.",Adjective,The gray concrete facade struck most visitors as unaesthetic.,inaesthetic,,C2,93,General,Rare,,,inartistic;unartistic
-9213,Unaffectionate,Lacking affection or warm feeling.,Adjective,An uncaring person.,detached,uncaring,C2,93,General,Rare,,,unloving
+9213,Unaffectionate,not showing or expressing affection.,Adjective,The cat was unaffectionate toward strangers but purred for its owner.,detached,uncaring,C2,93,General,Rare,,,unloving
 9214,Unafraid,Free from fear or doubt; easy in mind.,Adjective,He was secure that nothing will be held against him.,secure,untroubled,B1,22,General,Common,,,courageous;unblinking;unflinching
 9215,Unaired,Lacking fresh air.,Adjective,A dusty airless attic.,airless,close,C2,93,General,Rare,,,unventilated
 9216,Unalike,Not alike or similar.,Adjective,As unalike as two people could be.,dissimilar,,C2,93,General,Rare,,,similitude;likeness;alikeness
 9217,Unalterability,The quality of being fixed and unchangeable.,Noun,The fixedness of his gaze upset her.,fixedness,,C2,93,General,Rare,,,stability;absoluteness;unalterable
 9218,Unalterably,In a way that cannot be altered or changed.,Adverb,His mind was unalterably set on retiring at sixty.,unchangeably,unassailably,C2,93,General,Rare,,,changeless;unchanging;confirmed
 9219,Unambiguous,Having only one clear meaning; not open to more than one interpretation.,Adjective,"The contract's terms were unambiguous, leaving no room for dispute.",unequivocal,univocal,B1,27,General,Common,,,straightforward;absolute;unambiguity
-9220,Unanalyzable,Representing the furthest possible extent of analysis or division into parts.,Adjective,A feeling is a simple and undecomposable mental state.,undecomposable,,C2,93,General,Rare,,,simple
+9220,Unanalyzable,not capable of being broken down or examined analytically.,Adjective,"The mystic described the experience as unanalyzable, beyond the reach of logic.",undecomposable,,C2,93,General,Rare,,,simple
 9221,Unanimous,fully in agreement; agreed by everyone without exception.,Adjective,The jury reached a unanimous verdict after only two hours.,consentaneous,consentient,B1,19,General,Common,,,accordant;unanimity;undiversified
 9222,Unannounced,Without warning or announcement.,Adjective,They arrived unannounced.,unheralded,unpredicted,B2,34,General,Less Common,,,unexpected
-9223,Unanticipated,Not anticipated.,Adjective,Unanticipated and disconcerting lines of development.,unforeseen,unlooked-for,C2,93,General,Rare,,,unexpected
+9223,Unanticipated,not expected or foreseen beforehand.,Adjective,The merger faced several unanticipated regulatory hurdles.,unforeseen,unlooked-for,C2,93,General,Rare,,,unexpected
 9224,Unappeasable,Unable to be satisfied or calmed down.,Adjective,His unappeasable anger frightened everyone in the room.,grim,inexorable,B2,46,General,Less Common,,,implacable
-9225,Unapproachable,Inaccessibly located or situated.,Adjective,An unapproachable chalet high in the mountains.,unreachable,unreached,C2,94,General,Rare,,,standoffish;unapproachability;offish
-9226,Unarguably,In an unarguable and undisputed manner.,Adverb,You write as if this fact whilst inarguably forever condemning me to the ranks of Bohemianism nevertheless earned for me the right of entry into any company.,undisputedly,,C2,94,General,Rare,,,incontestable;unarguable;incontestible
+9225,Unapproachable,"difficult to approach, either physically or in manner (cold or intimidating).",Adjective,The CEO had an unapproachable reputation that kept junior staff at a distance.,unreachable,unreached,C2,94,General,Rare,,,standoffish;unapproachability;offish
+9226,Unarguably,in a way that cannot reasonably be disputed; indisputably.,Adverb,She is unarguably the strongest chess player in the club.,undisputedly,,C2,94,General,Rare,,,incontestable;unarguable;incontestible
 9227,Unashamedly,"Without any feeling of shame or embarrassment, often used to show pride.",Adverb,He is unashamedly a fan of cheesy 80s movies.,shamelessly,barefacedly,B2,46,General,Less Common,,,unabashed;audacious;insolent
-9228,Unassailable,Immune to attack; incapable of being tampered with.,Adjective,An impregnable fortress.,impregnable,inviolable,C2,94,General,Rare,,,invulnerable
+9228,Unassailable,so strong or well defended as to be impossible to attack or question successfully.,Adjective,"Her alibi was unassailable, backed by a dozen witnesses.",impregnable,inviolable,C2,94,General,Rare,,,invulnerable
 9229,Unassuming,Not arrogant or presuming.,Adjective,"Unassuming to a fault, skeptical about the value of his work.",retiring,,C2,94,General,Rare,,,unassumingness;modest
 9230,Unassumingness,A quality of naturalness and simplicity.,Noun,The simple sincerity of folk songs.,sincerity,,C2,94,General,Rare,,,unassuming;naturalization;spontaneity
-9231,Unattackable,Immune to attack; incapable of being tampered with.,Adjective,An impregnable fortress.,impregnable,inviolable,C2,94,General,Rare,,,invulnerable
-9232,Unattainably,In an unattainable manner or to an unattainable degree.,Adverb,This house is unattainably expensive.,unachievably,,C2,94,General,Rare,,,impossible;unattainable
-9233,Unattractive,Not appealing to the senses.,Adjective,Untempting food.,untempting,,B1,27,General,Common,,,attractiveness;unattractiveness;homely
+9231,Unattackable,"not capable of being attacked, especially physically (a rarer, more literal term).",Adjective,"The fortress was built into the cliff face, making it nearly unattackable.",impregnable,inviolable,C2,94,General,Rare,,,invulnerable
+9232,Unattainably,to a degree that cannot be reached or attained.,Adverb,The mansion was priced unattainably far beyond what the young couple could afford.,unachievably,,C2,94,General,Rare,,,impossible;unattainable
+9233,Unattractive,not pleasing in appearance or overall appeal.,Adjective,The building's unattractive facade discouraged many potential tenants.,untempting,,B1,27,General,Common,,,attractiveness;unattractiveness;homely
 9234,Unauthorised,"Not having official permission or approval, chiefly British spelling.",Adjective,The unauthorised use of the logo led to a legal warning.,unauthorized,wildcat,C2,94,General,Rare,,,authorization;authorisation;unaccredited
 9235,Unauthorized,"Not having official permission or approval, American spelling.",Adjective,Security stopped the unauthorized vehicle at the gate.,unauthorised,wildcat,B2,34,General,Less Common,,,authorization;authorisation;unaccredited
 9236,Unavoidable,not able to be avoided or prevented; certain to happen.,Adjective,Delays were unavoidable given the severity of the storm.,ineluctable,inescapable,A2,14,General,Very Common,,,inevitable
@@ -9252,12 +9252,12 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9251,Unbolted,Undo the bolt of.,Verb,Unbolt the door.,unbolt,,C2,94,General,Rare,,,open;undo;uncork
 9252,Unbounded,not limited or restrained; unrestricted in extent.,Adjective,His unbounded ambition drove him to start three companies before thirty.,boundless,limitless,B2,46,General,Less Common,,,infinite;unboundedness
 9253,Unbowed,Erect in posture.,Adjective,Sit straight.,straight,unbent,C2,94,General,Rare,,,vertical;erect;upright
-9254,Unbraced,Undo the ties of.,Verb,They untied the prisoner.,untie,unbrace,C2,94,General,Rare,,,unloose;disentangle;disconnect
+9254,Unbraced,released from a brace or support; loosened (past tense of 'unbrace').,Verb,He unbraced the wooden scaffolding before the storm hit.,untie,unbrace,C2,94,General,Rare,,,unloose;disentangle;disconnect
 9255,Unbranching,Without branches.,Adjective,A tree with an unbranched trunk.,unbranched,,C2,94,General,Rare,,,branchless
-9256,Unbroken,(of farmland) not plowed.,Adjective,Unplowed fields.,unplowed,unploughed,A2,14,General,Very Common,,,continuous;untamed;solid
+9256,Unbroken,"(of land) never plowed or cultivated; also, continuous or unbroken more generally.",Adjective,"The unbroken prairie stretched to the horizon, untouched by any plow.",unplowed,unploughed,A2,14,General,Very Common,,,continuous;untamed;solid
 9257,Unburdened,Take the burden off; remove the burden from.,Verb,Unburden the donkey.,unburden,disburden,B2,46,General,Less Common,,,withdraw;impound;confiscate
 9258,Unbuttoned,Undo the buttons of.,Verb,Unbutton the shirt.,unbutton,,C2,94,General,Rare,,,disentangle;disconnect;unravel
-9259,Uncaring,Lacking affection or warm feeling.,Adjective,An uncaring person.,detached,unaffectionate,C2,94,General,Rare,,,unloving;inconsiderate
+9259,Uncaring,showing no concern or sympathy for others.,Adjective,His uncaring response to her tears left her feeling completely alone.,detached,unaffectionate,C2,94,General,Rare,,,unloving;inconsiderate
 9260,Unceasing,"Never stopping, even for a moment.",Adjective,The unceasing rain made the streets impossible to cross.,ageless,aeonian,B2,46,General,Less Common,,,permanent;lasting;continuous
 9261,Unceremonial,Without ceremony or formality.,Adjective,An unceremonious speech.,unceremonious,,C2,94,General,Rare,,,informal
 9262,Uncertain,"not known, decided, or definite; subject to doubt.",Adjective,The outcome of the election remained uncertain until the final votes were counted.,unsure,incertain,A2,7,General,Very Common,,,groping;doubtful;confidence
@@ -9276,12 +9276,12 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9275,Unclouded,(of sound or color) free from anything that dulls or dims.,Adjective,Efforts to obtain a clean bass in orchestral recordings.,clean,clear,B2,34,General,Less Common,,,uncloudedness;pure
 9276,Uncloudedness,"the state of being free from clouds, haze, or obstruction; complete clearness.",Noun,The uncloudedness of the mountain sky made for perfect stargazing.,clearness,clarity,C2,94,General,Rare,,,unclouded;quality;sharpness
 9277,Uncluttered,free from clutter; tidy and open.,Adjective,The uncluttered desk made it much easier for him to focus.,unclutter,clear,B2,46,General,Less Common,,,change;alter;modify
-9278,Uncollected,Not brought together in one place.,Adjective,Uncollected garbage in the streets.,ungathered,,C2,94,General,Rare,,,
+9278,Uncollected,"not yet gathered or picked up, especially describing trash, mail, or debts.",Adjective,Uncollected trash piled up on the curb during the strike.,ungathered,,C2,94,General,Rare,,,
 9279,Uncolored,Without color.,Adjective,Pure water is uncolored.,uncoloured,,B2,46,General,Less Common,,,achromatic;neutral;colouring
 9280,Uncomely,"not physically attractive, or, in an older sense, not fitting or proper (an archaic, literary term).",Adjective,The old ballad describes his uncomely appearance despite his noble heart.,indecent,indecorous,C2,94,General,Rare,,,improper
 9281,Uncommitted,Not busy; not otherwise committed.,Adjective,He was not available for comment.,available,,B1,27,General,Common,,,undecided;floating;unengaged
 9282,Uncomparable,"not able to be compared, especially because the things involved are fundamentally different in kind (a more literal, technical usage).",Adjective,The two systems are uncomparable since they measure entirely different quantities.,incomparable,,C2,94,General,Rare,,,unequaled;nonpareil;peerless
-9283,Uncompensated,Not paying a salary.,Adjective,An uncompensated federal post.,unsalaried,,C2,94,General,Rare,,,unpaid
+9283,Uncompensated,"not paid or reimbursed for work, loss, or service.",Adjective,The volunteers spent uncompensated hours rebuilding homes after the flood.,unsalaried,,C2,94,General,Rare,,,unpaid
 9284,Uncompleted,Not yet finished.,Adjective,His thesis is still incomplete.,incomplete,,C2,94,General,Rare,,,unfinished
 9285,Uncomplicated,Lacking complexity.,Adjective,Small and uncomplicated cars for those really interested in motoring.,unsophisticated,,C2,94,General,Rare,,,simple;easy
 9286,Lighthouse,A tower with a bright light that warns and guides ships near the coast.,Noun,The old lighthouse still guides fishing boats safely into the harbour.,beacon tower,,A2,16,Travel & Places,Common,,,
@@ -9291,13 +9291,13 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9290,Uncongenial,Not suitable to your tastes or needs.,Adjective,The uncongenial roommates were always fighting.,incompatible,,C2,94,General,Rare,,,disagreeable;unfriendly;uncongeniality
 9291,Unconquerable,Incapable of being surmounted or excelled.,Adjective,Insuperable odds.,insuperable,,B2,46,General,Less Common,,,invincible;unbeatable;insurmountable
 9292,Unconsidered,Without proper consideration or reflection.,Adjective,Slovenly inconsiderate reasoning.,inconsiderate,,C2,94,General,Rare,,,thoughtless
-9293,Unconstraint,The trait of lacking restraint or control; reckless freedom from inhibition or worry.,Noun,She danced with abandon.,abandon,wantonness,C2,94,General,Rare,,,unrestraint;sottishness;intemperance
+9293,Unconstraint,the state or quality of being free from restraint or restriction.,Noun,There was a joyful unconstraint in the way the children ran through the field.,abandon,wantonness,C2,94,General,Rare,,,unrestraint;sottishness;intemperance
 9294,Uncontaminating,Not spreading pollution or contamination; especially radioactive contamination.,Adjective,A clean fuel.,clean,,C2,94,General,Rare,,,
-9295,Uncontrived,Not by design or artifice; unforced and impromptu.,Adjective,An air of unstudied spontaneous utterance is apt to be painstakingly achieved.,unstudied,,C2,94,General,Rare,,,candid;unaffected
+9295,Uncontrived,natural and genuine; not artificially planned or staged.,Adjective,Her uncontrived laughter was the most charming part of the interview.,unstudied,,C2,94,General,Rare,,,candid;unaffected
 9296,Unconventional,Not based on or conforming with what is generally done or believed.,Adjective,She took an unconventional path into a career in astrophysics.,improper,unlawful,B1,27,General,Common,,,irregular;original;convention
 9297,Uncooperative,Intentionally unaccommodating.,Adjective,The action was not offensive to him but proved somewhat disobliging.,disobliging,,B2,34,General,Less Common,,,disobedient;unobliging;unhelpful
-9298,Uncorrected,Not subjected to correction or discipline.,Adjective,Let her children grow up uncorrected.,undisciplined,,C2,94,General,Rare,,,unremedied;unpunished
-9299,Uncorrupted,(of language) not having its purity or excellence debased.,Adjective,Uncorrupted English.,undefiled,,C2,94,General,Rare,,,perfect;incorrupt
+9298,Uncorrected,"not yet fixed or amended, especially describing an error.",Adjective,The uncorrected typo remained in three printings before anyone noticed.,undisciplined,,C2,94,General,Rare,,,unremedied;unpunished
+9299,Uncorrupted,"not debased or degraded in quality, purity, or integrity.",Adjective,Linguists prize the village dialect as one of the few uncorrupted forms of the old tongue.,undefiled,,C2,94,General,Rare,,,perfect;incorrupt
 9300,Uncouple,Disconnect or separate.,Verb,Uncouple the hounds.,decouple,,C2,94,General,Rare,,,disconnect;detach
 9301,Uncouth,Lacking refinement or cultivation or taste.,Adjective,He had coarse manners but a first-rate mind.,coarse,common,C2,94,General,Rare,,,uncouthness;unrefined
 9302,Uncovered,Make visible.,Verb,Summer brings out bright clothes.,uncover,bring out,B1,14,General,Common,,,excavate;unclothe;exhibit
@@ -9305,53 +9305,53 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9304,Uncritical,lacking careful judgment; accepting something without proper scrutiny.,Adjective,News sources reflected uncritical estimates of the number of juvenile addicts.,noncritical,,B1,27,General,Common,,,unscholarly
 9305,Uncrowned,"not yet formally crowned, though holding the position in practice.",Adjective,Some historians call him the uncrowned king of American jazz.,crownless,,C2,94,General,Rare,,,uncapped
 9306,Uncrystallized,Not finally or definitely formed.,Adjective,Uncrystallized ideas.,uncrystallised,,C2,94,General,Rare,,,noncrystalline
-9307,Uncultivable,Not suitable for cultivation or tilling.,Adjective,Thickets of indigenous trees...on uncultivable land.,uncultivatable,,C2,94,General,Rare,,,
-9308,Uncultivatable,Not suitable for cultivation or tilling.,Adjective,Thickets of indigenous trees...on uncultivable land.,uncultivable,,C2,94,General,Rare,,,
+9307,Uncultivable,not capable of being cultivated or farmed.,Adjective,The rocky hillside was uncultivable and left to wild grass.,uncultivatable,,C2,94,General,Rare,,,
+9308,Uncultivatable,a less common variant of 'uncultivable'; not capable of being farmed.,Adjective,Surveyors marked the swamp as uncultivatable on the county map.,uncultivable,,C2,94,General,Rare,,,
 9309,Uncurbed,Not restrained or controlled.,Adjective,Unbridled rage.,unbridled,unchecked,C2,94,General,Rare,,,unrestrained
 9310,Uncurtained,not currently fitted with curtains.,Adjective,Moonlight streamed through the uncurtained window all night.,curtainless,,C2,94,General,Rare,,,
-9311,Undaunted,Unshaken in purpose.,Adjective,Wholly undismayed by the commercial failure of the three movies he had made.,undismayed,unshaken,B2,46,General,Less Common,,,courageous;resolute;brave
+9311,Undaunted,"not discouraged or intimidated by difficulty, danger, or setback.",Adjective,"Undaunted by three rejections, she submitted her manuscript a fourth time.",undismayed,unshaken,B2,46,General,Less Common,,,courageous;resolute;brave
 9312,Undecided,Not brought to a conclusion; subject to further thought.,Adjective,An open question.,open,undetermined,C2,94,General,Rare,,,unsettled;indecisive
-9313,Undecipherable,Not easily deciphered.,Adjective,Indecipherable handwriting.,indecipherable,unclear,C2,94,General,Rare,,,illegible
-9314,Undecomposable,Representing the furthest possible extent of analysis or division into parts.,Adjective,A feeling is a simple and undecomposable mental state.,unanalyzable,,C2,94,General,Rare,,,simple
+9313,Undecipherable,"impossible to make out or decode, especially describing writing or a code.",Adjective,The ancient script remained undecipherable for over a century.,indecipherable,unclear,C2,94,General,Rare,,,illegible
+9314,Undecomposable,"not capable of being broken down into simpler parts; irreducible (a more technical, philosophical term).",Adjective,"The philosopher argued that a basic sensation is undecomposable, a true atom of experience.",unanalyzable,,C2,94,General,Rare,,,simple
 9315,Undefendable,Not defended or capable of being defended.,Adjective,An open city.,assailable,undefended,C2,94,General,Rare,,,vulnerable
-9316,Undefiled,(of language) not having its purity or excellence debased.,Adjective,Uncorrupted English.,uncorrupted,,C2,94,General,Rare,,,perfect;pure
+9316,Undefiled,kept pure and unspoiled; not contaminated or debased (a more formal or archaic term).,Adjective,The monks preserved the manuscript's text in its undefiled original form.,uncorrupted,,C2,94,General,Rare,,,perfect;pure
 9317,Undefined,"Not precisely limited, determined, or distinguished.",Adjective,An undefined term.,vague,,B1,22,General,Common,,,indefinable;indefinite
 9318,Undependable,Not worthy of reliance or trust.,Adjective,In the early 1950s computers were large and expensive and unreliable.,unreliable,,B2,34,General,Less Common,,,uncertain;unsound;erratic
 9319,Underage,Not of legal age.,Adjective,Minor children.,minor,nonaged,C2,94,General,Rare,,,dependent
 9320,Undercover,Conducted with or marked by hidden aims or methods.,Adjective,Clandestine intelligence operations.,clandestine,cloak-and-dagger,B2,46,General,Less Common,,,covert
 9321,Underdeveloped,Process (a film or photographic plate) less than the required time or in an ineffective solution or at an insufficiently high temperature.,Verb,These photos are underdeveloped.,underdevelop,,A2,11,General,Very Common,,,develop;solarise;redevelop
 9322,Underdress,Dress informally and casually.,Verb,"On Fridays, employees can underdress.",dress down,,C2,94,Health & Wellness,Rare,,,costume;overclothe;dress
-9323,Underestimate,Assign too low a value to.,Verb,Don't underestimate the value of this heirloom-you may sell it at a good price.,undervalue,,B1,22,Academic,Common,,,estimate;approximate;quantise
+9323,Underestimate,"judge something to be smaller, less important, or less capable than it really is.",Verb,Never underestimate how much preparation a marathon actually takes.,undervalue,,B1,22,Academic,Common,,,estimate;approximate;quantise
 9324,Underframe,The internal supporting structure that gives an artifact its shape.,Noun,The building has a steel skeleton.,skeleton,skeletal frame,C2,94,Science & Technology,Rare,,,chassis;building;edifice
 9325,Underhand,With hand brought forward and up from below shoulder level.,Adjective,An underhand pitch.,underhanded,underarm,C2,94,General,Rare,,,crooked;corrupt
 9326,Underhandedly,Slyly and secretly.,Adverb,"Mean revenge, committed underhand.",underhand,,C2,94,General,Rare,,,crooked;corrupt
-9327,Underhung,Having a lower part projecting beyond the upper.,Adjective,An underhung jaw.,undershot,underslung,C2,94,General,Rare,,,supported;protrusive
+9327,Underhung,having the lower jaw projecting beyond the upper (especially describing an animal's bite).,Adjective,"The bulldog's underhung jaw gave it a distinctive, stubborn expression.",undershot,underslung,C2,94,General,Rare,,,supported;protrusive
 9328,Undermanned,Inadequate in number of workers or assistants etc.,Adjective,They're rather short-handed at the moment.,short-handed,short-staffed,C2,94,General,Rare,,,inadequate;unequal
 9329,Undermine,"weaken gradually, often in a stealthy or hidden manner.",Verb,Constant criticism began to undermine her confidence in the plan.,sabotage,countermine,A2,13,Society & Culture,Very Common,,,subvert;scallop;excavate
 9330,Undernourished,not given enough food or nutrients to remain healthy (past participle).,Verb,The rescued puppy arrived severely undernourished and underweight.,undernourish,malnourish,C2,94,Health & Wellness,Rare,,,breakfast;regurgitate;nourish
 9331,Underperform,Perform less well or with less success than expected.,Verb,"John consistently underachieves, although he is very able.",underachieve,,C2,94,Society & Culture,Rare,,,perform;conduct;playact
 9332,Underrate,Make too low an estimate of.,Verb,He underestimated the work that went into the renovation.,underestimate,,B2,46,Academic,Less Common,,,miscalculate;underrating;misjudge
 9333,Underscore,"give added emphasis or importance to a point, especially to make it unmistakable.",Verb,The report's numbers underscore just how urgent the problem has become.,underline,emphasize,B2,46,Communication,Less Common,,,punctuate;background;describe
-9334,Underslung,Having a lower part projecting beyond the upper.,Adjective,An underhung jaw.,underhung,undershot,C2,94,General,Rare,,,supported;protrusive
+9334,Underslung,"suspended or mounted below the main framework, especially of a vehicle.",Adjective,The hot rod's underslung chassis gave it a noticeably lower ride.,underhung,undershot,C2,94,General,Rare,,,supported;protrusive
 9335,Understandably,"in a way that is reasonable to expect, given the circumstances.",Adverb,She was understandably upset after hearing the news.,intelligibly,clearly,B1,27,General,Common,,,comprehensible;comprehendible;pellucid
 9336,Understated,Exhibiting restrained good taste.,Adjective,The room is pleasant and understated.,unostentatious,unpretentious,B2,46,General,Less Common,,,tasteful
 9337,Undertake,Accept as a challenge.,Verb,I'll tackle this difficult task.,tackle,take on,A2,9,Society & Culture,Very Common,,,initiate;pioneer;confront
-9338,Undervalue,Assign too low a value to.,Verb,Don't underestimate the value of this heirloom-you may sell it at a good price.,underestimate,,C2,94,Academic,Rare,,,undervaluation;value;disrespect
+9338,Undervalue,"fail to appreciate the true worth of something, especially in a financial or emotional sense.",Verb,Investors tend to undervalue small companies with strong fundamentals.,underestimate,,C2,94,Academic,Rare,,,undervaluation;value;disrespect
 9339,Underway,Currently in progress.,Adjective,There is mischief afoot.,afoot,,B1,27,General,Common,,,current
 9340,Underworld,(religion) the world of the dead.,Noun,No one goes to Hades with all his immense wealth.,hell,hades,B1,16,Academic,Common,,,stratum;class;racketeer
 9341,Underwrite,"guarantee financial support for something, especially by accepting the financial risk.",Verb,A local foundation agreed to underwrite the cost of the new wing.,subvention,subvent,B1,27,Communication,Common,,,guarantee;warrant;indemnify
 9342,Undesirable,Not wanted.,Adjective,Undesirable impurities in steel.,unwanted,,A2,11,General,Very Common,,,unenviable;hateful;undesirability
-9343,Undesired,Not desired.,Adjective,An undesired result.,unsought,,C2,94,General,Rare,,,unwanted
+9343,Undesired,not wanted or wished for.,Adjective,The medication came with several undesired side effects.,unsought,,C2,94,General,Rare,,,unwanted
 9344,Undesirous,Having or feeling no desire.,Adjective,"A very private man, totally undesirous of public office.",undesiring,,C2,94,General,Rare,,,
 9345,Undestroyable,a rare variant of 'indestructible'; incapable of being destroyed.,Adjective,"The ancient vault was said to be nearly undestroyable, built of solid stone.",durable,indestructible,C2,94,General,Rare,,,imperishable
 9346,Undetermined,not yet decided or settled.,Adjective,The exact date of the merger is still undetermined.,indeterminate,,B2,34,General,Less Common,,,uncertain;unexplained;inconclusive
-9347,Undeveloped,Undeveloped or unused.,Adjective,Vast unexploited (or undeveloped) natural resources.,unexploited,,B1,22,General,Common,,,vestigial;rudimentary;budding
-9348,Undiminished,Not lessened or diminished.,Adjective,Unrelieved suffering.,unrelieved,,B1,27,General,Common,,,unmitigated
+9347,Undeveloped,"not yet built up, improved, or brought to a fuller state.",Adjective,The undeveloped lot on the corner has sat empty for a decade.,unexploited,,B1,22,General,Common,,,vestigial;rudimentary;budding
+9348,Undiminished,not made smaller or weaker; remaining at full strength.,Adjective,Her enthusiasm for the project remained undiminished after months of setbacks.,unrelieved,,B1,27,General,Common,,,unmitigated
 9349,Undischarged,Owed as a debt.,Adjective,Outstanding bills.,outstanding,owing,C2,94,General,Rare,,,unpaid;loaded
-9350,Undisciplined,Not subjected to correction or discipline.,Adjective,Let her children grow up uncorrected.,uncorrected,,B1,27,General,Common,,,untrained;unpunished
+9350,Undisciplined,lacking self-control or order; not subjected to training or correction.,Adjective,The undisciplined puppy chewed through another pair of shoes.,uncorrected,,B1,27,General,Common,,,untrained;unpunished
 9351,Undiscovered,Not yet discovered.,Adjective,Undiscovered islands.,unexplored,,C2,94,General,Rare,,,unknown;undetected
 9352,Undisputable,"Not able to be disputed, a less common variant spelling of indisputable.",Adjective,The referee's replay review made the call undisputable.,incontestable,indisputable,C2,94,General,Rare,,,undeniable
-9353,Undisputedly,In an unarguable and undisputed manner.,Adverb,You write as if this fact whilst inarguably forever condemning me to the ranks of Bohemianism nevertheless earned for me the right of entry into any company.,unarguably,,C2,94,General,Rare,,,incontestable;undisputed;incontestible
+9353,Undisputedly,without dispute or challenge; acknowledged by all.,Adverb,He was undisputedly the finest violinist of his generation.,unarguably,,C2,94,General,Rare,,,incontestable;undisputed;incontestible
 9354,Cheerful,Happy and full of good spirits.,Adjective,He greeted every customer with a cheerful smile.,upbeat,jolly,A2,15,Emotion,Very Common,,,
 9355,Undoable,Impossible to achieve.,Adjective,An unattainable goal.,unachievable,unattainable,C2,94,General,Rare,,,impossible
 9356,Undoubtedly,without doubt or question; certainly.,Adverb,He is undoubtedly the most talented player on the team.,doubtless,doubtlessly,A2,6,General,Very Common,,,
@@ -9361,11 +9361,11 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9360,Unearthly,Concerned with or affecting the spirit or soul.,Adjective,A spiritual approach to life.,spiritual,,C2,94,General,Rare,,,unworldly;supernatural
 9361,Uneconomical,Inefficient in use of time and effort and materials.,Adjective,A clumsy and wasteful process.,wasteful,,B1,27,General,Common,,,inefficient
 9362,Unelaborated,Giving only major points; lacking completeness.,Adjective,A sketchy account.,sketchy,,C2,94,General,Rare,,,incomplete;uncomplete
-9363,Unembellished,Lacking embellishment or ornamentation.,Adjective,A plain hair style.,plain,bare,C2,94,General,Rare,,,unadorned;undecorated
+9363,Unembellished,plain and unadorned; stated without decoration or exaggeration.,Adjective,He gave an unembellished account of exactly what happened that night.,plain,bare,C2,94,General,Rare,,,unadorned;undecorated
 9364,Unembodied,Not given a physical or bodily form; abstract.,Adjective,The philosopher described the soul as an unembodied essence.,discorporate,bodiless,C2,94,General,Rare,,,immaterial;incorporeal
 9365,Unending,"Seeming to go on forever, with no end in sight.",Adjective,The queue at the airport felt unending.,ageless,aeonian,B1,27,General,Common,,,permanent;lasting
 9366,Unendurable,so severe or prolonged that it cannot be endured (emphasizing duration).,Adjective,The pain grew unendurable after the third hour without medication.,intolerable,unbearable,B2,46,General,Less Common,,,impossible;insufferable;unacceptable
-9367,Unengaged,Not promised in marriage.,Adjective,Continued seeing him but on an unengaged basis.,unpledged,unpromised,C2,94,General,Rare,,,uncommitted;idle;unattached
+9367,Unengaged,not currently betrothed or committed to marry.,Adjective,"She stayed unengaged well into her thirties, focused on her career.",unpledged,unpromised,C2,94,General,Rare,,,uncommitted;idle;unattached
 9368,Unenlightened,Lacking information or instruction.,Adjective,Lamentably unenlightened as to the laws.,uninstructed,naive,C2,95,General,Rare,,,benighted;dark;uninformed
 9369,Unenrgetic,lacking energy or enthusiasm (a variant spelling of 'unenergetic').,Adjective,"He seemed unenrgetic during practice, barely finishing the drills.",lethargic,,C2,95,General,Rare,,,languid;languorous;listless
 9370,Unenviable,Not desirable; difficult or unpleasant to be in (used of a position or situation).,Adjective,He found himself in the unenviable position of firing his own friend.,awkward,embarrassing,B2,46,General,Less Common,,,difficult;undesirable;hard
@@ -9377,24 +9377,24 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9376,Unexceptionable,Completely acceptable; not open to exception or reproach.,Adjective,Two unexceptionable witnesses.,unimpeachable,,C2,95,General,Rare,,,acceptable
 9377,Unexceptional,Not special in any way.,Adjective,Run-of-the-mill boxing.,run-of-the-mill,run-of-the-mine,C2,95,General,Rare,,,ordinary
 9378,Unexpectedness,the quality of being unforeseen or unanticipated.,Noun,The unexpectedness of the warm welcome caught them completely off guard.,surprisingness,,C2,95,General,Rare,,,unexpected;extraordinariness;uncommonness
-9379,Unexplainable,Not to be accounted for or explained.,Adjective,Perceptible only as unaccountable influences that hinder progress.,unaccountable,,B2,46,General,Less Common,,,inexplicable;incomprehensible
-9380,Unexploited,Undeveloped or unused.,Adjective,Vast unexploited (or undeveloped) natural resources.,undeveloped,,C2,95,General,Rare,,,untapped;fallow
+9379,Unexplainable,not able to be explained; defying explanation.,Adjective,The lights in the sky remained unexplainable even after the investigation.,unaccountable,,B2,46,General,Less Common,,,inexplicable;incomprehensible
+9380,Unexploited,"not yet used or taken advantage of, especially describing resources or opportunities.",Adjective,Geologists believe the region holds unexploited reserves of lithium.,undeveloped,,C2,95,General,Rare,,,untapped;fallow
 9381,Unexpressed,"Not spoken or communicated aloud, though felt or thought.",Adjective,Years of unexpressed resentment finally came out in the argument.,unsaid,unstated,C2,95,General,Rare,,,implicit;inexplicit
 9382,Unexpressive,Not showing or conveying feeling or emotion.,Adjective,Her unexpressive tone made it hard to tell if she was joking.,deadpan,expressionless,C2,95,General,Rare,,,uncommunicative;incommunicative
 9383,Unfairly,In an unfair manner.,Adverb,They dealt with him unfairly.,below the belt,,B2,34,General,Less Common,,,cheating;unsporting;partial
-9384,Unfaltering,Marked by firm determination or resolution; not shakable.,Adjective,Firm convictions.,firm,steadfast,C2,95,General,Rare,,,resolute
+9384,Unfaltering,"steady and without hesitation, especially describing effort or resolve.",Adjective,Her unfaltering support carried the team through the toughest season.,firm,steadfast,C2,95,General,Rare,,,resolute
 9385,Unfashionable,Not in accord with or not following current fashion.,Adjective,Unfashionable clothes.,unstylish,,C2,95,General,Rare,,,antique;outmoded;fogyish
 9386,Unfastened,Cause to become undone.,Verb,Unfasten your belt.,unfasten,,B2,46,General,Less Common,,,disentangle;disconnect;unravel
 9387,Unfastening,Loosening the ties that fasten something.,Noun,The tying of bow ties is an art; the untying is easy.,untying,undoing,C2,95,General,Rare,,,loosening;unfasten;laxation
 9388,Unfathomed,Situated at or extending to great depth; too deep to have been sounded or plumbed.,Adjective,The profound depths of the sea.,profound,unplumbed,C2,95,General,Rare,,,deep
-9389,Unfavorably,Showing disapproval; in a disparaging way.,Adverb,He reviewed the play unfavorably.,unfavourably,,C2,95,General,Rare,,,admonitory;admonishing;reproving
-9390,Unfavourably,Showing disapproval; in a disparaging way.,Adverb,He reviewed the play unfavorably.,unfavorably,,C2,95,General,Rare,,,admonitory;admonishing;reproving
+9389,Unfavorably,chiefly American spelling; in a way that shows disapproval or disadvantage.,Adverb,"Critics reviewed the film unfavorably, calling the plot predictable.",unfavourably,,C2,95,General,Rare,,,admonitory;admonishing;reproving
+9390,Unfavourably,chiefly British spelling; in a way that shows disapproval or disadvantage.,Adverb,The board viewed the proposal unfavourably from the very first reading.,unfavorably,,C2,95,General,Rare,,,admonitory;admonishing;reproving
 9391,Unfearing,"Not feeling or showing fear (rare, literary).",Adjective,The unfearing recruit walked straight into the training exercise.,audacious,brave,C2,95,General,Rare,,,bold
 9392,Unfeathered,Having no feathers.,Adjective,A featherless biped.,featherless,,C2,95,General,Rare,,,unfledged;fledgeless;unvaned
 9393,Unfeelingly,In a callous way.,Adverb,He callously exploited their feelings.,callously,,C2,95,General,Rare,,,unfeeling;uncompassionate;insensitive
 9394,Unfeignedly,With sincerity; without pretense.,Adverb,She praised him sincerely for his victory.,sincerely,truly,C2,95,General,Rare,,,genuine;wholehearted;earnest
 9395,Unfertile,Not productive; unable to support growth or reproduction.,Adjective,The unfertile soil made farming nearly impossible in that valley.,sterile,infertile,B2,46,General,Less Common,,,unimpregnated;sterilised;fertility
-9396,Unfertilised,Not having been fertilized.,Adjective,An unfertilized egg.,unfertilized,unimpregnated,C2,95,General,Rare,,,sterile;infertile
+9396,Unfertilised,"chiefly British spelling; not having been fertilized, especially describing an egg.",Adjective,"The hen laid an unfertilised egg, as there was no rooster in the coop.",unfertilized,unimpregnated,C2,95,General,Rare,,,sterile;infertile
 9397,Unfinished,Lacking a surface finish such as paint.,Adjective,Bare wood.,bare,,B2,34,General,Less Common,,,undressed;unsanded;unprocessed
 9398,Unfixed,Lacking definition or definite content.,Adjective,Nebulous reasons.,nebulous,,B2,46,General,Less Common,,,unsteady;floating;insecure
 9399,Unflappable,Not easily perturbed or excited or upset; marked by extreme calm and composure.,Adjective,"Hitherto imperturbable, he now showed signs of alarm.",imperturbable,,C2,95,General,Rare,,,composed
@@ -9404,20 +9404,20 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9403,Unfocused,(of an image) not being in or brought into focus.,Adjective,At their edges things were pretty much out of focus.,unfocussed,,C2,95,General,Rare,,,distributed
 9404,Unfolding,A developmental process.,Noun,The flowering of antebellum culture.,flowering,,B1,19,Nature,Common,,,development;evolution;deepening
 9405,Unforced,Not brought about by coercion or force.,Adjective,The confession was uncoerced.,uncoerced,willing,C2,95,General,Rare,,,voluntary;effortless
-9406,Unforeseen,Not anticipated.,Adjective,Unanticipated and disconcerting lines of development.,unanticipated,unlooked-for,B2,34,General,Less Common,,,unexpected
+9406,Unforeseen,not known about or expected in advance; unpredicted.,Adjective,Unforeseen delays pushed the launch date back by months.,unanticipated,unlooked-for,B2,34,General,Less Common,,,unexpected
 9407,Unforfeitable,Not subject to forfeiture.,Adjective,An unforfeitable right.,inalienable,,C2,95,General,Rare,,,indefeasible
 9408,Unforgivably,In a manner that is impossible to forgive.,Adverb,He was unforgivably late to his own wedding.,inexcusably,unpardonably,C2,95,General,Rare,,,unwarranted;unforgivable;indefensible
 9409,Unforgiving,"Not willing to forgive; also, harsh or difficult, allowing no margin for error.",Adjective,The unforgiving terrain made the hike far more dangerous than expected.,grim,inexorable,C2,95,General,Rare,,,revengeful;vengeful;vindictive
-9410,Unfreeze,Become or cause to become soft or liquid.,Verb,The sun melted the ice.,dissolve,thaw,C2,95,General,Rare,,,liquefy;defrost;condense
+9410,Unfreeze,cause something frozen to return to a liquid or soft state; thaw.,Verb,Leave the chicken on the counter an hour to unfreeze before cooking.,dissolve,thaw,C2,95,General,Rare,,,liquefy;defrost;condense
 9411,Unfriendly,Not friendly.,Adjective,An unfriendly act of aggression.,inimical,,B1,16,General,Common,,,uncongenial;hostile;unfriendliness
 9412,Unfulfilled,"Not achieved or satisfied, especially a hope, ambition, or promise.",Adjective,She still felt unfulfilled despite her career success.,unrealized,unrealised,B2,46,General,Less Common,,,unsuccessful
-9413,Ungathered,Not brought together in one place.,Adjective,Uncollected garbage in the streets.,uncollected,,C2,95,General,Rare,,,
+9413,Ungathered,"not yet brought together or harvested, especially describing crops.",Adjective,The ungathered wheat swayed untouched in the autumn wind.,uncollected,,C2,95,General,Rare,,,
 9414,Ungenerous,"not willing to give freely, or unkind in judging others (a milder, more formal term).",Adjective,It seems ungenerous to criticize such a well-researched book over one small error.,meanspirited,,C2,95,General,Rare,,,parsimonious;penurious;miserly
 9415,Unglamorous,"lacking excitement, glamour, or appeal, especially describing everyday work.",Adjective,"Behind the scenes, most of the job is unglamorous paperwork.",commonplace,humdrum,B2,46,General,Less Common,,,unexciting
 9416,Unglazed,Not furnished with glass.,Adjective,Windows were unglazed to admit as much light and air as possible.,glassless,,B2,46,General,Less Common,,,unvitrified
 9417,Ungovernable,"impossible to control or manage, especially describing behavior or a situation that has spiraled out of control.",Adjective,The crowd quickly became ungovernable once the announcement was made.,indocile,uncontrollable,C2,95,General,Rare,,,unmanageable;difficult
 9418,Ungraceful,Lacking grace; clumsy.,Adjective,A graceless production of the play.,graceless,,C2,95,General,Rare,,,awkward;ungracefulness
-9419,Ungracefully,Without grace; rigidly.,Adverb,They moved woodenly.,ungraciously,gracelessly,C2,95,General,Rare,,,ungraceful;awkward;inelegant
+9419,Ungracefully,"in a clumsy or awkward manner, lacking grace.",Adverb,"He landed ungracefully on the mat, arms flailing.",ungraciously,gracelessly,C2,95,General,Rare,,,ungraceful;awkward;inelegant
 9420,Ungrateful,Not feeling or showing gratitude.,Adjective,Ungrateful heirs.,thankless,unthankful,B2,34,General,Less Common,,,ungratefulness;unappreciative;unpleasant
 9421,Unguaranteed,Without financial security.,Adjective,An unsecured note.,unsecured,,C2,95,General,Rare,,,insecure;unsafe
 9422,Unguiculated,Having or resembling claws or nails.,Adjective,Unguiculate animals.,unguiculate,,C2,95,General,Rare,,,clawed;clawlike
@@ -9441,20 +9441,20 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9440,Unilluminating,Failing to inform or clarify.,Adjective,An unenlightening comment.,unenlightening,,C2,95,General,Rare,,,
 9441,Unimaginatively,in a way that lacks creativity or original thought.,Adverb,"The report addressed the problem unimaginatively, repeating the same tired solutions.",prosaically,,C2,95,General,Rare,,,unimaginative;unexciting;uncreative
 9442,Unimpeachable,Impossible to doubt or discredit; entirely trustworthy.,Adjective,The witness had an unimpeachable reputation for honesty.,blameless,inculpable,B2,34,General,Less Common,,,innocent;guiltless;unquestionable
-9443,Unimpregnated,Not having been fertilized.,Adjective,An unfertilized egg.,unfertilized,unfertilised,C2,95,General,Rare,,,sterile;unfertile;infertile
-9444,Uninfluenced,Not influenced or affected.,Adjective,Stewed in its petty provincialism untouched by the brisk debates that stirred the old world.,unswayed,untouched,B2,46,General,Less Common,,,unaffected
-9445,Uninitiate,Not initiated; deficient in relevant experience.,Adjective,It seemed a bizarre ceremony to uninitiated western eyes.,uninitiated,naive,B2,46,General,Less Common,,,inexperienced;inexperient
-9446,Uninitiated,Not initiated; deficient in relevant experience.,Adjective,It seemed a bizarre ceremony to uninitiated western eyes.,uninitiate,naive,B2,34,General,Less Common,,,inexperienced;inexperient
-9447,Uninspired,Deficient in originality or creativity; lacking powers of invention.,Adjective,A sterile ideology lacking in originality.,sterile,unimaginative,C2,95,General,Rare,,,unexciting;uncreative
+9443,Unimpregnated,not having been made pregnant or fertilized (a more clinical or formal term).,Adjective,The lab kept a control group of unimpregnated female mice for comparison.,unfertilized,unfertilised,C2,95,General,Rare,,,sterile;unfertile;infertile
+9444,Uninfluenced,not affected or altered by outside factors or opinions.,Adjective,Her verdict remained uninfluenced by the media coverage of the trial.,unswayed,untouched,B2,46,General,Less Common,,,unaffected
+9445,Uninitiate,a less common adjectival form of 'uninitiated'; lacking initiation or introductory experience.,Adjective,"To the uninitiate eye, the ritual seemed baffling and strange.",uninitiated,naive,B2,46,General,Less Common,,,inexperienced;inexperient
+9446,Uninitiated,not yet introduced to or experienced in something.,Adjective,"The manual assumes no prior knowledge, written for the completely uninitiated reader.",uninitiate,naive,B2,34,General,Less Common,,,inexperienced;inexperient
+9447,Uninspired,"lacking imagination, energy, or originality.",Adjective,"The remake was a flat, uninspired retread of the original film.",sterile,unimaginative,C2,95,General,Rare,,,unexciting;uncreative
 9448,Uninstructively,In an uninformative manner.,Adverb,"`I can't tell you when the manager will arrive,' he said rather uninformatively.",uninformatively,,C2,95,General,Rare,,,uninstructive;newsless
 9449,Unintelligent,Lacking intelligence.,Adjective,A dull job with lazy and unintelligent co-workers.,stupid,,C2,95,General,Rare,,,intelligence;brainless;headless
-9450,Unintentional,Without deliberate intent.,Adjective,My heart with unwilled love grew warm.,unwilled,,C2,95,General,Rare,,,unwilling
+9450,Unintentional,done without meaning to; not deliberate.,Adjective,"The insult was unintentional, and he apologized as soon as he realized.",unwilled,,C2,95,General,Rare,,,unwilling
 9451,Unintentionally,Without intention; in an unintentional manner.,Adverb,She hit him unintentionally.,accidentally,,B2,34,General,Less Common,,,unintentional
-9452,Uninventive,Deficient in originality or creativity; lacking powers of invention.,Adjective,A sterile ideology lacking in originality.,sterile,unimaginative,C2,95,General,Rare,,,uncreative
-9453,Unionisation,Act of forming labor unions.,Noun,The issue underlying the strike was unionization.,unionization,,C2,95,General,Rare,,,constitution;establishment;formation
-9454,Unionised,Recruit for a union or organize into a union.,Verb,We don't allow people to come into our plant and try to unionize the workers.,unionize,unionise,C2,95,Society & Culture,Rare,,,inscribe;recruit;register
-9455,Unionization,Act of forming labor unions.,Noun,The issue underlying the strike was unionization.,unionisation,,C2,95,General,Rare,,,constitution;establishment;formation
-9456,Unionized,Recruit for a union or organize into a union.,Verb,We don't allow people to come into our plant and try to unionize the workers.,unionize,unionise,C2,95,Society & Culture,Rare,,,inscribe;recruit;register
+9452,Uninventive,showing little inventiveness or original thinking.,Adjective,The committee dismissed the proposal as uninventive and derivative.,sterile,unimaginative,C2,95,General,Rare,,,uncreative
+9453,Unionisation,chiefly British spelling; the act or process of forming or joining labor unions.,Noun,The factory floor debated unionisation for months before the vote.,unionization,,C2,95,General,Rare,,,constitution;establishment;formation
+9454,Unionised,chiefly British spelling; recruited into or organized as a labor union.,Verb,The mill was fully unionised within two years of the campaign.,unionize,unionise,C2,95,Society & Culture,Rare,,,inscribe;recruit;register
+9455,Unionization,chiefly American spelling; the act or process of forming or joining labor unions.,Noun,The issue underlying the strike was unionization.,unionisation,,C2,95,General,Rare,,,constitution;establishment;formation
+9456,Unionized,chiefly American spelling; recruited into or organized as a labor union.,Verb,The plant finally became unionized after a decade of organizing efforts.,unionize,unionise,C2,95,Society & Culture,Rare,,,inscribe;recruit;register
 9457,Uniqueness,The quality of being one of a kind.,Noun,That singularity distinguished him from all his companions.,singularity,,B1,19,General,Common,,,individuality;specialness;specialty
 9458,Unitary,Having the indivisible character of a unit.,Adjective,A unitary action.,one,,C2,95,General,Rare,,,unity;unit
 9459,Uniting,the act or process of joining separate parts into a single whole.,Noun,The treaty spoke of uniting the two nations under one flag.,union,unification,B2,34,General,Less Common,,,consolidation;integration;combination
@@ -9465,7 +9465,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9464,Unkindly,Lacking in sympathy and kindness.,Adjective,Unkindly ancts.,unsympathetic,,C2,95,General,Rare,,,
 9465,Unknowingly,Without being aware; not realizing what one is doing.,Adverb,He unknowingly walked past his old friend on the street.,unwittingly,inadvertently,B2,46,General,Less Common,,,unintended
 9466,Unlabeled,Lacking a label or tag.,Adjective,Unlabeled luggage is liable to be lost.,unlabelled,untagged,C2,95,General,Rare,,,
-9467,Unlaced,Undo the ties of.,Verb,They untied the prisoner.,untie,unbrace,B2,46,General,Less Common,,,unloose;disentangle;disconnect
+9467,Unlaced,"undid the laces of, especially of a shoe or corset (past tense of 'unlace').",Verb,She unlaced her boots the moment she got home.,untie,unbrace,B2,46,General,Less Common,,,unloose;disentangle;disconnect
 9468,Unlatched,Not fastened by a latch; left open.,Adjective,The wind blew the unlatched door open all night.,unbarred,unbolted,C2,95,General,Rare,,,unfastened
 9469,Unlaureled,Not crowned with laurel; having no acclaim or reward.,Adjective,The unlaureled heroism of endurance.,unlaurelled,,C2,95,General,Rare,,,
 9470,Unlawful,Not authorized or permitted by law; illegal.,Adjective,The court ruled the search unlawful.,improper,unconventional,B2,46,General,Less Common,,,irregular;crooked;corrupt
@@ -9475,8 +9475,8 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9474,Unlighted,Not set afire or burning.,Adjective,"The table was bare, the candles unlighted.",unlit,,C2,95,General,Rare,,,unkindled;dark
 9475,Unlikeable,(of characters in literature or drama) tending to evoke antipathetic feelings.,Adjective,All the characters were peculiarly unsympathetic.,unsympathetic,unappealing,C2,95,General,Rare,,,disliked
 9476,Unliterary,lacking literary quality or affectation; plain in style.,Adjective,"Her talk was very unliterary, direct and free of any flourish.",nonliterary,,B2,46,General,Less Common,,,informal
-9477,Unlivable,Unfit or unsuitable to live in or with.,Adjective,Unlivable substandard housing.,unliveable,,C2,95,General,Rare,,,uninhabitable
-9478,Unliveable,Unfit or unsuitable to live in or with.,Adjective,Unlivable substandard housing.,unlivable,,C2,95,General,Rare,,,uninhabitable
+9477,Unlivable,chiefly American spelling; unfit to live in or endure.,Adjective,Mold had made the basement apartment completely unlivable.,unliveable,,C2,95,General,Rare,,,uninhabitable
+9478,Unliveable,chiefly British spelling; unfit to live in or endure.,Adjective,Years of neglect left the tenement unliveable by any reasonable standard.,unlivable,,C2,95,General,Rare,,,uninhabitable
 9479,Unloading,Leave or unload.,Verb,Unload the cargo.,drop,drop off,B1,19,General,Common,,,deliver;discharge;process
 9480,Unloose,Loosen the ties of.,Verb,Unloose your sneakers.,unloosen,,C2,95,General,Rare,,,parole;run;unspell
 9481,Unluckily,As a result of bad luck.,Adverb,"Unluckily, he missed the bus by only a minute.",unfortunately,regrettably,B2,46,General,Less Common,,,unhappy;miserable;misfortunate
@@ -9511,8 +9511,8 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9510,Unobtrusive,Not obtrusive or undesirably noticeable.,Adjective,"A quiet, unobtrusive life of self-denial.",unnoticeable,,B1,27,General,Common,,,unobtrusiveness
 9511,Unoffending,Not causing anger or annoyance.,Adjective,Inoffensive behavior.,inoffensive,,C2,96,General,Rare,,,offenseless;offenceless;offensiveness
 9512,Unorganised,Not having or belonging to a structured whole.,Adjective,Unorganized territories lack a formal government.,unorganized,,C2,96,General,Rare,,,unincorporated;unformed;uncoordinated
-9513,Unornamented,Lacking embellishment or ornamentation.,Adjective,A plain hair style.,plain,bare,C2,96,General,Rare,,,unadorned;undecorated
-9514,Unostentatious,Not ostentatious.,Adjective,His unostentatious office.,unpretentious,unpretending,C2,96,General,Rare,,,restrained;tasteful;quiet
+9513,Unornamented,without decorative ornament; plain in design.,Adjective,The chapel's unornamented walls emphasized its quiet simplicity.,plain,bare,C2,96,General,Rare,,,unadorned;undecorated
+9514,Unostentatious,modest and understated; not showy or flashy.,Adjective,The billionaire lived in a surprisingly unostentatious house.,unpretentious,unpretending,C2,96,General,Rare,,,restrained;tasteful;quiet
 9515,Unpainful,Not accompanied by pain sensations.,Adjective,Pain-free surgery.,pain-free,,C2,96,General,Rare,,,painless
 9516,Unpalatableness,The property of being unacceptable to the mind.,Noun,The policy's unpalatability caused an uproar.,unpalatability,,C2,96,General,Rare,,,palatableness;sweetness;acridness
 9517,Unpardonably,In a way that cannot be pardoned or excused (formal).,Adverb,The soldier's unpardonably reckless order cost several lives.,inexcusably,unforgivably,C2,96,General,Rare,,,unwarranted;unpardonable;indefensible
@@ -9522,14 +9522,14 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9521,Unperson,A person regarded as nonexistent and having no rights; a person whose existence is systematically ignored (especially for ideological or political reasons).,Noun,The former senator is treated as a nonperson by this administration.,nonperson,,C2,96,Society & Culture,Rare,,,individual;someone;somebody
 9522,Unpitying,Showing no sympathy or pity toward suffering.,Adjective,The judge's unpitying tone left no room for leniency.,pitiless,remorseless,C2,96,General,Rare,,,merciless;unmerciful
 9523,Unpleasing,not agreeable or pleasant to the senses or mind.,Adjective,"The harsh lighting gave the room an unpleasing, sterile feel.",graceless,,C2,96,General,Rare,,,unpleasingness;ungracious
-9524,Unpledged,Not promised in marriage.,Adjective,Continued seeing him but on an unengaged basis.,unengaged,unpromised,C2,96,General,Rare,,,uncommitted;unattached
-9525,Unplowed,(of farmland) not plowed.,Adjective,Unplowed fields.,unploughed,unbroken,B2,34,General,Less Common,,,fallow;untilled
+9524,Unpledged,"not formally promised or committed, especially in marriage or allegiance (a more formal term).",Adjective,Their families still considered the young pair unpledged to any match.,unengaged,unpromised,C2,96,General,Rare,,,uncommitted;unattached
+9525,Unplowed,(of farmland) not yet turned over by a plow.,Adjective,Rows of unplowed field lay fallow at the edge of the property.,unploughed,unbroken,B2,34,General,Less Common,,,fallow;untilled
 9526,Unpointed,Not having a point especially a sharp point.,Adjective,My pencils are all pointless.,pointless,,C2,96,General,Rare,,,unpointedness;blunt
 9527,Unpolluted,Free from admixture with noxious elements; clean.,Adjective,Unpolluted streams.,uncontaminated,,C2,96,General,Rare,,,pure
 9528,Smartphone,"A mobile phone that can also browse the internet, take photos, and run apps.",Noun,She checked the weather on her smartphone before leaving.,mobile device,,A1,8,Science & Technology,Very Common,,,
 9529,Unpredictably,in a manner that cannot be foreseen or anticipated.,Adverb,The stock market has been behaving unpredictably all week.,erratically,,B2,34,General,Less Common,,,unpredictable;changeable;occasional
 9530,Unprejudiced,Free from undue bias or preconceived opinions.,Adjective,An unprejudiced appraisal of the pros and cons.,impartial,,C2,96,General,Rare,,,receptive;nonracist;open
-9531,Unpretentious,Not ostentatious.,Adjective,His unostentatious office.,unostentatious,unpretending,B2,46,General,Less Common,,,tasteful;restrained;unpretentiousness
+9531,Unpretentious,simple and genuine; without pretension or affectation.,Adjective,The restaurant's unpretentious menu focused on a handful of dishes done well.,unostentatious,unpretending,B2,46,General,Less Common,,,tasteful;restrained;unpretentiousness
 9532,Unprocessed,Not refined or processed.,Adjective,Unrefined ore.,unrefined,crude,C2,96,General,Rare,,,streaming;natural;unfinished
 9533,Unprocurable,"Not able to be obtained, especially through purchase or effort (formal, rare).",Adjective,The rare manuscript was unprocurable at any price.,inaccessible,unobtainable,B2,46,General,Less Common,,,unavailable
 9534,Unprompted,"occurring spontaneously, without being suggested or triggered by someone else.",Adjective,Her unprompted apology surprised everyone in the room.,impulsive,,C2,96,General,Rare,,,spontaneous
@@ -9539,16 +9539,16 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9538,Unquenchable,Impossible to quench.,Adjective,Unquenchable thirst.,quenchless,,C2,96,General,Rare,,,unsatiable;insatiate;insatiable
 9539,Unquestionably,Without question.,Adverb,Fred Winter is unquestionably the jockey to follow.,unimpeachably,,A2,10,General,Very Common,,,acknowledged;mathematical;unimpeachable
 9540,Unquestioning,Being without doubt or reserve.,Adjective,Implicit trust.,implicit,,C2,96,General,Rare,,,absolute;credulous
-9541,Unquotable,Not able or fit to be repeated or quoted.,Adjective,What he said was funny but unquotable.,unrepeatable,,C2,96,General,Rare,,,
-9542,Unravel,Become or cause to become undone by separating the fibers or threads of.,Verb,Unravel the thread.,unknot,unscramble,B2,46,General,Less Common,,,separate;unsnarl;disentangle
-9543,Unreachable,Inaccessibly located or situated.,Adjective,An unapproachable chalet high in the mountains.,unapproachable,unreached,C2,96,General,Rare,,,inaccessible;unaccessible
-9544,Unreadable,Not easily deciphered.,Adjective,Indecipherable handwriting.,indecipherable,unclear,C2,96,General,Rare,,,illegible
+9541,Unquotable,"not suitable to be quoted, especially due to profanity or impropriety.",Adjective,His reaction to the news was funny but entirely unquotable in a family newspaper.,unrepeatable,,C2,96,General,Rare,,,
+9542,Unravel,"separate or undo the threads of something woven or knitted, or, figuratively, solve a complicated problem.",Verb,"She sat by the fire, patiently trying to unravel the tangled yarn.",unknot,unscramble,B2,46,General,Less Common,,,separate;unsnarl;disentangle
+9543,Unreachable,impossible to get to or make contact with.,Adjective,The cabin was unreachable by car once the snow set in.,unapproachable,unreached,C2,96,General,Rare,,,inaccessible;unaccessible
+9544,Unreadable,"difficult or impossible to read, whether from illegible handwriting or dense, confusing prose.",Adjective,His unreadable scrawl forced the pharmacist to call and confirm the prescription.,indecipherable,unclear,C2,96,General,Rare,,,illegible
 9545,Unrealised,"Not achieved or made real, chiefly British spelling.",Adjective,His unrealised dream of becoming a pilot stayed with him for years.,unfulfilled,unrealized,C2,96,General,Rare,,,unsuccessful
 9546,Unrealized,"Not achieved or made real, American spelling.",Adjective,The company's unrealized potential frustrated its early investors.,unfulfilled,unrealised,C2,96,General,Rare,,,unsuccessful
 9547,Unreasonable,Not guided by good sense; going beyond what is fair or appropriate.,Adjective,The landlord's demands were completely unreasonable.,excessive,inordinate,B1,27,General,Common,,,reasonless;unjustified;unwarranted
 9548,Unreasoning,Not based on reason or evidence.,Adjective,Blind hatred.,blind,,B2,46,General,Less Common,,,irrational
-9549,Unrecognisable,Beyond recognition; in an unrecognizable manner.,Adverb,He had unrecognizably aged.,unrecognizably,,C2,96,General,Rare,,,unidentifiable
-9550,Unrecognizably,Beyond recognition; in an unrecognizable manner.,Adverb,He had unrecognizably aged.,unrecognisable,,C2,96,General,Rare,,,unrecognizable;unidentifiable
+9549,Unrecognisable,changed so much as to be impossible to recognize (chiefly British spelling).,Adjective,"After the renovation, the old house was unrecognisable.",unrecognizably,,C2,96,General,Rare,,,unidentifiable
+9550,Unrecognizably,to a degree that makes something impossible to recognize (chiefly American spelling).,Adverb,He had aged unrecognizably since their last meeting.,unrecognisable,,C2,96,General,Rare,,,unrecognizable;unidentifiable
 9551,Unreconcilable,Impossible to reconcile.,Adjective,Irreconcilable differences.,irreconcilable,,C2,96,General,Rare,,,hostile;inconsistent
 9552,Unrecorded,Actually being performed at the time of hearing or viewing.,Adjective,A live television program.,live,,C2,96,General,Rare,,,unfilmed;untaped
 9553,Unredeemed,In danger of the eternal punishment of Hell.,Adjective,Poor damned souls.,cursed,damned,B2,46,General,Less Common,,,lost
@@ -9557,14 +9557,14 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9556,Unregretful,Feeling no regret.,Adjective,Was completely unregretful about what had happened.,unregretting,,C2,96,General,Rare,,,
 9557,Unrehearsed,Not practiced or planned in advance; spontaneous.,Adjective,The interview's unrehearsed moments felt the most genuine.,ad-lib,extemporaneous,B2,46,General,Less Common,,,unprepared
 9558,Unrelentingly,"in a way that shows no sign of easing or stopping, often describing something harsh.",Adverb,The sun beat down unrelentingly on the marathon runners.,relentlessly,,C2,96,General,Rare,,,unrelenting;continual
-9559,Unrelieved,Not lessened or diminished.,Adjective,Unrelieved suffering.,undiminished,,B1,22,General,Common,,,unmitigated
+9559,Unrelieved,"not eased or lessened, especially describing suffering or monotony.",Adjective,The desert offered unrelieved heat for miles in every direction.,undiminished,,B1,22,General,Common,,,unmitigated
 9560,Unremarkably,In a way that is ordinary and not worth commenting on.,Adverb,"The meeting ended, quite unremarkably, right on schedule.",normally,usually,C2,96,General,Rare,,,chronic;regular;habitual
 9561,Unremitting,Uninterrupted in time and indefinitely long continuing.,Adjective,The ceaseless thunder of surf.,ceaseless,constant,B2,46,General,Less Common,,,continuous;uninterrupted
-9562,Unrepeatable,Not able or fit to be repeated or quoted.,Adjective,What he said was funny but unquotable.,unquotable,,C2,96,General,Rare,,,irreproducible
+9562,Unrepeatable,"not able to be said again, especially because it is too crude, private, or unique.",Adjective,What the coach yelled after the missed shot was colorful and unrepeatable.,unquotable,,C2,96,General,Rare,,,irreproducible
 9563,Unreplaceable,a less common variant of 'irreplaceable'; incapable of being substituted or replaced.,Adjective,The vintage part was unreplaceable once the manufacturer stopped production.,irreplaceable,,C2,96,General,Rare,,,unexpendable
 9564,Unrequited,Not returned in kind.,Adjective,Unrequited (unanswered) love.,unanswered,unreciprocated,B2,46,General,Less Common,,,nonreciprocal
 9565,Unresistant,not offering resistance; easily affected or overcome (a rare term).,Adjective,The unresistant patient developed diabetes despite the recommended diet.,liable,nonimmune,C2,96,General,Rare,,,susceptible
-9566,Unresolvable,Not easily solved.,Adjective,An apparantly insolvable problem.,insolvable,unsoluble,C2,96,General,Rare,,,insoluble;inextricable
+9566,Unresolvable,not capable of being resolved or settled.,Adjective,The two departments reached an unresolvable disagreement over budget priorities.,insolvable,unsoluble,C2,96,General,Rare,,,insoluble;inextricable
 9567,Electrician,Someone whose job is installing and fixing electrical wiring and systems.,Noun,They hired an electrician to rewire the old house safely.,electrical technician,,B1,24,Society & Culture,Common,,,
 9568,Unretentive,(of memory) not holding onto information well; lacking retention (a more technical term).,Adjective,Standardized tests aren't well suited to an unretentive but creative mind.,forgetful,short,C2,96,General,Rare,,,unmindful;mindless
 9569,Unrewarded,Having acquired or gained nothing.,Adjective,The returned from the negotiations empty-handed.,empty-handed,,C2,96,General,Rare,,,unsuccessful
@@ -9572,13 +9572,13 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9571,Unripened,Not fully developed or mature; not ripe.,Adjective,Unripe fruit.,green,unripe,C2,96,General,Rare,,,unaged
 9572,Unrivalled,"Without a rival; superior to all others, chiefly British spelling.",Adjective,The restaurant's view of the harbor remains unrivalled in the city.,matchless,nonpareil,C2,96,General,Rare,,,incomparable;uncomparable
 9573,Unsaddle,remove the saddle from a horse.,Verb,They unsaddled their mounts before leading them into the stable.,offsaddle,,C2,96,General,Rare,,,withdraw;remove;take
-9574,Unsalaried,Not paying a salary.,Adjective,An uncompensated federal post.,uncompensated,,C2,96,General,Rare,,,unpaid
+9574,Unsalaried,"not receiving a regular salary, especially describing a position.",Adjective,The internship was unsalaried but offered valuable experience.,uncompensated,,C2,96,General,Rare,,,unpaid
 9575,Unsanded,Used of wood and furniture.,Adjective,Raw wood.,raw,,C2,96,General,Rare,,,unfinished
 9576,Unsatiable,Impossible to satisfy.,Adjective,An insatiate appetite.,insatiate,insatiable,C2,96,General,Rare,,,unquenchable;quenchless
 9577,Unsatisfying,"not providing enough satisfaction, fulfillment, or completeness.",Adjective,The movie's abrupt ending felt unsatisfying to most viewers.,disappointing,dissatisfactory,C2,96,General,Rare,,,
-9578,Unsavory,Morally offensive.,Adjective,An unsavory reputation.,unsavoury,offensive,B2,46,General,Less Common,,,odoriferous;unsavoriness;unpalatable
-9579,Unsavoury,Morally offensive.,Adjective,An unsavory reputation.,unsavory,offensive,C2,96,General,Rare,,,odoriferous;unpalatable
-9580,Unscramble,Become or cause to become undone by separating the fibers or threads of.,Verb,Unravel the thread.,unravel,unknot,B2,46,General,Less Common,,,separate;disentangle;disconnect
+9578,Unsavory,chiefly American spelling; morally objectionable or distasteful.,Adjective,He had a reputation for keeping unsavory company.,unsavoury,offensive,B2,46,General,Less Common,,,odoriferous;unsavoriness;unpalatable
+9579,Unsavoury,chiefly British spelling; morally objectionable or distasteful.,Adjective,The scandal exposed some rather unsavoury business dealings.,unsavory,offensive,C2,96,General,Rare,,,odoriferous;unpalatable
+9580,Unscramble,restore something jumbled or scrambled back into its proper order or sense.,Verb,The codebreakers worked all night to unscramble the intercepted message.,unravel,unknot,B2,46,General,Less Common,,,separate;disentangle;disconnect
 9581,Unseamed,"having no seams; smooth (a rare, more literal variant).",Adjective,The tailor admired the unseamed panel of fabric before cutting it.,seamless,unlined,C2,96,General,Rare,,,smooth
 9582,Unseasoned,"Not flavored with salt, herbs, or spices; also, inexperienced.",Adjective,The unseasoned rice tasted bland on its own.,untested,untried,C2,96,General,Rare,,,uncured;tasteless
 9583,Unsecured,"Not made safe or fixed firmly in place; also, not guaranteed by collateral, as a loan.",Adjective,The unsecured ladder wobbled dangerously against the wall.,unbarred,unbolted,C2,96,General,Rare,,,unfastened;insecure;unsafe
@@ -9586,26 +9586,26 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9585,Unseeing,Not consciously observing.,Adjective,Looked through him with blank unseeing eyes.,unobservant,,C2,96,General,Rare,,,unperceiving;unsighted;unperceptive
 9586,Unsegmented,Having a body that is not divided into segments.,Adjective,Unsegmented worms.,nonsegmental,,C2,96,General,Rare,,,united
 9587,Unsexed,Remove the qualities typical of one's sex.,Verb,She unsexed herself.,unsex,,C2,96,General,Rare,,,unclothe;deprive;strip
-9588,Unshakable,Marked by firm determination or resolution; not shakable.,Adjective,Firm convictions.,firm,steadfast,B2,46,General,Less Common,,,incontestable;resolute;incontestible
-9589,Unshaken,Unshaken in purpose.,Adjective,Wholly undismayed by the commercial failure of the three movies he had made.,undaunted,undismayed,C2,96,General,Rare,,,resolute
+9588,Unshakable,"so firmly held that it cannot be shaken or disturbed, especially describing belief or confidence.",Adjective,"His unshakable optimism never seemed to waver, even in a crisis.",firm,steadfast,B2,46,General,Less Common,,,incontestable;resolute;incontestible
+9589,Unshaken,"not disturbed or weakened, especially describing confidence or resolve.",Adjective,His faith remained unshaken even after the diagnosis.,undaunted,undismayed,C2,96,General,Rare,,,resolute
 9590,Unshapen,Incompletely or imperfectly shaped.,Adjective,Unshaped dough.,unshaped,,C2,96,General,Rare,,,unformed
 9591,Unsheathed,Draw from a sheath or scabbard.,Verb,The knight unsheathed his sword.,unsheathe,,C2,96,General,Rare,,,draw;pull
 9592,Unshorn,Not sheared.,Adjective,A grizzly unshorn beard.,unsheared,,C2,96,General,Rare,,,
 9593,Unsighted,Unable to see; --Kenneth Jernigan.,Adjective,A person is blind to the extent that he must devise alternative techniques to do efficiently those things he would do with sight if he had normal vision.,blind,,C2,96,General,Rare,,,blindfolded;eyeless;sightless
 9594,Unskillful,lacking skill or proficiency; done poorly or clumsily.,Adjective,His unskillful attempt at parallel parking blocked half the street.,botchy,butcherly,C2,96,General,Rare,,,unskillfulness
 9595,Unsloped,In a vertical position; not sloping.,Adjective,An upright post.,upright,,B2,46,General,Less Common,,,vertical;perpendicular
-9596,Unsnarl,Extricate from entanglement.,Verb,Can you disentangle the cord?,disentangle,straighten out,C2,96,General,Rare,,,unsnarling;unravel;systematize
-9597,Unsnarling,Extricate from entanglement.,Verb,Can you disentangle the cord?,disentangle,unsnarl,C2,96,General,Rare,,,unravel;systematize;systemize
+9596,Unsnarl,free something from a tangle or snarl.,Verb,It took twenty minutes to unsnarl the fishing line.,disentangle,straighten out,C2,96,General,Rare,,,unsnarling;unravel;systematize
+9597,Unsnarling,currently freeing something from a tangle or snarl.,Verb,She spent the whole morning unsnarling the Christmas lights.,disentangle,unsnarl,C2,96,General,Rare,,,unravel;systematize;systemize
 9598,Unsolder,Not disposed of by purchase.,Adjective,The house has been on the market almost a year and is still unsold.,unsold,,B2,46,General,Less Common,,,
-9599,Unsoluble,Not easily solved.,Adjective,An apparantly insolvable problem.,insolvable,unsolvable,C2,96,General,Rare,,,insoluble
+9599,Unsoluble,a rare variant of 'insoluble'; not capable of being solved or dissolved.,Adjective,The riddle proved unsoluble even to the sharpest minds in the room.,insolvable,unsolvable,C2,96,General,Rare,,,insoluble
 9600,Unsolved,Not solved.,Adjective,Many crimes remain unsolved.,unresolved,,B1,27,General,Common,,,
-9601,Unsought,Not desired.,Adjective,An undesired result.,undesired,,C2,96,General,Rare,,,unwanted
+9601,Unsought,not actively sought out or pursued; arriving unasked.,Adjective,"Fame came to her unsought, simply as a byproduct of her research.",undesired,,C2,96,General,Rare,,,unwanted
 9602,Unsound,"not based on solid reasoning or evidence; unreliable or defective, especially structurally or financially.",Adjective,The auditor flagged the company's accounting practices as unsound.,fallacious,,C2,96,General,Rare,,,decayed;corroded;speculative
 9603,Unsparing,"Giving generously and without restraint, or showing no mercy.",Adjective,He was unsparing in his praise for the young violinist.,lavish,munificent,C2,96,General,Rare,,,generous;inclement
-9604,Unspeakable,Defying expression or description.,Adjective,Indefinable yearnings.,indefinable,indescribable,B1,19,General,Common,,,inexpressible;unexpressible;bad
+9604,Unspeakable,"too terrible, shocking, or extreme to be expressed in words.",Adjective,The survivors described unspeakable conditions in the camp.,indefinable,indescribable,B1,19,General,Common,,,inexpressible;unexpressible;bad
 9605,Unspecific,Not detailed or specific.,Adjective,A broad rule.,broad,,C2,96,General,Rare,,,general
-9606,Unspoiled,Not left to spoil.,Adjective,The meat is still good.,good,undecomposed,C2,96,General,Rare,,,fresh;incorrupt
-9607,Unspoilt,Not left to spoil.,Adjective,The meat is still good.,good,undecomposed,C2,96,General,Rare,,,fresh
+9606,Unspoiled,"chiefly American spelling; not ruined, damaged, or corrupted; kept in a natural or original state.",Adjective,"The beach remained unspoiled, far from any resort development.",good,undecomposed,C2,96,General,Rare,,,fresh;incorrupt
+9607,Unspoilt,"chiefly British spelling; not ruined, damaged, or corrupted; kept in a natural or original state.",Adjective,Tourists praised the unspoilt countryside surrounding the village.,good,undecomposed,C2,96,General,Rare,,,fresh
 9608,Unsporting,Violating accepted standards or rules.,Adjective,A dirty fighter.,cheating,dirty,C2,96,General,Rare,,,unfair;unjust
 9609,Unstable,"likely to change, fail, or collapse; not firmly fixed.",Adjective,Engineers deemed the old bridge structurally unstable after the flood.,precarious,,A2,13,General,Very Common,,,explosive;rickety;tottering
 9610,Unstarred,Not marked with an asterisk.,Adjective,Unasterisked items.,unasterisked,,C2,96,General,Rare,,,unmarked
@@ -9614,7 +9614,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9613,Unstinting,Giving generously and without holding back.,Adjective,Her unstinting support helped the charity double its reach.,lavish,munificent,C2,97,General,Rare,,,generous
 9614,Unstrained,Cause to feel relaxed.,Verb,A hot bath always relaxes me.,relax,unstrain,C2,97,Health & Wellness,Rare,,,decompress;energize;energise
 9615,Unstuck,Thrown into a state of disorganization or incoherence.,Adjective,Price programs became unstuck because little grain was available.,undone,,B2,47,General,Less Common,,,disorganized;disorganised
-9616,Unstudied,Not by design or artifice; unforced and impromptu.,Adjective,An air of unstudied spontaneous utterance is apt to be painstakingly achieved.,uncontrived,,C2,97,General,Rare,,,candid;unaffected;uneducated
+9616,Unstudied,"natural and unaffected, as if without conscious effort or practice.",Adjective,He delivered the speech with an unstudied ease that put the whole room at ease.,uncontrived,,C2,97,General,Rare,,,candid;unaffected;uneducated
 9617,Unstylish,not fashionable or elegant.,Adjective,She worried the old coat looked unstylish next to her friends' new ones.,styleless,,C2,97,General,Rare,,,antique;outmoded;fogyish
 9618,Unsubtle,Lacking subtlety; obvious.,Adjective,Gave us a broad hint that it was time to leave.,broad,,C2,97,General,Rare,,,clear
 9619,Unsufferable,"Unable to be tolerated or endured, a less common variant spelling of insufferable.",Adjective,The heat in the un-air-conditioned room was simply unsufferable.,impossible,insufferable,C2,97,General,Rare,,,intolerable;unendurable;unbearable
@@ -9622,7 +9622,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9621,Unsullied,Not made dirty or spoiled; pure.,Adjective,Her reputation remained unsullied despite the rumors.,stainless,unstained,C2,97,General,Rare,,,unblemished;unmarred;unmutilated
 9622,Unsurprised,Not surprised or expressing surprise.,Adjective,That unsuprised obstinate look on his face.,not surprised,,C2,97,General,Rare,,,
 9623,Unsuspecting,Not suspicious.,Adjective,Deceiving the unsuspecting public.,unsuspicious,,B2,47,General,Less Common,,,trustful;incognizant;trusting
-9624,Unswayed,Not influenced or affected.,Adjective,Stewed in its petty provincialism untouched by the brisk debates that stirred the old world.,uninfluenced,untouched,C2,97,General,Rare,,,unaffected
+9624,Unswayed,"not persuaded or moved, especially by argument or emotion.",Adjective,The judge sat unswayed by the defense's emotional closing statement.,uninfluenced,untouched,C2,97,General,Rare,,,unaffected
 9625,Unswerving,Going directly ahead from one point to another without veering or turning aside.,Adjective,Some people see evolution as an undeviating upward march from simple organisms to the very complex.,undeviating,,C2,97,General,Rare,,,constant;direct
 9626,Unsymmetrically,a less common variant of 'asymmetrically'; without symmetry.,Adverb,The garden's paths were laid out unsymmetrically to feel more natural.,asymmetrically,,C2,97,General,Rare,,,
 9627,Unsympathising,Not showing or expressing sympathy.,Adjective,An uncharitable and unsympathizing attitude.,unsympathizing,,C2,97,General,Rare,,,
@@ -9633,11 +9633,11 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9632,Untarnished,Not damaged or diminished in quality or reputation.,Adjective,His record stayed untarnished throughout his long career.,stainless,unstained,C2,97,General,Rare,,,unblemished;unmarred;unmutilated
 9633,Untaught,Cause to unlearn.,Verb,Teach somebody to unlearn old habits or methods.,unteach,,C2,97,Communication,Rare,,,instruct;lecture;condition
 9634,Untaxed,(of goods or funds) not taxed.,Adjective,Tax-exempt bonds.,tax-exempt,tax-free,C2,97,General,Rare,,,nontaxable;exempt
-9635,Untellable,Defying expression or description.,Adjective,Indefinable yearnings.,indefinable,indescribable,B2,47,General,Less Common,,,inexpressible;unexpressible
-9636,Untempting,Not appealing to the senses.,Adjective,Untempting food.,unattractive,,C2,97,General,Rare,,,unseductive;uninviting
+9635,Untellable,"impossible to put into words or relate to others (a rarer, more literary term).",Adjective,He carried an untellable grief that no words could ever capture.,indefinable,indescribable,B2,47,General,Less Common,,,inexpressible;unexpressible
+9636,Untempting,"not arousing desire or appetite, especially describing food or an offer.",Adjective,The soggy sandwich looked untempting after sitting out all afternoon.,unattractive,,C2,97,General,Rare,,,unseductive;uninviting
 9637,Untested,Not yet tried out or proven in practice.,Adjective,The untested vaccine still needed several more trial phases.,unseasoned,untried,C2,97,General,Rare,,,inexperienced;inexperient;new
-9638,Unthawed,Become or cause to become soft or liquid.,Verb,The sun melted the ice.,dissolve,thaw,C2,97,General,Rare,,,liquefy;defrost;unfreeze
-9639,Unthinking,Without care or thought for others.,Adjective,The thoughtless saying of a great princess on being informed that the people had no bread; `Let them eat cake'.,thoughtless,uncaring,B2,47,General,Less Common,,,inconsiderate
+9638,Unthawed,"a nonstandard term sometimes used to mean 'thawed,' despite its prefix.",Verb,By noon the fish had unthawed enough to fillet.,dissolve,thaw,C2,97,General,Rare,,,liquefy;defrost;unfreeze
+9639,Unthinking,acting or done without careful thought or consideration; reflexive rather than deliberate.,Adjective,"In an unthinking moment, she blurted out the secret before she could stop herself.",thoughtless,uncaring,B2,47,General,Less Common,,,inconsiderate
 9640,Unthought,So unexpected as to have not been imagined.,Adjective,An unhoped-for piece of luck.,unhoped,unhoped-for,C2,97,General,Rare,,,unexpected
 9641,Untidily,in a manner lacking neatness or order.,Adverb,Papers were stacked untidily across every surface of the desk.,messily,,C2,97,General,Rare,,,sluttish;disheveled;frowzled
 9642,Untitled,Not of the nobility.,Adjective,Of ignoble (or ungentle) birth.,ignoble,ungentle,C2,97,General,Rare,,,lowborn
@@ -9668,7 +9668,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9667,Unwaveringly,"in a manner that shows no sign of doubt, hesitation, or change.",Adverb,She supported him unwaveringly through the entire trial.,firm,firmly,B2,47,General,Less Common,,,unwavering;resolute
 9668,Unwedded,Of someone who has not been married.,Adjective,Unwed mother.,unwed,,C2,97,General,Rare,,,unmarried;single
 9669,Unwieldiness,the quality of being difficult to handle due to size or complexity.,Noun,The unwieldiness of the new bureaucracy slowed every decision to a crawl.,awkwardness,cumbersomeness,C2,97,General,Rare,,,inconvenience;unwieldy;troublesomeness
-9670,Unwilled,Without deliberate intent.,Adjective,My heart with unwilled love grew warm.,unintentional,,C2,97,General,Rare,,,nonvoluntary;unvoluntary;involuntary
+9670,Unwilled,occurring without conscious will or deliberate intent (a more literary or philosophical term).,Adjective,"The tremor in his hand was unwilled, a symptom he could not control.",unintentional,,C2,97,General,Rare,,,nonvoluntary;unvoluntary;involuntary
 9671,Unwillingness,reluctance or refusal to do something.,Noun,His unwillingness to apologize prolonged the argument for weeks.,involuntariness,,B1,19,General,Common,,,temperament;hesitancy;hesitation
 9672,Unwished,Not welcome.,Adjective,Unwelcome publicity.,unwelcome,unwished-for,C2,97,General,Rare,,,unwanted
 9673,Unwittingly,Without knowledge or intention; unaware of what one is doing.,Adverb,The intern unwittingly forwarded the confidential email to the whole company.,inadvertently,unknowingly,B1,19,General,Common,,,unwitting;unintended
@@ -9678,7 +9678,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9677,Unwritten,Using speech rather than writing.,Adjective,An oral tradition.,oral,,C2,97,General,Rare,,,spoken
 9678,Upbraid,Express criticism towards.,Verb,The president reproached the general for his irresponsible behavior.,reproach,,C2,97,Communication,Rare,,,impeach;incriminate;upbraider
 9679,Upbringing,The treatment and instruction received from parents throughout childhood.,Noun,Her strict upbringing shaped her strong sense of discipline.,breeding,bringing up,B2,47,General,Less Common,,,heritage;raising;rearing
-9680,Upchuck,Eject the contents of the stomach through the mouth.,Verb,"After drinking too much, the students vomited.",vomit,vomit up,C2,97,Health & Wellness,Rare,,,eliminate;urinate;exudate
+9680,Upchuck,"vomit (an informal, slangy term).",Verb,The roller coaster made him upchuck right after the ride ended.,vomit,vomit up,C2,97,Health & Wellness,Rare,,,eliminate;urinate;exudate
 9681,Updating,Modernize or bring up to date.,Verb,We updated the kitchen in the old house.,update,,C2,97,General,Rare,,,cushion;corrupt;specialize
 9682,Upending,Become turned or set on end.,Verb,The airplanes upended.,upend,,C2,97,General,Rare,,,overturn;position;capsize
 9683,Upholder,"a person who supports or defends a principle, tradition, or cause.",Noun,She was known as a fierce upholder of free speech on campus.,maintainer,sustainer,C2,97,Society & Culture,Rare,,,supporter;champion;admirer
@@ -9700,13 +9700,13 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9699,Urgency,the quality of requiring immediate action or attention.,Noun,The doctor stressed the urgency of starting treatment right away.,importunity,urging,A2,9,Communication,Very Common,,,necessity;insistency;pressure
 9700,Urinate,To discharge urine from the body.,Verb,The dog stopped to urinate against every tree on the walk.,make,piddle,C2,97,Health & Wellness,Rare,,,eliminate;exudate;perspire
 9701,Usurious,"Charging an excessively high, often illegal, rate of interest on a loan.",Adjective,The payday lender was accused of usurious lending practices.,exorbitant,extortionate,B2,47,General,Less Common,,,usury;immoderate
-9702,Utilisation,The act of using.,Noun,He warned against the use of narcotic drugs.,use,usage,C2,97,General,Rare,,,utilise;activity;exploitation
-9703,Utilise,Put into service; make work or employ for a particular purpose or for its inherent or natural purpose.,Verb,Use your head!,use,utilize,C2,97,Health & Wellness,Rare,,,utilisation;utility;practice
+9702,Utilisation,chiefly British spelling; the act of putting something to use.,Noun,The report measured the utilisation of hospital beds across the region.,use,usage,C2,97,General,Rare,,,utilise;activity;exploitation
+9703,Utilise,chiefly British spelling; put something to practical use.,Verb,The team decided to utilise the spare room as a home office.,use,utilize,C2,97,Health & Wellness,Rare,,,utilisation;utility;practice
 9704,Utiliser,Someone who puts to good use.,Noun,Not all organisms are utilizers of oxygen.,utilizer,,C2,97,Society & Culture,Rare,,,consumer;user;usufructuary
-9705,Utilization,The act of using.,Noun,He warned against the use of narcotic drugs.,use,usage,A2,11,General,Very Common,,,activity;exploitation;development
-9706,Utilized,Put into service; make work or employ for a particular purpose or for its inherent or natural purpose.,Verb,Use your head!,use,utilize,A2,11,Health & Wellness,Very Common,,,practice;exchange;commute
+9705,Utilization,chiefly American spelling; the act of putting something to use.,Noun,Better utilization of solar panels could cut the building's energy costs significantly.,use,usage,A2,11,General,Very Common,,,activity;exploitation;development
+9706,Utilized,chiefly American spelling; put something to practical use (past tense).,Verb,The scientists utilized existing data rather than running new trials.,use,utilize,A2,11,Health & Wellness,Very Common,,,practice;exchange;commute
 9707,Uttered,"Articulate; either verbally or with a cry, shout, or noise.",Verb,She expressed her anger.,express,verbalize,B1,19,Communication,Common,,,blaspheme;imprecate;exclaim
-9708,Utterer,An organism that can utter vocal sounds.,Noun,An utterer of foul oaths.,vocalizer,vocaliser,C2,97,Society & Culture,Rare,,,utter;organism;being
+9708,Utterer,"one who says or expresses something aloud, especially words or sounds.",Noun,The sailor was a notorious utterer of foul oaths.,vocalizer,vocaliser,C2,97,Society & Culture,Rare,,,utter;organism;being
 9709,Uttermost,The greatest possible degree.,Noun,He tried his utmost.,utmost,maximum,B2,47,General,Less Common,,,boundary;absoluteness;limit
 9710,Vacancy,"an unoccupied position, room, or space available to be filled.",Noun,The hotel had one vacancy left for the holiday weekend.,void,emptiness,B1,16,General,Common,,,opening;vacant;space
 9711,Vaccinated,Given a vaccine to protect against a specific disease.,Verb,She got vaccinated before traveling to a region with the outbreak.,immunize,immunise,C2,97,Health & Wellness,Rare,,,inoculate;inject;shoot
@@ -9726,19 +9726,19 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9725,Vanguard,The position of greatest importance or advancement; the leading position in any movement or field.,Noun,The Cotswolds were once at the forefront of woollen manufacturing in England.,forefront,cutting edge,B1,27,Academic,Common,,,detachment;cavalry;company
 9726,Vanished,"Disappeared suddenly and completely, often without explanation.",Verb,The magician's assistant vanished in a puff of smoke.,disappear,vanish,A2,8,General,Very Common,,,evanesce;conclude;fade
 9727,Vanquish,"completely defeat someone in a battle or contest, especially decisively.",Verb,The knight set out to vanquish the dragon terrorizing the village.,beat,beat out,C2,97,Business,Rare,,,overcome;checkmate;eliminate
-9728,Vaporific,Resembling or characteristic of vapor.,Adjective,Vaporous clouds.,vapourific,vaporish,C2,97,General,Rare,,,volatile;gaseous
+9728,Vaporific,chiefly American spelling; resembling or having the qualities of vapor.,Adjective,A vaporific mist rose off the lake at dawn.,vapourific,vaporish,C2,97,General,Rare,,,volatile;gaseous
 9729,Vaporise,Cause to change into a vapor.,Verb,The chemist evaporated the water.,evaporate,,C2,97,General,Rare,,,change;alter;modify
-9730,Vaporize,Kill with or as if with a burst of gunfire or electric current or as if by shooting.,Verb,"In this computer game, space travellers are vaporized by aliens.",zap,,C2,97,General,Rare,,,kill;vaporizable;vaporization
-9731,Vaporized,Kill with or as if with a burst of gunfire or electric current or as if by shooting.,Verb,"In this computer game, space travellers are vaporized by aliens.",zap,vaporize,C2,97,General,Rare,,,kill
-9732,Vapourific,Resembling or characteristic of vapor.,Adjective,Vaporous clouds.,vaporific,vaporish,C2,97,General,Rare,,,volatile;gaseous
+9730,Vaporize,"convert a substance into vapor, typically by heating; or, figuratively, destroy something completely and instantly.",Verb,The laser could vaporize a steel plate in seconds.,zap,,C2,97,General,Rare,,,kill;vaporizable;vaporization
+9731,Vaporized,"converted into vapor, or, figuratively, destroyed instantly (past tense).",Verb,"In this computer game, space travellers are vaporized by aliens.",zap,vaporize,C2,97,General,Rare,,,kill
+9732,Vapourific,chiefly British spelling; resembling or having the qualities of vapor.,Adjective,The chemist noted the vapourific haze escaping from the flask.,vaporific,vaporish,C2,97,General,Rare,,,volatile;gaseous
 9733,Vapourous,"resembling vapor; thin, hazy, and insubstantial, chiefly British spelling.",Adjective,A vapourous mist hung low over the fields at dawn.,diaphanous,filmy,C2,97,General,Rare,,,thin;gaseous
 9734,Variance,"the state or fact of differing or being at odds, or a measure of statistical spread.",Noun,The two witnesses' accounts were in variance on several key details.,discrepancy,disagreement,B2,47,General,Less Common,,,departure;difference;division
 9735,Variant,(biology) a group of organisms within a species that differ in trivial ways from similar groups.,Noun,A new strain of microorganisms.,form,strain,B1,22,Society & Culture,Common,,,departure;difference;species
 9736,Varicoloured,Marked with a variety of different colours.,Adjective,The garden was full of varicoloured tulips.,motley,calico,C2,97,General,Rare,,,colored;coloured;colorful
 9737,Variegated,Make something more diverse and varied.,Verb,Vary the menu.,vary,variegate,B2,47,General,Less Common,,,change;alter;modify
 9738,Variously,In different ways at different times; differently by different people.,Adverb,The plan has been variously described as bold and reckless.,diversely,multifariously,B1,19,General,Common,,,various;different
-9739,Vascularise,Become vascular and have vessels that circulate fluids.,Verb,The egg yolk vascularized.,vascularize,,C2,97,General,Rare,,,change;alter;modify
-9740,Vascularize,Become vascular and have vessels that circulate fluids.,Verb,The egg yolk vascularized.,vascularise,,C2,98,General,Rare,,,vascular;vascularization;change
+9739,Vascularise,chiefly British spelling; develop or supply with blood vessels.,Verb,Doctors watched to see how quickly the graft would vascularise.,vascularize,,C2,97,General,Rare,,,change;alter;modify
+9740,Vascularize,chiefly American spelling; develop or supply with blood vessels.,Verb,The egg yolk vascularized as the embryo continued to develop.,vascularise,,C2,98,General,Rare,,,vascular;vascularization;change
 9741,Vasectomize,Remove the vas deferens.,Verb,Many men choose to be vasectomized as a form of safe birth control.,vasectomise,,C2,98,Health & Wellness,Rare,,,sterilize;desexualize;vasectomy
 9742,Vaulting,Revealing excessive self-confidence; reaching for the heights.,Adjective,Vaulting ambition.,overreaching,,B1,27,General,Common,,,bold
 9743,Veering,Turn sharply; change direction abruptly.,Verb,The car cut to the left at the intersection.,swerve,sheer,B2,34,General,Less Common,,,turn;yaw;switch
@@ -9754,14 +9754,14 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9753,Veneration,"great respect or reverence, especially as shown through worship or ritual.",Noun,The ancient temple was still held in veneration by the local community.,fear,reverence,B1,27,Emotion,Common,,,venerate;worship;anxiety
 9754,Venereal,Of or relating to the external sex organs.,Adjective,Genital herpes.,genital,,B1,27,General,Common,,,
 9755,Vengeful,showing or motivated by a strong desire for revenge.,Adjective,Her vengeful glare made it clear she hadn't forgiven him.,revengeful,vindictive,C2,98,General,Rare,,,unforgiving;vengefulness
-9756,Venomous,Extremely poisonous or injurious; producing venom.,Adjective,Venomous snakes.,deadly,virulent,B2,34,General,Less Common,,,venom;toxic;malicious
+9756,Venomous,"capable of injecting venom through a bite or sting; or, figuratively, full of spite.",Adjective,The venomous snake struck before the hiker could react.,deadly,virulent,B2,34,General,Less Common,,,venom;toxic;malicious
 9757,Ventilated,Expose to cool or cold air so as to cool or freshen.,Verb,Air the old winter clothes.,vent,ventilate,B2,47,General,Less Common,,,solarise;refresh;freshen
 9758,Ventilation,A mechanical system in a building that provides fresh air.,Noun,She was continually adjusting the ventilation.,ventilation system,ventilating system,B1,16,Science & Technology,Common,,,improvement;modernisation;melioration
 9759,Ventral,relating to or situated on the front or lower surface of an animal's body.,Adjective,The shark's ventral fins help it steer while swimming.,adaxial,,C2,98,General,Rare,,,venter;dorsoventral
 9760,Ventricous,Having a swelling on one side.,Adjective,The ventricose gullet of an insect.,ventricose,,C2,98,General,Rare,,,protrusive
 9761,Venturous,Disposed to venture or take risks.,Adjective,Audacious visions of the total conquest of space.,audacious,daring,C2,98,General,Rare,,,venture;adventurous;adventuresome
-9762,Verbalise,Be verbose.,Verb,This lawyer verbalizes and is rather tedious.,verbalize,,C2,98,Communication,Rare,,,communicate;talk;speak
-9763,Verbalised,Be verbose.,Verb,This lawyer verbalizes and is rather tedious.,verbalize,verbalise,C2,98,Communication,Rare,,,communicate;talk;speak
+9762,Verbalise,"chiefly British spelling; express something in words, especially a thought or feeling.",Verb,It took her a while to verbalise exactly why the painting unsettled her.,verbalize,,C2,98,Communication,Rare,,,communicate;talk;speak
+9763,Verbalised,chiefly British spelling; expressed something in words (past tense).,Verb,He finally verbalised the fear he'd been carrying for months.,verbalize,verbalise,C2,98,Communication,Rare,,,communicate;talk;speak
 9764,Verbalism,The communication (in speech or writing) of your beliefs or opinions.,Noun,Expressions of good will.,expression,verbal expression,C2,98,Communication,Rare,,,communication;congratulation;felicitation
 9765,Verbalizer,a person or device that puts thoughts or data into words.,Noun,The software's verbalizer converts raw statistics into a plain-language summary.,speaker,talker,C2,98,Society & Culture,Rare,,,verbalize;utterer;articulator
 9766,Verbiage,Wording that is excessive or overly technical relative to the content.,Noun,The contract was full of legal verbiage that confused most readers.,wording,diction,C2,98,Communication,Rare,,,expression;verbalism;phrasing
@@ -9770,11 +9770,11 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9769,Verification,"The process of establishing that something is true, accurate, or valid.",Noun,The bank requires verification of your identity before opening an account.,confirmation,check,B1,22,Academic,Common,,,establishment;verify;proof
 9770,Verified,Confirm the truth of.,Verb,Please verify that the doors are closed.,verify,,B1,16,Academic,Common,,,confirm;corroborate;sustain
 9771,Veritable,Often used as intensifiers.,Adjective,A regular morass of details.,regular,,B1,22,General,Common,,,typical;genuine;echt
-9772,Vermicular,Decorated with wormlike tracery or markings.,Adjective,Vermicular (or vermiculated) stonework.,vermiculate,vermiculated,C2,98,General,Rare,,,fancy
-9773,Vermiculated,Decorated with wormlike tracery or markings.,Adjective,Vermicular (or vermiculated) stonework.,vermicular,vermiculate,C2,98,General,Rare,,,fancy
+9772,Vermicular,resembling the movement or shape of a worm; wormlike.,Adjective,The stonework featured a vermicular pattern carved along its border.,vermiculate,vermiculated,C2,98,General,Rare,,,fancy
+9773,Vermiculated,"marked or decorated with wavy, wormlike lines or tracery (a more specific, decorative-arts term).",Adjective,"The vermiculated masonry gave the facade a rustic, textured look.",vermicular,vermiculate,C2,98,General,Rare,,,fancy
 9774,Versant,"the general slope or face of a mountain range (a rare, technical geography term).",Noun,Conifer forests cover the eastern versant of the range.,mountainside,,C2,98,General,Rare,,,incline;mountain;acclivity
 9775,Vertiginous,Having or causing a whirling sensation; liable to falling.,Adjective,Had a dizzy spell.,dizzy,giddy,C2,98,General,Rare,,,vertigo;ill;sick
-9776,Vestige,An indication that something has been present.,Noun,There wasn't a trace of evidence for the claim.,trace,tincture,B2,34,Communication,Less Common,,,indication;indicant;manifestation
+9776,Vestige,a visible trace or remaining sign of something that existed in the past.,Noun,Only a vestige of the ancient wall still stood among the ruins.,trace,tincture,B2,34,Communication,Less Common,,,indication;indicant;manifestation
 9777,Vestigial,Not fully developed in mature animals.,Adjective,Rudimentary wings.,rudimentary,,C2,98,General,Rare,,,undeveloped
 9778,Vexatious,"Causing annoyance or worry, especially through persistent trouble (formal, often legal).",Adjective,The court dismissed the case as a vexatious lawsuit.,annoying,bothersome,B2,47,General,Less Common,,,disagreeable
 9779,Vibrant,Vigorous and animated.,Adjective,A vibrant group that challenged the system.,vivacious,,B1,16,General,Common,,,spirited;vibrate;reverberant
@@ -9802,12 +9802,12 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9801,Virtuoso,"Showing exceptional technical skill, especially in the arts.",Adjective,The pianist's virtuoso performance left the audience in awe.,consummate,masterful,B1,27,General,Common,,,skilled
 9802,Virtuously,In a moral manner.,Adverb,He acted morally under the circumstances.,morally,,C2,98,General,Rare,,,innocent;continent;virginal
 9803,Virulency,Extreme harmfulness (as the capacity of a microorganism to cause disease).,Noun,The virulence of the plague.,virulence,,C2,98,General,Rare,,,virulent;harmfulness;injuriousness
-9804,Virulent,Extremely poisonous or injurious; producing venom.,Adjective,Venomous snakes.,deadly,venomous,B2,47,General,Less Common,,,virulency;virulence;toxic
+9804,Virulent,"extremely infectious, poisonous, or harmful, especially describing a disease or, figuratively, hostility.",Adjective,A virulent strain of the flu swept through the dormitory that winter.,deadly,venomous,B2,47,General,Less Common,,,virulency;virulence;toxic
 9805,Visceral,Relating to or affecting the viscera.,Adjective,Visceral bleeding.,splanchnic,,B1,22,General,Common,,,viscera;illogical;unlogical
 9806,Visibility,Quality or fact or degree of being visible; perceptible by the eye or obvious to the eye.,Noun,Low visibility caused by fog.,visibleness,,B1,19,General,Common,,,visible;profile;perceptibility
 9807,Visionary,showing great foresight and imagination about future possibilities.,Adjective,Her visionary design reimagined the whole downtown waterfront.,airy,impractical,C2,98,General,Rare,,,vision;utopian
-9808,Visualise,View the outline of by means of an X-ray.,Verb,The radiologist can visualize the cancerous liver.,visualize,,C2,98,General,Rare,,,imagine;prefigure;envision
-9809,Visualised,View the outline of by means of an X-ray.,Verb,The radiologist can visualize the cancerous liver.,visualize,visualise,C2,98,General,Rare,,,imagine;prefigure;envision
+9808,Visualise,chiefly British spelling; form a clear mental picture of something.,Verb,Try to visualise the finished garden before you start planting.,visualize,,C2,98,General,Rare,,,imagine;prefigure;envision
+9809,Visualised,"chiefly British spelling; formed a mental picture of something, or viewed by imaging technology such as X-ray (past tense).",Verb,The radiologist visualised the fracture clearly on the scan.,visualize,visualise,C2,98,General,Rare,,,imagine;prefigure;envision
 9810,Visualized,"Formed a clear mental image of something, often to aid planning or performance.",Verb,The athlete visualized every step of the race before it began.,visualize,visualise,B2,34,Arts & Creativity,Less Common,,,imagine;understand;realize
 9811,Vitality,A healthy capacity for vigorous activity.,Noun,Jogging works off my excess energy.,energy,vim,A2,7,General,Very Common,,,muscularity;wholeness;condition
 9812,Vitalizing,Give life to.,Verb,The eggs are vitalized.,vitalize,vitalise,C2,98,General,Rare,,,strengthen;confirm;reenforce
@@ -9818,10 +9818,10 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9817,Vituperate,Spread negative information about.,Verb,The Nazi propaganda vilified the Jews.,vilify,revile,C2,98,Communication,Rare,,,vituperative;clapperclaw;blackguard
 9818,Vituperative,Marked by harshly abusive criticism.,Adjective,His scathing remarks about silly lady novelists.,scathing,,C2,98,General,Rare,,,vituperate;critical
 9819,Vividness,Interest and variety and intensity.,Noun,The Puritan Period was lacking in color.,color,colour,B2,47,General,Less Common,,,interest;interestingness;newsworthiness
-9820,Vocalise,Pronounce as a vowel.,Verb,"Between two consonants, this liquid is vowelized.",vocalize,vowelize,C2,98,Communication,Rare,,,pronounce;enounce;enunciate
+9820,Vocalise,"chiefly British spelling; give voice or expression to something, or sing a passage using vowel sounds rather than words.",Verb,"The soprano began to vocalise, warming up before the recital.",vocalize,vowelize,C2,98,Communication,Rare,,,pronounce;enounce;enunciate
 9821,Vocalism,"The use of the voice, especially in singing; also, a system of vowel sounds in a language.",Noun,Her powerful vocalism carried to the back row without a microphone.,voice,vocalization,B2,47,Communication,Less Common,,,communication;phonation;message
 9822,Vocalization,"The act of producing sound with the voice, or a specific vocal sound produced.",Noun,The bird's vocalization changes depending on the season.,voice,vocalisation,B2,47,Communication,Less Common,,,communication;phonation;message
-9823,Vocalizer,An organism that can utter vocal sounds.,Noun,An utterer of foul oaths.,utterer,vocaliser,C2,98,Society & Culture,Rare,,,vocalize;organism;being
+9823,Vocalizer,an organism or device capable of producing vocal sounds.,Noun,"The mockingbird is an impressive vocalizer, mimicking dozens of other species.",utterer,vocaliser,C2,98,Society & Culture,Rare,,,vocalize;organism;being
 9824,Vociferate,Utter in a very loud voice.,Verb,They vociferated their demands.,shout out,,C2,98,Communication,Rare,,,express;verbalize;verbalise
 9825,Vociferous,Expressing opinions or feelings loudly and forcefully.,Adjective,The vociferous critics demanded the mayor's resignation.,blatant,clamant,B1,27,General,Common,,,noisy
 9826,Voiceless,Produced without vibration of the vocal cords.,Adjective,Unvoiced consonants such as `p' and `k' and `s'.,unvoiced,surd,B2,47,General,Less Common,,,voicelessness;whispered
@@ -9833,20 +9833,20 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9832,Volumetric,Of or relating to measurement by volume.,Adjective,Volumetric analysis.,volumetrical,,B2,34,General,Less Common,,,volumeter
 9833,Voluminous,Marked by repeated turns and bends.,Adjective,A tortuous road up the mountain.,tortuous,twisting,B1,27,General,Common,,,crooked;voluminousness;volume
 9834,Voluptuous,Having strong sexual appeal.,Adjective,Juicy barmaids.,juicy,luscious,B1,27,General,Common,,,voluptuousness;sexy;shapely
-9835,Vomiting,Eject the contents of the stomach through the mouth.,Verb,"After drinking too much, the students vomited.",vomit,vomit up,B1,27,Health & Wellness,Common,,,eliminate;urinate;exudate
+9835,Vomiting,currently ejecting the contents of the stomach through the mouth.,Verb,The child had been vomiting all night with the stomach flu.,vomit,vomit up,B1,27,Health & Wellness,Common,,,eliminate;urinate;exudate
 9836,Voracious,Excessively greedy and grasping.,Adjective,A rapacious divorcee on the prowl.,rapacious,ravening,C2,98,General,Rare,,,voraciousness;acquisitive;voracity
 9837,Voteless,Lacking the right to vote.,Adjective,The colony's residents remained voteless despite paying full taxes.,disenfranchised,disfranchised,C2,98,General,Rare,,,
-9838,Vowelize,Pronounce as a vowel.,Verb,"Between two consonants, this liquid is vowelized.",vocalize,vocalise,C2,98,Communication,Rare,,,pronounce;enounce;enunciate
+9838,Vowelize,"pronounce or mark a sound as a vowel, especially in phonetic transcription.",Verb,"Between two consonants, this liquid sound is often vowelized in casual speech.",vocalize,vocalise,C2,98,Communication,Rare,,,pronounce;enounce;enunciate
 9839,Voyeuristical,Of or relating to voyeurs or voyeurism.,Adjective,His voyeuristic pleasures.,voyeuristic,,C2,98,General,Rare,,,voyeur;voyeurism
-9840,Vulcanised,Undergo vulcanization.,Verb,Vulcanize rubber.,vulcanize,vulcanise,C2,98,General,Rare,,,process;change;treat
-9841,Vulcanize,Undergo vulcanization.,Verb,Vulcanize rubber.,vulcanise,,C2,98,General,Rare,,,process;vulcanization;change
+9840,Vulcanised,chiefly British spelling; treated with sulfur and heat to increase rubber's strength and elasticity (past tense).,Verb,The tires were vulcanised at the factory before shipping.,vulcanize,vulcanise,C2,98,General,Rare,,,process;change;treat
+9841,Vulcanize,chiefly American spelling; treat rubber with sulfur and heat to increase its strength and elasticity.,Verb,Goodyear discovered how to vulcanize rubber almost by accident.,vulcanise,,C2,98,General,Rare,,,process;vulcanization;change
 9842,Vulgarise,"To make something less refined or more crude in order to appeal to a wider audience, chiefly British spelling.",Verb,Critics felt the remake would vulgarise the original novel's subtlety.,popularize,popularise,C2,98,Communication,Rare,,,circulate;circularise;distribute
 9843,Vulnerability,The state of being vulnerable or exposed.,Noun,His vulnerability to litigation.,exposure,,B1,14,General,Common,,,vulnerable;weakness;smallness
 9844,Vulpine,Resembling or characteristic of a fox.,Adjective,Vulpine cunning.,vulpecular,,B2,47,General,Less Common,,,fox
 9845,Vulturine,Living by preying on other animals especially by catching living prey.,Adjective,A predatory bird.,predatory,rapacious,C2,98,General,Rare,,,aggressive
 9846,Wackily,"in a wildly funny, eccentric, or unconventional manner.",Adverb,The host dressed wackily for every episode of the children's show.,daftly,dottily,C2,98,General,Rare,,,wacky;insane
-9847,Wahabism,A conservative and intolerant form of Islam that is practiced in Saudi Arabia.,Noun,Osama bin Laden and his followers practice Wahhabism.,wahhabism,,C2,98,Academic,Rare,,,islamism;mohammedanism;muslimism
-9848,Wahhabism,A conservative and intolerant form of Islam that is practiced in Saudi Arabia.,Noun,Osama bin Laden and his followers practice Wahhabism.,wahabism,,C2,98,Academic,Rare,,,islamism;mohammedanism;muslimism
+9847,Wahabism,a less common spelling variant of 'Wahhabism.',Noun,Some older texts use the spelling Wahabism instead of the more common form.,wahhabism,,C2,98,Academic,Rare,,,islamism;mohammedanism;muslimism
+9848,Wahhabism,"a conservative and puritanical branch of Sunni Islam, founded in the Arabian Peninsula and associated with Saudi Arabia (the standard spelling).",Noun,Osama bin Laden and his followers practiced a militant strain of Wahhabism.,wahabism,,C2,98,Academic,Rare,,,islamism;mohammedanism;muslimism
 9849,Wailing,Emit long loud cries.,Verb,Wail in self-pity.,howl,ululate,B1,19,Communication,Common,,,screech;whimper;sniffle
 9850,Waitress,Serve as a waiter or waitress in a restaurant.,Verb,I'm waiting on tables at Maxim's.,wait,,B2,34,Society & Culture,Less Common,,,work
 9851,Wakefulness,"the state of being awake, especially when sleep is desired but elusive.",Noun,Accepting your wakefulness rather than fighting it can help sleep return in its own time.,sleeplessness,,B1,27,General,Common,,,emergency;drowsiness;somnolence
@@ -9855,7 +9855,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9854,Wandering,Travelling about without any clear destination.,Noun,She followed him in his wanderings and looked after him.,roving,vagabondage,B1,14,General,Common,,,traveling;travelling;staging
 9855,Wangling,"obtaining something through clever or devious persuasion, especially bending the rules.",Verb,She kept wangling extra days off by pleading family emergencies.,fudge,manipulate,C2,98,Society & Culture,Rare,,,achieve;accomplish;average
 9856,Wannabee,"an informal, often mildly mocking term for someone who aspires to be like a particular type of person.",Noun,The tabloids dismissed him as just another celebrity wannabee.,aspirant,aspirer,C2,98,Society & Culture,Rare,,,material;possible;suppliant
-9857,Wantonness,The trait of lacking restraint or control; reckless freedom from inhibition or worry.,Noun,She danced with abandon.,abandon,unconstraint,C2,98,General,Rare,,,corruption;degeneracy;depravity
+9857,Wantonness,"reckless or unrestrained behavior, especially disregarding consequences (a somewhat formal or old-fashioned term).",Noun,"The critics condemned the novel's wantonness, calling it needlessly reckless.",abandon,unconstraint,C2,98,General,Rare,,,corruption;degeneracy;depravity
 9858,Warfare,The waging of armed conflict against an enemy.,Noun,Thousands of people were killed in the war.,war,,A2,5,General,Very Common,,,struggle;resistance;conflict
 9859,Warlike,having or showing a readiness or eagerness to engage in war or conflict.,Adjective,The tribe's warlike reputation kept its neighbors cautious for generations.,militant,hawkish,B1,19,General,Common,,,military;unpeaceful
 9860,Warming,Warm weather following a freeze; snow and ice melt.,Noun,They welcomed the spring thaw.,thaw,thawing,A2,11,General,Very Common,,,boiling;weather;conditions
@@ -9881,7 +9881,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9880,Weakened,Lessen the strength of.,Verb,The fever weakened his body.,weaken,,B1,16,General,Common,,,enfeeble;cripple;devitalize
 9881,Wealthiness,The state of being rich and affluent; having a plentiful supply of material goods and money.,Noun,Great wealth is not a sign of great intelligence.,wealth,,C2,98,General,Rare,,,wealthy;affluence;poorness
 9882,Weaning,Gradually deprive (infants and young mammals) of mother's milk.,Verb,She weaned her baby when he was 3 months old and started him on powdered milk.,wean,ablactate,B2,34,Health & Wellness,Less Common,,,breastfeed;lactate;disaffect
-9883,Wearily,In a weary manner.,Adverb,He walked around tiredly.,tiredly,,B1,14,General,Common,,,careworn;raddled;drooping
+9883,Wearily,"in a manner showing weariness, especially from a long or tedious effort.",Adverb,He sighed wearily and pushed the paperwork aside.,tiredly,,B1,14,General,Common,,,careworn;raddled;drooping
 9884,Wearisome,"Causing tiredness or a loss of patience, especially over a long period.",Adjective,The wearisome commute left her exhausted every evening.,boring,deadening,B2,34,General,Less Common,,,uninteresting
 9885,Weathered,Face and withstand with courage.,Verb,She braved the elements.,weather,endure,C2,98,General,Rare,,,withstand;recline;incline
 9886,Weatherworn,Worn by exposure to the weather.,Adjective,A house of weathered shingles.,weather-beaten,weathered,C2,98,General,Rare,,,worn
@@ -9896,12 +9896,12 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9895,Welding,Join together by heating.,Verb,Weld metal.,weld,,B2,34,General,Less Common,,,conflate;commingle;combine
 9896,Wellbeing,"The state of being comfortable, healthy, or happy.",Noun,The company introduced new programs to support employee wellbeing.,well-being,welfare,B2,47,General,Less Common,,,prosperity;strength;success
 9897,Wellspring,"a source of continual supply, especially of ideas, energy, or emotion.",Noun,Her grandmother was a wellspring of family stories and wisdom.,well,fountainhead,C2,98,Communication,Rare,,,beginning;rootage;birthplace
-9898,Westbound,Moving toward the west.,Adjective,Westbound pioneers.,westerly,westward,C2,99,General,Rare,,,
+9898,Westbound,"traveling or heading in a westerly direction, especially describing traffic or transport.",Adjective,Westbound traffic on the interstate slowed to a crawl near the bridge.,westerly,westward,C2,99,General,Rare,,,
 9899,Westerner,a person from the western part of a country or the Western world.,Noun,"As a Westerner living in Tokyo, she noticed the cultural differences immediately.",western,,B2,34,General,Less Common,,,occidental;hesperian;occident
 9900,Westernize,"make something conform to the customs, ideas, or culture of the West.",Verb,The country was Westernized rapidly after it opened its borders to trade.,occidentalize,occidentalise,C2,99,General,Rare,,,western;change;alter
-9901,Westward,Moving toward the west.,Adjective,Westbound pioneers.,westbound,westerly,A2,13,General,Very Common,,,
+9901,Westward,moving or facing toward the west.,Adjective,The wagon train pressed westward across the plains.,westbound,westerly,A2,13,General,Very Common,,,
 9902,Wetting,A euphemism for urination.,Noun,He had to take a leak.,leak,making water,B1,22,Nature,Common,,,ducking;dousing;moistening
-9903,Whacking,Hit hard.,Verb,The teacher whacked the boy.,whack,wham,C2,99,General,Rare,,,hit
+9903,Whacking,currently hitting hard or with a sharp blow.,Verb,He was whacking the piñata with all his strength.,whack,wham,C2,99,General,Rare,,,hit
 9904,Whatchamacallum,A joking placeholder name for something whose real name escapes you.,Noun,"Grab the whatchamacallum from the top shelf, please.",doodad,doohickey,C2,99,Science & Technology,Rare,,,thingumabob;thingamajig;thingmajig
 9905,Whatsis,An informal name for a thing you can't remember the actual word for.,Noun,This little whatsis screws onto the end of the hose.,doodad,doohickey,C2,99,Science & Technology,Rare,,,thingumabob;thingamajig;thingmajig
 9906,Wheaten,Of or relating to or derived from wheat.,Adjective,Wheaten bread.,whole-wheat,wholemeal,C2,99,General,Rare,,,wheat
@@ -9918,13 +9918,13 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9917,Whispering,Making a low continuous indistinct sound.,Adjective,Like murmuring waves.,murmuring,susurrant,B1,19,General,Common,,,soft
 9918,Whistleblower,An informant who exposes wrongdoing within an organization in the hope of stopping it.,Noun,The law gives little protection to whistleblowers who feel the public has a right to know what is going on.,whistle blower,whistle-blower,C2,99,Society & Culture,Rare,,,informant;source;leaker
 9919,Whistling,"The act of signalling (e.g., summoning) by whistling or blowing a whistle.",Noun,The whistle signalled the end of the game.,whistle,,B1,19,Communication,Common,,,sound;music;carillon
-9920,Whitening,Turn white.,Verb,This detergent will whiten your laundry.,whiten,white,B2,47,General,Less Common,,,discolor;discolour;crimson
+9920,Whitening,currently making or becoming white.,Verb,The dentist recommended a whitening treatment for her stained teeth.,whiten,white,B2,47,General,Less Common,,,discolor;discolour;crimson
 9921,Whitewash,"Cover up a misdemeanor, fault, or error.",Verb,Let's not whitewash the crimes of Stalin.,gloss over,sleek over,C2,99,General,Rare,,,cover;wash
-9922,Whiting,Turn white.,Verb,This detergent will whiten your laundry.,whiten,white,B2,34,General,Less Common,,,discolor;discolour;crimson
+9922,Whiting,"a less common variant of 'whitening'; currently making white, especially by applying a whitewash or coating.",Verb,The workers spent the afternoon whiting the old fence with lime wash.,whiten,white,B2,34,General,Less Common,,,discolor;discolour;crimson
 9923,Whitish,Resembling milk in color not clear.,Adjective,Milky glass.,milky,milklike,C2,99,General,Rare,,,achromatic;neutral;opaque
 9924,Wholehearted,With unconditional and enthusiastic devotion.,Adjective,Heart-whole friendship.,heart-whole,whole-souled,C2,99,General,Rare,,,sincere;wholeheartedness
 9925,Wholeness,An undivided or unbroken completeness or totality with nothing wanting.,Noun,The integrity of the nervous system is required for normal development.,integrity,unity,B2,34,General,Less Common,,,vitality;condition;whole
-9926,Whopping,Hit hard.,Verb,The teacher whacked the boy.,whack,wham,B2,47,General,Less Common,,,hit
+9926,Whopping,"a less common variant of 'whacking'; currently striking hard (an informal, dialectal term).",Verb,The old dialect had the boys whopping each other with sticks in play.,whack,wham,B2,47,General,Less Common,,,hit
 9927,Wickedness,the quality of being morally wrong or evil.,Noun,The story explores the wickedness lurking beneath the town's peaceful surface.,iniquity,darkness,B1,27,General,Common,,,violation;condition;depravity
 9928,Wideband,"relating to a system or signal that operates across a wide range of frequencies, especially in radio or electronics.",Adjective,The radio uses a wideband receiver to pick up signals across many channels.,broadband,,C2,99,General,Rare,,,
 9929,Widowed,Cause to be without a spouse.,Verb,The war widowed many women in the former Yugoslavia.,widow,,B1,19,General,Common,,,leave
@@ -9958,7 +9958,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9957,Womanly,"befitting or characteristic of a mature woman, especially in dignity or grace.",Adjective,"She carried herself with a calm, womanly confidence.",feminine,,B2,47,General,Less Common,,,woman;womanliness;matronly
 9958,Wonderingly,in a manner that shows amazement or curiosity.,Adverb,The child stared wonderingly at the fireworks lighting up the sky.,questioningly,,B2,47,General,Less Common,,,wondering;curious
 9959,Wondrously,(used as an intensifier) extremely well.,Adverb,Her voice is superbly disciplined.,wonderfully,wondrous,B2,47,General,Less Common,,,extraordinary
-9960,Woodenly,Without grace; rigidly.,Adverb,They moved woodenly.,ungraciously,ungracefully,C2,99,General,Rare,,,awkward;wooden;inelegant
+9960,Woodenly,"in a stiff, unnatural manner, as if lacking feeling or flexibility.",Adverb,"The actor delivered his lines woodenly, without a trace of emotion.",ungraciously,ungracefully,C2,99,General,Rare,,,awkward;wooden;inelegant
 9961,Woollen,Of or related to or made of wool.,Adjective,A woolen sweater.,woolen,,C2,99,General,Rare,,,wool
 9962,Wording,"The way something is expressed in words, especially the precise phrasing chosen.",Noun,They spent an hour arguing over the exact wording of the apology.,diction,phrasing,B1,23,Communication,Common,,,expression;verbiage;word
 9963,Wordlessly,"without speaking, though not necessarily without sound.",Adverb,"He sat wordlessly next to her, his silence saying everything.",mutely,silently,B2,34,General,Less Common,,,wordless;inarticulate;unarticulate
@@ -9973,7 +9973,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9972,Wounding,Hurt the feelings of.,Verb,She hurt me when she did not include me among her guests.,hurt,wound,B2,47,Emotion,Less Common,,,trample;torture;excruciate
 9973,Wrangle,"a long, complicated dispute or argument, often over money or details.",Noun,The lawsuit turned into a years-long wrangle over unpaid royalties.,quarrel,row,C2,99,Communication,Rare,,,dispute;difference;conflict
 9974,Wrangling,"To quarrel noisily, angrily or disruptively.",Verb,"The bar keeper threw them out, but they continued to wrangle on down the street.",brawl,wrangle,C2,99,Communication,Rare,,,quarrel;dispute;altercate
-9975,Wrathful,Vehemently incensed and condemnatory.,Adjective,They trembled before the wrathful queen.,wroth,wrothful,B2,47,General,Less Common,,,angry
+9975,Wrathful,full of intense anger; vehemently incensed.,Adjective,They trembled before the wrathful queen.,wroth,wrothful,B2,47,General,Less Common,,,angry
 9976,Wrecking,Smash or break forcefully.,Verb,The kid busted up the car.,bust up,wreck,B1,19,General,Common,,,destroy;vandalise;explode
 9977,Wrestle,"A hard struggle or contest, especially one involving physical grappling.",Noun,It was quite a wrestle to get the old couch through the doorway.,wrestling,grapple,B2,34,General,Less Common,,,struggle
 9978,Wretchedness,A state of ill-being due to affliction or misfortune.,Noun,The misery and wretchedness of those slums is intolerable.,misery,miserableness,B2,47,General,Less Common,,,suffering;hangover;inconvenience
@@ -9985,17 +9985,17 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 9984,Writhing,"Twisting the body violently, especially due to pain.",Verb,The snake lay writhing in the dry grass.,writhe,wrestle,B1,16,General,Common,,,move
 9985,Wrongdoing,illegal or dishonest behavior in general.,Noun,He denied any wrongdoing despite the mounting evidence.,wrongful conduct,misconduct,B2,34,General,Less Common,,,evilness;activity;perverseness
 9986,Wrongfulness,That which is contrary to the principles of justice or law.,Noun,He feels that you are in the wrong.,wrong,,C2,99,General,Rare,,,wrongful;injustice;unjustness
-9987,Wrothful,Vehemently incensed and condemnatory.,Adjective,They trembled before the wrathful queen.,wrathful,wroth,C2,99,General,Rare,,,angry
+9987,Wrothful,an archaic variant of 'wrathful'; full of intense anger.,Adjective,The old text describes a wrothful king storming through his court.,wrathful,wroth,C2,99,General,Rare,,,angry
 9988,Wrought,Exert oneself by doing mental or physical work for a purpose or out of necessity.,Verb,I will work hard to improve my grades.,work,,B1,27,Society & Culture,Common,,,freelance;moonlight;serve
-9989,Yearner,A person with a strong desire for something.,Noun,A longer for money.,longer,thirster,C2,99,Society & Culture,Rare,,,individual;someone;somebody
+9989,Yearner,"someone who longs deeply for something, often wistfully.",Noun,The old sailor was a yearner for the sea long after he'd retired.,longer,thirster,C2,99,Society & Culture,Rare,,,individual;someone;somebody
 9990,Yearningly,"with an intense, often sorrowful longing (a somewhat literary term).",Adverb,"He looked yearningly toward the horizon, missing home.",longingly,,B2,47,General,Less Common,,,
 9991,Yellowed,Turn yellow.,Verb,The pages of the book began to yellow.,yellow,,B2,47,General,Less Common,,,discolor;discolour;crimson
 9992,Yelping,Bark in a high-pitched tone.,Verb,The puppies yelped.,yelp,yip,B2,47,Communication,Less Common,,,bark;bay;quest
 9993,Yielding,Be the cause or source of.,Verb,He gave me a lot of trouble.,yield,give,A2,11,Business,Very Common,,,provide;furnish;supply
 9994,Yodeling,Sing by changing register; sing by yodeling.,Verb,The Austrians were yodeling in the mountains.,yodel,warble,B2,34,Communication,Less Common,,,harmonize;cantillate;vocalise
 9995,Youngster,"a young person, especially a child.",Noun,She writes books that youngsters of every age seem to enjoy.,child,kid,A2,13,Society & Culture,Very Common,,,preteenager;nestling;juvenile
-9996,Yugoslav,Of or relating to or characteristic of the former country of Yugoslavia or its people or languages.,Adjective,Yugoslavian wine.,yugoslavian,,B1,15,General,Common,,,yugoslavia
-9997,Yugoslavian,Of or relating to or characteristic of the former country of Yugoslavia or its people or languages.,Adjective,Yugoslavian wine.,yugoslav,,C2,99,General,Rare,,,yugoslavia
+9996,Yugoslav,"of or relating to the former country of Yugoslavia, its people, or their languages (the shorter, more common form).",Adjective,The exhibit featured Yugoslav films from the 1960s.,yugoslavian,,B1,15,General,Common,,,yugoslavia
+9997,Yugoslavian,"of or relating to the former country of Yugoslavia, its people, or their languages (a less common longer variant).",Adjective,They toasted with a bottle of Yugoslavian wine from before the breakup.,yugoslav,,C2,99,General,Rare,,,yugoslavia
 9998,Zairese,Of or relating to or characteristic of Zaire or its people.,Adjective,Zairean elections.,zairean,,C2,99,General,Rare,,,zaire
 9999,Zestfully,With zest.,Adverb,She scrubbed the floors of the new apartment zestfully.,zestily,,C2,99,General,Rare,,,spirited;zestful
 10000,Zillion,"An enormous, made-up number used for comic exaggeration (informal).",Noun,I've told you a zillion times to lock the door.,million,billion,C2,99,General,Rare,,,multitude;plurality;barrels
