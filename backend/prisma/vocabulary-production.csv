@@ -5418,7 +5418,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5417,Imperfectly,In an imperfect or faulty way.,Adverb,The lobe was imperfectly developed.,amiss,,B1,30,General,Common,,,blemished;irregular;corrupt
 5418,Imperialistic,Of or relating to imperialism.,Adjective,Imperialistic wars.,imperialist,,C1,69,General,Uncommon,,,imperialism
 5419,Imperious,Expecting total obedience; bossy and superior in manner.,Adjective,The imperious manager rarely asked for anything -- she demanded it.,disdainful,haughty,B2,40,General,Less Common,,,imperiousness;proud
-5420,Imperishable,Unceasing.,Adjective,An abiding belief.,abiding,enduring,B2,40,General,Less Common,,,durable;perdurable;undestroyable
+5420,Imperishable,Unceasing.,Adjective,"The old oak seemed imperishable, standing through every storm for centuries.",abiding,enduring,B2,40,General,Less Common,,,durable;perdurable;undestroyable
 5421,Architect,Someone who designs buildings and plans how they will be built.,Noun,The architect showed them the blueprints for their new house.,designer,,B1,26,Arts & Creativity,Common,,,
 5422,Impermanent,not lasting or durable; transient by nature.,Adjective,"The sand sculpture was beautiful but impermanent, washed away by the tide.",temporary,,C1,69,General,Uncommon,,,working;temporal;interim
 5423,Impersonate,Assume or act the character of.,Verb,She impersonates Madonna.,portray,,C1,69,Arts & Creativity,Uncommon,,,persona;represent;pretend
@@ -5426,14 +5426,14 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5425,Athletics,"Sports that involve running, jumping, and throwing, often practised in competitions.",Noun,She represented her school in athletics every summer.,track and field,,B1,24,Health & Wellness,Common,,,
 5426,Printer,A machine that puts words or pictures from a computer onto paper.,Noun,The printer ran out of ink halfway through the document.,print machine,,A1,10,Science & Technology,Very Common,,,
 5427,Impervious,Not admitting of passage or capable of being affected.,Adjective,A material impervious to water.,imperviable,,B1,30,General,Common,,,resistant;imperviousness;soundproof
-5428,Impetuously,In an impulsive or impetuous way; without taking cautions.,Adverb,He often acts impulsively and later regrets it.,impulsively,,C1,69,General,Uncommon,,,impetuous;incautious
+5428,Impetuously,In an impulsive or impetuous way; without taking cautions.,Adverb,He impetuously signed the contract without reading a single clause.,impulsively,,C1,69,General,Uncommon,,,impetuous;incautious
 5429,Impinge,To have a negative or limiting effect on something; to encroach.,Verb,The new curfew will impinge on the students' evening activities.,encroach,entrench,B1,24,Society & Culture,Common,,,impingement;trespass;advance
 5430,Impingement,Influencing strongly.,Noun,They resented the impingement of American values on European culture.,encroachment,impact,C1,69,General,Uncommon,,,impinge;influence;suggestion
 5431,Impious,"lacking reverence or respect, especially toward religious or sacred matters.",Adjective,The congregation was shocked by his impious remarks during the sermon.,undutiful,,B1,30,General,Common,,,irreverent;profane;impiousness
-5432,Implant,Fix or set securely or deeply.,Verb,He planted a knee in the back of his opponent.,engraft,embed,B2,40,General,Less Common,,,introduce;cannulize;cannulise
-5433,Implausible,Highly imaginative but unlikely.,Adjective,A farfetched excuse.,farfetched,,C1,69,General,Uncommon,,,unbelievable;unlikely;incredible
+5432,Implant,Fix or set securely or deeply.,Verb,The surgeon will implant a small device beneath the skin.,engraft,embed,B2,40,General,Less Common,,,introduce;cannulize;cannulise
+5433,Implausible,Highly imaginative but unlikely.,Adjective,"The suspect's story was implausible, and the detectives did not believe it.",farfetched,,C1,69,General,Uncommon,,,unbelievable;unlikely;incredible
 5434,Implemental,"serving as a means or tool to accomplish something (a rare, less common variant of instrumental).",Adjective,The new software proved implemental in streamlining the entire workflow.,instrumental,subservient,C1,69,General,Uncommon,,,implement;helpful
-5435,Implicate,"Impose, involve, or imply as a necessary accompaniment or result.",Verb,What does this move entail?,entail,,C1,69,General,Uncommon,,,implication;involve;necessitate
+5435,Implicate,"Impose, involve, or imply as a necessary accompaniment or result.",Verb,The audit could implicate several senior managers in the fraud.,entail,,C1,69,General,Uncommon,,,implication;involve;necessitate
 5436,Implication,Something that is inferred (deduced or entailed or implied).,Noun,His resignation had political implications.,deduction,entailment,A2,10,Academic,Very Common,,,implicate;meaning;substance
 5437,Implicit,implied or understood without being directly stated.,Adjective,There was an implicit agreement that no one would discuss the incident.,inexplicit,,A2,8,General,Very Common,,,underlying;unexpressed;unstated
 5438,Implode,Burst inward.,Verb,The bottle imploded.,go off,,C1,69,General,Uncommon,,,collapse;founder;implosion
@@ -5443,40 +5443,40 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5442,Importing,"currently bringing in goods, materials, or ideas from another country or source.",Verb,The company has been importing raw materials from three different countries.,spell,import,C1,69,Communication,Uncommon,,,transfer;traffic;communicate
 5443,Importune,Beg persistently and urgently.,Verb,I importune you to help them.,insist,,C1,69,Communication,Uncommon,,,implore;beg;pray
 5444,Importunity,"persistent and pressing requests or demands, especially to the point of being annoying.",Noun,"Despite his importunity, the landlord refused to lower the rent.",urgency,urging,C1,69,Communication,Uncommon,,,beggary;begging;mendicancy
-5445,Imposingly,In an impressive manner.,Adverb,The students progressed impressively fast.,impressively,,C1,69,General,Uncommon,,,astonishing;staggering;stupefying
+5445,Imposingly,In an impressive manner.,Adverb,The cathedral rose imposingly above the small village.,impressively,,C1,69,General,Uncommon,,,astonishing;staggering;stupefying
 5446,Impound,"seize and hold property, especially a vehicle, in legal custody until a fine is paid or a matter is resolved.",Verb,The city will impound any car left parked overnight during the snow emergency.,attach,sequester,C1,69,Business,Uncommon,,,condemn;garnishee;confine
-5447,Impoverished,Destroyed financially.,Adjective,The broken fortunes of the family.,broken,wiped out,B1,24,General,Common,,,destroyed;poor
+5447,Impoverished,Destroyed financially.,Adjective,The war left the once-wealthy region impoverished.,broken,wiped out,B1,24,General,Common,,,destroyed;poor
 5448,Impracticable,Not capable of being carried out or put into practice.,Adjective,Refloating the sunken ship proved impracticable because of its fragility.,infeasible,unfeasible,B2,40,General,Less Common,,,impossible;impracticableness;impracticability
 5449,Imprecate,"To curse someone, or to call down harm upon them in speech.",Verb,The old sailor would imprecate the storm every time it delayed him.,curse,beshrew,C1,69,Communication,Uncommon,,,express;verbalize;verbalise
 5450,Imprecisely,In an imprecise manner.,Adverb,He expressed himself imprecisely.,inexactly,,B1,24,General,Common,,,general;liberal;approximate
-5451,Impregnate,"Fill, as with a certain quality.",Verb,The heavy traffic tinctures the air with carbon monoxide.,infuse,instill,C1,69,General,Uncommon,,,alcoholize;fill;impregnation
+5451,Impregnate,"Fill, as with a certain quality.",Verb,The scent of pine seemed to impregnate the whole cabin.,infuse,instill,C1,69,General,Uncommon,,,alcoholize;fill;impregnation
 5452,Impress,"make someone feel admiration or respect, or press a mark into a surface.",Verb,She hoped the presentation would impress the investors.,affect,move,B1,20,Emotion,Common,,,impressive;instill;disturb
 5453,Impressed,affected with a feeling of admiration or respect (past tense).,Verb,The judges were impressed by the contestant's flawless routine.,affect,impress,A2,6,Emotion,Very Common,,,instill;disturb;trouble
 5454,Impressionable,Easily impressed or influenced.,Adjective,An impressionable youngster.,waxy,impressible,C1,69,General,Uncommon,,,plastic;pliant;susceptible
-5455,Impressionistic,Relating to or characteristic of Impressionism.,Adjective,Impressionist music.,impressionist,,B2,40,General,Less Common,,,impression;impressionism
+5455,Impressionistic,Relating to or characteristic of Impressionism.,Adjective,"The critic called her loose, hazy style impressionistic.",impressionist,,B2,40,General,Less Common,,,impression;impressionism
 5456,Impressiveness,"the quality of evoking admiration through size, skill, or quality.",Noun,The impressiveness of the cathedral's ceiling left every visitor speechless.,grandness,magnificence,C1,69,General,Uncommon,,,impressive;excellence;expansiveness
-5457,Imprint,A concavity in a surface produced by pressing.,Noun,He left the impression of his fingers in the soft mud.,depression,impression,B2,40,General,Less Common,,,influence;channel;wrinkle
-5458,Imprinting,Establish or impress firmly in the mind.,Verb,We imprint our ideas onto our children.,imprint,form,C1,69,Society & Culture,Uncommon,,,influence;pressure;dominate
+5457,Imprint,A concavity in a surface produced by pressing.,Noun,His boot left a deep imprint in the wet sand.,depression,impression,B2,40,General,Less Common,,,influence;channel;wrinkle
+5458,Imprinting,Establish or impress firmly in the mind.,Verb,Imprinting a song in memory takes many repetitions.,imprint,form,C1,69,Society & Culture,Uncommon,,,influence;pressure;dominate
 5459,Imprisoned,"Lock up or confine, in or as in a jail.",Verb,The suspects were imprisoned without trial.,imprison,incarcerate,B1,20,Society & Culture,Common,,,confine;detain;keep
 5460,Improbability,the quality of being unlikely to happen or be true.,Noun,"Despite the improbability of the outcome, the underdog team won the championship.",improbableness,,C1,69,General,Uncommon,,,uncertainty;question;unpredictability
 5461,Improbableness,"a less common variant of 'improbability,' referring to the unlikely nature of something.",Noun,The scientist noted the sheer improbableness of the two events occurring together.,improbability,,C1,69,General,Uncommon,,,uncertainty;question;unpredictability
 5462,Improbably,In a way that is unlikely to be true or to happen.,Adverb,The underdog team improbably won the championship.,incredibly,implausibly,B2,40,General,Less Common,,,marvelous;marvellous;fabulous
 5463,Improper,Not in accordance with accepted standards of behavior; incorrect or unsuitable.,Adjective,His improper comments during the meeting drew a formal complaint.,unconventional,unlawful,B1,30,General,Common,,,indecent;uncomely;incorrect
-5464,Improvident,Not given careful consideration.,Adjective,Ill-considered actions often result in disaster.,ill-considered,ill-judged,C1,69,General,Uncommon,,,shortsighted;improvidence;unforethoughtful
-5465,Improvised,Perform without preparation.,Verb,He extemporized a speech at the wedding.,improvise,improvize,B1,25,Arts & Creativity,Common,,,perform;execute;contend
+5464,Improvident,Not given careful consideration.,Adjective,It was an improvident decision to spend the savings in a single weekend.,ill-considered,ill-judged,C1,69,General,Uncommon,,,shortsighted;improvidence;unforethoughtful
+5465,Improvised,Perform without preparation.,Verb,The band improvised a new song on the spot.,improvise,improvize,B1,25,Arts & Creativity,Common,,,perform;execute;contend
 5466,Impudent,not showing due respect for another person; impertinently bold.,Adjective,The impudent remark earned him a stern look from his grandmother.,insolent,snotty-nosed,B1,25,General,Common,,,forward;disrespectful;impudence
 5467,Impudently,"In a way that shows a bold, disrespectful lack of shame.",Adverb,He impudently interrupted the judge mid-sentence.,impertinently,saucily,B2,40,General,Less Common,,,impudent;forward
 5468,Impulse,An instinctive motive.,Noun,Profound religious impulses.,urge,,A2,7,Personal Development,Very Common,,,motivation;wishing;ambition
 5469,Impulsive,"acting or done suddenly and without careful thought, based on immediate feeling.",Adjective,Buying the car was an impulsive decision he later regretted.,unprompted,,B2,40,General,Less Common,,,spontaneous;impulsiveness;unpremeditated
-5470,Impurity,Worthless or dangerous material that should be removed.,Noun,There were impurities in the water.,dross,,B1,30,Science & Technology,Common,,,condition;contamination;pollution
-5471,Imputable,Capable of being assigned or credited to.,Adjective,Punctuation errors ascribable to careless proofreading.,ascribable,due,C1,69,General,Uncommon,,,attributable
-5472,Inactivate,Make inactive.,Verb,They deactivated the file.,deactivate,,B1,30,General,Common,,,discharge;inactivation;change
+5470,Impurity,Worthless or dangerous material that should be removed.,Noun,Any impurity in the water was removed by the filter.,dross,,B1,30,Science & Technology,Common,,,condition;contamination;pollution
+5471,Imputable,Capable of being assigned or credited to.,Adjective,"The mistake was imputable to a faulty sensor, not to the crew.",ascribable,due,C1,69,General,Uncommon,,,attributable
+5472,Inactivate,Make inactive.,Verb,Heating the milk to a high temperature will inactivate the bacteria.,deactivate,,B1,30,General,Common,,,discharge;inactivation;change
 5473,Inactiveness,the state of not being active; idleness or lack of movement.,Noun,Years of inactiveness had left the old machine rusted shut.,inactivity,inertia,C1,69,General,Uncommon,,,stagnancy;doldrums;stoppage
 5474,Inadequacy,Lack of an adequate quantity or number.,Noun,The inadequacy of unemployment benefits.,insufficiency,deficiency,B1,25,General,Common,,,deficit;shortage;meagerness
 5475,Inadvertent,Happening by chance or unexpectedly or unintentionally.,Adjective,With an inadvertent gesture she swept the vase off the table.,accidental,,B1,30,General,Common,,,inadvertency;inadvertence;unintended
 5476,Inadvertently,"Without intention; accidentally, as a result of not paying full attention.",Adverb,She inadvertently deleted the entire file.,unwittingly,unknowingly,B1,30,General,Common,,,inadvertent;unintended
 5477,Inaesthetic,chiefly British spelling; lacking in beauty or artistic quality; violating principles of good taste.,Adjective,The critics called the new tower an inaesthetic addition to the historic skyline.,unaesthetic,,C1,69,General,Uncommon,,,inartistic;unartistic
-5478,Inalterable,Not capable of being changed or altered.,Adjective,Unalterable resolve.,unalterable,,C1,69,General,Uncommon,,,final;last;incurable
+5478,Inalterable,Not capable of being changed or altered.,Adjective,The captain's inalterable decision was to sail at dawn.,unalterable,,C1,69,General,Uncommon,,,final;last;incurable
 5479,Inapplicable,Not capable of being applied.,Adjective,Rules inapplicable to day students.,unsuitable,,B1,30,General,Common,,,inapplicability;irrelevant
 5480,Inappropriate,Not in keeping with what is correct or proper.,Adjective,Completely inappropriate behavior.,incompatible,out or keeping,B1,20,General,Common,,,improper;malapropos;inappropriateness
 5481,Inappropriately,in a manner not suited to the particular circumstances.,Adverb,He laughed inappropriately during the solemn ceremony.,unsuitably,,C1,69,General,Uncommon,,,inappropriate;improper;malapropos
@@ -5484,17 +5484,17 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5483,Inarticulately,Without eloquence; in an inarticulate manner.,Adverb,The freshman expresses his thoughts inarticulately.,ineloquently,,C1,69,General,Uncommon,,,voiceless;inarticulate;incoherent
 5484,Inattentively,Without paying proper attention or care.,Adverb,The driver was scrolling his phone inattentively when the light changed.,absently,abstractedly,C1,69,General,Uncommon,,,inattentive
 5485,Inaudible,not loud enough to be heard.,Adjective,His mumbled apology was almost inaudible over the noise of the crowd.,unhearable,,B1,31,General,Common,,,breathed;voiceless;imperceptible
-5486,Inaugurate,Be a precursor of.,Verb,The fall of the Berlin Wall ushered in the post-Cold War period.,usher in,introduce,C1,69,General,Uncommon,,,commence;dedicate;inauguration
+5486,Inaugurate,Be a precursor of.,Verb,The opening of the bridge will inaugurate a new era for the town.,usher in,introduce,C1,69,General,Uncommon,,,commence;dedicate;inauguration
 5487,Inauspicious,not favorable or promising; suggesting a bad outcome.,Adjective,The trip got off to an inauspicious start when the flight was delayed.,adverse,untoward,C1,69,General,Uncommon,,,inauspiciousness;unpromising;auspiciousness
 5488,Inauthentic,not genuine or real; fake or contrived.,Adjective,Critics called the reunion tour an inauthentic cash grab with none of the original members.,unauthentic,spurious,C1,70,General,Uncommon,,,counterfeit;imitative
-5489,Inbuilt,Existing as an essential constituent or characteristic.,Adjective,The Ptolemaic system with its built-in concept of periodicity.,built-in,constitutional,C1,70,General,Uncommon,,,intrinsic;intrinsical
+5489,Inbuilt,Existing as an essential constituent or characteristic.,Adjective,The camera has an inbuilt flash that turns on in dim light.,built-in,constitutional,C1,70,General,Uncommon,,,intrinsic;intrinsical
 5490,Incandescent,Emitting light as a result of being heated.,Adjective,An incandescent bulb.,candent,,B1,25,General,Common,,,glorious;incandescence;light
 5491,Incapacitate,"To deprive someone of strength or ability, making them unable to function normally.",Verb,The injury will incapacitate him for at least six weeks.,disable,disenable,C1,70,General,Uncommon,,,confine;trample;torture
 5492,Incapacitating,Depriving someone of the strength or ability to function.,Verb,She suffered an incapacitating migraine before the exam.,disable,disenable,C1,70,General,Uncommon,,,confine;trample;torture
 5493,Incarceration,"the state of being imprisoned or confined, especially in the modern legal or penal sense.",Noun,He spent five years in incarceration before his sentence was overturned.,captivity,imprisonment,C1,70,General,Uncommon,,,detention;custody;constraint
 5494,Incarnate,"gave bodily form to, especially a deity, spirit, or abstract idea (formal or religious usage).",Verb,The ancient text describes the god as having chosen to incarnate as a mortal.,body forth,embody,B1,31,General,Common,,,realize;realise;actualise
-5495,Incased,"Enclose in, or as if in, a case.",Verb,My feet were encased in mud.,encase,incase,C1,70,General,Uncommon,,,enclose;inclose;package
-5496,Incendiarism,Malicious burning to destroy property.,Noun,The British term for arson is fire-raising.,arson,fire-raising,C1,70,General,Uncommon,,,burning;combustion;lighting
+5495,Incased,"Enclose in, or as if in, a case.",Verb,The fossil was incased in a block of amber.,encase,incase,C1,70,General,Uncommon,,,enclose;inclose;package
+5496,Incendiarism,Malicious burning to destroy property.,Noun,"The investigation found that the fires were a case of incendiarism, not accident.",arson,fire-raising,C1,70,General,Uncommon,,,burning;combustion;lighting
 5497,Incertain,an archaic spelling of 'uncertain'; not known or definite.,Adjective,The old poem describes an incertain future awaiting the wandering knight.,uncertain,unsure,B2,40,General,Less Common,,,groping;doubtful;confidence
 5498,Incessantly,without interruption; constantly and often annoyingly.,Adverb,The baby cried incessantly through the entire flight.,endlessly,ceaselessly,B1,31,General,Common,,,infinite;continuous;incessant
 5499,Inchoate,just begun and not yet fully formed or developed; rudimentary.,Adjective,"Her plan was still inchoate, more of a rough idea than a proposal.",incipient,,C1,70,General,Uncommon,,,early
@@ -5502,36 +5502,36 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5501,Incipience,Beginning to exist or to be apparent.,Noun,He placed the incipience of democratic faith at around 1850.,incipiency,,B2,40,General,Less Common,,,incipient;beginning;kickoff
 5502,Incipient,in an initial or early stage of development; beginning to appear or happen.,Adjective,Doctors caught the incipient infection before it could spread.,inchoate,,B1,20,General,Common,,,incipience;incipiency;early
 5503,Incisive,Showing clear and sharp thinking or expression; getting to the heart of an issue quickly.,Adjective,Her incisive questions exposed the flaw in his argument.,acute,discriminating,B1,20,General,Common,,,incisiveness;perceptive;incision
-5504,Incisively,In a precise manner.,Adverb,She always expressed herself precisely.,precisely,exactly,C1,70,General,Uncommon,,,incisive;correct;perceptive
+5504,Incisively,In a precise manner.,Adverb,"She spoke incisively, cutting through the confusion in a single sentence.",precisely,exactly,C1,70,General,Uncommon,,,incisive;correct;perceptive
 5505,Incitement,An act of urging on or spurring on or rousing to action or instigating.,Noun,The incitement of mutiny.,incitation,,B1,25,General,Common,,,rousing;encouragement;excitement
-5506,Inclemency,Excessive sternness.,Noun,Severity of character.,severity,severeness,C1,70,General,Uncommon,,,weather;conditions;overcast
-5507,Incline,An elevated geological formation.,Noun,He climbed the steep slope.,slope,side,B1,20,General,Common,,,formation;acclivity;upgrade
-5508,Inclined,Have a tendency or disposition to do or be something; be inclined.,Verb,She tends to be nervous before her lectures.,tend,be given,A2,7,General,Very Common,,,suffer;gravitate;listen
-5509,Inclose,Surround completely.,Verb,Darkness enclosed him.,enclose,close in,C1,70,General,Uncommon,,,surround;encapsulate;swallow
-5510,Incognizant,(often followed by `of') not aware.,Adjective,Seemed unaware of the scrutiny.,unaware,,C1,70,General,Uncommon,,,unsuspecting;unmindful;insensible
+5506,Inclemency,Excessive sternness.,Noun,The inclemency of the judge shocked even the lawyers.,severity,severeness,C1,70,General,Uncommon,,,weather;conditions;overcast
+5507,Incline,An elevated geological formation.,Noun,The cyclists struggled up the steep incline in the heat.,slope,side,B1,20,General,Common,,,formation;acclivity;upgrade
+5508,Inclined,Have a tendency or disposition to do or be something; be inclined.,Verb,I was inclined to agree with her after hearing the evidence.,tend,be given,A2,7,General,Very Common,,,suffer;gravitate;listen
+5509,Inclose,Surround completely.,Verb,A high stone wall was built to inclose the garden.,enclose,close in,C1,70,General,Uncommon,,,surround;encapsulate;swallow
+5510,Incognizant,(often followed by `of') not aware.,Adjective,He was incognizant of the danger until the alarm rang.,unaware,,C1,70,General,Uncommon,,,unsuspecting;unmindful;insensible
 5511,Incoming,"Arriving, especially phone calls, mail, or a new group of people.",Noun,The office was flooded with incoming calls after the announcement.,entrance,entering,B1,17,General,Common,,,arrival;admission;irruption
 5512,Incomparable,without equal; so exceptional that nothing else can be compared to it.,Adjective,Her incomparable talent set her apart from every other violinist in the competition.,uncomparable,,B1,20,General,Common,,,unequaled;nonpareil;peerless
 5513,Incomparably,In an incomparable manner or to an incomparable degree.,Adverb,She is incomparably gifted.,uncomparably,,B1,25,General,Common,,,incomparable;unequaled;nonpareil
 5514,Incompetent,lacking the necessary skill or ability to do something successfully.,Adjective,The incompetent contractor left the roof leaking worse than before.,unqualified,,B1,31,General,Common,,,ineffective;inefficient;incompetency
 5515,Incomplete,Not complete or total; not completed.,Adjective,An incomplete account of his life.,uncomplete,,A2,8,General,Very Common,,,rudimentary;uncompleted;unelaborated
 5516,Badminton,A sport in which players use rackets to hit a shuttlecock over a net.,Noun,They set up a badminton net in the backyard for the party.,racket sport,,A2,18,Health & Wellness,Common,,,
-5517,Incomputable,Beyond calculation or measure.,Adjective,Of incalculable value.,inestimable,immeasurable,C1,70,General,Uncommon,,,incalculable
+5517,Incomputable,Beyond calculation or measure.,Adjective,The incomputable vastness of space left the child speechless.,inestimable,immeasurable,C1,70,General,Uncommon,,,incalculable
 5518,Inconsequential,Lacking worth or importance.,Adjective,His work seems trivial and inconsequential.,inconsequent,,B1,25,General,Common,,,unimportant;illogical;unlogical
-5519,Inconsequently,Lacking consequence.,Adverb,"`You're so beautifully dressed,' she said and added quite inconsequentially, `Can you stay the night?'.",inconsequentially,,C1,70,General,Uncommon,,,inconsequent;unimportant
+5519,Inconsequently,Lacking consequence.,Adverb,"He spoke inconsequently, jumping from topic to topic without reason.",inconsequentially,,C1,70,General,Uncommon,,,inconsequent;unimportant
 5520,Inconsolable,so overcome with grief or sorrow that comfort seems impossible.,Adjective,The child was inconsolable after losing her balloon.,disconsolate,unconsolable,C1,70,General,Uncommon,,,desolate
 5521,Incontestable,So clearly true that it cannot be disputed or challenged.,Adjective,The DNA evidence was incontestable proof of his identity.,indisputable,undisputable,B2,40,General,Less Common,,,demonstrated;demonstrable;unassailable
 5522,Bookshelf,A shelf or set of shelves used to hold books.,Noun,His bookshelf was so full that novels were stacked on top.,shelving unit,,A1,9,General,Very Common,,,
 5523,Inconvenience,cause trouble or difficulty for someone.,Verb,The road closure will inconvenience commuters for the next two weeks.,trouble,put out,B1,25,Society & Culture,Common,,,influence;distort;subject
 5524,Incorporate,include something as part of a whole.,Verb,The new curriculum will incorporate more hands-on lab work.,integrate,,B1,31,General,Common,,,compound;combine;include
 5525,Incorrect,Not correct; not in conformity with fact or truth.,Adjective,An incorrect calculation.,wrong,,B1,18,General,Common,,,mistaken;fallacious;improper
-5526,Incorrectly,In an incorrect manner.,Adverb,To credit Lister with the first formulation of the basic principle of stratigraphy would be to bestow credit falsely.,falsely,,C1,70,General,Uncommon,,,incorrect;mistaken;fallacious
+5526,Incorrectly,In an incorrect manner.,Adverb,The student incorrectly spelled his own name on the exam.,falsely,,C1,70,General,Uncommon,,,incorrect;mistaken;fallacious
 5527,Incredulously,in a manner expressing an inability or unwillingness to believe something; skeptically.,Adverb,"He stared incredulously at the bill, certain there had been a mistake.",unbelievingly,disbelievingly,B2,40,General,Less Common,,,unbelieving;unbelievable;incredulous
 5528,Incriminate,To provide evidence that someone is involved in a crime.,Verb,The fingerprints on the weapon incriminate the suspect.,accuse,impeach,C1,70,Communication,Uncommon,,,incrimination;suggest;upbraid
 5529,Incrimination,the act of showing or implying that someone is guilty of a crime or wrongdoing.,Noun,His own testimony amounted to self-incrimination.,inculpation,blame,C1,70,Communication,Uncommon,,,incriminate;allegation;implication
-5530,Incubate,Sit on (eggs).,Verb,Birds brood.,brood,hatch,C1,70,Health & Wellness,Uncommon,,,develop;reproduce;progress
+5530,Incubate,Sit on (eggs).,Verb,The hen will incubate the eggs for three weeks.,brood,hatch,C1,70,Health & Wellness,Uncommon,,,develop;reproduce;progress
 5531,Inculcate,Teach and impress by frequent repetitions or admonitions.,Verb,Inculcate values into the young generation.,instill,infuse,C1,70,Academic,Uncommon,,,inculcation;drill
 5532,Inculpation,"a formal accusation or the act of implicating someone in a wrongdoing (a more formal, legal term).",Noun,The witness's statement provided key inculpation of the suspect.,incrimination,blame,C1,70,Communication,Uncommon,,,allegation;implication;information
-5533,Incurring,Make oneself subject to; bring upon oneself; become liable to.,Verb,People who smoke incur a great danger to their health.,incur,,B2,40,General,Less Common,,,subject;acquire;change
+5533,Incurring,Make oneself subject to; bring upon oneself; become liable to.,Verb,"By ignoring the warnings, he risked incurring heavy fines.",incur,,B2,40,General,Less Common,,,subject;acquire;change
 5534,Indecent,"not conforming to accepted standards of morality or propriety, especially regarding modesty.",Adjective,The comedian's indecent jokes offended much of the audience.,indecorous,unbecoming,B1,15,General,Common,,,improper;hollywood;indelicate
 5535,Indecision,Inability to make a decision quickly or at all.,Noun,His indecision cost the team valuable time before the deadline.,indecisiveness,irresolution,B1,18,Academic,Common,,,uncertainty;suspicion;reservation
 5536,Indecisiveness,A tendency or habit of struggling to make decisions.,Noun,Her indecisiveness over the menu held up the whole order.,indecision,irresolution,B2,40,Academic,Less Common,,,uncertainty;suspicion;reservation
@@ -5544,15 +5544,15 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5543,Indeterminate,"not precisely known, established, or fixed in advance.",Adjective,The cause of the fire remains indeterminate pending further investigation.,undetermined,,B1,20,General,Common,,,uncertain;indeterminateness;inconclusive
 5544,Indicant,"A sign or indicator, especially in a scientific or medical context (formal).",Noun,Elevated white blood cell count is an indicant of infection.,indication,,C1,70,Communication,Uncommon,,,indicate;communication;manifestation
 5545,Indicative,relating to the grammatical mood expressing straightforward factual statements.,Adjective,'She runs every morning' is in the indicative mood.,declarative,,B1,15,General,Common,,,indicate;revealing
-5546,Indictable,"Liable to be accused, or cause for such liability.",Adjective,The suspect was chargeable.,chargeable,,C1,70,General,Uncommon,,,indictability;guilty
+5546,Indictable,"Liable to be accused, or cause for such liability.",Adjective,Fraud is an indictable offense that can lead to prison.,chargeable,,C1,70,General,Uncommon,,,indictability;guilty
 5547,Indigen,"A native inhabitant of a place, or a native plant or animal species (rare, formal).",Noun,The botanist catalogued every indigen found on the island.,native,indigene,C1,70,Society & Culture,Uncommon,,,individual;someone;somebody
 5548,Indigene,A person or organism that originated in and is native to a particular place.,Noun,The researchers interviewed several indigenes about local farming traditions.,native,indigen,C1,70,Society & Culture,Uncommon,,,individual;someone;somebody
 5549,Indignant,Angered at something unjust or wrong.,Adjective,An indignant denial.,incensed,outraged,A2,10,General,Very Common,,,angry
 5550,Indiscernible,Barely able to be perceived.,Adjective,The transition was almost indiscernible.,insensible,undetectable,C1,70,General,Uncommon,,,imperceptible;unperceivable
-5551,Indispensable,Absolutely necessary; vitally necessary.,Adjective,Essential tools and materials.,essential,,A2,8,General,Very Common,,,critical;necessary;indispensableness
+5551,Indispensable,Absolutely necessary; vitally necessary.,Adjective,A good map is indispensable for any hiker in the mountains.,essential,,A2,8,General,Very Common,,,critical;necessary;indispensableness
 5552,Indisposed,"Slightly unwell; also, unwilling to do something.",Verb,"She sent her regrets, saying she was feeling indisposed.",disqualify,unfit,B1,25,General,Common,,,determine;influence;regulate
 5553,Indisputable,"Not able to be disputed or denied; unquestionable, the standard spelling.",Adjective,Her talent was indisputable from her very first performance.,incontestable,undisputable,C1,70,General,Uncommon,,,certain;indisputability;undeniable
-5554,Indistinctly,In a dim indistinct manner.,Adverb,We perceived the change only dimly.,dimly,,C1,70,General,Uncommon,,,nebulose;indistinct;cloudy
+5554,Indistinctly,In a dim indistinct manner.,Adverb,The figures moved indistinctly through the heavy fog.,dimly,,C1,70,General,Uncommon,,,nebulose;indistinct;cloudy
 5555,Seagull,"A grey and white bird commonly seen near the sea, known for its loud call.",Noun,A seagull swooped down and stole a chip right off his plate.,gull,,A2,12,Nature,Common,,,
 5556,Individualised,chiefly British spelling; made or treated as distinct and specific to one person (past tense).,Verb,The tutoring program was individualised for each student's needs.,individualize,individualise,C1,70,Academic,Uncommon,,,distinguish;separate;differentiate
 5557,Individualist,Marked by or expressing individuality.,Adjective,An individualistic way of dressing.,individualistic,,B1,25,General,Common,,,single
@@ -5560,15 +5560,15 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5559,Individualize,"make or mark as distinct to a particular individual, chiefly American spelling.",Verb,The app can individualize workout plans based on personal fitness goals.,individualise,,C1,70,Academic,Uncommon,,,individual;distinguish;separate
 5560,Individually,"one at a time, or considered as a single person or item rather than as a group.",Adverb,The teacher graded each essay individually before averaging the scores.,separately,singly,A2,7,General,Very Common,,,individual;singular;respective
 5561,Indocile,"not easily taught, trained, or managed; resistant to instruction or discipline.",Adjective,The indocile colt refused every attempt to be saddled.,uncontrollable,ungovernable,C1,70,General,Uncommon,,,unmanageable;difficult
-5562,Indoors,Within a building.,Adverb,In winter we play inside.,inside,,B1,18,General,Common,,,
-5563,Indorse,Be behind; approve of.,Verb,He plumped for the Labor Party.,back,endorse,C1,70,Society & Culture,Uncommon,,,approve;sanction;guarantee
+5562,Indoors,Within a building.,Adverb,"It rained all day, so we stayed indoors.",inside,,B1,18,General,Common,,,
+5563,Indorse,Be behind; approve of.,Verb,The senator was quick to indorse the new law.,back,endorse,C1,70,Society & Culture,Uncommon,,,approve;sanction;guarantee
 5564,Indrawn,Tending to reserve or introspection.,Adjective,A quiet indrawn man.,withdrawn,,C1,70,General,Uncommon,,,reserved
-5565,Induced,Cause to arise.,Verb,Induce a crisis.,induce,bring on,A2,9,Arts & Creativity,Very Common,,,generate;solicit;encourage
-5566,Inducing,Act of bringing about a desired result.,Noun,Inducement of sleep.,inducement,,B1,20,General,Common,,,compulsion;influence;trigger
-5567,Induction,A formal entry into an organization or position or office.,Noun,His initiation into the club.,initiation,installation,B1,15,General,Common,,,ceremony;ceremonial;exercise
+5565,Induced,Cause to arise.,Verb,The drug induced a deep sleep within minutes.,induce,bring on,A2,9,Arts & Creativity,Very Common,,,generate;solicit;encourage
+5566,Inducing,Act of bringing about a desired result.,Noun,Inducing a sense of calm is the whole point of the music.,inducement,,B1,20,General,Common,,,compulsion;influence;trigger
+5567,Induction,A formal entry into an organization or position or office.,Noun,The induction of the new members took place on Friday evening.,initiation,installation,B1,15,General,Common,,,ceremony;ceremonial;exercise
 5568,Inductive,Inducing or influencing; leading on.,Adjective,Inductive to the sin of Eve.,inducive,,C1,70,General,Uncommon,,,synthetic;inductance;synthetical
 5569,Indulgence,"the act of allowing oneself or someone else a pleasure, especially to an excessive degree.",Noun,Her one indulgence each week was a slice of chocolate cake.,lenience,leniency,B1,18,General,Common,,,acceptance;indulge;indiscipline
-5570,Indulging,Give free rein to.,Verb,The writer indulged in metaphorical language.,indulge,,B2,40,Society & Culture,Less Common,,,provide;supply;ply
+5570,Indulging,Give free rein to.,Verb,He was indulging his sweet tooth with a third slice of cake.,indulge,,B2,40,Society & Culture,Less Common,,,provide;supply;ply
 5571,Industrialise,"To develop industries in a country or region on a large scale, chiefly British spelling.",Verb,The government pushed hard to industrialise the rural provinces.,industrialize,,C1,70,General,Uncommon,,,change;alter;modify
 5572,Industrialised,"Having developed large-scale industry, chiefly British spelling.",Verb,The once-agricultural region became fully industrialised within decades.,industrialize,industrialise,C1,70,General,Uncommon,,,change;alter;modify
 5573,Industrialized,"Having developed large-scale industry, American spelling.",Verb,Many industrialized nations now face aging manufacturing infrastructure.,industrialize,industrialise,A2,11,General,Very Common,,,change;alter;modify
@@ -5577,29 +5577,29 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5576,Ineffably,"In a way that is too great or intense to be expressed in words (formal, literary).",Adverb,The music was ineffably moving to everyone in the hall.,indescribably,unutterably,C1,70,General,Uncommon,,,ineffable;inexpressible;unexpressible
 5577,Ineffective,not producing the intended or desired result.,Adjective,The new marketing campaign proved ineffective at boosting sales.,uneffective,ineffectual,B1,25,General,Common,,,useless;effectiveness;ineffectiveness
 5578,Ineffectual,"not achieving the desired effect, especially due to a lack of ability or force, often implying weakness of character.",Adjective,His ineffectual leadership left the team directionless.,ineffective,uneffective,B2,40,General,Less Common,,,useless;effectiveness;ineffectualness
-5579,Inefficient,Lacking the ability or skill to perform effectively; inadequate.,Adjective,An ineffective administration.,ineffective,,A2,14,General,Very Common,,,uneconomical;incompetent;inefficiency
+5579,Inefficient,Lacking the ability or skill to perform effectively; inadequate.,Adjective,The inefficient system wasted hours of work every week.,ineffective,,A2,14,General,Very Common,,,uneconomical;incompetent;inefficiency
 5580,Ineluctable,"impossible to avoid or escape; inevitable (a formal, literary term).",Adjective,Death is an ineluctable fact of life that every philosophy must confront.,inescapable,unavoidable,B2,40,General,Less Common,,,inevitable
-5581,Ineptitude,Having no qualities that would render it valuable or useful.,Noun,The drill sergeant's intent was to convince all the recruits of their worthlessness.,worthlessness,,C1,70,General,Uncommon,,,quality;emptiness;groundlessness
+5581,Ineptitude,Having no qualities that would render it valuable or useful.,Noun,The manager's ineptitude cost the company thousands of dollars.,worthlessness,,C1,70,General,Uncommon,,,quality;emptiness;groundlessness
 5582,Ineptly,"in a clumsy or incompetent manner, lacking skill or ability.",Adverb,The repair was done so ineptly that it broke again within a week.,fecklessly,,B2,40,General,Less Common,,,incompetent;inept
-5583,Inerrable,Not liable to error.,Adjective,The Church was...theoretically inerrant and omnicompetent.,inerrant,unerring,C1,70,General,Uncommon,,,infallible
+5583,Inerrable,Not liable to error.,Adjective,"No expert is inerrable, and even the best make mistakes.",inerrant,unerring,C1,70,General,Uncommon,,,infallible
 5584,Inertia,"a tendency to remain unchanged or inactive, whether physically or figuratively resistant to change.",Noun,Bureaucratic inertia kept the outdated policy in place for decades.,inactiveness,inactivity,B1,31,General,Common,,,lethargy;purchase;resistance
 5585,Inescapably,By necessity.,Adverb,The situation slid inescapably toward disaster.,ineluctably,inevitably,B2,40,General,Less Common,,,inevitable;inescapable
 5586,Inessential,Anything that is not essential.,Noun,They discarded all their inessentials.,nonessential,,C1,70,General,Uncommon,,,subject;content;variable
-5587,Inevitably,In such a manner as could not be otherwise.,Adverb,It is necessarily so.,necessarily,of necessity,A2,5,General,Very Common,,,inevitable;ineluctable;unavoidable
+5587,Inevitably,In such a manner as could not be otherwise.,Adverb,"Inevitably, the old bridge gave way after the flood.",necessarily,of necessity,A2,5,General,Very Common,,,inevitable;ineluctable;unavoidable
 5588,Inexcusably,In a way that cannot be justified or excused.,Adverb,The manager was inexcusably rude to the new hire.,unpardonably,unforgivably,C1,70,General,Uncommon,,,unwarranted;inexcusable;excusable
-5589,Inexhaustibly,With indefatigable energy.,Adverb,She watched the show indefatigably.,indefatigably,tirelessly,C1,70,General,Uncommon,,,energetic
+5589,Inexhaustibly,With indefatigable energy.,Adverb,The children played inexhaustibly until the sun went down.,indefatigably,tirelessly,C1,70,General,Uncommon,,,energetic
 5590,Inexorable,Impossible to stop or prevent; unyielding.,Adjective,The inexorable rise of sea levels worries coastal cities.,grim,relentless,B1,25,General,Common,,,inexorableness;inexorability;implacable
-5591,Inexorableness,Mercilessness characterized by an unwillingness to relent or let up.,Noun,The relentlessness or their pursuit.,relentlessness,inexorability,C1,70,General,Uncommon,,,inexorable;mercilessness;unmercifulness
-5592,Inexpensively,In a cheap manner.,Adverb,A cheaply dressed woman approached him in the bar.,cheaply,tattily,C1,70,General,Uncommon,,,affordable;catchpenny;sixpenny
+5591,Inexorableness,Mercilessness characterized by an unwillingness to relent or let up.,Noun,The inexorableness of the tide frightened the climbers on the beach.,relentlessness,inexorability,C1,70,General,Uncommon,,,inexorable;mercilessness;unmercifulness
+5592,Inexpensively,In a cheap manner.,Adverb,"They furnished the whole apartment inexpensively, using secondhand pieces.",cheaply,tattily,C1,70,General,Uncommon,,,affordable;catchpenny;sixpenny
 5593,Inexpert,not skilled or knowledgeable in a particular area.,Adjective,His inexpert attempt to fix the pipe only made the leak worse.,amateurish,amateur,B2,40,General,Less Common,,,unprofessional
 5594,Inexplicable,Incapable of being explained or accounted for.,Adjective,Inexplicable errors.,incomprehensible,,B1,15,General,Common,,,cryptic;inscrutable;mysterious
 5595,Inexplicit,not clearly or explicitly stated; vague.,Adjective,The contract's inexplicit language led to a dispute over the terms.,implicit,,C1,70,General,Uncommon,,,underlying;unexpressed;unstated
-5596,Inexpungeable,Not capable of being expunged.,Adjective,The inexpungible scent of a bottle of perfume he had broken.,inexpungible,,C1,70,General,Uncommon,,,ineradicable
-5597,Inexterminable,Incapable of extermination or extirpation.,Adjective,Some weeds seem inextirpable.,inextirpable,,C1,70,General,Uncommon,,,ineradicable
+5596,Inexpungeable,Not capable of being expunged.,Adjective,"The memory of that night was inexpungeable, no matter how hard he tried to forget.",inexpungible,,C1,70,General,Uncommon,,,ineradicable
+5597,Inexterminable,Incapable of extermination or extirpation.,Adjective,The old farmer cursed the inexterminable weeds that returned every spring.,inextirpable,,C1,70,General,Uncommon,,,ineradicable
 5598,Infamous,well known for a bad quality or deed; having a reputation of the worst kind.,Adjective,The pirate became infamous for his brutal raids along the coast.,ill-famed,notorious,B1,20,General,Common,,,infamy;disreputable
-5599,Infantry,An army unit consisting of soldiers who fight on foot.,Noun,There came ten thousand horsemen and as many fully-armed foot.,foot,,A2,7,Society & Culture,Very Common,,,detachment;cavalry;vanguard
+5599,Infantry,An army unit consisting of soldiers who fight on foot.,Noun,The infantry marched ahead of the tanks.,foot,,A2,7,Society & Culture,Very Common,,,detachment;cavalry;vanguard
 5600,Infatuated,Arouse unreasoning love or passion in and cause to behave in an irrational way.,Verb,His new car has infatuated him.,infatuate,,C1,70,Emotion,Uncommon,,,enkindle;disconcert;overwhelm
-5601,Infectious,Caused by infection or capable of causing infection.,Adjective,Viruses and other infective agents.,infective,,A2,7,General,Very Common,,,infection;catching;transmissible
+5601,Infectious,Caused by infection or capable of causing infection.,Adjective,"The flu is highly infectious, so stay home until you feel better.",infective,,A2,7,General,Very Common,,,infection;catching;transmissible
 5602,Infective,capable of causing or transmitting infection.,Adjective,The infective bacteria spread rapidly through the ward before it was contained.,morbific,pathogenic,C1,70,General,Uncommon,,,infect;unhealthful;septic
 5603,Inferential,based on or involving inference or deduction rather than direct observation.,Adjective,The detective's case rested on inferential evidence rather than a confession.,illative,,B1,31,General,Common,,,inference;deductive
 5604,Inferior,"lower in rank, status, or quality compared to something or someone else.",Adjective,The knockoff bags were clearly inferior to the designer originals.,deficient,substandard,A2,14,General,Very Common,,,commercial;utility;deplorable
@@ -5607,30 +5607,30 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5606,Infertile,"Not able to produce offspring or, of soil, unable to support plant growth.",Adjective,The couple sought treatment after learning she was infertile.,sterile,unfertile,B2,40,General,Less Common,,,unfertilised;unimpregnated;sterilised
 5607,Infiltrate,Enter a group or organization in order to spy on the members.,Verb,The student organization was infiltrated by a traitor.,penetrate,,C1,70,Society & Culture,Uncommon,,,permeate;infiltration;percolate
 5608,Infinitely,Without bounds.,Adverb,He is infinitely wealthy.,boundlessly,immeasurably,B1,25,General,Common,,,infinite;abysmal;limitless
-5609,Infinitesimal,Infinitely or immeasurably small.,Adjective,Two minute whiplike threads of protoplasm.,minute,,B1,25,General,Common,,,small;little
+5609,Infinitesimal,Infinitely or immeasurably small.,Adjective,The difference between the two measurements was infinitesimal.,minute,,B1,25,General,Common,,,small;little
 5610,Inflamed,Cause inflammation in.,Verb,The repetitive motion inflamed her joint.,inflame,,B2,40,Health & Wellness,Less Common,,,aggravate;exacerbate;degrade
 5611,Inflammation,"the body's localized reaction to injury or infection, marked by redness, heat, swelling, and pain.",Noun,The doctor prescribed medication to reduce the inflammation in his knee.,excitement,excitation,B2,40,General,Less Common,,,fervour;inflame;symptom
 5612,Inflated,Exaggerate or make bigger.,Verb,The charges were inflated.,inflate,blow up,B1,25,General,Common,,,increase;develop;expand
-5613,Inflict,Impose something unpleasant.,Verb,The principal visited his rage on the students.,bring down,visit,B1,20,Communication,Common,,,infliction;communicate;intrude
+5613,Inflict,Impose something unpleasant.,Verb,The tyrant did not hesitate to inflict harsh punishments on his people.,bring down,visit,B1,20,Communication,Common,,,infliction;communicate;intrude
 5614,Infliction,"the act of imposing something unpleasant, such as pain or punishment, on someone.",Noun,The infliction of such a harsh penalty seemed unfair for a first offense.,annoyance,bother,B1,25,Academic,Common,,,protection;inflict;wrongdoing
 5615,Informal,Not officially recognized or controlled.,Adjective,An informal agreement.,loose,,A2,7,General,Very Common,,,unceremonial;everyday;formalness
 5616,Informally,"in a relaxed, casual manner, without following strict rules or conventions.",Adverb,The two leaders met informally before the official summit began.,colloquially,conversationally,B1,18,General,Common,,,informal;unceremonial;everyday
-5617,Informing,"Impart knowledge of some fact, state or affairs, or event to.",Verb,I informed him of his rights.,inform,,B1,20,Communication,Common,,,communicate;intercommunicate;change
+5617,Informing,"Impart knowledge of some fact, state or affairs, or event to.",Verb,She was informing the staff of the new schedule.,inform,,B1,20,Communication,Common,,,communicate;intercommunicate;change
 5618,Infract,"violate or break a law, rule, or agreement (a rare, formal legal term).",Verb,The company was found to infract several clauses of the trade agreement.,transgress,offend,C1,70,Society & Culture,Uncommon,,,conflict;trespass;intrude
 5619,Infrared,The infrared region of the electromagnetic spectrum; electromagnetic wave frequencies below the visible range.,Noun,They could sense radiation in the infrared.,infrared frequency,,A2,9,General,Very Common,,,frequency;attendance;frequence
 5620,Infringement,"an act that limits or undermines someone's legal right, especially a copyright or patent.",Noun,The company was sued for copyright infringement over the stolen design.,violation,,A2,14,General,Very Common,,,wrongdoing;misconduct;offense
-5621,Infuriating,Extremely annoying or displeasing.,Adjective,His cavelier curtness of manner was exasperating.,exasperating,maddening,B1,31,General,Common,,,displeasing
+5621,Infuriating,Extremely annoying or displeasing.,Adjective,It was infuriating to wait two hours for a ten-minute meeting.,exasperating,maddening,B1,31,General,Common,,,displeasing
 5622,Ingeminate,"To repeat something, especially for emphasis (rare, formal or archaic).",Verb,The preacher would ingeminate his warning until every pew fell silent.,repeat,reiterate,C1,70,Communication,Uncommon,,,translate;summarise;announce
-5623,Ingenious,Showing inventiveness and skill.,Adjective,A clever gadget.,clever,cunning,A2,10,General,Very Common,,,ingenuity;ingeniousness;adroit
+5623,Ingenious,Showing inventiveness and skill.,Adjective,The engineer's ingenious design solved the problem with a single spring.,clever,cunning,A2,10,General,Very Common,,,ingenuity;ingeniousness;adroit
 5624,Ingenuity,The property of being ingenious.,Noun,A plot of great ingenuity.,ingeniousness,cleverness,B1,18,General,Common,,,ingenious;creativity;imagination
-5625,Ingenuously,In an ingenuous manner.,Adverb,She answered the judge's questions artlessly.,artlessly,,C1,70,General,Uncommon,,,sincere;ingenuous;undistorted
+5625,Ingenuously,In an ingenuous manner.,Adverb,"He smiled ingenuously, unaware of the trouble he had caused.",artlessly,,C1,70,General,Uncommon,,,sincere;ingenuous;undistorted
 5626,Ingloriously,In a way that lacks any honour or glory.,Adverb,The once-great empire collapsed ingloriously within a decade.,disgracefully,ignominiously,C1,70,General,Uncommon,,,inglorious;dishonorable;dishonourable
-5627,Ingraft,Cause to grow together parts from different plants.,Verb,Graft the cherry tree branch onto the plum tree.,graft,engraft,C1,70,General,Uncommon,,,anastomose;entwine;feather
+5627,Ingraft,Cause to grow together parts from different plants.,Verb,The gardener will ingraft a branch of the sweet pear onto the wild tree.,graft,engraft,C1,70,General,Uncommon,,,anastomose;entwine;feather
 5628,Ingrained,"worked or fixed thoroughly into the fabric or substance of something, especially a habit or belief (past tense).",Verb,The habit of checking his phone constantly had become deeply ingrained.,ingrain,grain,C1,70,General,Uncommon,,,penetrate;perforate;impress
 5629,Ingratiating,Calculated to please or gain favor.,Adjective,A smooth ingratiating manner.,insinuating,ingratiatory,B1,20,General,Common,,,pleasing;flattering
-5630,Ingratiatory,Pleasingly persuasive or intended to persuade.,Adjective,A coaxing and obsequious voice.,coaxing,,C1,70,General,Uncommon,,,persuasive;ingratiate;flattering
+5630,Ingratiatory,Pleasingly persuasive or intended to persuade.,Adjective,His ingratiatory smile did not fool anyone at the table.,coaxing,,C1,70,General,Uncommon,,,persuasive;ingratiate;flattering
 5631,Ingress,"The act or right of entering a place (formal, legal).",Noun,The easement grants the neighbor ingress to the shared driveway.,entrance,entering,C1,70,General,Uncommon,,,arrival;admission;irruption
-5632,Ingrowing,Growing abnormally into the flesh.,Adjective,An ingrown toenail.,ingrown,,C1,70,General,Uncommon,,,unhealthy
+5632,Ingrowing,Growing abnormally into the flesh.,Adjective,She had to see a doctor for an ingrowing toenail.,ingrown,,C1,70,General,Uncommon,,,unhealthy
 5633,Ingurgitate,To swallow or eat something greedily and in large quantities.,Verb,He seemed to ingurgitate his lunch in under two minutes.,gorge,overindulge,C1,70,Health & Wellness,Uncommon,,,banquet;breakfast;overgorge
 5634,Inhabitable,capable of being lived in; suitable for habitation (used interchangeably with habitable despite the confusing prefix).,Adjective,Scientists debated whether the distant moon could ever be inhabitable.,habitable,,C1,70,General,Uncommon,,,liveable;livable
 5635,Inhabitation,The act of dwelling in or living permanently in a place (said of both animals and men).,Noun,He studied the creation and inhabitation and demise of the colony.,inhabitancy,habitation,B2,40,General,Less Common,,,occupancy;bivouacking;tenting
@@ -5640,16 +5640,16 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5639,Inherited,Obtain from someone after their death.,Verb,I inherited a castle from my French grandparents.,inherit,,A2,7,Business,Very Common,,,acquire;get
 5640,Inhibit,To hold something back or prevent it from happening freely.,Verb,Shyness can inhibit a child's ability to make friends.,suppress,stamp down,A2,12,General,Very Common,,,control;contain;moderate
 5641,Inhibited,"Held back, or restrained from acting freely.",Adjective,She felt inhibited about singing in front of strangers.,suppress,stamp down,B1,18,General,Common,,,control;contain;moderate
-5642,Inhibitory,Restrictive of action.,Adjective,A repressive regime.,repressive,repressing,B1,31,General,Common,,,inhibit;restrictive
+5642,Inhibitory,Restrictive of action.,Adjective,The medicine has an inhibitory effect on the nerves.,repressive,repressing,B1,31,General,Common,,,inhibit;restrictive
 5643,Inhumed,"buried in the ground, especially in a formal or ceremonial sense (a somewhat rare, literary term).",Verb,The pharaoh was inhumed with treasures meant for the afterlife.,bury,entomb,C1,70,Society & Culture,Uncommon,,,lay;repose;blow
 5644,Inimitably,In an unreproducible manner.,Adverb,He has an inimitably verbose style.,unreproducibly,,C1,70,General,Uncommon,,,unrepeatable;inimitable;unreproducible
 5645,Iniquity,"gross injustice or immoral behavior, especially of a serious or sinful nature.",Noun,The preacher warned the congregation against the iniquity of greed.,wickedness,darkness,C1,70,General,Uncommon,,,condition;violation;depravity
-5646,Initialise,Divide (a disk) into marked sectors so that it may store data.,Verb,Please format this disk before entering data!,format,initialize,C1,70,General,Uncommon,,,determine;separate;dissever
+5646,Initialise,Divide (a disk) into marked sectors so that it may store data.,Verb,He had to initialise the drive before it could store anything.,format,initialize,C1,70,General,Uncommon,,,determine;separate;dissever
 5647,Initiate,"a person who has recently been admitted or introduced to the knowledge of a particular field, group, or activity.",Noun,"As a new initiate, she still had much to learn about the order's traditions.",enlightened,,B1,18,Society & Culture,Common,,,fledgling;incompetent;trainee
 5648,Initiatory,"Relating to or serving as an introduction or beginning, especially of a ritual or process (formal).",Adjective,The initiatory ceremony welcomed the new members into the guild.,inaugural,initiative,C1,70,General,Uncommon,,,initiate;opening
 5649,Injunction,A formal court order requiring a party to do or stop doing a specific act.,Noun,The court issued an injunction to stop the demolition.,enjoining,enjoinment,B1,25,Communication,Common,,,command;bidding;commission
 5650,Injurious,"causing physical harm or damage, or detrimental to health or well-being.",Adjective,Prolonged exposure to the chemical proved injurious to workers' lungs.,deleterious,hurtful,B1,31,General,Common,,,injury;injuriousness;harmful
-5651,Innards,Internal organs collectively (especially those in the abdominal cavity).,Noun,`viscera' is the plural form of `viscus'.,viscera,entrails,C1,70,Health & Wellness,Uncommon,,,stomach;viscus;liver
+5651,Innards,Internal organs collectively (especially those in the abdominal cavity).,Noun,The cook removed the innards before roasting the bird.,viscera,entrails,C1,70,Health & Wellness,Uncommon,,,stomach;viscus;liver
 5652,Innocuous,Not causing disapproval.,Adjective,It was an innocuous remark.,unobjectionable,,C1,70,General,Uncommon,,,innoxious;harmless;inoffensive
 5653,Innovational,relating to or characterized by innovation; introducing new methods or ideas (a less common variant of innovative).,Adjective,The company prided itself on its innovational approach to product design.,innovative,groundbreaking,C1,70,General,Uncommon,,,innovation;original
 5654,Innumerous,Too many to count.,Adjective,The night sky was filled with innumerous stars.,countless,infinite,C1,70,General,Uncommon,,,incalculable
@@ -5658,11 +5658,11 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5657,Inopportunely,at a time or in a way that is inconvenient or unsuitable.,Adverb,The phone rang inopportunely just as she began her presentation.,malapropos,,C1,70,General,Uncommon,,,inopportune;unseasonable;untimely
 5658,Inordinately,Far more than is reasonable or normal.,Adverb,He was inordinately proud of his tiny garden.,extraordinarily,,B1,31,General,Common,,,inordinate;immoderate
 5659,Inpouring,An inflow.,Noun,An inpouring of spiritual comfort.,inpour,inrush,C1,70,Nature,Uncommon,,,inflow;influx
-5660,Inquire,Inquire about.,Verb,I asked about their special today.,ask,enquire,B1,15,Communication,Common,,,inquiry;communicate;question
+5660,Inquire,Inquire about.,Verb,I will inquire at the front desk about the lost bag.,ask,enquire,B1,15,Communication,Common,,,inquiry;communicate;question
 5661,Inquiringly,"in a manner suggesting curiosity or a request for information, chiefly American spelling.",Adverb,The dog tilted its head inquiringly at the strange noise.,enquiringly,,C1,70,General,Uncommon,,,probing;searching;investigatory
 5662,Inquisitively,in a manner showing eager curiosity; questioningly.,Adverb,The toddler poked inquisitively at the strange object on the floor.,curiously,interrogatively,C1,70,General,Uncommon,,,speculative;questioning;wondering
 5663,Insanely,in an extremely foolish or irrational way; also used to mean extremely.,Adverb,"The stunt was insanely dangerous, even for a professional.",crazily,dementedly,B2,40,General,Less Common,,,berserk;demoniac;bonkers
-5664,Insanitary,Not sanitary or healthful.,Adjective,Unsanitary open sewers.,unsanitary,unhealthful,C1,70,General,Uncommon,,,unhygienic
+5664,Insanitary,Not sanitary or healthful.,Adjective,The insanitary conditions in the camp caused several outbreaks.,unsanitary,unhealthful,C1,70,General,Uncommon,,,unhygienic
 5665,Insatiably,To an insatiable degree.,Adverb,She was insatiably hungry.,unsatiably,,C1,71,General,Uncommon,,,unquenchable;insatiable;quenchless
 5666,Inscribe,"To write or carve words onto a surface, often as a dedication.",Verb,The author agreed to inscribe a personal message inside the book.,scratch,engrave,C1,71,General,Uncommon,,,register;recruit;carve
 5667,Inscrutable,Impossible to understand or interpret; giving nothing away.,Adjective,The judge's inscrutable expression gave no hint of her decision.,cryptic,cryptical,B1,18,General,Common,,,inexplicable;incomprehensible;inscrutability
@@ -5672,60 +5672,60 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5671,Inshore,(of winds) coming from the sea toward the land.,Adjective,An inshore breeze.,onshore,seaward,B1,31,General,Common,,,coastal
 5672,Insidiously,"in a gradual, subtle way that causes harm without being immediately noticed.",Adverb,The rust spread insidiously through the pipe's interior for years before it was found.,perniciously,,B1,31,General,Common,,,insidious;harmful;noxious
 5673,Insignificant,Of little importance or influence or power; of minor status.,Adjective,"A minor, insignificant bureaucrat.",peanut,,B1,18,General,Common,,,unnoticeable;insignificance;meaningless
-5674,Insinuating,Introduce or insert (oneself) in a subtle manner.,Verb,He insinuated himself into the conversation of the people at the nearby table.,insinuate,,B2,40,General,Less Common,,,introduce;suggest;intimate
+5674,Insinuating,Introduce or insert (oneself) in a subtle manner.,Verb,He kept insinuating himself into conversations where he was not wanted.,insinuate,,B2,40,General,Less Common,,,introduce;suggest;intimate
 5675,Insipid,Lacking flavor or interest; dull and bland.,Adjective,The soup was watery and insipid.,bland,flat,B2,40,General,Less Common,,,insipidness;insipidity;tasteless
-5676,Insistency,The state of demanding notice or attention.,Noun,The insistence of their hunger.,imperativeness,insistence,C1,71,General,Uncommon,,,urgency;pressure;insistent
-5677,Insisting,Be emphatic or resolute and refuse to budge.,Verb,I must insist!,insist,take a firm stand,B1,15,Communication,Common,,,maintain;implore;importune
+5676,Insistency,The state of demanding notice or attention.,Noun,The insistency of the alarm woke the whole street.,imperativeness,insistence,C1,71,General,Uncommon,,,urgency;pressure;insistent
+5677,Insisting,Be emphatic or resolute and refuse to budge.,Verb,"She kept insisting that she had paid the bill, but there was no record.",insist,take a firm stand,B1,15,Communication,Common,,,maintain;implore;importune
 5678,Insofar,To the degree or extent that.,Adverb,"Insofar as it can be ascertained, the horse lung is comparable to that of man.",in so far,so far,A2,14,General,Very Common,,,
 5679,Insolent,"showing a rude and arrogant lack of respect, especially toward someone in authority.",Adjective,The insolent teenager rolled his eyes at every instruction from the coach.,impudent,snotty-nosed,B1,31,General,Common,,,insolence;disrespectful;unashamed
 5680,Insomniac,Experiencing or accompanied by sleeplessness.,Adjective,Insomniac old people.,sleepless,watchful,C1,71,General,Uncommon,,,awake
-5681,Inspect,Come to see in an official or professional capacity.,Verb,The governor visited the prison.,visit,,A2,9,General,Very Common,,,examine;perambulate;inspection
+5681,Inspect,Come to see in an official or professional capacity.,Verb,An officer will inspect the building before it opens.,visit,,A2,9,General,Very Common,,,examine;perambulate;inspection
 5682,Inspiring,Filling people with excitement or a strong desire to do something.,Adjective,Her speech was genuinely inspiring to everyone in the room.,inspire,animate,A2,12,Emotion,Very Common,,,occasion;affright;intoxicate
 5683,Inspirit,"fill with enthusiasm, courage, or energy.",Verb,The coach's halftime speech seemed to inspirit the exhausted team.,spirit,spirit up,C1,71,General,Uncommon,,,enliven;liven;invigorate
-5684,Inspissate,Make viscous or dense.,Verb,Thicken the sauce by adding flour.,thicken,,C1,71,General,Uncommon,,,inspissation;change;alter
+5684,Inspissate,Make viscous or dense.,Verb,Boil the sauce slowly to inspissate it to a thick glaze.,thicken,,C1,71,General,Uncommon,,,inspissation;change;alter
 5685,Installing,The process of setting something up and putting it into position for use.,Noun,Installing the shelves took longer than expected.,installation,installment,B1,18,General,Common,,,install;beginning;constitution
 5686,Instalment,"One of several parts of a payment, story, or series delivered over time, chiefly British spelling.",Noun,She paid for the sofa in six monthly instalments.,installation,installing,C1,71,General,Uncommon,,,broadcast;program;programme
-5687,Instancy,The quickness of action or occurrence.,Noun,The immediacy of their response.,immediacy,immediateness,B2,40,General,Less Common,,,instant;quickness;urgency
-5688,Instantaneously,Without any delay.,Adverb,He was killed outright.,outright,instantly,B1,31,General,Common,,,instantaneous;fast
-5689,Instauration,The act of starting something for the first time; introducing something new.,Noun,She looked forward to her initiation as an adult.,initiation,founding,C1,71,General,Uncommon,,,beginning;constitution;establishment
-5690,Instigate,Provoke or stir up.,Verb,Incite a riot.,incite,set off,B2,40,Communication,Less Common,,,solicit;encourage;instigative
+5687,Instancy,The quickness of action or occurrence.,Noun,The instancy of the response surprised the engineers.,immediacy,immediateness,B2,40,General,Less Common,,,instant;quickness;urgency
+5688,Instantaneously,Without any delay.,Adverb,The signal traveled instantaneously across the wire.,outright,instantly,B1,31,General,Common,,,instantaneous;fast
+5689,Instauration,The act of starting something for the first time; introducing something new.,Noun,The instauration of the new festival marked the first time the village had held one.,initiation,founding,C1,71,General,Uncommon,,,beginning;constitution;establishment
+5690,Instigate,Provoke or stir up.,Verb,Rumors can instigate panic if nobody corrects them.,incite,set off,B2,40,Communication,Less Common,,,solicit;encourage;instigative
 5691,Instill,"To gradually establish an idea, attitude, or habit in someone's mind.",Verb,Good coaches instill confidence in their players over time.,transfuse,,C1,71,Business,Uncommon,,,contribute;introduce;implant
 5692,Instilling,Gradually establishing an idea or quality in someone's mind.,Verb,The program focuses on instilling good study habits in young children.,instill,transfuse,C1,71,Business,Uncommon,,,contribute;introduce;implant
-5693,Instinctive,Unthinking; prompted by (or as if by) instinct.,Adjective,A cat's natural aversion to water.,natural,,B1,31,General,Common,,,spontaneous
+5693,Instinctive,Unthinking; prompted by (or as if by) instinct.,Adjective,Her instinctive reaction was to jump back from the snake.,natural,,B1,31,General,Common,,,spontaneous
 5694,Volcano,"A mountain with an opening that can erupt, releasing hot lava and ash.",Noun,Scientists monitored the volcano closely after it began to rumble.,fire mountain,,A2,18,Nature,Common,,,
 5695,Backpack,A bag with straps that you wear on your back to carry things.,Noun,She packed her backpack the night before the school trip.,rucksack,knapsack,A1,8,General,Very Common,,,
-5696,Instruct,Impart skills or knowledge to.,Verb,I taught them French.,teach,learn,B1,25,Communication,Common,,,instruction;lecture;condition
+5696,Instruct,Impart skills or knowledge to.,Verb,The guide will instruct the new climbers in basic safety.,teach,learn,B1,25,Communication,Common,,,instruction;lecture;condition
 5697,Instrumental,serving as a crucial means of achieving something; helpful in bringing about a result.,Adjective,Her mentorship was instrumental in helping him land the job.,implemental,subservient,A2,9,General,Very Common,,,instrument;helpful;instrumentality
 5698,Insufferable,"So unpleasant or arrogant as to be unbearable, the standard spelling.",Adjective,His insufferable bragging ruined the whole dinner.,impossible,unacceptable,C1,71,General,Uncommon,,,intolerable;unendurable;unbearable
 5699,Insufficient,Of a quantity not able to fulfill a need or requirement.,Adjective,Insufficient funds.,deficient,,A2,14,General,Very Common,,,quantity;insufficiency;lean
 5700,Insularism,An attitude of narrow-minded isolation from outside ideas or influences.,Noun,The town's insularism made newcomers feel unwelcome.,insulation,insularity,C1,71,General,Uncommon,,,detachment;loneliness;isolation
 5701,Insularity,"The state or quality of being isolated, especially in outlook or geography.",Noun,Growing up on a remote island shaped her sense of insularity.,insulation,insularism,B1,25,General,Common,,,detachment;loneliness;insular
 5702,Insulation,"Material used to prevent heat, sound, or electricity from passing through; more broadly, protection from outside influence.",Noun,They added extra insulation to the attic before winter.,insularity,insularism,A2,10,General,Very Common,,,detachment;loneliness;fencing
-5703,Insultingly,In an unfair and insulting manner.,Adverb,This internationally known writer was foully condemned by the Muslim fundamentalists.,foully,,C1,71,General,Uncommon,,,insulting;disrespectful;unfair
-5704,Insured,Be careful or certain to do something; make certain of something.,Verb,He verified that the valves were closed.,see,check,B1,15,Academic,Common,,,determine;guarantee;control
+5703,Insultingly,In an unfair and insulting manner.,Adverb,He spoke insultingly to the waiter and was asked to leave.,foully,,C1,71,General,Uncommon,,,insulting;disrespectful;unfair
+5704,Insured,Be careful or certain to do something; make certain of something.,Verb,She insured that the doors were locked before leaving the shop.,see,check,B1,15,Academic,Common,,,determine;guarantee;control
 5705,Insurmountable,Not capable of being surmounted or overcome.,Adjective,Insurmountable disadvantages.,unsurmountable,,B1,31,General,Common,,,unconquerable;impossible;insuperable
 5706,Integer,Any of the natural numbers (positive or negative) or zero.,Noun,An integer is a number that is not a fraction.,whole number,,B1,20,General,Common,,,divisor;population;characteristic
 5707,Integrality,The quality of being a necessary and complete part of a whole (formal).,Noun,The committee stressed the integrality of trust to any lasting agreement.,entirety,entireness,C1,71,General,Uncommon,,,totality;comprehensiveness;integral
 5708,Integrating,"currently combining separate parts into a unified, functioning whole.",Verb,The team has been integrating the new software with the existing database.,integrate,incorporate,B1,31,General,Common,,,compound;combine;fold
 5709,Intellection,"The exercise of the intellect; the act of understanding (formal, philosophical).",Noun,The lecture explored the nature of intellection versus mere instinct.,thinking,thought,C1,71,Academic,Uncommon,,,explanation;planning;preparation
 5710,Intelligibly,in a way that can be understood; clearly enough to comprehend.,Adverb,"Despite the static, the pilot spoke intelligibly over the radio.",clearly,understandably,C1,71,General,Uncommon,,,comprehensible;comprehendible;pellucid
-5711,Intemperate,Given to excessive indulgence of bodily appetites especially for intoxicating liquors.,Adjective,A hard drinker.,hard,heavy,C1,71,General,Uncommon,,,intemperateness;intense;inclement
-5712,Intemperateness,"Excess in action and immoderate indulgence of bodily appetites, especially in passion or indulgence.",Noun,The intemperance of their language.,intemperance,self-indulgence,C1,71,General,Uncommon,,,intemperate;indulgence;indulging
+5711,Intemperate,Given to excessive indulgence of bodily appetites especially for intoxicating liquors.,Adjective,The intemperate young lord wasted his fortune on feasts and wine.,hard,heavy,C1,71,General,Uncommon,,,intemperateness;intense;inclement
+5712,Intemperateness,"Excess in action and immoderate indulgence of bodily appetites, especially in passion or indulgence.",Noun,The intemperateness of his diet eventually caught up with him.,intemperance,self-indulgence,C1,71,General,Uncommon,,,intemperate;indulgence;indulging
 5713,Intensifier,A modifier that has little meaning except to intensify the meaning it modifies.,Noun,`up' in `finished up' is an intensifier.,intensive,,B1,15,Communication,Common,,,modifier;adjective;intensify
-5714,Intensifying,Increase in extent or intensity.,Verb,The Allies escalated the bombing.,escalate,intensify,B1,31,General,Common,,,increase;sharpen;heighten
+5714,Intensifying,Increase in extent or intensity.,Verb,The storm was intensifying as it moved toward the coast.,escalate,intensify,B1,31,General,Common,,,increase;sharpen;heighten
 5715,Intentional,Done on purpose; deliberate rather than accidental.,Adjective,The foul was ruled intentional by the referee.,knowing,,B1,18,General,Common,,,intention;fashioned;intentionality
 5716,Intentness,The quality of being intent and concentrated.,Noun,The intentness of his gaze.,engrossment,,C1,71,General,Uncommon,,,concentration;singleness;intent
 5717,Interbreed,"To breed with a different species, breed, or population, typically producing hybrid offspring.",Verb,Wolves and coyotes can occasionally interbreed in the wild.,crossbreed,cross,C1,71,General,Uncommon,,,mongrelize;hybridize;interbreeding
 5718,Intercede,"intervene on behalf of another, especially to resolve a conflict or ask for mercy.",Verb,She agreed to intercede with her boss on his behalf.,mediate,intermediate,B2,40,Communication,Less Common,,,negociate;negotiate;bargain
 5719,Intercept,Seize on its way.,Verb,The fighter plane was ordered to intercept an aircraft that had entered the country's airspace.,stop,,B1,15,General,Common,,,eavesdrop;interception;interceptor
-5720,Interchange,The act of changing one thing for another thing.,Noun,Adam was promised immortality in exchange for his disobedience.,exchange,,B1,15,General,Common,,,traffic;crossing;contact
+5720,Interchange,The act of changing one thing for another thing.,Noun,The interchange of letters between the two friends lasted for years.,exchange,,B1,15,General,Common,,,traffic;crossing;contact
 5721,Interchurch,Occurring between or among or common to different churches or denominations.,Adjective,Interchurch aid.,interdenominational,,C1,71,General,Uncommon,,,nonsectarian;unsectarian
 5722,Interconnect,To connect two or more things with each other.,Verb,The new subway line will interconnect all five boroughs.,complect,interlink,C1,71,General,Uncommon,,,interconnection;connect;link
 5723,Dolphin,"A smart, playful sea animal known for leaping out of the water.",Noun,"A dolphin swam alongside the boat, leaping through the waves.",porpoise,,A1,10,Nature,Very Common,,,
 5724,Interconnection,A state of being connected reciprocally.,Noun,An interconnection between the two buildings.,interconnectedness,,C1,71,General,Uncommon,,,interconnect;connection;connectedness
-5725,Interdepend,Be connected.,Verb,In my heart I can make the world hang together.,hang together,,C1,71,General,Uncommon,,,connect;interdependent;interdependency
-5726,Interestingness,The power of attracting or holding one's attention (because it is unusual or exciting etc.).,Noun,They said nothing of great interest.,interest,,C1,71,General,Uncommon,,,interesting;vividness;newsworthiness
-5727,Interfering,Come between so as to be hindrance or obstacle.,Verb,Your talking interferes with my work!,interfere,,B1,15,Society & Culture,Common,,,inhibit;obstruct;obturate
+5725,Interdepend,Be connected.,Verb,"The tasks interdepend, so a delay in one slows down all the others.",hang together,,C1,71,General,Uncommon,,,connect;interdependent;interdependency
+5726,Interestingness,The power of attracting or holding one's attention (because it is unusual or exciting etc.).,Noun,"The film's interestingness lay in its odd, unexpected twists.",interest,,C1,71,General,Uncommon,,,interesting;vividness;newsworthiness
+5727,Interfering,Come between so as to be hindrance or obstacle.,Verb,Please stop interfering with my work while I finish this report.,interfere,,B1,15,Society & Culture,Common,,,inhibit;obstruct;obturate
 5728,Interim,The period of time between one event and another; an interval.,Noun,She took a temporary job in the interim before starting graduate school.,meantime,meanwhile,A2,9,General,Very Common,,,absence;suspension;distance
 5729,Interiorize,To make something part of one's inner mental or emotional life; to internalize (rare).,Verb,"Over time, the therapist helped him interiorize a calmer response to stress.",internalize,internalise,C1,71,Academic,Uncommon,,,interior;ascribe;attribute
 5730,Interlace,"To cross or weave things together, especially threads or fibers.",Verb,The weaver would interlace strands of wool to form a tight pattern.,intertwine,twine,C1,71,General,Uncommon,,,distort;entwine;entangle
@@ -5735,61 +5735,61 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5734,Interlocking,the state of two or more parts fitting together closely so as to be connected.,Noun,The interlocking of the gears kept the mechanism perfectly synchronized.,engagement,mesh,A2,11,General,Very Common,,,contact;striking;touching
 5735,Intermeshed,"interlocked or fitted together closely, like gears working in unison.",Adjective,The two departments' schedules were so intermeshed that a delay in one stalled the other.,enmeshed,,B2,41,General,Less Common,,,tangled;geared
 5736,Interminably,All the time; seemingly without stopping.,Adverb,A theological student with whom I argued interminably.,endlessly,,C1,71,General,Uncommon,,,interminable;long
-5737,Intermit,Cease an action temporarily.,Verb,We pause for station identification.,pause,break,C1,71,Communication,Uncommon,,,breathe;punctuate;intermission
+5737,Intermit,Cease an action temporarily.,Verb,The rain will intermit for an hour or two before returning in force.,pause,break,C1,71,Communication,Uncommon,,,breathe;punctuate;intermission
 5738,Intermix,To mix different things together so they combine.,Verb,The paint colors began to intermix as she stirred the can.,blend,immingle,C1,71,General,Uncommon,,,amalgamate;compound;combine
 5739,Internalise,"To absorb and accept an idea, attitude, or behavior as one's own, chiefly British spelling.",Verb,Children often internalise the values their parents model.,internalize,interiorize,C1,71,Academic,Uncommon,,,ascribe;attribute;accredit
 5740,Internalize,"To absorb and accept an idea or attitude as one's own, American spelling.",Verb,It took years for her to internalize her own accomplishments.,internalise,interiorize,C1,71,Academic,Uncommon,,,ascribe;attribute;accredit
 5741,Carpenter,Someone whose job is making and repairing things out of wood.,Noun,The carpenter built a beautiful oak table for the dining room.,woodworker,,A2,17,Society & Culture,Common,,,
 5742,Casserole,"A dish cooked slowly in the oven, usually a mix of meat or vegetables in a sauce.",Noun,She brought a warm casserole to the family potluck.,baked dish,,B1,23,General,Common,,,
 5743,Interpenetrate,Penetrate mutually or be interlocked.,Verb,The territories of two married people interpenetrate a lot.,permeate,,B2,41,General,Less Common,,,penetrate;perforate;diffuse
-5744,Interpose,To insert between other elements.,Verb,She interjected clever remarks.,interject,come in,C1,71,Communication,Uncommon,,,introduce
+5744,Interpose,To insert between other elements.,Verb,The lawyer chose to interpose an objection at that moment.,interject,come in,C1,71,Communication,Uncommon,,,introduce
 5745,Interpretable,"capable of being understood or explained in a particular way, especially when open to more than one meaning.",Adjective,The ambiguous clause was interpretable in at least two very different ways.,explainable,,B2,41,General,Less Common,,,explicable
 5746,Interpreter,a person who translates spoken language from one language into another in real time.,Noun,The interpreter translated the ambassador's remarks for the foreign delegation.,spokesperson,representative,A2,12,Society & Culture,Very Common,,,individual;someone;somebody
-5747,Interpreting,An explanation of something that is not immediately obvious.,Noun,The edict was subject to many interpretations.,interpretation,rendition,B1,31,Academic,Common,,,explanation;principle;interpret
+5747,Interpreting,An explanation of something that is not immediately obvious.,Noun,The scholar's interpreting of the ancient text surprised his colleagues.,interpretation,rendition,B1,31,Academic,Common,,,explanation;principle;interpret
 5748,Interred,"placed in a grave or tomb (the more common, standard term).",Verb,Her grandmother was interred beside her husband in the family plot.,bury,entomb,B2,41,Society & Culture,Less Common,,,lay;repose;blow
-5749,Interrelated,Be in a relationship with.,Verb,How are these two observations related?,relate,interrelate,B1,18,General,Common,,,associate;colligate;connect
+5749,Interrelated,Be in a relationship with.,Verb,"The two experiments are interrelated, since both rely on the same data.",relate,interrelate,B1,18,General,Common,,,associate;colligate;connect
 5750,Interrelation,Mutual or reciprocal relation or relatedness.,Noun,Interrelationships of animal structure and function.,interrelationship,interrelatedness,B1,20,General,Common,,,relation;interrelate
 5751,Barbecue,"A meal cooked outdoors over an open fire or grill, or the grill itself.",Noun,They invited the whole street to their backyard barbecue.,cookout,grill,A2,16,General,Common,,,
-5752,Interrogation,A sentence of inquiry that asks for a reply.,Noun,He asked a direct question.,question,interrogative,B1,31,Communication,Common,,,sentence;channels;channel
+5752,Interrogation,A sentence of inquiry that asks for a reply.,Noun,The interrogation of the suspect lasted nearly six hours.,question,interrogative,B1,31,Communication,Common,,,sentence;channels;channel
 5753,Interrogatively,"in the manner of asking a question, especially with a formal or probing tone.",Adverb,"She raised her eyebrow interrogatively, waiting for an explanation.",curiously,inquisitively,C1,71,General,Uncommon,,,speculative;questioning;wondering
 5754,Interrupted,"stopped the continuous progress of something, especially by breaking in.",Verb,A phone call interrupted their conversation halfway through.,interrupt,disrupt,A2,7,Communication,Very Common,,,punctuate;fracture;break
 5755,Intersection,The set of elements common to two or more sets.,Noun,The set of red hats is the intersection of the set of hats and the set of red things.,product,cartesian product,A2,7,Society & Culture,Very Common,,,crossing;point;vertex
-5756,Interspecies,Arising or occurring between species.,Adjective,An interspecific hybrid.,interspecific,,B2,41,General,Less Common,,,
-5757,Interspersal,The act of combining one thing at intervals among other things.,Noun,The interspersion of illustrations in the text.,interspersion,,C1,71,General,Uncommon,,,combination;combining;consolidation
+5756,Interspecies,Arising or occurring between species.,Adjective,The study looked at interspecies cooperation among birds and ants.,interspecific,,B2,41,General,Less Common,,,
+5757,Interspersal,The act of combining one thing at intervals among other things.,Noun,The interspersal of jokes among the facts kept the lecture lively.,interspersion,,C1,71,General,Uncommon,,,combination;combining;consolidation
 5758,Intertwine,To twist or twine together closely; to become closely linked.,Verb,Their lives began to intertwine after they started working together.,twine,entwine,C1,71,General,Uncommon,,,distort;entangle;prepare
 5759,Intervene,"Get involved, so as to alter or hinder an action, or through force or threat of force.",Verb,Why did the U.S. not intervene earlier in WW II?,step in,interfere,B1,31,Society & Culture,Common,,,intervention;communicate;patronize
 5760,Intestinal,"of, relating to, or located within the intestines.",Adjective,The scan revealed mild intestinal inflammation.,enteric,enteral,C1,71,General,Uncommon,,,intestine
 5761,Intifada,An uprising by Palestinian Arabs (in both the Gaza Strip and the West Bank) against Israel in the late 1980s and again in 2000.,Noun,The first intifada ended when Israel granted limited autonomy to the Palestine National Authority in 1993.,intifadah,,C1,71,General,Uncommon,,,uprising;rebellion;insurrection
 5762,Intimacy,Close or warm friendship.,Noun,The absence of fences created a mysterious intimacy in which no one knew privacy.,familiarity,closeness,B1,25,General,Common,,,friendliness;neighborliness;neighbourliness
-5763,Intimation,An indirect suggestion.,Noun,Not a breath of scandal ever touched her.,hint,breath,C1,71,Communication,Uncommon,,,intimate;suggestion;proposition
-5764,Intimidating,Make timid or fearful.,Verb,Her boss intimidates her.,intimidate,,C1,71,Emotion,Uncommon,,,affright;ballyrag;discourage
+5763,Intimation,An indirect suggestion.,Noun,There was no intimation that the plan would change.,hint,breath,C1,71,Communication,Uncommon,,,intimate;suggestion;proposition
+5764,Intimidating,Make timid or fearful.,Verb,The large dog was intimidating to the postman.,intimidate,,C1,71,Emotion,Uncommon,,,affright;ballyrag;discourage
 5765,Intolerable,impossible to bear or put up with.,Adjective,The heat in the un-air-conditioned office became intolerable by noon.,unbearable,unendurable,B1,25,General,Common,,,impossible;insufferable;unacceptable
-5766,Intolerantly,In a narrow-minded manner.,Adverb,His illiberally biased way of thinking.,illiberally,,C1,71,General,Uncommon,,,intolerant;rigid;strict
-5767,Intoned,Utter monotonously and repetitively and rhythmically.,Verb,The students chanted the same slogan over and over again.,tone,chant,B1,20,Communication,Common,,,verbalize;verbalise;harmonize
+5766,Intolerantly,In a narrow-minded manner.,Adverb,He spoke intolerantly of anyone who disagreed with him.,illiberally,,C1,71,General,Uncommon,,,intolerant;rigid;strict
+5767,Intoned,Utter monotonously and repetitively and rhythmically.,Verb,"The priest intoned the prayer in a low, steady voice.",tone,chant,B1,20,Communication,Common,,,verbalize;verbalise;harmonize
 5768,Intoxicate,"To cause someone to lose control of their faculties through alcohol or drugs; also, figuratively, to excite intensely.",Verb,The strong wine began to intoxicate the guests quickly.,elate,lift up,C1,71,Emotion,Uncommon,,,affright;energize;energise
 5769,Intoxicating,"Causing intoxication; also, figuratively, exhilarating or exciting to an overwhelming degree.",Verb,The scent of the garden was intoxicating in the evening air.,elate,lift up,B2,41,Emotion,Less Common,,,affright;energize;energise
 5770,Intracutaneous,"situated or introduced within the skin, especially referring to an injection.",Adjective,The allergy test involved an intracutaneous injection just beneath the surface of the skin.,intradermal,intradermic,C1,71,General,Uncommon,,,skin
 5771,Intradermic,"a less common variant of 'intradermal,' relating to something within the layers of skin.",Adjective,The nurse administered an intradermic dose to check for a reaction.,intradermal,intracutaneous,C1,71,General,Uncommon,,,skin
 5772,Intransigent,refusing to change one's views or agree about something; uncompromising.,Adjective,The union remained intransigent in its demands throughout the negotiation.,adamant,adamantine,C1,71,General,Uncommon,,,intransigency;intransigence;inflexible
 5773,Intransitivize,"(grammar) make a verb intransitive, or use a normally transitive verb without an object.",Verb,Speakers sometimes intransitivize 'eat' as in 'I already ate.',detransitivize,detransitivise,C1,71,General,Uncommon,,,change;alter;modify
-5774,Intraspecies,Arising or occurring within a species; involving the members of one species.,Adjective,Intraspecific competition.,intraspecific,,C1,71,General,Uncommon,,,
+5774,Intraspecies,Arising or occurring within a species; involving the members of one species.,Adjective,The researchers studied intraspecies conflict within a single colony of ants.,intraspecific,,C1,71,General,Uncommon,,,
 5775,Intravenous,Within or by means of a vein.,Adjective,An intravenous inflammation.,endovenous,,C1,71,General,Uncommon,,,vein
 5776,Intrepidly,"in a manner showing fearless resolve and adventurous courage, especially in the face of the unknown.",Adverb,The explorers pressed intrepidly into uncharted territory.,fearlessly,dauntlessly,C1,71,General,Uncommon,,,courageous;intrepid;unblinking
 5777,Intriguer,"A person who plots or schemes secretly, especially for political gain.",Noun,The court was full of intriguers vying for the king's favor.,designer,,C1,71,Society & Culture,Uncommon,,,planner;contriver;deviser
 5778,Intrinsic,belonging naturally to something; essential to its basic nature.,Adjective,Honesty was an intrinsic part of her character.,intrinsical,,B1,18,General,Common,,,internal;intimate;constitutional
 5779,Intrinsical,an archaic variant spelling of 'intrinsic.',Adjective,The old treatise spoke of virtue as an intrinsical quality of the soul.,intrinsic,,C1,71,General,Uncommon,,,internal;intimate;constitutional
-5780,Introductory,Serving as a base or starting point.,Adjective,A basic course in Russian.,basic,,B1,25,General,Common,,,introduce;opening;first
+5780,Introductory,Serving as a base or starting point.,Adjective,The introductory chapter gives the background for the rest of the book.,basic,,B1,25,General,Common,,,introduce;opening;first
 5781,Introversion,the state of being predominantly focused on one's own inner thoughts and feelings rather than external stimulation.,Noun,His introversion made large parties draining rather than exciting.,invagination,intussusception,C1,71,Nature,Uncommon,,,condition;ordinary;fortune
 5782,Introverted,"turned inward in attention or interest, away from external things (past tense).",Verb,"Years of isolation left him deeply introverted, withdrawing into his own thoughts.",invaginate,introvert,B2,41,General,Less Common,,,retract;change;alter
 5783,Intrude,Enter uninvited.,Verb,They intruded on our dinner party.,irrupt,,B2,41,General,Less Common,,,intrusion;transgress;infract
 5784,Intrusion,An unwelcome or uninvited entry into a place or situation.,Noun,She apologized for the intrusion and left the meeting.,invasion,encroachment,B1,25,General,Common,,,entrance;entering;ingress
 5785,Intubate,To insert a tube into the windpipe to help someone breathe or to administer anesthesia.,Verb,The anesthesiologist had to intubate the patient before surgery began.,cannulate,cannulize,C1,71,General,Uncommon,,,introduce;implant;cannulise
-5786,Intumesce,"Move upwards in bubbles, as from the effect of heating; also used metaphorically.",Verb,Gases bubbled up from the earth.,bubble up,,C1,71,General,Uncommon,,,surface;distend;blister
+5786,Intumesce,"Move upwards in bubbles, as from the effect of heating; also used metaphorically.",Verb,The mixture began to intumesce as it came to a boil.,bubble up,,C1,71,General,Uncommon,,,surface;distend;blister
 5787,Intussusception,"the folding in of an outer layer of tissue to form a pocket within itself, as when part of the intestine slides into an adjacent part.",Noun,The infant was rushed to surgery after doctors diagnosed intussusception in his bowel.,invagination,introversion,C1,71,Nature,Uncommon,,,growing;maturation;development
 5788,Inundate,"overwhelm with a large amount of something, especially water or a flood of requests.",Verb,The office was inundated with complaints after the announcement.,deluge,flood,C1,71,General,Uncommon,,,inundation;submerge;fill
 5789,Inundation,an overwhelming flood of water covering land that is normally dry.,Noun,The storm caused a sudden inundation of the entire coastal town.,flood,deluge,C1,71,General,Uncommon,,,inundate;mountain;deposit
 5790,Invaginate,fold or draw inward so as to form a pocket or sheath within a surrounding structure.,Verb,"During development, certain embryonic cells invaginate to form the beginnings of the gut.",introvert,,C1,71,General,Uncommon,,,retract;invagination;sheathe
-5791,Invalid,Injure permanently.,Verb,He was disabled in a car accident.,disable,incapacitate,A2,14,Health & Wellness,Very Common,,,trample;torture;excruciate
+5791,Invalid,Injure permanently.,Verb,The accident invalided him out of the army for good.,disable,incapacitate,A2,14,Health & Wellness,Very Common,,,trample;torture;excruciate
 5792,Invalidated,Made no longer legally or officially valid.,Adjective,His passport was invalidated after the name change.,invalidate,annul,B2,41,Society & Culture,Less Common,,,reverse;overturn;nullify
 5793,Invalidating,Making something no longer valid or acceptable.,Verb,The missing signature ended up invalidating the whole contract.,invalidate,annul,C1,71,Society & Culture,Uncommon,,,reverse;overturn;nullify
 5794,Invariably,"In every case; always, without exception.",Adverb,She invariably orders the same dish every time they eat out.,constantly,always,A2,6,General,Very Common,,,changeless;constant;consistent
@@ -5799,29 +5799,29 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5798,Inverse,Something inverted in sequence or character or effect.,Noun,When the direct approach failed he tried the inverse.,opposite,,B1,18,General,Common,,,opposition;conflict;contradiction
 5799,Invertebrate,Lacking a backbone or spinal column.,Adjective,Worms are an example of invertebrate animals.,spineless,,C1,71,General,Uncommon,,,
 5800,Investigating,Carrying out a systematic inquiry into the facts of something.,Verb,Detectives spent weeks investigating the disappearance.,investigate,look into,A2,12,Communication,Very Common,,,analyze;examine;research
-5801,Investigatory,Designed to find information or ascertain facts.,Adjective,A fact-finding committee.,fact-finding,investigative,C1,71,General,Uncommon,,,investigate;inquiring
-5802,Investing,Make an investment.,Verb,Put money into bonds.,invest,put,B2,41,Business,Less Common,,,shelter;speculate;deplete
-5803,Invidious,Containing or implying a slight or showing prejudice.,Adjective,Discriminatory attitudes and practices.,discriminatory,,C1,71,General,Uncommon,,,unfavorable;unfavourable
+5801,Investigatory,Designed to find information or ascertain facts.,Adjective,The investigatory panel interviewed all the witnesses.,fact-finding,investigative,C1,71,General,Uncommon,,,investigate;inquiring
+5802,Investing,Make an investment.,Verb,She started investing a portion of her salary every month.,invest,put,B2,41,Business,Less Common,,,shelter;speculate;deplete
+5803,Invidious,Containing or implying a slight or showing prejudice.,Adjective,The report made an invidious comparison between the two schools.,discriminatory,,C1,71,General,Uncommon,,,unfavorable;unfavourable
 5804,Invigorated,Filled with new energy and strength.,Adjective,She felt invigorated after the swim in the cold sea.,inspire,animate,C1,71,Emotion,Uncommon,,,affright;intoxicate;quicken
-5805,Invigorator,An agent that gives or restores life or vigor.,Noun,The soul is the quickener of the body.,quickener,enlivener,C1,71,General,Uncommon,,,transmitter;retardent;retardation
+5805,Invigorator,An agent that gives or restores life or vigor.,Noun,The cool mountain air was a great invigorator after the long train ride.,quickener,enlivener,C1,71,General,Uncommon,,,transmitter;retardent;retardation
 5806,Invincible,too powerful to be defeated or overcome.,Adjective,The champion seemed invincible after her twentieth consecutive win.,unbeatable,unvanquishable,B1,31,General,Common,,,unconquerable;invincibility
-5807,Inviolate,(of a woman) having the hymen unbroken.,Adjective,"She was intact, virginal.",intact,,B1,25,General,Common,,,uninjured;sacred
+5807,Inviolate,(of a woman) having the hymen unbroken.,Adjective,"In the old ballad, the princess is kept inviolate until her wedding day.",intact,,B1,25,General,Common,,,uninjured;sacred
 5808,Invitingly,"in a way that attracts or tempts someone to enter, try, or enjoy something.",Adverb,The pool sparkled invitingly in the afternoon sun.,tantalizingly,,C1,71,General,Uncommon,,,tantalizing;tempting;attractive
 5809,Involuntariness,the quality of happening without conscious control or intention.,Noun,Doctors studied the involuntariness of the muscle spasm to rule out epilepsy.,unwillingness,,C1,71,General,Uncommon,,,temperament;hesitancy;hesitation
-5810,Involution,The act of sharing in the activities of a group.,Noun,The teacher tried to increase his students' engagement in class activities.,engagement,participation,A2,11,General,Very Common,,,construction;expression;adjunct
+5810,Involution,The act of sharing in the activities of a group.,Noun,His involution in the club's activities began when he joined the choir.,engagement,participation,A2,11,General,Very Common,,,construction;expression;adjunct
 5811,Inwardly,With respect to private feelings.,Adverb,"Inwardly, she was raging.",inside,,B1,25,General,Common,,,interior;internal;private
 5812,Inwards,Toward the center or interior.,Adverb,Move the needle further inwards!,inward,,C1,71,General,Uncommon,,,
-5813,Iodinating,Cause to combine with iodine.,Verb,Iodinate thyroxine.,iodinate,,B1,25,General,Common,,,change;alter;modify
-5814,Iodized,Treat with iodine.,Verb,Iodize salt.,iodize,iodise,C1,71,General,Uncommon,,,process;treat
+5813,Iodinating,Cause to combine with iodine.,Verb,The chemist spent the afternoon iodinating the sample.,iodinate,,B1,25,General,Common,,,change;alter;modify
+5814,Iodized,Treat with iodine.,Verb,The mill iodized the salt before shipping it to the shops.,iodize,iodise,C1,71,General,Uncommon,,,process;treat
 5815,Ionization,The condition of being dissociated into ions (as by heat or radiation or chemical reaction or electrical discharge).,Noun,The ionization of a gas.,ionisation,,C1,71,General,Uncommon,,,condition;activity;ionize
-5816,Irascible,Quickly aroused to anger.,Adjective,A hotheaded commander.,choleric,hotheaded,C1,71,General,Uncommon,,,irascibility;angry
+5816,Irascible,Quickly aroused to anger.,Adjective,The irascible old judge snapped at anyone who interrupted him.,choleric,hotheaded,C1,71,General,Uncommon,,,irascibility;angry
 5817,Irksome,"Annoying or irritating, especially due to persistence.",Adjective,The constant beeping from the smoke detector was irksome.,boring,deadening,B2,41,General,Less Common,,,uninteresting
-5818,Ironical,Characterized by often poignant difference or incongruity between what is expected and what actually is.,Adjective,"Madness, an ironic fate for such a clear thinker.",ironic,,B1,31,General,Common,,,humorous;irony;incongruous
+5818,Ironical,Characterized by often poignant difference or incongruity between what is expected and what actually is.,Adjective,It was ironical that the fire station burned down the night of the party.,ironic,,B1,31,General,Common,,,humorous;irony;incongruous
 5819,Ironmonger,"chiefly British term for a dealer in hardware, tools, and household metal goods.",Noun,The village ironmonger had run the same shop for forty years.,hardwareman,,C1,71,Society & Culture,Uncommon,,,trader;bargainer;dealer
-5820,Ironworks,Work made of iron (gratings or rails or railings etc).,Noun,The houses had much ornamental ironwork.,ironwork,,C1,71,Science & Technology,Uncommon,,,workplace;publication;work
+5820,Ironworks,Work made of iron (gratings or rails or railings etc).,Noun,The ironworks on the old gate were painted black.,ironwork,,C1,71,Science & Technology,Uncommon,,,workplace;publication;work
 5821,Irreclaimable,"Not able to be reclaimed, reformed, or recovered.",Adjective,The polluted land was declared irreclaimable for farming.,irredeemable,unredeemable,C1,71,General,Uncommon,,,wicked
 5822,Irredeemable,"Not able to be saved, improved, or redeemed.",Adjective,Critics called the film's plot irredeemable despite strong acting.,irreclaimable,unredeemable,B1,31,General,Common,,,wicked;inconvertible;unconvertible
-5823,Irregular,"Deviating from normal expectations; somewhat odd, strange, or abnormal.",Adjective,These days large families are atypical.,atypical,,A2,11,General,Very Common,,,improper;unconventional;unlawful
+5823,Irregular,"Deviating from normal expectations; somewhat odd, strange, or abnormal.",Adjective,The tailor noted an irregular stitch along the hem.,atypical,,A2,11,General,Very Common,,,improper;unconventional;unlawful
 5824,Irreplaceable,"too special, rare, or valuable to be replaced.",Adjective,"The stolen necklace was irreplaceable, a family heirloom passed down for generations.",unreplaceable,,C1,71,General,Uncommon,,,irreplaceableness;unexpendable
 5825,Coastline,The shape of the land where it meets the sea.,Noun,"They drove along the coastline, stopping at every beach.",shoreline,coast,B1,21,Travel & Places,Common,,,
 5826,Irreproachable,Beyond criticism or blame; faultless.,Adjective,Her professional conduct was irreproachable throughout the scandal.,blameless,inculpable,C1,72,General,Uncommon,,,innocent;guiltless
@@ -5829,18 +5829,18 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 5828,Irresolution,"A lack of firmness of purpose or decision (formal, literary).",Noun,The general's sudden irresolution surprised his usually confident troops.,indecision,indecisiveness,B2,41,Academic,Less Common,,,uncertainty;volatility;unpredictability
 5829,Irrespective,without taking into account; regardless of a particular factor.,Adverb,"Everyone must follow the rules, irrespective of rank.",regardless,disregardless,B1,25,General,Common,,,
 5830,Irreverent,Characterized by a lightly pert and exuberant quality.,Adjective,A certain irreverent gaiety and ease of manner.,impertinent,pert,B1,31,General,Common,,,profane;sacrilegious;spirited
-5831,Irrevokable,Incapable of being retracted or revoked.,Adjective,Firm and irrevocable is my doom.,irrevocable,,C1,72,General,Uncommon,,,sealed
+5831,Irrevokable,Incapable of being retracted or revoked.,Adjective,The treaty was irrevokable once both leaders had signed.,irrevocable,,C1,72,General,Uncommon,,,sealed
 5832,Irritability,A tendency to become annoyed or angry easily.,Noun,Lack of sleep can cause real irritability.,temper,biliousness,B2,41,General,Less Common,,,irritable;distemper;testiness
-5833,Irritably,In a petulant manner.,Adverb,He said testily; `Go away!'.,testily,petulantly,B1,25,General,Common,,,irritable
-5834,Irritant,Something that causes irritation and annoyance.,Noun,He's a thorn in my flesh.,thorn,,B2,41,Academic,Less Common,,,botheration;infliction;nuisance
+5833,Irritably,In a petulant manner.,Adverb,"He replied irritably, annoyed at being interrupted again.",testily,petulantly,B1,25,General,Common,,,irritable
+5834,Irritant,Something that causes irritation and annoyance.,Noun,Smoke is a common irritant for people with asthma.,thorn,,B2,41,Academic,Less Common,,,botheration;infliction;nuisance
 5835,Irritated,Feeling angry or impatient because of something persistent or unpleasant.,Verb,He grew irritated waiting in line for over an hour.,annoy,rag,B1,18,Emotion,Common,,,antagonise;aggravate;exacerbate
-5836,Irritation,A sudden outburst of anger.,Noun,His temper sparked like damp firewood.,pique,temper,A2,14,Emotion,Very Common,,,torment;aggravation;irritate
+5836,Irritation,A sudden outburst of anger.,Noun,"His irritation boiled over, and he slammed the door.",pique,temper,A2,14,Emotion,Very Common,,,torment;aggravation;irritate
 5837,Irruption,"a sudden, violent, or forcible entry or influx, especially of people or animals into a new territory.",Noun,Ecologists recorded an irruption of snowy owls farther south than usual that winter.,outbreak,eruption,C1,72,General,Uncommon,,,entrance;entering;ingress
 5838,Islamism,a political ideology that advocates organizing government and society according to Islamic law and principles.,Noun,The professor's lecture traced the rise of Islamism as a modern political movement.,islam,mohammedanism,C1,72,Academic,Uncommon,,,wahhabism;wahabism;reformation
 5839,Islamize,Cause to conform to Islamic law.,Verb,Islamize the dietary laws.,islamise,,C1,72,General,Uncommon,,,convert;evangelize;latinize
-5840,Isochronous,Equal in duration or interval.,Adjective,The oscillations were isochronal.,isochronal,,C1,72,General,Uncommon,,,equal
-5841,Isolating,Place or set apart.,Verb,They isolated the political prisoners from the other inmates.,isolate,insulate,B1,18,General,Common,,,separate;ghettoize;seclude
-5842,Issuing,The act of providing an item for general use or for official purposes (usually in quantity).,Noun,A new issue of stamps.,issue,issuance,B1,20,General,Common,,,provision;irrigation;subvention
+5840,Isochronous,Equal in duration or interval.,Adjective,"A pendulum's swings are isochronous, each taking the same time as the last.",isochronal,,C1,72,General,Uncommon,,,equal
+5841,Isolating,Place or set apart.,Verb,Isolating the cause of the leak took the plumber all afternoon.,isolate,insulate,B1,18,General,Common,,,separate;ghettoize;seclude
+5842,Issuing,The act of providing an item for general use or for official purposes (usually in quantity).,Noun,The issuing of new uniforms began on Monday morning.,issue,issuance,B1,20,General,Common,,,provision;irrigation;subvention
 5843,Itching,Scrape or rub as if to relieve itching.,Verb,Don't scratch your insect bites!,rub,scratch,B1,20,General,Common,,,vellicate;irritate;ache
 5844,Itemize,"list items individually, especially for the purposes of an account or bill.",Verb,Please itemize your expenses before submitting the reimbursement form.,enumerate,recite,C1,72,Communication,Uncommon,,,identify;announce;itemization
 5845,Iteration,(computer science) a single execution of a set of instructions that are to be repeated.,Noun,The solution took hundreds of iterations.,loop,,C1,72,Nature,Uncommon,,,process;iterate
