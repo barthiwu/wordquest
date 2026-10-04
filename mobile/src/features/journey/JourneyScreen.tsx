@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
-import { useIsNewLook } from '@/state/uiVersionStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { getMyJourney, type JourneyView } from '@/services/journey';
 import { useAuthStore } from '@/state/authStore';
@@ -51,11 +50,8 @@ export function JourneyScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation('journey');
-  // Both hooks must run on every render (never short-circuited), or flipping
-  // the New look flag at runtime changes the hook count and crashes the screen.
-  const newLook = useIsNewLook();
   const { isMobile } = useBreakpoint();
-  const wideGrid = newLook && !isMobile;
+  const wideGrid = !isMobile;
   const accessToken = useAuthStore((s) => s.accessToken);
   const countryCode = useAuthStore((s) => s.user?.countryCode);
   const [journey, setJourney] = useState<JourneyView | null>(null);

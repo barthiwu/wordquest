@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMemo } from 'react';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
-import { useIsNewLook } from '@/state/uiVersionStore';
 import { useBreakpoint, type Breakpoint } from '@/hooks/useBreakpoint';
 
 export const RAIL_WIDTH = 88;
@@ -24,22 +23,21 @@ const TAB_ICONS: Record<
 
 /** Width the navigator must reserve on the left for the current layout
  * (0 = bottom tabs). Shared by the tab bar and sceneContainerStyle. */
-export function navInset(newLook: boolean, breakpoint: Breakpoint): number {
-  if (!newLook || breakpoint === 'mobile') return 0;
+export function navInset(breakpoint: Breakpoint): number {
+  if (breakpoint === 'mobile') return 0;
   return breakpoint === 'desktop' ? SIDEBAR_WIDTH : RAIL_WIDTH;
 }
 
 /**
  * Adaptive navigation chrome (UI spec §app shell):
- *   classic UI, or mobile  → the stock bottom tab bar (unchanged)
- *   new look + tablet      → compact left rail (icon + label)
- *   new look + desktop     → persistent labelled sidebar
+ *   mobile   → the stock bottom tab bar
+ *   tablet   → compact left rail (icon + label)
+ *   desktop  → persistent labelled sidebar
  * Destinations and route keys are identical in every layout.
  */
 export function ResponsiveTabBar(props: BottomTabBarProps) {
-  const newLook = useIsNewLook();
   const { breakpoint } = useBreakpoint();
-  if (!newLook || breakpoint === 'mobile') return <BottomTabBar {...props} />;
+  if (breakpoint === 'mobile') return <BottomTabBar {...props} />;
   return <SideNav {...props} expanded={breakpoint === 'desktop'} />;
 }
 

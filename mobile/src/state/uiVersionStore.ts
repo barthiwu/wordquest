@@ -4,24 +4,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 /**
  * Which visual direction the player is seeing.
  *
- *  - 'classic' — the shipped WordQuest UI (default; also the "revert" target).
- *  - 'new'     — the UI-only redesign from the Sept 2026 UI specification
- *                (responsive shell, restyled Home / Compete hub / Journey…).
+ *  - 'standard'  — the responsive WordQuest UI (default). The original
+ *                  "classic" UI was retired in Oct 2026 (git tag
+ *                  `classic-ui-final` keeps it recoverable).
+ *  - 'prototype' — the illustrated "New look": scene backdrops, animated
+ *                  ALI, gradient CTAs, from the Oct 2026 UI prototype.
  *
- * This is a presentation preference only — it never touches backend
- * contracts, progression, economy, scoring or timing, so it lives in
- * local storage exactly like themeStore (BUILD_HANDOFF §40: frontend owns
- * local prefs, backend owns progression truth). Reverting is one flag:
- * flip it back in Settings, or change DEFAULT_UI_VERSION below to ship
- * either look to everyone.
+ * Presentation preference only — it never touches backend contracts,
+ * progression, economy, scoring or timing, so it lives in local storage
+ * exactly like themeStore. Reverting is one switch in Settings, or change
+ * DEFAULT_UI_VERSION to ship either look to everyone.
  */
-export type UiVersion = 'classic' | 'new';
+export type UiVersion = 'standard' | 'prototype';
 
-/** Flip this single constant to make the redesign (or the old UI) the
- * default for players who have never touched the Settings switch. */
-export const DEFAULT_UI_VERSION: UiVersion = 'classic';
+export const DEFAULT_UI_VERSION: UiVersion = 'standard';
 
-export const UI_VERSION_STORAGE_KEY = 'wordquest.uiVersion.v1';
+/** v2: the v1 key stored 'classic' | 'new' with different meanings. */
+export const UI_VERSION_STORAGE_KEY = 'wordquest.uiVersion.v2';
 
 interface UiVersionState {
   version: UiVersion;
@@ -31,7 +30,7 @@ interface UiVersionState {
 }
 
 export function parseUiVersion(raw: unknown): UiVersion | null {
-  return raw === 'classic' || raw === 'new' ? raw : null;
+  return raw === 'standard' || raw === 'prototype' ? raw : null;
 }
 
 export const useUiVersionStore = create<UiVersionState>((set) => ({
@@ -57,7 +56,7 @@ export const useUiVersionStore = create<UiVersionState>((set) => ({
   },
 }));
 
-/** True when the redesigned UI is active. Call inside components. */
-export function useIsNewLook(): boolean {
-  return useUiVersionStore((s) => s.version === 'new');
+/** True when the illustrated prototype "New look" is active. Call inside components. */
+export function useIsPrototype(): boolean {
+  return useUiVersionStore((s) => s.version === 'prototype');
 }

@@ -135,8 +135,8 @@ export function SettingsScreen({ navigation }: Props) {
             <Text style={styles.rowHint}>{t('newLookHint')}</Text>
           </View>
           <Switch
-            value={uiVersion === 'new'}
-            onValueChange={(on) => setUiVersion(on ? 'new' : 'classic')}
+            value={uiVersion === 'prototype'}
+            onValueChange={(on) => setUiVersion(on ? 'prototype' : 'standard')}
             trackColor={{ false: colors.border, true: colors.arcane }}
             thumbColor={colors.ink}
             accessibilityLabel={t('newLookRow')}

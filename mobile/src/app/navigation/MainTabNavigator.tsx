@@ -2,7 +2,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/state/themeStore';
-import { useIsNewLook } from '@/state/uiVersionStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { withResponsiveFrame as framed } from '@/components/layout/withResponsiveFrame';
 import { ResponsiveTabBar, navInset } from './ResponsiveTabBar';
@@ -49,12 +48,11 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 export function MainTabNavigator() {
   const { t } = useTranslation('common');
   const colors = useThemeColors();
-  const newLook = useIsNewLook();
   const { breakpoint } = useBreakpoint();
   return (
     <Tab.Navigator
       tabBar={(props) => <ResponsiveTabBar {...props} />}
-      sceneContainerStyle={{ paddingLeft: navInset(newLook, breakpoint) }}
+      sceneContainerStyle={{ paddingLeft: navInset(breakpoint) }}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.arcaneSoft,

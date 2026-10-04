@@ -1,4 +1,4 @@
-import { Fragment, type ComponentType, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
-import { useIsNewLook } from '@/state/uiVersionStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { ResponsiveContainer } from '@/components/layout/ResponsiveContainer';
 import {
@@ -73,9 +72,8 @@ export function PlayScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
-  const newLook = useIsNewLook();
   const bp = useBreakpoint();
-  const wide = newLook && !bp.isMobile;
+  const wide = !bp.isMobile;
 
   const [catalog, setCatalog] = useState<QuestCatalogEntry[] | null>(null);
   const [summary, setSummary] = useState<TodayQuestSummary | null>(null);
@@ -304,13 +302,11 @@ export function PlayScreen({ navigation }: Props) {
     </View>
   );
 
-  const Wrapper: ComponentType<any> = newLook ? ResponsiveContainer : Fragment;
-
   return (
-    <ScrollView contentContainerStyle={[styles.container, newLook && styles.containerNew]}>
-      <Wrapper {...(newLook ? { style: styles.hubStack } : {})}>
-      <Text style={styles.title}>{newLook ? t('common:tabs.play') : t('play:title')}</Text>
-      {newLook && <Text style={styles.subtitle}>{t('arcade:subtitle')}</Text>}
+    <ScrollView contentContainerStyle={[styles.container, styles.containerNew]}>
+      <ResponsiveContainer style={styles.hubStack}>
+      <Text style={styles.title}>{t('common:tabs.play')}</Text>
+      <Text style={styles.subtitle}>{t('arcade:subtitle')}</Text>
 
       <FirstTimeTip
         id="play.intro"
@@ -347,7 +343,7 @@ export function PlayScreen({ navigation }: Props) {
       <Text style={styles.deviceTime}>
         {t('quests:localTime', { period: timeOfDayPeriod(now), clock: formatLocalClock(now) })}
       </Text>
-      </Wrapper>
+      </ResponsiveContainer>
     </ScrollView>
   );
 }
