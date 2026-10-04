@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/state/themeStore';
 import { useIsNewLook } from '@/state/uiVersionStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { withResponsiveFrame as framed } from '@/components/layout/withResponsiveFrame';
 import { ResponsiveTabBar, navInset } from './ResponsiveTabBar';
 import { HomeEntry } from '@/features/home/HomeEntry';
 import { PlayScreen } from '@/features/play/PlayScreen';
@@ -71,17 +72,17 @@ export function MainTabNavigator() {
       <Tab.Screen name="Play" component={PlayScreen} options={{ tabBarLabel: t('tabs.play') }} />
       <Tab.Screen
         name="Journey"
-        component={JourneyScreen}
+        component={framed(JourneyScreen, 1280)}
         options={{ tabBarLabel: t('tabs.journey') }}
       />
       <Tab.Screen
         name="Compete"
-        component={LeaderboardScreen}
+        component={framed(LeaderboardScreen, 1280)}
         options={{ tabBarLabel: t('tabs.compete') }}
       />
       <Tab.Screen
         name="Profile"
-        component={PassportScreen}
+        component={framed(PassportScreen, 1280)}
         options={{ tabBarLabel: t('tabs.profile') }}
       />
     </Tab.Navigator>

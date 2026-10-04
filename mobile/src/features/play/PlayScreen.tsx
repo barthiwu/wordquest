@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -6,6 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
+import { useIsNewLook } from '@/state/uiVersionStore';
+import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { ResponsiveContainer } from '@/components/layout/ResponsiveContainer';
 import {
   listQuests,
   getTodayQuestSummary,
@@ -65,11 +68,14 @@ interface PlayQuestEntry {
  * background clock tick must never override.
  */
 export function PlayScreen({ navigation }: Props) {
-  const { t } = useTranslation(['play', 'quests', 'arcade', 'home']);
+  const { t } = useTranslation(['play', 'quests', 'arcade', 'home', 'common']);
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const accessToken = useAuthStore((s) => s.accessToken);
+  const newLook = useIsNewLook();
+  const bp = useBreakpoint();
+  const wide = newLook && !bp.isMobile;
 
   const [catalog, setCatalog] = useState<QuestCatalogEntry[] | null>(null);
   const [summary, setSummary] = useState<TodayQuestSummary | null>(null);
@@ -158,30 +164,8 @@ export function PlayScreen({ navigation }: Props) {
     ? formatBossBattleCountdown(upcomingBattle.scheduledStartUtc, upcomingBattle.status)
     : null;
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{t('play:title')}</Text>
-
-      <FirstTimeTip
-        id="play.intro"
-        colors={colors}
-        icon="compass-outline"
-        title={t('play:tipTitle')}
-        body={t('play:tipBody')}
-      />
-
-      {!catalog && !error && (
-        <View style={styles.centered}>
-          <ActivityIndicator color={colors.arcaneSoft} />
-        </View>
-      )}
-      {error && <Text style={styles.error}>{error}</Text>}
-      {catalog && quests.length === 0 && (
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>{t('quests:emptyState')}</Text>
-        </View>
-      )}
-
+  const questBlock = (
+    <>
       {selected && (
         <View style={styles.primaryCard}>
           <Pressable
@@ -270,6 +254,11 @@ export function PlayScreen({ navigation }: Props) {
         </View>
       )}
 
+    </>
+  );
+
+  const gamesBlock = (
+    <View style={[styles.gamesBlock, wide && styles.gamesGrid]}>
       <GameRow
         title={t('arcade:scrambleQuestTitle')}
         subtitle={t('arcade:scrambleQuestSubtitle')}
@@ -278,6 +267,7 @@ export function PlayScreen({ navigation }: Props) {
         onPress={() => selectGame('SCRAMBLE_QUEST', 'ScrambleQuest')}
         icon={<ScrambleQuestIcon colors={colors} />}
         styles={styles}
+        grid={wide}
       />
       <GameRow
         title={t('arcade:wordDuelTitle')}
@@ -287,6 +277,7 @@ export function PlayScreen({ navigation }: Props) {
         onPress={() => selectGame('WORD_DUEL', 'WordDuel')}
         icon={<WordDuelIcon colors={colors} />}
         styles={styles}
+        grid={wide}
       />
       <GameRow
         title={t('arcade:completeItTitle')}
@@ -296,6 +287,7 @@ export function PlayScreen({ navigation }: Props) {
         onPress={() => selectGame('COMPLETE_IT', 'CompleteIt')}
         icon={<CompleteItIcon colors={colors} />}
         styles={styles}
+        grid={wide}
       />
       <GameRow
         title={t('home:bossBattle')}
@@ -306,11 +298,56 @@ export function PlayScreen({ navigation }: Props) {
         badge={battleCountdown?.compact}
         badgeSubtext={battleCountdown?.subtitle}
         styles={styles}
+        grid={wide}
       />
+
+    </View>
+  );
+
+  const Wrapper = newLook ? ResponsiveContainer : Fragment;
+
+  return (
+    <ScrollView contentContainerStyle={[styles.container, newLook && styles.containerNew]}>
+      <Wrapper>
+      <Text style={styles.title}>{newLook ? t('common:tabs.play') : t('play:title')}</Text>
+      {newLook && <Text style={styles.subtitle}>{t('arcade:subtitle')}</Text>}
+
+      <FirstTimeTip
+        id="play.intro"
+        colors={colors}
+        icon="compass-outline"
+        title={t('play:tipTitle')}
+        body={t('play:tipBody')}
+      />
+
+      {!catalog && !error && (
+        <View style={styles.centered}>
+          <ActivityIndicator color={colors.arcaneSoft} />
+        </View>
+      )}
+      {error && <Text style={styles.error}>{error}</Text>}
+      {catalog && quests.length === 0 && (
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>{t('quests:emptyState')}</Text>
+        </View>
+      )}
+
+      {wide ? (
+        <View style={styles.hubRow}>
+          <View style={styles.hubQuestCol}>{questBlock}</View>
+          <View style={styles.hubGamesCol}>{gamesBlock}</View>
+        </View>
+      ) : (
+        <>
+          {questBlock}
+          {gamesBlock}
+        </>
+      )}
 
       <Text style={styles.deviceTime}>
         {t('quests:localTime', { period: timeOfDayPeriod(now), clock: formatLocalClock(now) })}
       </Text>
+      </Wrapper>
     </ScrollView>
   );
 }
@@ -325,6 +362,7 @@ function GameRow({
   badge,
   badgeSubtext,
   styles,
+  grid,
 }: {
   title: string;
   subtitle: string;
@@ -335,10 +373,11 @@ function GameRow({
   badge?: string;
   badgeSubtext?: string;
   styles: ReturnType<typeof createStyles>;
+  grid?: boolean;
 }) {
   return (
     <Pressable
-      style={[styles.card, !enabled && styles.cardDisabled]}
+      style={[styles.card, grid && styles.cardGrid, !enabled && styles.cardDisabled]}
       onPress={enabled ? onPress : undefined}
       disabled={!enabled}
       accessibilityRole="button"
@@ -374,6 +413,14 @@ function createStyles(colors: ThemeColors, topInset: number) {
       paddingTop: topInset + spacing.xl,
       gap: spacing.md,
     },
+    containerNew: { paddingHorizontal: spacing.md },
+    subtitle: { color: colors.inkMuted, fontSize: typography.scale.md, marginTop: -spacing.sm },
+    hubRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.lg },
+    hubQuestCol: { flex: 2, gap: spacing.md },
+    hubGamesCol: { flex: 3 },
+    gamesBlock: { gap: spacing.md },
+    gamesGrid: { flexDirection: 'row', flexWrap: 'wrap' },
+    cardGrid: { flexGrow: 1, flexBasis: 280, minWidth: 0 },
     centered: { alignItems: 'center', paddingVertical: spacing.xl },
     empty: {
       backgroundColor: colors.surface,

@@ -3,6 +3,7 @@ import { NavigationContainer, type NavigatorScreenParams } from '@react-navigati
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useThemeColors, useThemeStore } from '@/state/themeStore';
 import { useAuthStore } from '@/state/authStore';
+import { withResponsiveFrame as framed } from '@/components/layout/withResponsiveFrame';
 import { SplashScreen } from '@/features/splash/SplashScreen';
 import { WelcomeScreen } from '@/features/welcome/WelcomeScreen';
 import { RegistrationScreen } from '@/features/auth/RegistrationScreen';
@@ -176,42 +177,42 @@ export function RootNavigator() {
         <Stack.Screen name="ClanSelection" component={ClanSelectionScreen} />
         <Stack.Screen name="AppIntro" component={AppIntroScreen} />
         <Stack.Screen name="Main" component={MainTabNavigator} />
-        <Stack.Screen name="DailyQuest" component={DailyQuestScreen} />
-        <Stack.Screen name="QuestComplete" component={QuestCompleteScreen} />
-        <Stack.Screen name="CatchUpCalendar" component={CatchUpCalendarScreen} />
-        <Stack.Screen name="CatchUpReplay" component={CatchUpReplayScreen} />
-        <Stack.Screen name="SkillRadar" component={SkillRadarScreen} />
-        <Stack.Screen name="WordInTheWild" component={WordInTheWildScreen} />
-        <Stack.Screen name="SubmitEvidence" component={SubmitEvidenceScreen} />
-        <Stack.Screen name="EvidenceResult" component={EvidenceResultScreen} />
-        <Stack.Screen name="Achievements" component={AchievementsScreen} />
-        <Stack.Screen name="Ali" component={AliScreen} />
-        <Stack.Screen name="BossBattle" component={BossBattleScreen} />
-        <Stack.Screen name="ScrambleQuest" component={ScrambleQuestScreen} />
-        <Stack.Screen name="CompleteIt" component={CompleteItScreen} />
-        <Stack.Screen name="WordDuel" component={WordDuelScreen} />
-        <Stack.Screen name="BossBattleLeaderboard" component={BossBattleLeaderboardScreen} />
-        <Stack.Screen name="MasterChallenge" component={MasterChallengeScreen} />
-        <Stack.Screen name="Order" component={OrderScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-        <Stack.Screen name="ProfileSettings" component={ProfileSettingsScreen} />
-        <Stack.Screen name="Shop" component={ShopScreen} />
-        <Stack.Screen name="Notifications" component={NotificationsScreen} />
-        <Stack.Screen name="CalibrationResult" component={CalibrationResultScreen} />
-        <Stack.Screen name="QuestCardGallery" component={QuestCardGalleryScreen} />
-        <Stack.Screen name="QuestCardDetail" component={QuestCardDetailScreen} />
-        <Stack.Screen name="WordMastery" component={WordMasteryScreen} />
-        <Stack.Screen name="WordPractice" component={WordPracticeScreen} />
-        <Stack.Screen name="LevelRoadmap" component={LevelRoadmapScreen} />
-        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
-        <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
-        <Stack.Screen name="AgeRestriction" component={AgeRestrictionScreen} />
-        <Stack.Screen name="Language" component={LanguageScreen} />
-        <Stack.Screen name="About" component={AboutScreen} />
-        <Stack.Screen name="SendFeedback" component={SendFeedbackScreen} />
-        <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} />
-        <Stack.Screen name="Friends" component={FriendsScreen} />
-        <Stack.Screen name="PublicProfile" component={PublicProfileScreen} />
+        <Stack.Screen name="DailyQuest" component={framed(DailyQuestScreen)} />
+        <Stack.Screen name="QuestComplete" component={framed(QuestCompleteScreen)} />
+        <Stack.Screen name="CatchUpCalendar" component={framed(CatchUpCalendarScreen)} />
+        <Stack.Screen name="CatchUpReplay" component={framed(CatchUpReplayScreen)} />
+        <Stack.Screen name="SkillRadar" component={framed(SkillRadarScreen)} />
+        <Stack.Screen name="WordInTheWild" component={framed(WordInTheWildScreen)} />
+        <Stack.Screen name="SubmitEvidence" component={framed(SubmitEvidenceScreen)} />
+        <Stack.Screen name="EvidenceResult" component={framed(EvidenceResultScreen)} />
+        <Stack.Screen name="Achievements" component={framed(AchievementsScreen)} />
+        <Stack.Screen name="Ali" component={framed(AliScreen)} />
+        <Stack.Screen name="BossBattle" component={framed(BossBattleScreen)} />
+        <Stack.Screen name="ScrambleQuest" component={framed(ScrambleQuestScreen)} />
+        <Stack.Screen name="CompleteIt" component={framed(CompleteItScreen)} />
+        <Stack.Screen name="WordDuel" component={framed(WordDuelScreen)} />
+        <Stack.Screen name="BossBattleLeaderboard" component={framed(BossBattleLeaderboardScreen)} />
+        <Stack.Screen name="MasterChallenge" component={framed(MasterChallengeScreen)} />
+        <Stack.Screen name="Order" component={framed(OrderScreen)} />
+        <Stack.Screen name="Settings" component={framed(SettingsScreen)} />
+        <Stack.Screen name="ProfileSettings" component={framed(ProfileSettingsScreen)} />
+        <Stack.Screen name="Shop" component={framed(ShopScreen)} />
+        <Stack.Screen name="Notifications" component={framed(NotificationsScreen)} />
+        <Stack.Screen name="CalibrationResult" component={framed(CalibrationResultScreen)} />
+        <Stack.Screen name="QuestCardGallery" component={framed(QuestCardGalleryScreen)} />
+        <Stack.Screen name="QuestCardDetail" component={framed(QuestCardDetailScreen)} />
+        <Stack.Screen name="WordMastery" component={framed(WordMasteryScreen)} />
+        <Stack.Screen name="WordPractice" component={framed(WordPracticeScreen)} />
+        <Stack.Screen name="LevelRoadmap" component={framed(LevelRoadmapScreen)} />
+        <Stack.Screen name="PrivacyPolicy" component={framed(PrivacyPolicyScreen)} />
+        <Stack.Screen name="TermsOfService" component={framed(TermsOfServiceScreen)} />
+        <Stack.Screen name="AgeRestriction" component={framed(AgeRestrictionScreen)} />
+        <Stack.Screen name="Language" component={framed(LanguageScreen)} />
+        <Stack.Screen name="About" component={framed(AboutScreen)} />
+        <Stack.Screen name="SendFeedback" component={framed(SendFeedbackScreen)} />
+        <Stack.Screen name="AdminDashboard" component={framed(AdminDashboardScreen)} />
+        <Stack.Screen name="Friends" component={framed(FriendsScreen)} />
+        <Stack.Screen name="PublicProfile" component={framed(PublicProfileScreen)} />
       </Stack.Navigator>
     </NavigationContainer>
   );
