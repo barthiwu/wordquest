@@ -2,6 +2,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/state/themeStore';
+import { useIsNewLook } from '@/state/uiVersionStore';
+import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { ResponsiveTabBar, navInset } from './ResponsiveTabBar';
 import { HomeScreen } from '@/features/home/HomeScreen';
 import { PlayScreen } from '@/features/play/PlayScreen';
 import { JourneyScreen } from '@/features/journey/JourneyScreen';
@@ -45,8 +48,12 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 export function MainTabNavigator() {
   const { t } = useTranslation('common');
   const colors = useThemeColors();
+  const newLook = useIsNewLook();
+  const { breakpoint } = useBreakpoint();
   return (
     <Tab.Navigator
+      tabBar={(props) => <ResponsiveTabBar {...props} />}
+      sceneContainerStyle={{ paddingLeft: navInset(newLook, breakpoint) }}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.arcaneSoft,
