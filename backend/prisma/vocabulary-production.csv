@@ -7324,15 +7324,15 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7323,Probability,A measure of how likely it is that some event will occur; a number expressing the ratio of favorable cases to the whole number of cases possible.,Noun,The probability that an unbiased coin will fall with the head up is 0.5.,chance,,A2,5,General,Very Common,,,measure;quantity;quality
 7324,Probationary,relating to a trial period during which a person's suitability is assessed.,Adjective,Probationary employees are reviewed after their first ninety days.,provisional,provisionary,C2,82,General,Rare,,,probation;conditional
 7325,Probatory,Tending to prove a particular proposition or to persuade you of the truth of an allegation.,Adjective,The lawyer submitted probatory evidence to show the will was genuine.,probative,,C2,82,General,Rare,,,significant;important
-7326,Probing,Examine physically with or as if with a probe.,Verb,Probe an anthill.,probe,dig into,B1,18,General,Common,,,investigate;inquire;penetrate
-7327,Problematical,Open to doubt or debate.,Adjective,"If you ever get married, which seems to be extremely problematic.",debatable,problematic,B2,43,General,Less Common,,,problem;difficult;questionable
-7328,Proceeding,"Continue talking;  he continued,.",Verb,"I know it's hard,.",continue,go on,A2,9,Communication,Very Common,,,locomote;preserve;coquette
-7329,Processed,"Subject to a process or treatment, with the aim of readying for some purpose, improving, or remedying a condition.",Verb,Process cheese.,process,treat,A2,9,General,Very Common,,,influence;distort;trouble
-7330,Procession,(theology) the origination of the Holy Spirit at Pentecost.,Noun,The emanation of the Holy Spirit.,emanation,rise,B1,18,General,Common,,,collection;assemblage;caravan
+7326,Probing,Examine physically with or as if with a probe.,Verb,The doctor was probing the wound with a thin steel instrument.,probe,dig into,B1,18,General,Common,,,investigate;inquire;penetrate
+7327,Problematical,Open to doubt or debate.,Adjective,"Whether the bridge will open on time is problematical, given the weather.",debatable,problematic,B2,43,General,Less Common,,,problem;difficult;questionable
+7328,Proceeding,"Continue talking;  he continued,.",Verb,"He paused, then, proceeding in a quieter voice, told the rest of the story.",continue,go on,A2,9,Communication,Very Common,,,locomote;preserve;coquette
+7329,Processed,"Subject to a process or treatment, with the aim of readying for some purpose, improving, or remedying a condition.",Verb,The grain was processed at the mill before being shipped to the bakeries.,process,treat,A2,9,General,Very Common,,,influence;distort;trouble
+7330,Procession,(theology) the origination of the Holy Spirit at Pentecost.,Noun,The procession of the Holy Spirit is a point that theologians have debated for centuries.,emanation,rise,B1,18,General,Common,,,collection;assemblage;caravan
 7331,Proclaim,announce something officially or publicly.,Verb,"'I am not a Communist,' he proclaimed loudly to the reporters.",exclaim,promulgate,A2,9,Communication,Very Common,,,proclamation;profess;consecrate
 7332,Proclamation,"An official public statement, especially one made by a government or ruler.",Noun,The governor issued a proclamation declaring a state of emergency.,announcement,annunciation,A2,8,Communication,Very Common,,,proclaim;statement;promulgation
 7333,Procrastinate,"delay or postpone action, especially out of avoidance or habitual putting-off.",Verb,She tends to procrastinate until the deadline is nearly upon her.,stall,drag one's feet,B2,43,General,Less Common,,,dillydally;hesitate;postpone
-7334,Procreative,Producing new life or offspring.,Adjective,The reproductive potential of a species is its relative capacity to reproduce itself under optimal conditions.,generative,reproductive,B1,32,General,Common,,,procreate;fruitful
+7334,Procreative,Producing new life or offspring.,Adjective,The procreative cycle of the salmon begins in the cold upper streams.,generative,reproductive,B1,32,General,Common,,,procreate;fruitful
 7335,Procurable,"Able to be obtained, especially through deliberate effort or purchase (formal).",Adjective,Fresh truffles are procurable only during a short autumn season.,gettable,getable,C2,82,General,Rare,,,available
 7336,Procurance,"an archaic, rare variant of 'procurement'; the act of obtaining something.",Noun,The old ledger recorded the procurance of grain for the garrison.,procurement,procural,C2,82,General,Rare,,,acquisition;assumption;succession
 7337,Procurement,"the act of obtaining or acquiring something, especially through formal or official means.",Noun,He was responsible for the procurement of materials and supplies.,procurance,procural,A2,7,General,Very Common,,,acquisition;assumption;succession
@@ -7342,53 +7342,53 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7341,Productively,in a manner that yields useful or valuable results efficiently.,Adverb,"She used the long flight productively, catching up on emails.",fruitfully,profitably,C2,82,General,Rare,,,productive;fertile;creative
 7342,Profane,"To treat something sacred with disrespect, or to corrupt something pure.",Verb,The vandals were accused of trying to profane the ancient temple.,corrupt,pervert,B2,43,Society & Culture,Less Common,,,assault;desecrate;outrage
 7343,Profess,"openly declare a belief, feeling, or claim, sometimes insincerely.",Verb,He professed his innocence to anyone who would listen.,concede,confess,B1,18,Communication,Common,,,professing;pretend;purport
-7344,Professed,"Practice as a profession, teach, or claim to be knowledgeable about.",Verb,She professes organic chemistry.,profess,,B1,18,Communication,Common,,,pretend;purport;contend
-7345,Professing,An open avowal (true or false) of some belief or opinion.,Noun,A profession of disagreement.,profession,,B1,32,Communication,Common,,,profess;avowal;avouchment
+7344,Professed,"Practice as a profession, teach, or claim to be knowledgeable about.",Verb,"She professed to know everything about wine, though she had never visited a vineyard.",profess,,B1,18,Communication,Common,,,pretend;purport;contend
+7345,Professing,An open avowal (true or false) of some belief or opinion.,Noun,His public professing of the new creed surprised his friends.,profession,,B1,32,Communication,Common,,,profess;avowal;avouchment
 7346,Professionalise,chiefly British spelling; give an activity or field a professional character or standard.,Verb,The federation moved to professionalise the sport over the following decade.,professionalize,,C2,82,General,Rare,,,change;alter;modify
 7347,Professionalize,"give an activity or field a professional character or standard, chiefly American spelling.",Verb,Philosophy has not always been professionalized and used to be pursued only by amateurs.,professionalise,,C2,82,General,Rare,,,professionalization;change;alter
 7348,Proffer,"an offer or proposal put forward for acceptance (a somewhat formal term, more commonly used as a verb).",Noun,The lawyer's proffer of a plea deal surprised the defense team.,suggestion,proposition,C2,82,Communication,Rare,,,proposal;advance;approach
 7349,Proficiency,a high degree of competence or skill; expertise.,Noun,He achieved fluent proficiency in Spanish after two years abroad.,technique,,B1,26,Academic,Common,,,competence;fitness;fluency
-7350,Profiling,Write about.,Verb,The author of this article profiles a famous painter.,profile,,C2,82,Arts & Creativity,Rare,,,compose;represent;poetise
-7351,Profits,Derive a benefit from.,Verb,She profited from his vast experience.,profit,gain,A2,7,Business,Very Common,,,acquire;capitalize;realize
-7352,Profound,Far-reaching and thoroughgoing in effect especially on the nature of something.,Adjective,The fundamental revolution in human values that has occurred.,fundamental,,A2,6,General,Very Common,,,profundity;thoughtful;intense
-7353,Profoundly,To a great depth psychologically.,Adverb,They felt the loss deeply.,deeply,,A2,12,General,Very Common,,,profound;deep;heavy
+7350,Profiling,Write about.,Verb,The magazine is profiling a young inventor from the village.,profile,,C2,82,Arts & Creativity,Rare,,,compose;represent;poetise
+7351,Profits,Derive a benefit from.,Verb,"He profits from every sale, no matter how small.",profit,gain,A2,7,Business,Very Common,,,acquire;capitalize;realize
+7352,Profound,Far-reaching and thoroughgoing in effect especially on the nature of something.,Adjective,The war had a profound effect on the whole region.,fundamental,,A2,6,General,Very Common,,,profundity;thoughtful;intense
+7353,Profoundly,To a great depth psychologically.,Adverb,She was profoundly moved by the quiet kindness of the stranger.,deeply,,A2,12,General,Very Common,,,profound;deep;heavy
 7354,Profundity,"great depth of insight, knowledge, or feeling.",Noun,The profundity of her observation surprised everyone in the room.,reconditeness,abstruseness,B1,26,Academic,Common,,,profound;wisdom;depth
 7355,Profusely,"In large amounts; abundantly, especially of sweating, bleeding, or apologizing.",Adverb,He apologized profusely for arriving late.,abundantly,copiously,B1,26,General,Common,,,voluminous;riotous;rampant
 7356,Profusion,an abundant or excessive amount of something.,Noun,The garden burst with a profusion of colorful wildflowers each spring.,profuseness,richness,B1,32,General,Common,,,abundance;teemingness;plentifulness
-7357,Prognostic,A sign of something about to happen.,Noun,He looked for an omen before going into battle.,omen,portent,C2,82,General,Rare,,,preindication;augury;sign
+7357,Prognostic,A sign of something about to happen.,Noun,A ring around the moon was an old sailor's prognostic of rain.,omen,portent,C2,82,General,Rare,,,preindication;augury;sign
 7358,Prognosticate,"To forecast something, especially based on current signs or symptoms.",Verb,Doctors can prognosticate a patient's recovery from early test results.,predict,foretell,C2,82,Communication,Rare,,,venture;pretend;forecast
-7359,Programing,Arrange a program of or for.,Verb,Program the 80th birthday party.,program,programme,A2,9,Communication,Very Common,,,schedule;concoct;construct
-7360,Progression,A movement forward.,Noun,He listened for the progress of the troops.,progress,advance,B1,32,General,Common,,,blizzard;stations;succession
+7359,Programing,Arrange a program of or for.,Verb,She spent the weekend programing the school's new timetable.,program,programme,A2,9,Communication,Very Common,,,schedule;concoct;construct
+7360,Progression,A movement forward.,Noun,The progression from apprentice to master took ten long years.,progress,advance,B1,32,General,Common,,,blizzard;stations;succession
 7361,Prohibit,"To formally forbid something, usually by law or rule.",Verb,Local laws prohibit smoking in restaurants.,forbid,interdict,B1,32,Communication,Common,,,command;require;criminalise
 7362,Prohibited,Formally forbidden by a law or rule.,Adjective,Fishing is prohibited in this part of the lake.,forbid,prohibit,A2,12,Communication,Very Common,,,command;require;criminalise
 7363,Prohibitive,Tending to discourage (especially of prices).,Adjective,The price was prohibitive.,prohibitory,,B2,43,General,Less Common,,,preventative;preventive
 7364,Projected,estimate or forecast for the future based on current trends or data.,Verb,The projected sales for next quarter look promising.,project,,A2,8,Communication,Very Common,,,communicate;overhang;intercommunicate
 7365,Projection,The acoustic phenomenon that gives sound a penetrating quality.,Noun,Our ukuleles have been designed to have superior sound and projection.,acoustic projection,sound projection,A2,11,General,Very Common,,,project;foreshadowing;demonstration
-7366,Proletarian,A member of the working class (not necessarily employed).,Noun,Workers of the world--unite!,prole,worker,C2,82,Society & Culture,Rare,,,bourgeois;commoner;labor
-7367,Proletariat,A social class comprising those who do manual labor or work for wages.,Noun,There is a shortage of skilled labor in this field.,labor,labour,B1,26,Society & Culture,Common,,,proletarian;stratum;class
+7366,Proletarian,A member of the working class (not necessarily employed).,Noun,The play showed a proletarian family struggling to pay the rent.,prole,worker,C2,82,Society & Culture,Rare,,,bourgeois;commoner;labor
+7367,Proletariat,A social class comprising those who do manual labor or work for wages.,Noun,The poet gave a voice to the proletariat of the northern mills.,labor,labour,B1,26,Society & Culture,Common,,,proletarian;stratum;class
 7368,Prolificacy,"The quality of producing abundant works, offspring, or results.",Noun,The author's prolificacy resulted in over forty novels in twenty years.,richness,rankness,C2,82,General,Rare,,,productivity;fertility;fruitfulness
 7369,Prolongation,The act of extending the duration of something.,Noun,The prolongation of the drought devastated local farmers.,protraction,perpetuation,B2,43,General,Less Common,,,perseverance;repetition;repeating
-7370,Promenade,March in a procession.,Verb,The veterans paraded down the street.,parade,troop,B1,26,General,Common,,,process;march;walk
+7370,Promenade,March in a procession.,Verb,The marchers promenade down the main street at the start of the festival.,parade,troop,B1,26,General,Common,,,process;march;walk
 7371,Prominently,"in a way that stands out and attracts attention, often due to importance.",Adverb,Her name was prominently displayed at the top of the program.,conspicuously,,A2,12,General,Very Common,,,prominent;conspicuous;outstanding
 7372,Promiscuous,"having casual sexual relations with many partners, or, more broadly, indiscriminate in choice or use.",Adjective,The novel's promiscuous narrator drifts from one relationship to the next.,easy,light,C2,82,General,Rare,,,indiscriminate;promiscuousness;promiscuity
 7373,Prompting,A cue given to a performer (usually the beginning of the next line to be spoken).,Noun,The audience could hear his prompting.,prompt,,C2,82,Communication,Rare,,,persuasion;suggestion;incitement
 7374,Promulgate,"formally put a law or decree into effect, or widely promote an idea (a more formal, legal-sounding term).",Verb,The council moved to promulgate the new zoning regulations by spring.,proclaim,exclaim,C2,82,Communication,Rare,,,promulgation;announce;profess
-7375,Promulgation,A public statement containing information about an event that has happened or is going to happen.,Noun,The announcement appeared in the local newspaper.,announcement,,C2,82,Communication,Rare,,,promulgate;statement;program
-7376,Pronged,Having prongs or tines; usually used in combination.,Adjective,A three-tined fork.,tined,,C2,82,General,Rare,,,divided
-7377,Proofed,Knead to reach proper lightness.,Verb,Proof dough.,proof,,C2,82,General,Rare,,,produce;make;create
+7375,Promulgation,A public statement containing information about an event that has happened or is going to happen.,Noun,The promulgation of the new law was announced in every village square.,announcement,,C2,82,Communication,Rare,,,promulgate;statement;program
+7376,Pronged,Having prongs or tines; usually used in combination.,Adjective,The three-pronged fork slipped from his hand and clattered across the floor.,tined,,C2,82,General,Rare,,,divided
+7377,Proofed,Knead to reach proper lightness.,Verb,She proofed the dough in a warm kitchen until it doubled in size.,proof,,C2,82,General,Rare,,,produce;make;create
 7378,Propaedeutic,"serving as an introduction or preliminary course of study for a more advanced subject (a formal, academic term).",Adjective,The seminar was designed as a propaedeutic course before students tackled advanced theory.,preparatory,preparative,C2,82,General,Rare,,,preceding;propaedeutics
 7379,Propellant,Tending to or capable of propelling.,Adjective,Propellant fuel for submarines.,propellent,propelling,C2,82,General,Rare,,,dynamic;dynamical;propel
 7380,Propelling,"Driving something forward, especially physically.",Verb,The strong current kept propelling the raft downstream.,propel,impel,B2,43,General,Less Common,,,project;impress;initiate
-7381,Propensity,An inclination to do something.,Noun,He felt leanings toward frivolity.,leaning,tendency,C2,82,Emotion,Rare,,,stomach;direction;disfavor
-7382,Prophesy,Deliver a sermon.,Verb,The minister is not preaching this Sunday.,preach,,C2,82,Communication,Rare,,,predict;prognosticate;forebode
-7383,Prophetical,Foretelling events as if by supernatural intervention.,Adjective,Prophetic writings.,prophetic,,C2,82,General,Rare,,,prognostic;fateful;portentous
-7384,Propitiative,Intended to reconcile or appease.,Adjective,Sent flowers as a propitiatory gesture.,propitiatory,,C2,82,General,Rare,,,conciliatory;conciliative;propitiate
+7381,Propensity,An inclination to do something.,Noun,He had a propensity for telling stories at the worst possible moments.,leaning,tendency,C2,82,Emotion,Rare,,,stomach;direction;disfavor
+7382,Prophesy,Deliver a sermon.,Verb,The preacher began to prophesy from the pulpit as the church fell silent.,preach,,C2,82,Communication,Rare,,,predict;prognosticate;forebode
+7383,Prophetical,Foretelling events as if by supernatural intervention.,Adjective,The prophetical dream warned the king of the coming flood.,prophetic,,C2,82,General,Rare,,,prognostic;fateful;portentous
+7384,Propitiative,Intended to reconcile or appease.,Adjective,He offered a propitiative gift to calm the angry chief.,propitiatory,,C2,82,General,Rare,,,conciliatory;conciliative;propitiate
 7385,Propitiatory,"intended to appease or gain the favor of someone, especially a deity.",Adjective,They left a propitiatory gift at the shrine before the harvest.,expiatory,expiative,C2,82,General,Rare,,,conciliatory;conciliative;propitiate
 7386,Proportional,Properly related in size or degree or other measurable characteristics; usually followed by `to'.,Adjective,The punishment ought to be proportional to the crime.,relative,,A2,8,General,Very Common,,,proportionality
-7387,Proportionally,To a proportionate degree.,Adverb,Your salary will rise proportionately to your workload.,proportionately,,B2,43,General,Less Common,,,proportional;commensurate
+7387,Proportionally,To a proportionate degree.,Adverb,Taxes rise proportionally with income in this system.,proportionately,,B2,43,General,Less Common,,,proportional;commensurate
 7388,Propose,"Make a proposal, declare a plan for something.",Verb,The senator proposed to abolish the sales tax.,suggest,advise,A2,9,Communication,Very Common,,,proposition;proposal;recommend
 7389,Proposition,a suggestion or proposal offered for consideration or acceptance.,Noun,It was a proposition we simply couldn't refuse.,suggestion,proffer,A2,8,Communication,Very Common,,,statement;particular;conclusion
-7390,Proprietor,(law) someone who owns (is legal possessor of) a business.,Noun,He is the owner of a chain of restaurants.,owner,,A2,10,Society & Culture,Very Common,,,operator;proprietary;proprietorship
+7390,Proprietor,(law) someone who owns (is legal possessor of) a business.,Noun,The proprietor of the shop greeted every customer by name.,owner,,A2,10,Society & Culture,Very Common,,,operator;proprietary;proprietorship
 7391,Prorogue,"discontinue a session of a parliament or assembly without dissolving it (a specific, formal legislative term).",Verb,The prime minister moved to prorogue Parliament ahead of the vote.,postpone,hold over,C2,82,General,Rare,,,respite;scratch;withdraw
 7392,Prosaically,"in a plain, matter-of-fact manner lacking imagination or poetic quality.",Adverb,"I applied my attention prosaically to my daily routine, task by task.",unimaginatively,,C2,82,General,Rare,,,prosaic;unexciting
 7393,Proscribed,Officially forbidden or banned.,Adjective,The substance is proscribed under international law.,forbid,prohibit,B2,43,Communication,Less Common,,,command;require;criminalise
@@ -7399,13 +7399,13 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7398,Protestation,"a firm declaration or affirmation, especially one made in the face of denial or doubt.",Noun,"Despite his protestation of innocence, the jury found him guilty.",protest,,C2,82,Communication,Rare,,,declaration;dissent;exception
 7399,Prototypal,Serving as an original model or first example from which others are developed.,Adjective,The 1985 concept car was prototypal for the entire model line.,archetypal,archetypical,C2,82,General,Rare,,,prototype;first
 7400,Prototypic,Relating to or having the character of an original model or type.,Adjective,The device is prototypic of the next generation of wearables.,archetypal,archetypical,C2,82,General,Rare,,,prototype;first
-7401,Protract,Lengthen in time; cause to be or last longer.,Verb,We prolonged our stay.,prolong,extend,C2,82,General,Rare,,,protraction;temporize;elongate
-7402,Protractedly,"In a slow, leisurely or prolonged way.",Adverb,"Her voice was swift, yet ever the last words fell lingeringly.",lingeringly,,C2,82,General,Rare,,,protracted;long
+7401,Protract,Lengthen in time; cause to be or last longer.,Verb,There is no reason to protract the meeting any longer.,prolong,extend,C2,82,General,Rare,,,protraction;temporize;elongate
+7402,Protractedly,"In a slow, leisurely or prolonged way.",Adverb,The negotiations dragged on protractedly for months.,lingeringly,,C2,82,General,Rare,,,protracted;long
 7403,Protractile,Able to be extended.,Adjective,Protractile muscle.,protractible,,C2,82,General,Rare,,,extensile;extensible
 7404,Protraction,The act of extending something in time beyond its normal or expected length.,Noun,The protraction of the trial exhausted both legal teams.,prolongation,perpetuation,C2,82,General,Rare,,,protract;duration;perseverance
 7405,Protruding,sticking out or extending beyond the normal surface or boundary.,Verb,"A nail was protruding from the old fence post, ready to snag a sleeve.",stick out,protrude,B1,26,General,Common,,,overhang;sharpen;distort
 7406,Protuberance,A part that sticks out or bulges from a surface.,Noun,There was a strange protuberance on the side of the rock.,bulge,bump,B2,43,General,Less Common,,,projection;condition;salient
-7407,Provably,In an obvious and provable manner.,Adverb,His documentary sources are demonstrably wrong.,demonstrably,incontrovertibly,C2,82,General,Rare,,,obvious;provable
+7407,Provably,In an obvious and provable manner.,Adverb,"The claim is provably false, as the records clearly show.",demonstrably,incontrovertibly,C2,82,General,Rare,,,obvious;provable
 7408,Provenance,"the place of origin or earliest known history of something, especially an object such as an artwork.",Noun,The auction house confirmed the painting's provenance before the sale.,birthplace,cradle,B2,43,Travel & Places,Less Common,,,beginning;rootage;fountainhead
 7409,Providential,"occurring at a fortunate time, as if by divine intervention.",Adjective,The providential rain arrived just in time to save the crops.,heaven-sent,miraculous,B2,43,General,Less Common,,,fortunate;providence
 7410,Provisional,"arranged or existing for the present, possibly to be changed later.",Adjective,The committee reached a provisional agreement pending further review.,probationary,provisionary,A2,14,General,Very Common,,,conditional
@@ -7415,11 +7415,11 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7414,Provoked,"Caused a strong reaction, especially anger, through deliberate action.",Verb,His comment provoked an immediate response from the crowd.,arouse,elicit,A2,14,Emotion,Very Common,,,disconcert;overwhelm;overcome
 7415,Provoking,"Causing a strong or sudden reaction, especially anger or annoyance.",Verb,The referee's provoking call led to boos from the stands.,arouse,elicit,C2,82,Emotion,Rare,,,disconcert;overwhelm;overcome
 7416,Prowess,"exceptional skill or bravery, especially in a particular activity, such as combat or sport.",Noun,His prowess on the battlefield earned him a knighthood.,art,artistry,B1,32,Academic,Common,,,aviation;enology;oenology
-7417,Proximo,In or of the next month after the present.,Adjective,Scheduled for the 6th prox.,prox,,C2,82,General,Rare,,,future
+7417,Proximo,In or of the next month after the present.,Adjective,The payment is due on the 10th proximo.,prox,,C2,82,General,Rare,,,future
 7418,Prudently,In a prudent manner.,Adverb,"I had allotted my own bedroom for necking, prudently removing both the bed and the key, and taken both myself and my typewriter into my son's bedroom.",providentially,,B2,43,General,Less Common,,,circumspect;discreet;responsible
 7419,Prudishly,In a prudish manner.,Adverb,"She acts prudishly, but I wonder whether she is really all that chaste.",puritanically,,C2,82,General,Rare,,,prudish;proper
 7420,Prurient,Having or encouraging an excessive interest in sexual matters.,Adjective,The tabloid's prurient headlines drew plenty of criticism.,lubricious,lustful,B2,43,General,Less Common,,,pruriency;prurience;sexy
-7421,Psychiatrical,Relating to or used in or engaged in the practice of psychiatry.,Adjective,Psychiatric disorder.,psychiatric,,C2,82,General,Rare,,,psychiatry
+7421,Psychiatrical,Relating to or used in or engaged in the practice of psychiatry.,Adjective,The hospital has a new psychiatrical unit on the third floor.,psychiatric,,C2,82,General,Rare,,,psychiatry
 7422,Psychic,Affecting or influenced by the human mind.,Adjective,Psychic energy.,psychical,,B1,26,General,Common,,,psyche;mental;paranormal
 7423,Psychoactive,"affecting the mind, mood, or mental processes, especially describing a substance.",Adjective,Caffeine is one of the most widely used psychoactive substances in the world.,psychotropic,,B1,32,General,Common,,,hallucinogenic
 7424,Psychoanalysis,A set of techniques for exploring underlying motives and a method of treating various mental disorders; based on the theories of Sigmund Freud.,Noun,His physician recommended psychoanalysis.,analysis,depth psychology,B1,18,General,Common,,,psychoanalytical;psychoanalytic;hypnotherapy
@@ -7430,40 +7430,40 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7429,Publically,"a less common variant spelling of 'publicly'; in an open, public manner.",Adverb,He publically endorsed the candidate at the rally.,publicly,in public,B2,43,General,Less Common,,,national;semipublic;unexclusive
 7430,Publicised,"Made widely known to the public, chiefly British spelling.",Verb,The event was heavily publicised in the local papers.,advertise,publicize,C2,82,Communication,Rare,,,announce;release;broadcast
 7431,Publicity,attention or information intended to bring something to public notice.,Noun,The film's publicity campaign began months before its release.,promotion,promotional material,A2,6,Communication,Very Common,,,message;content;substance
-7432,Publicized,Make public.,Verb,She aired her opinions on welfare.,publicize,publicise,B1,16,Communication,Common,,,release;broadcast;circulate
+7432,Publicized,Make public.,Verb,The festival was publicized on posters and local radio.,publicize,publicise,B1,16,Communication,Common,,,release;broadcast;circulate
 7433,Publishing,in the process of preparing and issuing a work for public distribution.,Verb,The magazine is publishing its next issue on Friday.,print,publish,A2,8,Arts & Creativity,Very Common,,,produce;release;broadcast
-7434,Puckishly,In an appealing but bold manner.,Adverb,She asked him impishly to come in.,impishly,,C2,82,General,Rare,,,puckish;playful
-7435,Puerile,Displaying or suggesting a lack of maturity.,Adjective,Adolescent insecurity.,adolescent,jejune,B2,43,General,Less Common,,,puerility;child;immature
-7436,Puffing,Smoke and exhale strongly.,Verb,Puff a cigar.,puff,whiff,B1,32,Health & Wellness,Common,,,sniffle;snuffle;smoke
+7434,Puckishly,In an appealing but bold manner.,Adverb,He grinned puckishly and hid her hat behind the door.,impishly,,C2,82,General,Rare,,,puckish;playful
+7435,Puerile,Displaying or suggesting a lack of maturity.,Adjective,The puerile joke made the whole room groan.,adolescent,jejune,B2,43,General,Less Common,,,puerility;child;immature
+7436,Puffing,Smoke and exhale strongly.,Verb,The old man sat puffing on his pipe by the fire.,puff,whiff,B1,32,Health & Wellness,Common,,,sniffle;snuffle;smoke
 7437,Pullback,"a decorative loop of cord or fabric used to hold drapery back, or, more broadly, a withdrawal or reduction.",Noun,The draperies were drawn to the sides by matching pullbacks.,tieback,,C2,82,Science & Technology,Rare,,,spindle;retreat;retirement
 7438,Pulmonary,relating to or affecting the lungs.,Adjective,The patient was treated for a serious pulmonary infection.,pneumonic,pulmonic,A2,6,General,Very Common,,,lung
-7439,Pulsate,Expand and contract rhythmically; beat rhythmically.,Verb,The baby's heart was pulsating again after the surgeon massaged it.,throb,pulse,C2,82,General,Rare,,,pulsation;palpitate;beat
+7439,Pulsate,Expand and contract rhythmically; beat rhythmically.,Verb,The lights seemed to pulsate in time with the music.,throb,pulse,C2,82,General,Rare,,,pulsation;palpitate;beat
 7440,Pulsation,"a rhythmic beat, throb, or vibration, especially describing an electrical or physical signal.",Noun,The pulsations seemed to be coming from somewhere deep within the star.,pulsing,pulse,B1,32,General,Common,,,pulsate;impulse;fluctuation
 7441,Pulsing,the act or state of beating or vibrating rhythmically.,Noun,The steady pulsing of the machine's lights signaled it was still charging.,pulsation,pulse,B1,32,General,Common,,,impulse;fluctuation;vibration
 7442,Pulverised,Crushed or ground into fine powder or dust.,Verb,The rocks were pulverised by the quarry's massive crusher.,demolish,pulverize,C2,82,Arts & Creativity,Rare,,,destroy;dismantle;extinguish
 7443,Pulverized,crushed or ground into a fine powder or dust (past tense of 'pulverize').,Verb,The machine pulverized the grains into a fine flour.,powderize,powderise,B1,32,General,Common,,,destroy;dissolve;unravel
-7444,Punctually,At the proper time.,Adverb,She was duly apprised of the raise.,duly,,B1,32,General,Common,,,expected;punctual;timely
+7444,Punctually,At the proper time.,Adverb,The train left punctually at six o'clock.,duly,,B1,32,General,Common,,,expected;punctual;timely
 7445,Punctuate,"To interrupt something at intervals, or to add marks to written text to clarify meaning.",Verb,Bursts of applause continued to punctuate his speech.,stress,emphasize,C2,82,Communication,Rare,,,express;background;underscore
-7446,Punctured,Pierce with a pointed object; make a hole into.,Verb,Puncture a tire.,puncture,,B1,26,General,Common,,,perforate;pierce;make
+7446,Punctured,Pierce with a pointed object; make a hole into.,Verb,A nail punctured the tire on the way home.,puncture,,B1,26,General,Common,,,perforate;pierce;make
 7447,Pungent,Strong and sharp.,Adjective,The pungent taste of radishes.,acrid,,B1,21,General,Common,,,pungency;tasty;sarcastic
 7448,Punished,made to suffer a consequence for wrongdoing (past tense of 'punish').,Verb,The team was punished with a fine after the brawl on the field.,punish,penalize,A2,14,Society & Culture,Very Common,,,execute;scourge;revenge
 7449,Punitive,intended as punishment or inflicting punishment.,Adjective,The court imposed punitive damages far exceeding the actual loss.,punitory,,B2,43,General,Less Common,,,retaliatory;retributive;retributory
 7450,Punitory,a less common variant of 'punitive'; relating to or inflicting punishment.,Adjective,The old legal text used the term punitory to describe such penalties.,punitive,,C2,83,General,Rare,,,retaliatory;retributive;retributory
-7451,Punting,(football) a kick in which the football is dropped from the hands and kicked before it touches the ground.,Noun,The punt traveled 50 yards.,punt,,C2,83,General,Rare,,,kicking;kick;boot
+7451,Punting,(football) a kick in which the football is dropped from the hands and kicked before it touches the ground.,Noun,His punting gave the team good field position for the rest of the game.,punt,,C2,83,General,Rare,,,kicking;kick;boot
 7452,Purchasable,"able to be bought, or figuratively, able to have one's loyalty bought.",Adjective,"His silence, it turned out, was entirely purchasable for the right price.",corruptible,bribable,C2,83,General,Rare,,,corrupt;available
-7453,Purging,Oust politically.,Verb,Deng Xiao Ping was purged several times throughout his lifetime.,purge,,B1,32,Society & Culture,Common,,,oppress;discharge;whitewash
+7453,Purging,Oust politically.,Verb,The new ruler began purging the court of anyone who had opposed him.,purge,,B1,32,Society & Culture,Common,,,oppress;discharge;whitewash
 7454,Purifying,currently removing impurities or contaminants from something.,Verb,The plant is constantly purifying the city's drinking water.,purify,sublimate,B2,43,General,Less Common,,,improve;ameliorate;better
 7455,Puritanical,"Having strict moral or religious views, especially about pleasure and self-indulgence.",Adjective,Her puritanical upbringing made her uneasy at the beach party.,priggish,prim,B2,43,General,Less Common,,,puritanism;puritan;proper
-7456,Purport,The pervading meaning or tenor.,Noun,Caught the general drift of the conversation.,drift,,B1,32,Academic,Common,,,meaning;significance;signification
+7456,Purport,The pervading meaning or tenor.,Noun,The purport of her letter was clear enough: she was not coming back.,drift,,B1,32,Academic,Common,,,meaning;significance;signification
 7457,Purposely,With a specific purpose in mind; intentionally.,Adverb,He purposely arrived early to get a good seat.,intentionally,deliberately,B1,18,General,Common,,,intended
 7458,Pursual,an archaic term for the act of pursuing or following after someone.,Noun,The hounds' pursual of the fox ended at the riverbank.,pursuit,chase,C2,83,General,Rare,,,movement;shadowing;trailing
-7459,Pursuance,A search for an alternative that meets cognitive criteria.,Noun,The pursuit of love.,pursuit,quest,C2,83,Academic,Rare,,,perseverance;repetition;repeating
+7459,Pursuance,A search for an alternative that meets cognitive criteria.,Noun,"In pursuance of a better answer, the team tried a dozen different designs.",pursuit,quest,C2,83,Academic,Rare,,,perseverance;repetition;repeating
 7460,Pursuer,A person who is pursuing and trying to overtake or capture.,Noun,Always before he had been able to outwit his pursuers.,chaser,,B1,32,Society & Culture,Common,,,individual;someone;somebody
 7461,Purulent,Containing pus.,Adjective,A purulent wound.,pussy,,C2,83,General,Rare,,,infected;purulency;purulence
-7462,Pushcart,Wheeled vehicle that can be pushed by a person; may have one or two or four wheels.,Noun,He used a handcart to carry the rocks away.,handcart,cart,C2,83,Science & Technology,Rare,,,carriage;truck;barrow
-7463,Pushful,Marked by aggressive ambition and energy and initiative.,Adjective,An aggressive young executive.,pushy,,C2,83,General,Rare,,,ambitious
+7462,Pushcart,Wheeled vehicle that can be pushed by a person; may have one or two or four wheels.,Noun,The vendor pushed his pushcart through the narrow lane every morning.,handcart,cart,C2,83,Science & Technology,Rare,,,carriage;truck;barrow
+7463,Pushful,Marked by aggressive ambition and energy and initiative.,Adjective,The pushful young salesman was promoted within a year.,pushy,,C2,83,General,Rare,,,ambitious
 7464,Pushtun,a less common spelling variant of 'Pashtun.',Noun,The documentary followed a Pushtun family living along the border region.,pathan,pashtun,C2,83,Society & Culture,Rare,,,afghan;afghanistani;kafir
-7465,Pussyfoot,To go stealthily or furtively.,Verb,..stead of sneaking around spying on the neighbor's house.,sneak,mouse,C2,83,General,Rare,,,walk
+7465,Pussyfoot,To go stealthily or furtively.,Verb,Stop trying to pussyfoot around and tell me what you really think.,sneak,mouse,C2,83,General,Rare,,,walk
 7466,Puzzled,Confused because you can't quite figure something out.,Adjective,"He scratched his head, puzzled by the missing piece.",perplex,vex,A2,7,Academic,Very Common,,,confuse;befuddle;bedevil
 7467,Puzzling,Hard to understand or explain; likely to leave you confused.,Adjective,The sudden drop in sales was a puzzling development for the team.,perplex,vex,A2,11,Academic,Very Common,,,confuse;befuddle;bedevil
 7468,Pyrogenic,"producing heat or fever, or produced by fire or intense heat (a broader technical term used across geology and medicine).",Adjective,The vaccine caused a mild pyrogenic reaction in some patients.,igneous,pyrogenous,C2,83,General,Rare,,,pyrogen;heat
@@ -7473,7 +7473,7 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7472,Quadrisonic,"relating to quadraphony, a four-channel sound reproduction system.",Adjective,His quadrisonic sound system filled every corner of the living room.,quadraphonic,quadriphonic,C2,83,General,Rare,,,quadraphony
 7473,Quadruple,"having four parts, units, or components.",Adjective,Quadruple rhythm has four beats per measure in musical notation.,quadruplicate,quadruplex,B2,43,General,Less Common,,,multiple
 7474,Quadruplicate,existing in four identical copies or forms.,Adjective,The contract had to be signed in quadruplicate before it could be filed.,quadruple,quadruplex,C2,83,General,Rare,,,multiple
-7475,Qualifying,Success in satisfying a test or requirement.,Noun,His future depended on his passing that test.,passing,pass,B2,43,General,Less Common,,,qualify;success;agreement
+7475,Qualifying,Success in satisfying a test or requirement.,Noun,Qualifying for the final took three tough rounds.,passing,pass,B2,43,General,Less Common,,,qualify;success;agreement
 7476,Quantify,Express as a number or measure or quantity.,Verb,Can you quantify your results?,measure,,C2,83,General,Rare,,,specify;determine;quantity
 7477,Quantise,chiefly British spelling; restrict a quantity to discrete values according to quantum theory.,Verb,Physicists have long tried to quantise gravity within a unified theory.,quantize,,C2,83,Academic,Rare,,,estimate;approximate;calculate
 7478,Quantized,"restricted to discrete values according to quantum theory (past tense, American spelling).",Verb,Energy levels in an atom are quantized rather than continuous.,quantize,quantise,C2,83,Academic,Rare,,,estimate;approximate;calculate
@@ -7487,20 +7487,20 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7486,Queenly,"having the rank, dignity, or manner of a queen.",Adjective,Her queenly propriety impressed even the harshest critics.,queenlike,,C2,83,General,Rare,,,queen;noble
 7487,Quelled,"put an end to something, especially by force (past tense of 'quell').",Verb,The riot police quickly quelled the disturbance downtown.,squelch,quell,C2,83,General,Rare,,,suppress;inhibit;conquer
 7488,Quellung,The swelling of the capsule surrounding a microorganism after reaction with an antibody; the basis of certain tests for identifying microorganisms.,Noun,Pneumococcus quellung.,quellung reaction,,C2,83,Nature,Rare,,,
-7489,Quenching,The act of extinguishing; causing to stop burning.,Noun,The extinction of the lights.,extinction,extinguishing,B2,43,General,Less Common,,,termination;conclusion;quench
-7490,Querulous,Habitually complaining.,Adjective,A whiny child.,fretful,whiney,B2,43,General,Less Common,,,complaining;complaintive;querulousness
+7489,Quenching,The act of extinguishing; causing to stop burning.,Noun,The quenching of the blaze took the firefighters all night.,extinction,extinguishing,B2,43,General,Less Common,,,termination;conclusion;quench
+7490,Querulous,Habitually complaining.,Adjective,"The querulous old man complained about the soup, the chair and the weather.",fretful,whiney,B2,43,General,Less Common,,,complaining;complaintive;querulousness
 7491,Quester,"a person on a quest; someone actively searching for something meaningful, especially in a mythic or spiritual sense.",Noun,The novel follows a lonely quester in search of his family's lost fortune.,seeker,searcher,C2,83,Society & Culture,Rare,,,individual;someone;somebody
 7492,Questioningly,"in a manner that shows curiosity or doubt, as if asking a question.",Adverb,"They turned their heads questioningly, as if awaiting further instructions.",wonderingly,,B2,43,General,Less Common,,,questioning;curious
 7493,Quicken,To become or make faster or more lively.,Verb,Her pulse began to quicken as she waited for the results.,accelerate,speed up,B2,43,General,Less Common,,,quickening;sharpen;condense
 7494,Quickening,"Becoming faster or more intense; also, the first movements of a fetus felt by the mother.",Verb,She felt the quickening of her own excitement as the show began.,accelerate,speed up,B1,32,General,Common,,,sharpen;condense;intensify
-7495,Quicker,Accomplished rapidly and without delay.,Adjective,Was quick to make friends.,quick,speedy,B1,16,General,Common,,,fast;hurried
+7495,Quicker,Accomplished rapidly and without delay.,Adjective,The quicker route is through the market square.,quick,speedy,B1,16,General,Common,,,fast;hurried
 7496,Quickness,"The quality of moving, thinking, or reacting fast.",Noun,His quickness on the field made him hard to tackle.,adeptness,adroitness,B2,43,Academic,Less Common,,,intelligence;fluency;facility
-7497,Quiesce,Become quiet or quieter.,Verb,The audience fell silent when the speaker entered.,quieten,hush,C2,83,General,Rare,,,silence;sharpen;quiescent
+7497,Quiesce,Become quiet or quieter.,Verb,The crowd began to quiesce once the speaker raised her hand.,quieten,hush,C2,83,General,Rare,,,silence;sharpen;quiescent
 7498,Quiescency,"a state of quiet stillness or inactivity, often temporary and restful.",Noun,"After the storm passed, an eerie quiescency settled over the harbor.",dormancy,quiescence,C2,83,General,Rare,,,dormant;inactiveness;relaxation
-7499,Quietus,Euphemisms for death (based on an analogy between lying in a bed and in a tomb).,Noun,She was laid to rest beside her husband.,rest,eternal rest,C2,83,General,Rare,,,defunctness;death;sleep
-7500,Quilted,Stitch or sew together.,Verb,Quilt the skirt.,quilt,,B2,43,Arts & Creativity,Less Common,,,bolster;anastomose;entwine
-7501,Quincentenary,Of or relating to a 500th anniversary.,Adjective,The quincentennial celebration of the founding of the city.,quincentennial,,C2,83,General,Rare,,,
-7502,Quintupling,Increase fivefold.,Verb,The population of China quintupled.,quintuple,,C2,83,General,Rare,,,manifold;duplicate;quadruple
+7499,Quietus,Euphemisms for death (based on an analogy between lying in a bed and in a tomb).,Noun,The old poem speaks of death as a quiet quietus at the end of a long day.,rest,eternal rest,C2,83,General,Rare,,,defunctness;death;sleep
+7500,Quilted,Stitch or sew together.,Verb,She quilted the bedspread over the long winter nights.,quilt,,B2,43,Arts & Creativity,Less Common,,,bolster;anastomose;entwine
+7501,Quincentenary,Of or relating to a 500th anniversary.,Adjective,The city held a grand quincentenary celebration for its five hundredth anniversary.,quincentennial,,C2,83,General,Rare,,,
+7502,Quintupling,Increase fivefold.,Verb,The company is quintupling its output within the year.,quintuple,,C2,83,General,Rare,,,manifold;duplicate;quadruple
 7503,Quixotic,Not sensible about practical matters; idealistic and unrealistic.,Adjective,As quixotic as a restoration of medieval knighthood.,romantic,wild-eyed,B1,32,General,Common,,,impractical
 7504,Quizzically,In a quizzical and questioning manner.,Adverb,They looked quizzically at the doctor.,questioningly,,C2,83,General,Rare,,,perplexed;quizzical
 7505,Quondam,"Former; that once was (archaic, formal).",Adjective,His quondam allies had all abandoned him by the trial's end.,erstwhile,former,C2,83,General,Rare,,,past
@@ -7508,19 +7508,19 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7507,Rabbinic,Of or relating to rabbis or their teachings.,Adjective,Rabbinical school.,rabbinical,,C2,83,General,Rare,,,rabbi
 7508,Rabidity,"extreme fervor or fanaticism, especially in pursuit of an idea (a rare, figurative term).",Noun,The critic wrote with a rabidity that alienated even sympathetic readers.,madness,rabidness,C2,83,General,Rare,,,enthusiasm;rabid;exuberance
 7509,Rabidness,"a less common variant of 'rabidity'; extreme, unrestrained zeal.",Noun,His rabidness on the subject made calm debate nearly impossible.,madness,rabidity,C2,83,General,Rare,,,enthusiasm;rabid;exuberance
-7510,Raciness,A strong odor or taste property.,Noun,The pungency of mustard.,pungency,bite,C2,83,General,Rare,,,sharpness;racy;spiciness
+7510,Raciness,A strong odor or taste property.,Noun,The raciness of the old cheese made some guests wince.,pungency,bite,C2,83,General,Rare,,,sharpness;racy;spiciness
 7511,Raddled,Used until no longer useful.,Adjective,Battered trumpets and raddled radios.,worn-out,,C2,83,General,Rare,,,worn;tired
 7512,Radiate,Extend or spread outward from a center or focus or inward towards a center.,Verb,Spokes radiate from the hub of the wheel.,ray,,B2,43,General,Less Common,,,radiation;breathe;sparkle
 7513,Radiopaque,Not transparent to X-rays or other forms of radiation.,Adjective,Barium sulfate is radiopaque.,radio-opaque,,C2,83,General,Rare,,,radiopacity
-7514,Raffish,Marked by up-to-dateness in dress and manners.,Adjective,A dapper young man.,dapper,dashing,B2,43,General,Less Common,,,fashionable;unconventional;stylish
-7515,Raffles,Dispose of in a lottery.,Verb,We raffled off a trip to the Bahamas.,raffle,raffle off,C2,83,Business,Rare,,,present;distribute;bequeath
-7516,Raiding,"Search without warning, make a sudden surprise attack on.",Verb,The police raided the crack house.,raid,bust,B1,32,Society & Culture,Common,,,surprise;surround;circumvent
-7517,Railing,Enclose with rails.,Verb,Rail in the old graves.,rail,rail in,B1,26,General,Common,,,complain;enclose;confine
+7514,Raffish,Marked by up-to-dateness in dress and manners.,Adjective,"He had a raffish charm, with a scarf thrown carelessly over one shoulder.",dapper,dashing,B2,43,General,Less Common,,,fashionable;unconventional;stylish
+7515,Raffles,Dispose of in a lottery.,Verb,The charity raffles a hamper of goods at every summer fair.,raffle,raffle off,C2,83,Business,Rare,,,present;distribute;bequeath
+7516,Raiding,"Search without warning, make a sudden surprise attack on.",Verb,Pirates were raiding the coastal villages every spring.,raid,bust,B1,32,Society & Culture,Common,,,surprise;surround;circumvent
+7517,Railing,Enclose with rails.,Verb,The carpenter was railing the balcony before the winter set in.,rail,rail in,B1,26,General,Common,,,complain;enclose;confine
 7518,Railroading,"pushing something or someone through a process hastily and forcefully, allowing little resistance or scrutiny.",Verb,Critics accused the committee of railroading the bill through without debate.,dragoon,sandbag,B2,43,Society & Culture,Less Common,,,squeeze;pressure;provide
 7519,Raininess,the quality or degree of a climate or period being characterized by rain.,Noun,The region's raininess makes it ideal for growing rice.,foulness,,C2,83,General,Rare,,,badness;severeness;distressfulness
 7520,Raisable,Capable of being raised.,Adjective,The roadster had a raisable sunroof.,raiseable,,C2,83,General,Rare,,,mobile
 7521,Rakishly,In a rakish manner.,Adverb,She wore her hat rakishly at an angle.,raffishly,carelessly,B2,43,General,Less Common,,,fashionable;rakish;stylish
-7522,Rambling,Continue talking or writing in a desultory manner.,Verb,This novel rambles on and jogs.,ramble on,ramble,B1,32,General,Common,,,continue;proceed;locomote
+7522,Rambling,Continue talking or writing in a desultory manner.,Verb,He kept rambling about his holiday long after anyone was listening.,ramble on,ramble,B1,32,General,Common,,,continue;proceed;locomote
 7523,Rambunctious,"Uncontrollably exuberant and full of energy, especially of children or animals.",Adjective,The rambunctious puppy knocked over the lamp again.,boisterous,robustious,C2,83,General,Rare,,,disorderly
 7524,Rampant,Rearing on left hind leg with forelegs elevated and head usually in profile.,Adjective,A lion rampant.,rearing,,B1,21,General,Common,,,vertical;ramp;uncontrolled
 7525,Rampart,"a defensive wall or bank of earth, typically forming part of a fortification.",Noun,The soldiers patrolled the ancient rampart surrounding the old city.,bulwark,wall,B1,32,Science & Technology,Common,,,embankment;merlon;bailey
@@ -7530,71 +7530,71 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7529,Randomly,"Without any definite pattern, aim, or method; by chance.",Adverb,The survey selected participants randomly from the phone directory.,indiscriminately,haphazardly,B1,32,General,Common,,,promiscuous;general;random
 7530,Rankness,The quality of growing excessively thick or having an unpleasantly strong smell or taste.,Noun,The rankness of the untended garden overwhelmed the whole yard.,richness,prolificacy,C2,83,General,Rare,,,productivity;fertility;sweetness
 7531,Ransacked,"searched roughly and thoroughly, typically causing damage while stealing.",Verb,"Burglars ransacked the apartment, leaving drawers overturned everywhere.",plunder,despoil,B1,26,Business,Common,,,relieve;pillage;take
-7532,Ransacking,A thorough search for something (often causing disorder or confusion).,Noun,He gave the attic a good rummage but couldn't find his skis.,rummage,,B2,43,General,Less Common,,,hunting;seeking;frisking
-7533,Rapaciousness,An excessive desire for wealth (usually in large amounts).,Noun,The greediness of lawyers.,greediness,voraciousness,C2,83,General,Rare,,,rapacious;gluttony;selfishness
+7532,Ransacking,A thorough search for something (often causing disorder or confusion).,Noun,The ransacking of the old house left drawers on the floor and papers everywhere.,rummage,,B2,43,General,Less Common,,,hunting;seeking;frisking
+7533,Rapaciousness,An excessive desire for wealth (usually in large amounts).,Noun,The rapaciousness of the merchants was the talk of the town.,greediness,voraciousness,C2,83,General,Rare,,,rapacious;gluttony;selfishness
 7534,Rapture,a feeling of intense pleasure or joy; ecstatic delight.,Noun,She listened to the symphony in a state of pure rapture.,ecstasy,transport,B1,26,General,Common,,,gratification;satisfaction;happiness
 7535,Rarefied,Lessen the density or solidity of.,Verb,The bones are rarefied.,rarefy,,C2,83,General,Rare,,,change;alter;modify
 7536,Rascally,"behaving in a mischievous or dishonest way, though often in a charming manner.",Adjective,The rascally fox managed to steal another chicken from the coop.,devilish,roguish,C2,83,General,Rare,,,rascal;playful;dishonest
-7537,Rasping,Unpleasantly harsh or grating in sound.,Adjective,A gravelly voice.,grating,gravelly,B2,43,General,Less Common,,,cacophonous;cacophonic
+7537,Rasping,Unpleasantly harsh or grating in sound.,Adjective,A rasping cough echoed down the corridor.,grating,gravelly,B2,43,General,Less Common,,,cacophonous;cacophonic
 7538,Ratable,"liable to be assessed for local property tax, chiefly American spelling.",Adjective,The ratable value of the property rose sharply after the renovation.,rateable,,B2,43,General,Less Common,,,taxable;ratability;nonexempt
 7539,Rateable,"liable to be assessed for local property tax, chiefly British spelling.",Adjective,The council reassessed the rateable value of every shop on the high street.,ratable,,B2,43,General,Less Common,,,taxable;rateability;nonexempt
 7540,Ratified,"Approve and express assent, responsibility, or obligation.",Verb,All parties ratified the peace treaty.,sign,ratify,B1,21,Society & Culture,Common,,,formalize;indorse;validate
-7541,Rational,Of or associated with or requiring the use of the mind.,Adjective,Intellectual problems.,intellectual,noetic,A2,6,General,Very Common,,,coherent;logical;demythologized
-7542,Rationalise,Structure and run according to rational or scientific principles in order to achieve desired results.,Verb,We rationalized the factory's production and raised profits.,rationalize,,C2,83,Business,Rare,,,support;palliate;territorialise
+7541,Rational,Of or associated with or requiring the use of the mind.,Adjective,She made a rational decision after weighing every option.,intellectual,noetic,A2,6,General,Very Common,,,coherent;logical;demythologized
+7542,Rationalise,Structure and run according to rational or scientific principles in order to achieve desired results.,Verb,The company hopes to rationalise its supply chain to cut costs.,rationalize,,C2,83,Business,Rare,,,support;palliate;territorialise
 7543,Rationalize,"Defend, explain, clear away, or make excuses for by reasoning.",Verb,Rationalize the child's seemingly crazy behavior.,apologize,apologise,B1,18,Communication,Common,,,support;palliate;extinguish
-7544,Rationing,"Restrict the consumption of a relatively scarce commodity, as during war.",Verb,Bread was rationed during the siege of the city.,ration,,B1,26,Business,Common,,,circumscribe;confine;allocate
+7544,Rationing,"Restrict the consumption of a relatively scarce commodity, as during war.",Verb,"During the war, the government was rationing sugar and flour.",ration,,B1,26,Business,Common,,,circumscribe;confine;allocate
 7545,Rattlebrained,"Silly and lacking good sense; scatterbrained (informal, dated).",Adjective,His rattlebrained scheme was doomed from the start.,rattlepated,scatterbrained,C2,83,General,Rare,,,foolish
 7546,Rattlepated,"Foolish or empty-headed (informal, dated, alternate form of rattlebrained).",Adjective,The old comic strip mocked its rattlepated hero every week.,rattlebrained,scatterbrained,C2,83,General,Rare,,,foolish
 7547,Raucous,Disturbing the public peace; loud and rough.,Adjective,A raucous party.,rowdy,,A2,14,General,Very Common,,,cacophonous;cacophonic;disorderly
-7548,Raunchy,Suggestive of or tending to moral looseness.,Adjective,Lewd whisperings of a dirty old man.,lewd,obscene,C2,83,General,Rare,,,sexy;raunch;dirty
+7548,Raunchy,Suggestive of or tending to moral looseness.,Adjective,The film was banned for its raunchy jokes.,lewd,obscene,C2,83,General,Rare,,,sexy;raunch;dirty
 7549,Ravaging,"causing severe and extensive damage through violent, often repeated action.",Verb,Locusts were ravaging the farmland for the third season in a row.,lay waste to,waste,C2,83,General,Rare,,,destroy;vandalise;explode
-7550,Ravelling,Disentangle.,Verb,Can you unravel the mystery?,ravel,unravel,C2,83,General,Rare,,,disentangle;unsnarl;intertwine
-7551,Ravening,Prey on or hunt for.,Verb,These mammals predate certain eggs.,raven,prey,C2,83,Health & Wellness,Rare,,,seize;forage;kidnap
+7550,Ravelling,Disentangle.,Verb,She spent the evening ravelling the knotted yarn.,ravel,unravel,C2,83,General,Rare,,,disentangle;unsnarl;intertwine
+7551,Ravening,Prey on or hunt for.,Verb,The wolves were ravening in the hills during the long winter.,raven,prey,C2,83,Health & Wellness,Rare,,,seize;forage;kidnap
 7552,Ravenously,in an extremely hungry manner; voraciously.,Adverb,He devoured the sandwich ravenously after skipping breakfast.,hungrily,,C2,83,General,Rare,,,ravenous;peckish;empty
-7553,Ravishing,Force (someone) to have sex against their will.,Verb,The woman was raped on her way home at night.,rape,ravish,C2,83,Society & Culture,Rare,,,assault;delight;desecrate
-7554,Razorback,Having a sharp narrow back.,Adjective,A razor-backed horse.,razor-backed,,B2,43,General,Less Common,,,backed
+7553,Ravishing,Force (someone) to have sex against their will.,Verb,"Old texts use 'ravishing' for a violent crime, though today it more often means beautiful.",rape,ravish,C2,83,Society & Culture,Rare,,,assault;delight;desecrate
+7554,Razorback,Having a sharp narrow back.,Adjective,The razorback ridge made the climb dangerously narrow.,razor-backed,,B2,43,General,Less Common,,,backed
 7555,Razzing,Teasing or mocking someone good-naturedly (informal).,Verb,His teammates kept razzing him about the missed shot.,tease,razz,C2,83,Communication,Rare,,,barrack;tantalise;blackguard
-7556,Reaching,"Reach a destination, either real or abstract.",Verb,We hit Detroit by noon.,reach,make,A2,5,General,Very Common,,,surmount;locomote;top
+7556,Reaching,"Reach a destination, either real or abstract.",Verb,The hikers were reaching the summit just before dusk.,reach,make,A2,5,General,Very Common,,,surmount;locomote;top
 7557,Readably,"in a way that is pleasant and easy to read, especially describing writing style.",Adverb,The dense legal topic was explained readably for a general audience.,legibly,decipherably,C2,83,General,Rare,,,readable;clear;decipherable
-7558,Readily,In a punctual manner.,Adverb,He did his homework promptly.,promptly,pronto,A2,5,General,Very Common,,,punctual
+7558,Readily,In a punctual manner.,Adverb,The dog came readily when she called its name.,promptly,pronto,A2,5,General,Very Common,,,punctual
 7559,Readjust,Adjust anew.,Verb,"After moving back to America, he had to readjust.",readapt,,B1,32,General,Common,,,correct;focalise;acclimatise
-7560,Readying,The activity of putting or setting in order in advance of some act or purpose.,Noun,Preparations for the ceremony had begun.,preparation,,B2,43,General,Less Common,,,activity;planning;ready
-7561,Realine,Align anew or better.,Verb,The surgeon realigned my jaw after the accident.,realign,,C2,83,General,Rare,,,focalise;address;collimate
+7560,Readying,The activity of putting or setting in order in advance of some act or purpose.,Noun,The readying of the hall began three days before the wedding.,preparation,,B2,43,General,Less Common,,,activity;planning;ready
+7561,Realine,Align anew or better.,Verb,The mechanic had to realine the wheels after the accident.,realign,,C2,83,General,Rare,,,focalise;address;collimate
 7562,Realism,"an approach or attitude that accepts and represents things as they actually are, especially in art or thought.",Noun,The film was praised for its gritty realism in depicting wartime life.,reality,realness,A2,6,General,Very Common,,,trueness;realist;practicality
-7563,Reallocate,"Allocate, distribute, or apportion anew.",Verb,Congressional seats are reapportioned on the basis of census data.,reapportion,,C2,83,Business,Rare,,,allocate;apportion;present
+7563,Reallocate,"Allocate, distribute, or apportion anew.",Verb,The council voted to reallocate funds from the stadium to the schools.,reapportion,,C2,83,Business,Rare,,,allocate;apportion;present
 7564,Realness,the quality of being genuinely real rather than false or imagined.,Noun,"The reality of his situation, its sheer realness, slowly dawned on him.",reality,realism,B2,43,General,Less Common,,,trueness;real;actuality
 7565,Reanimated,brought back to life or activity (past tense of 'reanimate').,Verb,The old engine was reanimated after months in the junkyard.,animate,recreate,C2,83,Health & Wellness,Rare,,,energize;energise;resuscitate
 7566,Reappearance,The act of someone appearing again.,Noun,His reappearance as Hamlet has been long awaited.,return,,B1,32,General,Common,,,appearance;manifestation;materialization
 7567,Rearing,The process of bringing up and caring for a child or young animal until maturity.,Noun,The rearing of livestock is central to the region's economy.,breeding,bringing up,B1,32,General,Common,,,upbringing;socialization;socialisation
-7568,Rearwards,Direction toward the rear.,Noun,His outfit marched to the rearward of the tank divisions.,rearward,,C2,83,Travel & Places,Rare,,,backside;nape;scruff
-7569,Reasonableness,The state of having good sense and sound judgment.,Noun,His rationality may have been impaired.,rationality,reason,C2,83,General,Rare,,,reasonable;soundness;sanity
+7568,Rearwards,Direction toward the rear.,Noun,The troops retreated rearwards under heavy fire.,rearward,,C2,83,Travel & Places,Rare,,,backside;nape;scruff
+7569,Reasonableness,The state of having good sense and sound judgment.,Noun,The reasonableness of her offer won over even the toughest critics.,rationality,reason,C2,83,General,Rare,,,reasonable;soundness;sanity
 7570,Reasoned,thought through carefully and logically to reach a judgment.,Verb,She reasoned that the shortcut would save them nearly an hour.,reason,reason out,B1,21,Academic,Common,,,generalise;present;represent
-7571,Reasonless,Not marked by the use of reason.,Adjective,Mindless violence.,mindless,senseless,C2,83,General,Rare,,,unreasonable;irrational
+7571,Reasonless,Not marked by the use of reason.,Adjective,His reasonless fear kept him awake long into the night.,mindless,senseless,C2,83,General,Rare,,,unreasonable;irrational
 7572,Reassure,say or do something to remove someone's doubts or fears.,Verb,The airline tried to reassure the customers that the planes were safe.,assure,,B2,43,Emotion,Less Common,,,reassurance;tranquilize;compose
 7573,Reassuring,currently giving comfort or removing someone's doubts.,Verb,The doctor's calm tone was reassuring the anxious family in the waiting room.,reassure,assure,A2,14,Emotion,Very Common,,,tranquilize;compose;gruntle
 7574,Rebarbative,Serving or tending to repel.,Adjective,He became rebarbative and prickly and spiteful.,repellent,repellant,C2,83,General,Rare,,,unpleasant
 7575,Rebound,spring or bounce back after hitting a surface.,Verb,The rubber ball rebounded off the wall and rolled under the couch.,bounce,resile,B1,32,General,Common,,,recover;recuperate;ricochet
-7576,Rebuilding,Build again.,Verb,The house was rebuild after it was hit by a bomb.,rebuild,reconstruct,B1,16,Arts & Creativity,Common,,,construct;channelize;customize
+7576,Rebuilding,Build again.,Verb,Rebuilding the old bridge took nearly two years.,rebuild,reconstruct,B1,16,Arts & Creativity,Common,,,construct;channelize;customize
 7577,Recalcitrant,"stubbornly resistant to authority or control, especially in a defiant or uncooperative way.",Adjective,The recalcitrant witness refused to answer any of the prosecutor's questions.,fractious,refractory,B1,32,General,Common,,,disobedient;defiant;recalcitrancy
 7578,Recapitulate,Summarize briefly.,Verb,Let's recapitulate the main ideas.,recap,,B2,43,Communication,Less Common,,,summarise;duplicate;reduplicate
-7579,Recasting,"Cast again, in a different role.",Verb,He was recast as Iago.,recast,,C2,83,Arts & Creativity,Rare,,,remould;cast;mold
-7580,Receipt,Report the receipt of.,Verb,The program committee acknowledged the submission of the authors of the paper.,acknowledge,,B1,21,Communication,Common,,,communicate;request;bespeak
+7579,Recasting,"Cast again, in a different role.",Verb,The director is recasting the lead role after the actor's sudden departure.,recast,,C2,83,Arts & Creativity,Rare,,,remould;cast;mold
+7580,Receipt,Report the receipt of.,Verb,The clerk will receipt each package as it arrives.,acknowledge,,B1,21,Communication,Common,,,communicate;request;bespeak
 7581,Receptive,Ready or willing to receive favorably.,Adjective,Receptive to the proposals.,open,,B1,32,General,Common,,,receptivity;receive;acceptive
-7582,Receptivity,Willingness or readiness to receive (especially impressions or ideas).,Noun,He was testing the government's receptiveness to reform.,receptiveness,openness,C2,83,General,Rare,,,receptive;eagerness;willingness
-7583,Recessed,Put into a recess.,Verb,Recess lights.,recess,,B1,32,General,Common,,,position;put;set
+7582,Receptivity,Willingness or readiness to receive (especially impressions or ideas).,Noun,The receptivity of young children to new languages is remarkable.,receptiveness,openness,C2,83,General,Rare,,,receptive;eagerness;willingness
+7583,Recessed,Put into a recess.,Verb,The lights were recessed into the ceiling.,recess,,B1,32,General,Common,,,position;put;set
 7584,Recidivate,Go back to bad behavior.,Verb,Those who recidivate are often minor criminals.,relapse,lapse,C2,83,Health & Wellness,Rare,,,retrovert;regress;recover
-7585,Reciprocally,(often followed by `for') in exchange or in reciprocation.,Adverb,Gave up our seats on the plane and in return received several hundred dollars and seats on the next plane out.,in return,,C2,83,General,Rare,,,trilateral;reciprocal;correlative
-7586,Recital,The act of giving an account describing incidents or a course of events.,Noun,His narration was hesitant.,narration,yarn,A2,12,Communication,Very Common,,,account;conclusion;closing
+7585,Reciprocally,(often followed by `for') in exchange or in reciprocation.,Adverb,"He helped her move, and she reciprocally cooked dinner for him.",in return,,C2,83,General,Rare,,,trilateral;reciprocal;correlative
+7586,Recital,The act of giving an account describing incidents or a course of events.,Noun,The recital of the whole story took two hours.,narration,yarn,A2,12,Communication,Very Common,,,account;conclusion;closing
 7587,Recitation,A public instance of reciting or repeating (from memory) something prepared in advance.,Noun,The program included songs and recitations of well-loved poems.,recital,reading,B1,26,Communication,Common,,,speechmaking;speaking;supplement
 7588,Reckoning,"The act of calculating or estimating something; also, a time when past actions are judged or accounted for.",Noun,A day of reckoning was coming for the company's poor decisions.,count,counting,B1,26,General,Common,,,estimate;estimation;conversion
-7589,Reclaimed,"Bring, lead, or force to abandon a wrong or evil course of life, conduct, and adopt a right one.",Verb,The Church reformed me.,reform,reclaim,B1,32,General,Common,,,acquire;recycle;preserve
-7590,Recline,Lean in a comfortable resting position.,Verb,He was reposing on the couch.,recumb,repose,C2,83,General,Rare,,,position;incline;weather
+7589,Reclaimed,"Bring, lead, or force to abandon a wrong or evil course of life, conduct, and adopt a right one.",Verb,The reclaimed thief became a respected teacher in the village.,reform,reclaim,B1,32,General,Common,,,acquire;recycle;preserve
+7590,Recline,Lean in a comfortable resting position.,Verb,She likes to recline on the sofa with a good book.,recumb,repose,C2,83,General,Rare,,,position;incline;weather
 7591,Recluse,"living in seclusion, withdrawn from society (a less common adjectival use; more often a noun).",Adjective,The old man led a recluse existence deep in the forest.,reclusive,withdrawn,B1,32,General,Common,,,unsocial
 7592,Reclusive,tending to avoid other people; preferring solitude.,Adjective,"The author lived an unsocial, reclusive life after her first novel's success.",recluse,withdrawn,C2,83,General,Rare,,,private;reclusiveness;unsocial
-7593,Recognise,Show approval or appreciation of.,Verb,My work is not recognized by anybody!,recognize,,C2,83,Society & Culture,Rare,,,treasure;appreciate;license
-7594,Recollection,The process of remembering (especially the process of recovering information by mental effort).,Noun,He has total recall of the episode.,recall,reminiscence,B1,18,Academic,Common,,,retentiveness;reproduction;recognition
+7593,Recognise,Show approval or appreciation of.,Verb,The school will recognise the top ten students at the ceremony.,recognize,,C2,83,Society & Culture,Rare,,,treasure;appreciate;license
+7594,Recollection,The process of remembering (especially the process of recovering information by mental effort).,Noun,Her recollection of that summer was hazy but warm.,recall,reminiscence,B1,18,Academic,Common,,,retentiveness;reproduction;recognition
 7595,Recompense,"pay or reward someone for effort, loss, or injury; make amends.",Verb,The court ordered the company to recompense the workers for lost wages.,compensate,repair,B2,43,Business,Less Common,,,pay
-7596,Reconcile,Make (one thing) compatible with (another).,Verb,The scientists had to accommodate the new results with the existing theories.,accommodate,conciliate,B1,21,General,Common,,,reconciliation;harmonize;correct
+7596,Reconcile,Make (one thing) compatible with (another).,Verb,It is hard to reconcile his harsh words with his gentle manner.,accommodate,conciliate,B1,21,General,Common,,,reconciliation;harmonize;correct
 7597,Reconciliation,"the restoration of friendly relations, or the process of making two financial accounts consistent.",Noun,The bank statement reconciliation revealed a small error in April.,balancing,,B2,43,General,Less Common,,,reconcile;cooperation;leveling
 7598,Recondite,"little known; obscure, especially requiring special knowledge to understand.",Adjective,His essay was full of recondite references only a historian would catch.,abstruse,deep,B2,43,General,Less Common,,,reconditeness;esoteric
 7599,Reconnaissance,The act of reconnoitring (especially to gain information about an enemy or potential enemy).,Noun,An exchange of fire occurred on a reconnaissance mission.,reconnaissance mission,,A2,11,General,Very Common,,,intelligence;scouting;reconnoitre
@@ -7602,34 +7602,34 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7601,Reconsideration,"the act of thinking again carefully about a decision, especially to possibly change it.",Noun,He asked the board for a reconsideration of its earlier ruling.,second thought,afterthought,B1,21,Academic,Common,,,consideration;reconsider;reversal
 7602,Reconstruct,Reassemble mentally.,Verb,Reconstruct the events of 20 years ago.,construct,retrace,B1,16,Academic,Common,,,speculate;theorize;conjecture
 7603,Reconstructive,Helping to restore to good condition.,Adjective,Reconstructive surgery.,rehabilitative,,C2,83,General,Rare,,,reconstruct;constructive
-7604,Recounting,An act of narration.,Noun,He was the hero according to his own relation.,relation,telling,B1,26,Communication,Common,,,narration;recital;recount
-7605,Recovering,Get or find back; recover the use of.,Verb,She regained control of herself.,recover,retrieve,B1,21,Business,Common,,,acquire;improve;ameliorate
+7604,Recounting,An act of narration.,Noun,The recounting of the voyage made the children's eyes grow wide.,relation,telling,B1,26,Communication,Common,,,narration;recital;recount
+7605,Recovering,Get or find back; recover the use of.,Verb,He is slowly recovering the use of his injured arm.,recover,retrieve,B1,21,Business,Common,,,acquire;improve;ameliorate
 7606,Recreant,"having abandoned one's duty, faith, or principles; disloyal (an archaic, literary term).",Adjective,The chronicle condemned the recreant knight who fled the battlefield.,renegade,,C2,83,General,Rare,,,cowardly;fearful;disloyal
 7607,Recreational,Relating to activities done for enjoyment during leisure time rather than professionally.,Adjective,"The league is strictly recreational, with no prize money involved.",amateur,unpaid,A2,12,General,Very Common,,,recreation;nonprofessional
 7608,Recriminatory,Countering one charge with another.,Adjective,Recriminatory arguments.,recriminative,,C2,83,General,Rare,,,recriminate;inculpatory;inculpative
 7609,Recruit,Register formally as a participant or member.,Verb,The party recruited many new members.,enroll,inscribe,A2,10,Society & Culture,Very Common,,,register;recruiter;matriculate
-7610,Rectangular,Having a set of mutually perpendicular axes; meeting at right angles.,Adjective,Wind and sea may displace the ship's center of gravity along three orthogonal axes.,orthogonal,,B1,18,General,Common,,,perpendicular;rectangle;rectangularity
-7611,Rectified,Math: determine the length of.,Verb,Rectify a curve.,rectify,,C2,83,Communication,Rare,,,determine;sublimate;translate
-7612,Rectilineal,Characterized by a straight line or lines.,Adjective,Rectilinear patterns in wallpaper.,rectilinear,,C2,83,General,Rare,,,linear
+7610,Rectangular,Having a set of mutually perpendicular axes; meeting at right angles.,Adjective,The rectangular table seated eight people comfortably.,orthogonal,,B1,18,General,Common,,,perpendicular;rectangle;rectangularity
+7611,Rectified,Math: determine the length of.,Verb,The mathematician rectified the curve to find its true length.,rectify,,C2,83,Communication,Rare,,,determine;sublimate;translate
+7612,Rectilineal,Characterized by a straight line or lines.,Adjective,The rectilineal pattern on the tiles made the floor look like a grid.,rectilinear,,C2,83,General,Rare,,,linear
 7613,Recuperate,Regain or make up for.,Verb,Recuperate one's losses.,recover,recoup,C2,83,Business,Rare,,,acquire;retrovert;regress
-7614,Recurrence,Happening again (especially at regular intervals).,Noun,The return of spring.,return,,B2,43,General,Less Common,,,recurrent;repetition;sequence
+7614,Recurrence,Happening again (especially at regular intervals).,Noun,The recurrence of the fever worried the doctors.,return,,B2,43,General,Less Common,,,recurrent;repetition;sequence
 7615,Recurrent,"occurring often or repeatedly at intervals, especially a problem or symptom.",Adjective,The engineer traced the recurrent glitch back to a faulty sensor.,perennial,repeated,B1,21,General,Common,,,recurrence;recur;continual
 7616,Recycle,Use again after processing.,Verb,We must recycle the cardboard boxes.,reprocess,reuse,C2,83,Health & Wellness,Rare,,,recycling;utilise;recover
 7617,Redeemable,"able to be exchanged for goods, money, or a reward, or able to be saved from fault.",Adjective,The gift card is redeemable online or in any physical store.,cashable,,C2,83,General,Rare,,,convertible;exchangeable;recoverable
 7618,Redemptional,a rare variant of 'redemptive'; relating to or resulting in redemption.,Adjective,The sermon explored the redemptional arc running through the entire story.,redemptive,redemptory,C2,83,General,Rare,,,redemption
 7619,Redemptive,"serving to redeem or save someone, especially in a moral or spiritual sense.",Adjective,The film offered a redemptive theory about even the darkest lives.,redemptional,redemptory,B2,43,General,Less Common,,,redeem;redemption;good
-7620,Redevelopment,The act of improving by renewing and restoring.,Noun,They are pursuing a general program of renovation to the entire property.,renovation,overhaul,B1,18,General,Common,,,improvement;modernisation;melioration
-7621,Redistributed,Distribute anew.,Verb,Redistribute the troops more strategically.,redistribute,,B1,32,General,Common,,,distribute;straggle;generalise
+7620,Redevelopment,The act of improving by renewing and restoring.,Noun,The redevelopment of the old docks brought new shops and homes.,renovation,overhaul,B1,18,General,Common,,,improvement;modernisation;melioration
+7621,Redistributed,Distribute anew.,Verb,The redistributed funds helped build three new schools.,redistribute,,B1,32,General,Common,,,distribute;straggle;generalise
 7622,Redoubled,"Double in magnitude, extent, or intensity.",Verb,The enemy redoubled their screaming on the radio.,redouble,,B1,26,General,Common,,,duplicate;geminate;escalate
-7623,Redress,Make reparations or amends for.,Verb,Right a wrongs done to the victims of the Holocaust.,right,compensate,B1,32,Society & Culture,Common,,,change;alter;modify
-7624,Reduced,Cut down on; make a reduction in.,Verb,Reduce your daily fat intake.,reduce,cut down,A2,5,General,Very Common,,,decrease;detract;subtract
+7623,Redress,Make reparations or amends for.,Verb,The company promised to redress the wrongs done to its customers.,right,compensate,B1,32,Society & Culture,Common,,,change;alter;modify
+7624,Reduced,Cut down on; make a reduction in.,Verb,The shop reduced its prices by half during the sale.,reduce,cut down,A2,5,General,Very Common,,,decrease;detract;subtract
 7625,Redundancy,The attribute of being superfluous and unneeded.,Noun,The use of industrial robots created redundancy among workers.,redundance,,B1,21,General,Common,,,superfluity;redundant;repetitiveness
 7626,Reduplicate,"form a word by repeating a sound or syllable, as in 'bye-bye' or 'so-so.'",Verb,Linguists study how children naturally reduplicate syllables when learning to speak.,geminate,,C2,84,Arts & Creativity,Rare,,,duplicate;replicate;reproduce
-7627,Reeking,Have an element suggestive (of something).,Verb,His speeches smacked of racism.,smack,reek,B2,43,General,Less Common,,,suggest;incriminate;evoke
+7627,Reeking,Have an element suggestive (of something).,Verb,The room was reeking of stale smoke and old coffee.,smack,reek,B2,43,General,Less Common,,,suggest;incriminate;evoke
 7628,Reenforce,a less common spelling variant of 'reinforce'; make something stronger.,Verb,Engineers moved to reenforce the aging dam before the spring floods.,reinforce,,C2,84,General,Rare,,,reenforcement;strengthen;bolster
-7629,Reenforcement,Information that makes more forcible or convincing.,Noun,His gestures provided eloquent reinforcement for his complaints.,reinforcement,,C2,84,Communication,Rare,,,confirmation;reenforce;operation
+7629,Reenforcement,Information that makes more forcible or convincing.,Noun,The new data gave reenforcement to her argument.,reinforcement,,C2,84,Communication,Rare,,,confirmation;reenforce;operation
 7630,Reestablish,set something up again after it had ended or been lost.,Verb,The peace treaty aimed to reestablish law and order across the region.,restore,reinstate,B2,43,Society & Culture,Less Common,,,change;alter;modify
-7631,Refashion,Make new.,Verb,She is remaking her image.,remake,redo,B2,43,Arts & Creativity,Less Common,,,produce;make;create
+7631,Refashion,Make new.,Verb,The designer will refashion the old coat into a bright jacket.,remake,redo,B2,43,Arts & Creativity,Less Common,,,produce;make;create
 7632,Refereeing,The act of supervising a sports match to enforce the rules.,Noun,Refereeing a youth soccer game requires a lot of patience.,umpirage,officiation,C2,84,General,Rare,,,deciding;alternative;determination
 7633,Referenced,Refer to.,Verb,He referenced his colleagues' work.,reference,cite,C2,84,Arts & Creativity,Rare,,,compose;poetise;annotate
 7634,Refined,improved or made more precise by removing flaws or impurities (past tense of 'refine').,Verb,She refined her writing style over years of practice.,polish,refine,B1,16,General,Common,,,improve;ameliorate;overrefine
@@ -7637,39 +7637,39 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 7636,Reflective,Thoughtful; given to careful consideration of ideas or experiences.,Adjective,The essay takes a reflective look back at her career.,brooding,broody,B1,16,General,Common,,,reflect;thoughtful;mirrorlike
 7637,Reflectorise,chiefly British spelling; equip something with reflective material for visibility and safety.,Verb,The council decided to reflectorise every crosswalk in the district.,reflectorize,,C2,84,Business,Rare,,,provide;furnish;supply
 7638,Reflectorize,"equip something with reflective material for visibility and safety, chiefly American spelling.",Verb,The driveway was reflectorized for safety reasons after several near-misses.,reflectorise,,C2,84,Business,Rare,,,provide;furnish;supply
-7639,Reflexive,Without volition or conscious control.,Adjective,The automatic shrinking of the pupils of the eye in strong light.,automatic,reflex,C2,84,General,Rare,,,involuntary;reflexiveness;reflexivity
-7640,Reforge,Cast or model anew.,Verb,She had to recast her image to please the electorate in her home state.,recast,remodel,C2,84,Arts & Creativity,Rare,,,refashion;remake;redo
-7641,Reformation,Rescuing from error and returning to a rightful course.,Noun,The reclamation of delinquent children.,reclamation,,B1,18,General,Common,,,improvement;melioration;development
+7639,Reflexive,Without volition or conscious control.,Adjective,"The knee jerk was a reflexive reaction, not a decision.",automatic,reflex,C2,84,General,Rare,,,involuntary;reflexiveness;reflexivity
+7640,Reforge,Cast or model anew.,Verb,The smith will reforge the broken blade into a new knife.,recast,remodel,C2,84,Arts & Creativity,Rare,,,refashion;remake;redo
+7641,Reformation,Rescuing from error and returning to a rightful course.,Noun,The reformation of the old prisoner was the pride of the whole town.,reclamation,,B1,18,General,Common,,,improvement;melioration;development
 7642,Reformative,Tending to reform.,Adjective,Reformative and rehabilitative agencies.,reformatory,,C2,84,General,Rare,,,helpful;reform
-7643,Reformed,Make changes for improvement in order to remove abuse and injustices.,Verb,Reform a political system.,reform,,B1,26,General,Common,,,improve;ameliorate;better
+7643,Reformed,Make changes for improvement in order to remove abuse and injustices.,Verb,The reformed law now protects tenants from sudden eviction.,reform,,B1,26,General,Common,,,improve;ameliorate;better
 7644,Refractive,Of or relating to or capable of refraction.,Adjective,The refractive characteristics of the eye.,refractile,,B2,43,General,Less Common,,,crooked;refractiveness;refract
 7645,Refrain,Resist doing something.,Verb,He refrained from hitting him back.,forbear,,A2,10,General,Very Common,,,abstain;teetotal;leave
-7646,Refreshed,Refresh one's memory.,Verb,I reviewed the material before the test.,review,brush up,B1,18,Academic,Common,,,remember;recognize;recognise
-7647,Refreshen,Become or make oneself fresh again.,Verb,She freshened up after the tennis game.,freshen,refresh,C2,84,Health & Wellness,Rare,,,change;alter;modify
+7646,Refreshed,Refresh one's memory.,Verb,She refreshed her memory by rereading her notes before the exam.,review,brush up,B1,18,Academic,Common,,,remember;recognize;recognise
+7647,Refreshen,Become or make oneself fresh again.,Verb,A cool shower will refreshen you after the long day.,freshen,refresh,C2,84,Health & Wellness,Rare,,,change;alter;modify
 7648,Refreshfully,"a rare, archaic variant of 'refreshingly'; in a way that restores energy or vitality.",Adverb,The old poem describes rain falling refreshfully on the parched fields.,refreshingly,,C2,84,General,Rare,,,invigorating
 7649,Refreshingly,"in a way that is pleasantly different, invigorating, or restorative.",Adverb,The air was refreshingly cool after the stuffy train ride.,refreshfully,,B1,32,General,Common,,,refreshing;invigorating;new
 7650,Refrigerant,Causing cooling or freezing.,Adjective,A refrigerant substance such as ice or solid carbon dioxide.,refrigerating,,C2,84,General,Rare,,,refrigerate;cold
-7651,Refrigerating,Preserve by chilling.,Verb,Many foods must be refrigerated or else they will spoil.,refrigerate,,C2,84,General,Rare,,,preserve;conserve;keep
-7652,Refulgent,Radiating or as if radiating light.,Adjective,The beaming sun.,beaming,beamy,C2,84,General,Rare,,,refulgency;refulgence;bright
-7653,Refurbishment,The state of being restored to its former good condition.,Noun,The inn was a renovation of a Colonial house.,renovation,restoration,C2,84,General,Rare,,,improvement;melioration;development
+7651,Refrigerating,Preserve by chilling.,Verb,She was refrigerating the leftover soup overnight.,refrigerate,,C2,84,General,Rare,,,preserve;conserve;keep
+7652,Refulgent,Radiating or as if radiating light.,Adjective,The refulgent sun lit up the whole valley at dawn.,beaming,beamy,C2,84,General,Rare,,,refulgency;refulgence;bright
+7653,Refurbishment,The state of being restored to its former good condition.,Noun,The hotel closed for a six-month refurbishment.,renovation,restoration,C2,84,General,Rare,,,improvement;melioration;development
 7654,Regaining,the act of getting something back that was lost.,Noun,The regaining of his confidence took nearly a full season.,restitution,return,B1,26,General,Common,,,acquisition;procurement;procurance
 7655,Regenerating,"currently growing back or being restored to a former, often improved, state.",Verb,The damaged coral reef has been slowly regenerating since the protections began.,regenerate,renew,B2,43,Arts & Creativity,Less Common,,,renovate;restore;remould
-7656,Regimented,"Subject to rigid discipline, order, and systematization.",Verb,Regiment one's children.,regiment,,B2,43,Society & Culture,Less Common,,,control;command;dominate
+7656,Regimented,"Subject to rigid discipline, order, and systematization.",Verb,The regimented schedule left no time for rest.,regiment,,B2,43,Society & Culture,Less Common,,,control;command;dominate
 7657,Regress,"To return to a former, less developed state.",Verb,"Without practice, his language skills began to regress.",revert,return,C2,84,General,Rare,,,reverse;recidivate;recover
-7658,Regrets,Sadness associated with some wrong done or some disappointment.,Noun,He drank to drown his sorrows.,sorrow,regret,B1,26,Emotion,Common,,,acknowledgment;sadness;farewell
+7658,Regrets,Sadness associated with some wrong done or some disappointment.,Noun,He expressed his regrets for missing the funeral.,sorrow,regret,B1,26,Emotion,Common,,,acknowledgment;sadness;farewell
 7659,Regrettably,In a way that is unfortunate and causes regret (formal).,Adverb,"Regrettably, we must cancel this year's event.",unfortunately,unluckily,B1,32,General,Common,,,unhappy;miserable;misfortunate
-7660,Regularize,Bring into conformity with rules or principles or usage; impose regulations.,Verb,We cannot regulate the way people dress.,regulate,regularise,C2,84,Society & Culture,Rare,,,determine;arrange;purpose
+7660,Regularize,Bring into conformity with rules or principles or usage; impose regulations.,Verb,The council voted to regularize the status of the street vendors.,regulate,regularise,C2,84,Society & Culture,Rare,,,determine;arrange;purpose
 7661,Regulate,"control or adjust something, especially by means of rules or a mechanism.",Verb,The thermostat helps regulate the temperature throughout the house.,modulate,,B1,32,General,Common,,,regulatory;correct;regulation
-7662,Regulating,The act of controlling or directing according to rule.,Noun,Fiscal regulations are in the hands of politicians.,regulation,,B1,21,General,Common,,,regulate;control;limitation
+7662,Regulating,The act of controlling or directing according to rule.,Noun,The regulating of traffic at the crossing was done by a single guard.,regulation,,B1,21,General,Common,,,regulate;control;limitation
 7663,Regurgitate,Repeat after memorization.,Verb,"For the exam, you must be able to regurgitate the information.",reproduce,,C2,84,Communication,Rare,,,malnourish;breakfast;nourish
 7664,Reharmonise,chiefly British spelling; give a piece of music a new set of harmonies.,Verb,The arranger decided to reharmonise the old hymn for a jazz trio.,reharmonize,,C2,84,Arts & Creativity,Rare,,,harmonize;realize;realise
 7665,Reharmonize,"give a piece of music a new set of harmonies, chiefly American spelling.",Verb,The producer asked her to reharmonize the melody for a fuller sound.,reharmonise,,C2,84,Arts & Creativity,Rare,,,harmonize;realize;realise
 7666,Reification,Representing a human being as a physical thing deprived of personal qualities or individuality.,Noun,"According to Marx, treating labor as a commodity exemplified the reification of the individual.",depersonalization,depersonalisation,C2,84,General,Rare,,,reify;objectification;embodiment
-7667,Reincarnate,Be born anew in another body after death.,Verb,Hindus believe that we transmigrate.,transmigrate,,C2,84,General,Rare,,,restore;reincarnation;regenerate
+7667,Reincarnate,Be born anew in another body after death.,Verb,Some believe that a person can reincarnate as an animal.,transmigrate,,C2,84,General,Rare,,,restore;reincarnation;regenerate
 7668,Reinforced,"made stronger, especially by adding extra material or support (past tense).",Verb,He reinforced the concrete with steel rebar before it set.,reinforce,reenforce,A2,14,General,Very Common,,,strengthen;bolster;instruct
 7669,Reinstate,"restore someone or something to a former position, condition, or status.",Verb,The court ordered the company to reinstate the wrongfully fired employee.,restore,reestablish,C2,84,Society & Culture,Rare,,,reconstruct;decompress;reinstatement
 7670,Reintroduce,Introduce anew.,Verb,"We haven't met in a long time, so let me reintroduce myself.",re-introduce,,C2,84,Communication,Rare,,,introduce;present;reintroduction
-7671,Reinvigorated,"Impart vigor, strength, or vitality to.",Verb,Exercise is invigorating.,invigorate,reinvigorate,C2,84,Health & Wellness,Rare,,,energize;energise;renovate
+7671,Reinvigorated,"Impart vigor, strength, or vitality to.",Verb,The long holiday left her reinvigorated and ready for new work.,invigorate,reinvigorate,C2,84,Health & Wellness,Rare,,,energize;energise;renovate
 7672,Reiterate,"To say something again, usually for emphasis or clarity.",Verb,Let me reiterate: the deadline will not be extended.,repeat,ingeminate,B2,43,Communication,Less Common,,,translate;summarise;announce
 7673,Rejoicing,"expressing great joy or delight, especially in a shared or celebratory way.",Verb,The whole village was rejoicing at the news of the harvest.,exuberate,exult,B1,21,Communication,Common,,,experience;radiate;sympathize
 7674,Rejoinder,"a sharp or witty reply, especially to a criticism or remark.",Noun,"It brought a sharp rejoinder from the teacher, who was not amused.",retort,return,B2,43,Communication,Less Common,,,response;riposte;counter
