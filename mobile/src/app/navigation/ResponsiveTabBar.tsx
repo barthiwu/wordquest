@@ -8,7 +8,7 @@ import { useThemeColors } from '@/state/themeStore';
 import { useIsNewLook } from '@/state/uiVersionStore';
 import { useBreakpoint, type Breakpoint } from '@/hooks/useBreakpoint';
 
-export const RAIL_WIDTH = 76;
+export const RAIL_WIDTH = 88;
 export const SIDEBAR_WIDTH = 248;
 
 const TAB_ICONS: Record<
@@ -141,7 +141,7 @@ function createStyles(colors: ThemeColors, expanded: boolean, topInset: number, 
     itemHover: { backgroundColor: colors.surfaceRaised, opacity: 0.8 },
     label: {
       color: colors.inkMuted,
-      fontSize: expanded ? typography.scale.md : 11,
+      fontSize: expanded ? typography.scale.md : 10,
       fontWeight: '600',
     },
     labelActive: { color: colors.ink },
