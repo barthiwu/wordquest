@@ -80,6 +80,7 @@ export const NAMESPACES = [
   'friends',
   'feedback',
   'adminDashboard',
+  'proto',
 ] as const;
 
 export type Namespace = (typeof NAMESPACES)[number];

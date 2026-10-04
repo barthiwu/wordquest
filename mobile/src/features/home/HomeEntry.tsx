@@ -1,8 +1,7 @@
-import type { ComponentProps } from 'react';
+import { byLook } from '@/features/proto/byLook';
+import { ProtoHomeScreen } from '@/features/proto/ProtoHomeScreen';
 import { NewHomeScreen } from './NewHomeScreen';
 
-/** Home tab entry point. (The illustrated prototype Home plugs in here
- * once built; both receive the identical tab-screen props.) */
-export function HomeEntry(props: ComponentProps<typeof NewHomeScreen>) {
-  return <NewHomeScreen {...props} />;
-}
+/** Home tab entry point: standard Home, or the illustrated prototype Home
+ * when "New look" is on. Both receive the identical tab-screen props. */
+export const HomeEntry = byLook(NewHomeScreen, ProtoHomeScreen as typeof NewHomeScreen);

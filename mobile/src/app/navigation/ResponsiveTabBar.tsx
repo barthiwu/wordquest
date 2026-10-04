@@ -6,6 +6,8 @@ import { useMemo } from 'react';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { useBreakpoint, type Breakpoint } from '@/hooks/useBreakpoint';
+import { useIsPrototype } from '@/state/uiVersionStore';
+import { ProtoNav } from '@/features/proto/ui/ProtoNav';
 
 export const RAIL_WIDTH = 88;
 export const SIDEBAR_WIDTH = 248;
@@ -37,6 +39,8 @@ export function navInset(breakpoint: Breakpoint): number {
  */
 export function ResponsiveTabBar(props: BottomTabBarProps) {
   const { breakpoint } = useBreakpoint();
+  const proto = useIsPrototype();
+  if (proto) return <ProtoNav {...props} />;
   if (breakpoint === 'mobile') return <BottomTabBar {...props} />;
   return <SideNav {...props} expanded={breakpoint === 'desktop'} />;
 }

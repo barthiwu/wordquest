@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { darkColors, lightColors, type ThemeColors } from '@/constants/theme';
+import { protoDarkColors, protoLightColors } from '@/features/proto/ui/protoTheme';
+import { useUiVersionStore } from '@/state/uiVersionStore';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -63,5 +65,9 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
  * HomeScreen for the pattern. */
 export function useThemeColors(): ThemeColors {
   const mode = useThemeStore((s) => s.mode);
+  // The illustrated "New look" swaps in its own palette (same token roles),
+  // which re-skins every screen that builds its styles from these colors.
+  const prototype = useUiVersionStore((s) => s.version === 'prototype');
+  if (prototype) return mode === 'light' ? protoLightColors : protoDarkColors;
   return mode === 'light' ? lightColors : darkColors;
 }

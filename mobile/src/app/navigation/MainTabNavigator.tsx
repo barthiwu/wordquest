@@ -3,6 +3,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/state/themeStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { useIsPrototype } from '@/state/uiVersionStore';
+import { protoInset } from '@/features/proto/ui/ProtoNav';
 import { withResponsiveFrame as framed } from '@/components/layout/withResponsiveFrame';
 import { ResponsiveTabBar, navInset } from './ResponsiveTabBar';
 import { HomeEntry } from '@/features/home/HomeEntry';
@@ -49,10 +51,12 @@ export function MainTabNavigator() {
   const { t } = useTranslation('common');
   const colors = useThemeColors();
   const { breakpoint } = useBreakpoint();
+  const proto = useIsPrototype();
+  const inset = proto ? protoInset(breakpoint) : { left: navInset(breakpoint), top: 0 };
   return (
     <Tab.Navigator
       tabBar={(props) => <ResponsiveTabBar {...props} />}
-      sceneContainerStyle={{ paddingLeft: navInset(breakpoint) }}
+      sceneContainerStyle={{ paddingLeft: inset.left, paddingTop: inset.top }}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.arcaneSoft,

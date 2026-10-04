@@ -1093,5 +1093,22 @@
       "acceptErrorTitle": "Couldn’t accept request",
       "declineErrorTitle": "Couldn’t decline request"
     }
+  },
+  "proto": {
+    "readyForQuest": "Ready for today's quest?",
+    "todaysQuest": "Today's Quest",
+    "discoverWord": "Discover a new word and grow your mastery.",
+    "startQuest": "Start Quest",
+    "dailyGoals": "Daily Goals",
+    "completeOf": "{{done}} of {{total}} complete",
+    "dayStreak": "Day streak",
+    "totalXp": "Total XP",
+    "playAndEarn": "Play & Earn",
+    "compete": "Compete",
+    "findRival": "Find a rival",
+    "weeklyChallenge": "Weekly challenge",
+    "nextWorld": "Next: {{name}}",
+    "masteredOf": "{{done}} / {{total}} words mastered",
+    "toGo": "{{count}} to go"
   }
 }
