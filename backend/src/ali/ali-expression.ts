@@ -66,11 +66,27 @@ export type AliIntensity = 0 | 1 | 2 | 3 | 4 | 5;
  */
 export type AliPriority = 0 | 1 | 2 | 3 | 4 | 5;
 
+/**
+ * Bible §7 major sequences — a semantic id the client maps to a multi-beat
+ * choreography on the one ALI rig (mobile/src/components/aliSequences.ts).
+ * Optional: only the major moments carry one; everything else is a single
+ * expression/pose.
+ */
+export type AliSequenceId =
+  | 'FIRST_ATTEMPT_MASTERY'
+  | 'MASTERY_AFTER_STRUGGLE'
+  | 'LEVEL_UP'
+  | 'JOURNEY_TRANSITION'
+  | 'BOSS_VICTORY'
+  | 'BOSS_DEFEAT';
+
 export interface AliExpressionCue {
   expression: AliExpression;
   pose: AliPose;
   intensity: AliIntensity;
   priority: AliPriority;
+  /** Present on the §7 major moments: play this choreography instead of the single pose. */
+  sequence?: AliSequenceId;
   /** How long the client should hold this cue on screen before it's safe
    * to show the next one. 0 means "no bubble/timed moment" — the cue is
    * for a caller that renders it inline in its own persistent UI (the
@@ -158,6 +174,7 @@ export function aliExpressionForEvent(
         pose: 'CIRCULAR_FLIGHT',
         intensity: 5,
         priority: 5,
+        sequence: 'JOURNEY_TRANSITION',
         durationMs: 6000,
       };
     case 'LEVEL_UP':
@@ -166,6 +183,7 @@ export function aliExpressionForEvent(
         pose: 'WING_SPREAD_FULL',
         intensity: 4,
         priority: 4,
+        sequence: 'LEVEL_UP',
         durationMs: 4500,
       };
     case 'MASTERY_EVENT': {
@@ -182,6 +200,7 @@ export function aliExpressionForEvent(
             pose: 'CELEBRATORY_HOP',
             intensity: 4,
             priority: 4,
+            sequence: 'FIRST_ATTEMPT_MASTERY',
             durationMs: 4500,
           }
         : {
@@ -189,6 +208,7 @@ export function aliExpressionForEvent(
             pose: 'APPROVING_NOD',
             intensity: 3,
             priority: 3,
+            sequence: 'MASTERY_AFTER_STRUGGLE',
             durationMs: 3500,
           };
     }
@@ -201,6 +221,7 @@ export function aliExpressionForEvent(
             pose: 'WING_SPREAD_FULL',
             intensity: 4,
             priority: 4,
+            sequence: 'BOSS_VICTORY',
             durationMs: 4500,
           }
         : {
@@ -212,6 +233,7 @@ export function aliExpressionForEvent(
             pose: 'HEAD_TILT',
             intensity: 2,
             priority: 2,
+            sequence: 'BOSS_DEFEAT',
             durationMs: 3200,
           };
     }

@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -144,6 +145,15 @@ export function AliScreen({ navigation }: Props) {
         <Text style={styles.heroTitle}>ALI</Text>
         <View style={styles.heroRule} />
         <Text style={styles.heroSubtitle}>{t('heroSubtitle')}</Text>
+        <Pressable
+          style={styles.galleryLink}
+          accessibilityRole="button"
+          onPress={() => navigation.navigate('AliGallery')}
+        >
+          <Text style={styles.galleryLinkText}>
+            {t('gallery.open', { defaultValue: 'See ALI’s moves' })}
+          </Text>
+        </Pressable>
 
         <Svg
           width="100%"
@@ -342,6 +352,15 @@ function createStyles(colors: ThemeColors, topInset: number) {
       backgroundColor: colors.arcane,
       opacity: 0.22,
     },
+    galleryLink: {
+      marginTop: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.pill,
+      borderWidth: 1,
+      borderColor: colors.arcaneSoft,
+    },
+    galleryLinkText: { color: colors.arcaneSoft, fontSize: typography.scale.sm, fontWeight: '700' },
     heroTitle: {
       color: colors.ink,
       fontSize: 30,

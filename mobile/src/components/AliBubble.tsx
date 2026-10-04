@@ -99,7 +99,8 @@ export function AliBubble({
       >
         <Animated.View style={styles.avatar}>
           <AliCharacter
-            size={34}
+            size={44}
+            framing="bust"
             expression={expression.expression}
             pose={expression.pose}
             intensity={expression.intensity}
@@ -139,8 +140,8 @@ function createStyles(colors: ThemeColors, bottomInset: number) {
       elevation: 8,
     },
     avatar: {
-      width: 40,
-      height: 40,
+      width: 44,
+      height: 44,
       alignItems: 'center',
       justifyContent: 'center',
     },

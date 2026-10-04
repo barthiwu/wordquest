@@ -52,7 +52,14 @@ export interface AliResponse extends AliExpressionCue {
  */
 export type AliDisplayMessage = Pick<
   AliResponse,
-  'text' | 'recommendation' | 'expression' | 'pose' | 'intensity' | 'priority' | 'durationMs'
+  | 'text'
+  | 'recommendation'
+  | 'expression'
+  | 'pose'
+  | 'intensity'
+  | 'priority'
+  | 'sequence'
+  | 'durationMs'
 >;
 
 /** Trims a full AliResponse down to what a client actually renders — see AliDisplayMessage's doc comment. */
@@ -64,6 +71,7 @@ export function toAliDisplayMessage(response: AliResponse): AliDisplayMessage {
     pose: response.pose,
     intensity: response.intensity,
     priority: response.priority,
+    ...(response.sequence ? { sequence: response.sequence } : {}),
     durationMs: response.durationMs,
   };
 }
@@ -321,7 +329,14 @@ export class AliService {
     intensity: number;
     priority: number;
     durationMs: number;
+    eventContext?: unknown;
   }): AliFeedMessage {
+    // The major-moment choreography id is derived, not stored (no migration):
+    // it is a pure function of the event type + the persisted context.
+    const sequence = aliExpressionForEvent(
+      row.eventType as AliEventType,
+      (row.eventContext as Record<string, unknown> | null) ?? {},
+    ).sequence;
     return {
       text: row.text,
       recommendation: row.recommendation,
@@ -333,6 +348,7 @@ export class AliService {
       pose: row.pose as AliExpressionCue['pose'],
       intensity: row.intensity as AliExpressionCue['intensity'],
       priority: row.priority as AliExpressionCue['priority'],
+      ...(sequence ? { sequence } : {}),
       durationMs: row.durationMs,
     };
   }

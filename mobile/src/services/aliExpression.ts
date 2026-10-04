@@ -48,11 +48,22 @@ export type AliIntensity = 0 | 1 | 2 | 3 | 4 | 5;
 /** Bible §10 priority table — used by useAliReactionQueue to arbitrate concurrent/rapid triggers. */
 export type AliPriority = 0 | 1 | 2 | 3 | 4 | 5;
 
+/** Bible §7 major sequences (choreographed in components/aliSequences.ts). */
+export type AliSequenceId =
+  | 'FIRST_ATTEMPT_MASTERY'
+  | 'MASTERY_AFTER_STRUGGLE'
+  | 'LEVEL_UP'
+  | 'JOURNEY_TRANSITION'
+  | 'BOSS_VICTORY'
+  | 'BOSS_DEFEAT';
+
 export interface AliExpressionCue {
   expression: AliExpression;
   pose: AliPose;
   intensity: AliIntensity;
   priority: AliPriority;
+  /** Present on the major moments — play the multi-beat choreography instead of one pose. */
+  sequence?: AliSequenceId;
   /** 0 means "no timed pop-up moment" — render inline instead of as a dismissable bubble. */
   durationMs: number;
 }

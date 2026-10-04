@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import type { AliDisplayMessage } from '@/services/aliExpression';
 import { AliCharacter } from './AliCharacter';
+import { AliSequencePlayer } from './AliSequencePlayer';
 import { trackEvent } from '@/services/analyticsClient';
 import { RichAliText } from './RichAliText';
 
@@ -13,6 +14,8 @@ interface AliReactionPopupProps {
   onDismiss: () => void;
 }
 
+/** Wide enough for the long tail, wings and rune to read. */
+const ALI_SIZE = 116;
 const MIN_AUTO_DISMISS_MS = 2400;
 const MAX_AUTO_DISMISS_MS = 6000;
 
@@ -42,6 +45,7 @@ export function AliReactionPopup({ cue, colors, onDismiss }: AliReactionPopupPro
       expression: cue.expression,
       pose: cue.pose,
       priority: cue.priority,
+      sequence: cue.sequence ?? null,
     });
     Animated.parallel([
       Animated.spring(opacity, { toValue: 1, useNativeDriver: true, speed: 16, bounciness: 6 }),
@@ -82,12 +86,16 @@ export function AliReactionPopup({ cue, colors, onDismiss }: AliReactionPopupPro
         accessibilityHint={t('aliBubble.dismissHint')}
       >
         <View style={styles.characterWrap}>
-          <AliCharacter
-            size={72}
-            expression={cue.expression}
-            pose={cue.pose}
-            intensity={cue.intensity}
-          />
+          {cue.sequence ? (
+            <AliSequencePlayer sequence={cue.sequence} size={ALI_SIZE} />
+          ) : (
+            <AliCharacter
+              size={ALI_SIZE}
+              expression={cue.expression}
+              pose={cue.pose}
+              intensity={cue.intensity}
+            />
+          )}
         </View>
         <View style={styles.textCol}>
           <RichAliText style={styles.text} text={cue.text} />

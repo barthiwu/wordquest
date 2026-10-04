@@ -98,6 +98,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
       ResetPassword: 'reset-password',
       DailyQuest: 'daily-quest/:questKey',
       Achievements: 'achievements',
+      AliGallery: 'ali-gallery',
       BossBattle: 'boss-battle',
       BossBattleLeaderboard: 'boss-battle-leaderboard',
       SkillRadar: 'skill-radar',

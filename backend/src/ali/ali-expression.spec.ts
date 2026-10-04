@@ -134,4 +134,25 @@ describe('aliExpressionForEvent', () => {
       expect(aliExpressionForEvent('FORGETTING_CURVE_REMINDER', {}).durationMs).toBe(0);
     });
   });
+
+  describe('§7 major sequences', () => {
+    it('tags each major moment with its choreography id', () => {
+      expect(aliExpressionForEvent('JOURNEY_COMPLETION', {}).sequence).toBe('JOURNEY_TRANSITION');
+      expect(aliExpressionForEvent('LEVEL_UP', {}).sequence).toBe('LEVEL_UP');
+      expect(aliExpressionForEvent('MASTERY_EVENT', { firstAttempt: true }).sequence).toBe(
+        'FIRST_ATTEMPT_MASTERY',
+      );
+      expect(aliExpressionForEvent('MASTERY_EVENT', { firstAttempt: false }).sequence).toBe(
+        'MASTERY_AFTER_STRUGGLE',
+      );
+      expect(aliExpressionForEvent('BOSS_BATTLE_RESULT', { rank: 1 }).sequence).toBe('BOSS_VICTORY');
+      expect(aliExpressionForEvent('BOSS_BATTLE_RESULT', { rank: 4 }).sequence).toBe('BOSS_DEFEAT');
+    });
+
+    it('leaves ordinary reactions as a single expression/pose', () => {
+      expect(aliExpressionForEvent('QUEST_COMPLETION', {}).sequence).toBeUndefined();
+      expect(aliExpressionForEvent('ACHIEVEMENT_UNLOCK', {}).sequence).toBeUndefined();
+      expect(quickAliExpression(true).sequence).toBeUndefined();
+    });
+  });
 });

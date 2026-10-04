@@ -1,77 +1,124 @@
-import { useEffect, useRef } from 'react';
-import { Animated, Easing } from 'react-native';
-import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Stop } from 'react-native-svg';
+import { useEffect, useMemo, useRef } from 'react';
+import { Animated, Easing, View } from 'react-native';
+import Svg, {
+  Circle,
+  ClipPath,
+  Defs,
+  Ellipse,
+  G,
+  LinearGradient,
+  Path,
+  RadialGradient,
+  Stop,
+} from 'react-native-svg';
+import { useReduceMotion } from '@/hooks/useReduceMotion';
 import type { AliExpression, AliIntensity, AliPose } from '@/services/aliExpression';
 import {
-  BEAK_D,
-  BELLY,
-  BODY,
-  EYELID,
-  EYE_HIGHLIGHT,
-  EYE_PUPIL,
-  EYE_WHITE,
-  GLINT_D,
-  HEAD,
-  HEAD_TUFT_D,
+  BEAK_PIVOT,
+  BELLY_D,
+  BELLY_LINE_D,
+  BILL_LOWER_D,
+  BILL_UPPER_D,
+  BILL_UPPER_SHEEN_D,
+  BODY_D,
+  COVERTS_D,
+  COVERTS_LINES_D,
+  EYE,
+  FAR_WING_FEATHER_INDEXES,
+  FEET,
+  HEAD_D,
+  HEAD_PIVOT,
+  HEAD_SHEEN_D,
   MAGPIE_ASPECT,
   MAGPIE_VIEW_BOX,
-  MONOCLE_ARM_D,
-  MONOCLE_RING,
+  MONOCLE,
+  MONOCLE_CHAIN_D,
+  MONOCLE_GLINT_D,
+  QUILL,
+  QUILL_BARBS_D,
   QUILL_D,
-  QUILL_LINE_A_D,
-  QUILL_LINE_B_D,
-  QUILL_LINE_C_D,
-  RUNE_CORE,
-  RUNE_GLOW,
+  QUILL_SHAFT_D,
+  RUNE,
   RUNE_MARK_D,
-  TAIL_D,
-  TAIL_LINE_A_D,
-  TAIL_LINE_B_D,
+  RUNE_ORBIT_DOTS,
+  SHOULDER_STREAK_D,
+  SPARKLE_SPOTS,
+  TAIL_FEATHERS,
   TAIL_PIVOT,
-  WING_D,
-  WING_HIGHLIGHT_D,
+  WING_FEATHERS,
   WING_PIVOT,
+  legPath,
+  originOf,
 } from './aliMagpieShapes';
+import {
+  CHANNEL_LIMITS,
+  CHANNEL_NAMES,
+  MAX_LAYERS,
+  resolveAliRig,
+  type ChannelName,
+  type MotionLayer,
+} from './aliRig';
 
 const AnimatedG = Animated.createAnimatedComponent(G);
 const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
-const AnimatedView = Animated.View;
+
+type Node =
+  | Animated.Value
+  | Animated.AnimatedInterpolation<number>
+  | Animated.AnimatedAddition<number>
+  | Animated.AnimatedMultiplication<number>;
+
+export type AliFraming = 'full' | 'bust';
+
+/** The `bust` framing crops to head + shoulders so the face reads at avatar sizes. */
+const BUST_VIEW_BOX = '176 30 200 190';
+const BUST_ASPECT = 190 / 200;
+
+export function aliAspect(framing: AliFraming = 'full'): number {
+  return framing === 'bust' ? BUST_ASPECT : MAGPIE_ASPECT;
+}
 
 export interface AliCharacterProps {
   size?: number;
-  /** Bible §4 expression — see ali-expression.ts on the backend for how these get chosen. Defaults to a resting NEUTRAL. */
+  /** Bible §4 expression. */
   expression?: AliExpression;
-  /** Bible §5 pose — defaults to PERCHED (the same idle stance AliMarkAnimated always showed). */
+  /** Bible §5 pose. */
   pose?: AliPose;
-  /** Bible §6 reaction tier (0-5) — scales how strong the rune-glow accent and hop height read. 0 renders like the old idle-only AliMarkAnimated. */
+  /** Bible §6 tier (0-5) — scales gesture size, rune glow and celebration sparkles. */
   intensity?: AliIntensity;
-  /** Whether the continuous idle loops (breathing, blink, tail sway, wing flutter, rune pulse, glint) keep running underneath the pose/expression targets. Default true; false gives a perfectly still frame (thumbnails, reduced-motion). */
+  /** Whether motion plays (idle loops, gestures, flight). False — and the OS reduced-motion setting — render one held still frame. */
   animated?: boolean;
+  /** 'bust' crops to head and shoulders for small avatars; 'full' shows the whole bird. */
+  framing?: AliFraming;
 }
 
+let uidCounter = 0;
+
+const range = (n: number) => Array.from({ length: n }, (_, i) => i / (n - 1));
+
+function sum(parts: Node[]): Node {
+  return parts.reduce((a: Node, b: Node): Node => Animated.add(a, b));
+}
+
+const starPath = (x: number, y: number, r: number) =>
+  `M${x},${y - r} C${x + 0.12 * r},${y - 0.28 * r} ${x + 0.28 * r},${y - 0.12 * r} ${x + r},${y} ` +
+  `C${x + 0.28 * r},${y + 0.12 * r} ${x + 0.12 * r},${y + 0.28 * r} ${x},${y + r} ` +
+  `C${x - 0.12 * r},${y + 0.28 * r} ${x - 0.28 * r},${y + 0.12 * r} ${x - r},${y} ` +
+  `C${x - 0.28 * r},${y - 0.12 * r} ${x - 0.12 * r},${y - 0.28 * r} ${x},${y - r} Z`;
+
 /**
- * ALI in full motion, expression- and pose-aware — the rig the ALI
- * Character & Animation Bible v1 asks for (§4 Expressions, §5 Poses,
- * §15 "do not create unrelated versions of ALI for each emotion; every
- * state must trace back to the canonical character reference").
- *
- * This is deliberately NOT twelve-times-sixteen bespoke drawings. It's
- * one rig — the exact same "Mystic Scholar" geometry AliMark/
- * AliMarkAnimated already draw from (aliMagpieShapes.ts) — with a small
- * set of numeric target channels (head tilt, wing rotation/spread, tail
- * angle, a vertical hop, rune glow strength, eye/lid shape) that every
- * expression and pose is expressed as a combination of. The existing
- * idle loops (breathe, blink, tailSway, wingFlutter, rune pulse, glint)
- * keep running underneath via Animated.add — ALI never goes fully
- * static, even mid-reaction, the same "always a little alive" quality
- * the original idle mark had.
- *
- * Use this wherever a reaction needs to actually look like something —
- * AliBubble's quick-reaction avatar, a major-moment render, the ALI
- * feed. For a perfectly static small mark (a button icon, a list-row
- * avatar) AliMark is still the right, cheaper choice.
+ * ALI — "The Mystic Scholar" magpie, expression- and pose-aware (ALI
+ * Character & Animation Bible v1 §4/§5/§6/§15). One drawing; every
+ * expression and pose is the same ~22 numeric channels (aliRig.ts) so every
+ * state traces back to the canonical character. Held channels spring toward
+ * their target; keyframed gesture layers (a curious head-sway, a surprised
+ * recoil, flapping wings, circular flight) play on top; subtle idle loops
+ * (breathing, blinking, tail sway, rune pulse) never stop, so ALI is never
+ * fully static. With `animated={false}` or the OS reduced-motion setting he
+ * renders one held still frame — the missing-motion fallback the Bible asks
+ * for. He never covers input: callers position him beside content.
  */
 export function AliCharacter({
   size = 96,
@@ -79,481 +126,612 @@ export function AliCharacter({
   pose = 'PERCHED',
   intensity = 0,
   animated = true,
+  framing = 'full',
 }: AliCharacterProps) {
-  const bg = '#12102A';
-  const cream = '#F4F1E8';
-  const accent = '#C4B5FD';
-  const gold = '#D9A94B';
+  const reduceMotion = useReduceMotion();
+  const motion = animated && !reduceMotion;
+  const uid = useRef(0);
+  if (uid.current === 0) uid.current = ++uidCounter;
+  const id = (name: string) => `ali${uid.current}${name}`;
 
-  // -- Continuous idle loops (unchanged from AliMarkAnimated) -----------
-  const breathe = useRef(new Animated.Value(0)).current;
-  const tailSway = useRef(new Animated.Value(0)).current;
-  const wingFlutter = useRef(new Animated.Value(0)).current;
-  const blink = useRef(new Animated.Value(0)).current;
-  const rune = useRef(new Animated.Value(0)).current;
-  const glint = useRef(new Animated.Value(0)).current;
+  const resolved = useMemo(
+    () => resolveAliRig(expression, pose, intensity),
+    [expression, pose, intensity],
+  );
 
-  // -- One-shot "reaction" loops, only active for poses that ask for them --
-  const bounce = useRef(new Animated.Value(0)).current;
-  const nod = useRef(new Animated.Value(0)).current;
-  const fastFlap = useRef(new Animated.Value(0)).current;
+  // -- one Animated.Value per channel (the held pose) ------------------------
+  const base = useRef<Record<ChannelName, Animated.Value> | null>(null);
+  if (base.current === null) {
+    const init = {} as Record<ChannelName, Animated.Value>;
+    CHANNEL_NAMES.forEach((n) => {
+      init[n] = new Animated.Value(resolved.channels[n]);
+    });
+    base.current = init;
+  }
+  const channelValues = base.current;
 
-  // -- Settle: where this pose/expression holds relative to idle (0 = just arrived, 1 = settled) --
-  const poseSettle = useRef(new Animated.Value(0)).current;
+  // -- motion phases + idle loops ----------------------------------------------
+  const phases = useRef<Animated.Value[] | null>(null);
+  if (phases.current === null)
+    phases.current = Array.from({ length: MAX_LAYERS }, () => new Animated.Value(0));
+  const phase = phases.current;
+  const idle = useRef({
+    breathe: new Animated.Value(0),
+    tail: new Animated.Value(0),
+    wing: new Animated.Value(0),
+    blink: new Animated.Value(0),
+    rune: new Animated.Value(0),
+    orbit: new Animated.Value(0),
+    sparks: Array.from({ length: SPARKLE_SPOTS.length }, () => new Animated.Value(0)),
+  }).current;
 
+  // Held pose: spring toward the target channels (or snap, when still).
   useEffect(() => {
-    if (!animated) return undefined;
-    const loop = (value: Animated.Value, duration: number, delay = 0) =>
-      Animated.sequence([
-        ...(delay > 0 ? [Animated.delay(delay)] : []),
-        Animated.loop(
-          Animated.timing(value, {
-            toValue: 1,
-            duration,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: false,
-          }),
-        ),
-      ]);
+    if (!motion) {
+      CHANNEL_NAMES.forEach((n) => channelValues[n].setValue(resolved.channels[n]));
+      return undefined;
+    }
+    const springs = CHANNEL_NAMES.map((n) =>
+      Animated.spring(channelValues[n], {
+        toValue: resolved.channels[n],
+        friction: 7,
+        tension: 70,
+        useNativeDriver: false,
+      }),
+    );
+    const all = Animated.parallel(springs);
+    all.start();
+    return () => all.stop();
+  }, [resolved, motion, channelValues]);
 
+  // Gesture layers.
+  useEffect(() => {
+    phase.forEach((p) => p.setValue(0));
+    if (!motion) return undefined;
+    const anims = resolved.layers.map((layer, i) => {
+      const t = Animated.timing(phase[i], {
+        toValue: 1,
+        duration: layer.ms,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      });
+      return layer.iterations === 1
+        ? t
+        : Animated.loop(t, { iterations: layer.iterations === 'loop' ? -1 : layer.iterations });
+    });
+    anims.forEach((a) => a.start());
+    return () => {
+      anims.forEach((a) => a.stop());
+      phase.forEach((p) => p.setValue(0));
+    };
+  }, [resolved, motion, phase]);
+
+  // Idle: always a little alive.
+  useEffect(() => {
+    if (!motion) return undefined;
+    const loop = (v: Animated.Value, duration: number, easing = Easing.inOut(Easing.ease)) =>
+      Animated.loop(Animated.timing(v, { toValue: 1, duration, easing, useNativeDriver: false }));
     const loops = [
-      loop(breathe, 3200),
-      loop(tailSway, 5000),
-      loop(wingFlutter, 4000, 300),
-      loop(blink, 4500),
-      loop(rune, 2400),
-      loop(glint, 6000),
+      loop(idle.breathe, 3200),
+      loop(idle.tail, 5000),
+      loop(idle.wing, 4000),
+      loop(idle.blink, 4500, Easing.linear),
+      loop(idle.rune, 2400),
+      loop(idle.orbit, 9000, Easing.linear),
     ];
     loops.forEach((l) => l.start());
     return () => {
       loops.forEach((l) => l.stop());
-      [breathe, tailSway, wingFlutter, blink, rune, glint].forEach((v) => v.setValue(0));
+      [idle.breathe, idle.tail, idle.wing, idle.blink, idle.rune, idle.orbit].forEach((v) =>
+        v.setValue(0),
+      );
     };
-  }, [animated, breathe, tailSway, wingFlutter, blink, rune, glint]);
-
-  const target = POSE_TARGETS[pose];
-  const expr = EXPRESSION_TARGETS[expression];
+  }, [motion, idle]);
 
   useEffect(() => {
-    poseSettle.setValue(0);
-    Animated.spring(poseSettle, {
-      toValue: 1,
-      useNativeDriver: false,
-      friction: 6,
-      tension: 50,
-    }).start();
-    // Re-settle whenever the pose or expression identity changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pose, expression]);
-
-  useEffect(() => {
-    if (!animated) return undefined;
-    const loops: Animated.CompositeAnimation[] = [];
-    if (target.bounceLoop) {
-      loops.push(
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(bounce, {
-              toValue: 1,
-              duration: 260,
-              easing: Easing.out(Easing.quad),
-              useNativeDriver: false,
-            }),
-            Animated.timing(bounce, {
-              toValue: 0,
-              duration: 340,
-              easing: Easing.in(Easing.quad),
-              useNativeDriver: false,
-            }),
-          ]),
-        ),
-      );
-    }
-    if (target.nodLoop) {
-      loops.push(
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(nod, {
-              toValue: 1,
-              duration: 380,
-              easing: Easing.inOut(Easing.ease),
-              useNativeDriver: false,
-            }),
-            Animated.timing(nod, {
-              toValue: 0,
-              duration: 380,
-              easing: Easing.inOut(Easing.ease),
-              useNativeDriver: false,
-            }),
-          ]),
-          { iterations: 2 },
-        ),
-      );
-    }
-    if (target.fastFlap) {
-      loops.push(
-        Animated.loop(
-          Animated.timing(fastFlap, {
+    if (!motion || resolved.sparkles === 0) return undefined;
+    const loops = idle.sparks.slice(0, resolved.sparkles).map((v, i) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(i * 230),
+          Animated.timing(v, {
             toValue: 1,
-            duration: 260,
+            duration: 1100 + i * 140,
             easing: Easing.linear,
             useNativeDriver: false,
           }),
-        ),
-      );
-    }
+        ]),
+      ),
+    );
     loops.forEach((l) => l.start());
     return () => {
       loops.forEach((l) => l.stop());
-      bounce.setValue(0);
-      nod.setValue(0);
-      fastFlap.setValue(0);
+      idle.sparks.forEach((v) => v.setValue(0));
     };
-  }, [animated, target, bounce, nod, fastFlap]);
+  }, [motion, resolved.sparkles, idle]);
 
-  // -- Idle interpolations (unchanged amplitudes from AliMarkAnimated) --
-  const bodyRx = breathe.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [BODY.rx, BODY.rx + 3, BODY.rx],
-  });
-  const bodyRy = breathe.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [BODY.ry, BODY.ry + 3, BODY.ry],
-  });
-  const bellyRx = breathe.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [BELLY.rx, BELLY.rx + 2, BELLY.rx],
-  });
-  const bellyRy = breathe.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [BELLY.ry, BELLY.ry + 2, BELLY.ry],
-  });
-  const idleTailRotate = tailSway.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, -4, 0] });
-  const idleWingRotate = wingFlutter.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0, 3, 0],
-  });
-  const fastFlapRotate = fastFlap.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, 14, 0] });
-  const eyelidOpacity = blink.interpolate({
-    inputRange: [0, 0.85, 0.92, 0.96, 1],
-    outputRange: [0, 0, 1, 0, 0],
-  });
-  const glintOpacity = glint.interpolate({
-    inputRange: [0, 0.7, 0.75, 0.8, 1],
-    outputRange: [0, 0, 0.9, 0, 0],
-  });
+  // -- compose each channel: held + gestures + idle, clamped --------------------
+  const ch = useMemo(() => {
+    const out = {} as Record<ChannelName, Node>;
+    const layerNode = (layer: MotionLayer, li: number, name: ChannelName): Node | null => {
+      const k = layer.keys[name];
+      if (!k) return null;
+      return phase[li].interpolate({ inputRange: range(k.length), outputRange: k });
+    };
+    CHANNEL_NAMES.forEach((name) => {
+      const parts: Node[] = [channelValues[name]];
+      if (motion) {
+        resolved.layers.forEach((layer, li) => {
+          const n = layerNode(layer, li, name);
+          if (n) parts.push(n);
+        });
+        if (name === 'puff')
+          parts.push(
+            idle.breathe.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, 0.012, 0] }),
+          );
+        if (name === 'tailRot')
+          parts.push(idle.tail.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, -3, 0] }));
+        if (name === 'wingLift')
+          parts.push(idle.wing.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, 2.5, 0] }));
+        if (name === 'rune')
+          parts.push(idle.rune.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, 0.12, 0] }));
+        if (name === 'lid')
+          parts.push(
+            idle.blink.interpolate({
+              inputRange: [0, 0.88, 0.92, 0.96, 1],
+              outputRange: [0, 0, 1, 0, 0],
+            }),
+          );
+      }
+      let node: Node = sum(parts);
+      const lim = CHANNEL_LIMITS[name];
+      if (lim) node = node.interpolate({ inputRange: lim, outputRange: lim, extrapolate: 'clamp' });
+      out[name] = node;
+    });
+    return out;
+  }, [resolved, motion, channelValues, phase, idle]);
 
-  // -- Pose settle interpolations (idle -> this pose's target) ----------
-  const settledTailOffset = poseSettle.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, target.tailRotate],
-  });
-  const settledWingOffset = poseSettle.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, target.wingRotate],
-  });
-  const settledHeadRotate = poseSettle.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, target.headRotate],
-  });
-  const settledWingScale = poseSettle.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, target.wingScale],
-  });
-  const settledBodyScale = poseSettle.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, expr.bodyScale],
-  });
+  const negate = (n: Node): Node => Animated.multiply(n, -1);
+  const gold = '#D9A94B';
+  const showFar = resolved.farWing;
+  const eyeOrigin = originOf(EYE);
 
-  const bounceLift = bounce.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -10 - intensity * 2],
-  });
-  const nodTilt = nod.interpolate({ inputRange: [0, 1], outputRange: [0, 12] });
+  const spreadAngle = (folded: number, open: number): Node =>
+    ch.wingSpread.interpolate({ inputRange: [0, 1], outputRange: [folded, open] });
+  const tailAngle = (folded: number, open: number): Node =>
+    ch.tailSpread.interpolate({ inputRange: [0, 1], outputRange: [folded, open] });
 
-  const tailRotate = Animated.add(idleTailRotate, settledTailOffset);
-  const wingRotate = Animated.add(
-    Animated.add(idleWingRotate, target.fastFlap ? fastFlapRotate : 0),
-    settledWingOffset,
-  );
-  const headRotate = Animated.add(settledHeadRotate, nodTilt);
-
-  // -- Expression -> rune treatment ---------------------------------------
-  const runeGlowOpacity = rune.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [
-      0.35 + expr.glowBoost,
-      0.75 + expr.glowBoost + intensity * 0.03,
-      0.35 + expr.glowBoost,
-    ],
-  });
-  const runeGlowR = rune.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [RUNE_GLOW.r, RUNE_GLOW.r + 4 + intensity, RUNE_GLOW.r],
-  });
+  const viewBox = framing === 'bust' ? BUST_VIEW_BOX : MAGPIE_VIEW_BOX;
+  const height = size * aliAspect(framing);
+  const hopLift = Animated.add(negate(ch.hop), ch.travelY);
 
   return (
-    <AnimatedView
-      style={{ width: size, height: size * MAGPIE_ASPECT, transform: [{ translateY: bounceLift }] }}
-    >
-      <Svg width={size} height={size * MAGPIE_ASPECT} viewBox={MAGPIE_VIEW_BOX} fill="none">
+    <View style={{ width: size, height }} pointerEvents="none">
+      <Svg
+        width={size}
+        height={height}
+        viewBox={viewBox}
+        fill="none"
+        style={{ overflow: framing === 'bust' ? 'hidden' : 'visible' }}
+      >
         <Defs>
-          <LinearGradient
-            id="aliTailGrad2"
-            x1="170"
-            y1="298"
-            x2="40"
-            y2="432"
-            gradientUnits="userSpaceOnUse"
-          >
-            <Stop offset="0%" stopColor="#241a3d" />
-            <Stop offset="55%" stopColor="#5b3fae" />
-            <Stop offset="100%" stopColor={accent} />
+          <LinearGradient id={id('blk')} x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#2a2560" />
+            <Stop offset="0.45" stopColor="#14112f" />
+            <Stop offset="1" stopColor="#07061a" />
           </LinearGradient>
-          <LinearGradient
-            id="aliWingGrad2"
-            x1="249"
-            y1="188"
-            x2="316"
-            y2="335"
-            gradientUnits="userSpaceOnUse"
-          >
-            <Stop offset="0%" stopColor="#1b2a3d" />
-            <Stop offset="50%" stopColor="#2f6f7a" />
-            <Stop offset="100%" stopColor="#6a4fc9" />
+          <LinearGradient id={id('head')} x1="0.1" y1="0" x2="0.9" y2="1">
+            <Stop offset="0" stopColor="#3c3a86" />
+            <Stop offset="0.5" stopColor="#16132f" />
+            <Stop offset="1" stopColor="#0a0818" />
           </LinearGradient>
-          <LinearGradient
-            id="aliBeakGrad2"
-            x1="315"
-            y1="165"
-            x2="380"
-            y2="190"
-            gradientUnits="userSpaceOnUse"
-          >
-            <Stop offset="0%" stopColor="#f4d773" />
-            <Stop offset="100%" stopColor={gold} />
+          <LinearGradient id={id('wing')} x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0" stopColor="#1c2766" />
+            <Stop offset="0.5" stopColor="#2a63c0" />
+            <Stop offset="0.82" stopColor="#2fa3b4" />
+            <Stop offset="1" stopColor="#8a6be0" />
           </LinearGradient>
+          <LinearGradient id={id('tail')} x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0" stopColor="#1a1440" />
+            <Stop offset="0.45" stopColor="#3b3aa8" />
+            <Stop offset="0.8" stopColor="#5b7fd0" />
+            <Stop offset="1" stopColor="#C4B5FD" />
+          </LinearGradient>
+          <LinearGradient id={id('cov')} x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#26397f" />
+            <Stop offset="0.5" stopColor="#1b5cc4" />
+            <Stop offset="1" stopColor="#1a3a9a" />
+          </LinearGradient>
+          <LinearGradient id={id('belly')} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor="#FBF8EE" />
+            <Stop offset="1" stopColor="#D9D3C2" />
+          </LinearGradient>
+          <LinearGradient id={id('gold')} x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0" stopColor="#f4d773" />
+            <Stop offset="1" stopColor={gold} />
+          </LinearGradient>
+          <LinearGradient id={id('quill')} x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0" stopColor="#d9d3c2" />
+            <Stop offset="1" stopColor="#FFFDF4" />
+          </LinearGradient>
+          <RadialGradient id={id('rune')} cx="0.5" cy="0.5" r="0.5">
+            <Stop offset="0" stopColor="#C4B5FD" stopOpacity={0.95} />
+            <Stop offset="1" stopColor="#C4B5FD" stopOpacity={0} />
+          </RadialGradient>
+          <RadialGradient id={id('glow')} cx="0.5" cy="0.5" r="0.5">
+            <Stop offset="0" stopColor="#8fe3ff" stopOpacity={0.5} />
+            <Stop offset="1" stopColor="#8fe3ff" stopOpacity={0} />
+          </RadialGradient>
+          <ClipPath id={id('headClip')}>
+            <Path d={HEAD_D} />
+          </ClipPath>
         </Defs>
 
-        {/* tail */}
-        <AnimatedG rotation={tailRotate} origin={TAIL_PIVOT}>
-          <Path d={TAIL_D} fill="url(#aliTailGrad2)" />
-          <Path
-            d={TAIL_LINE_A_D}
-            stroke="rgba(0,0,0,0.35)"
-            strokeWidth={3}
-            fill="none"
-            strokeLinecap="round"
-          />
-          <Path
-            d={TAIL_LINE_B_D}
-            stroke="rgba(0,0,0,0.25)"
-            strokeWidth={3}
-            fill="none"
-            strokeLinecap="round"
-          />
-        </AnimatedG>
-
-        {/* body -- an outer settle-scale (proud puff / discouraged hunch) around the existing breathe-pulsed ellipses */}
-        <AnimatedG scale={settledBodyScale} origin={`${BODY.cx}, ${BODY.cy}`}>
-          <AnimatedEllipse cx={BODY.cx} cy={BODY.cy} rx={bodyRx} ry={bodyRy} fill={bg} />
-          <AnimatedEllipse cx={BELLY.cx} cy={BELLY.cy} rx={bellyRx} ry={bellyRy} fill={cream} />
-        </AnimatedG>
-
-        {/* tucked quill */}
-        <Path d={QUILL_D} fill={cream} stroke="#cfcabe" strokeWidth={1} />
-        <Path d={QUILL_LINE_A_D} stroke="#cfcabe" strokeWidth={1.5} />
-        <Path d={QUILL_LINE_B_D} stroke="#cfcabe" strokeWidth={1.5} />
-        <Path d={QUILL_LINE_C_D} stroke="#cfcabe" strokeWidth={1.5} />
-
-        {/* wing -- rotation reads as flutter/twitch/flap, scale reads as a partial/full "spread" without new artwork */}
-        <AnimatedG rotation={wingRotate} scale={settledWingScale} origin={WING_PIVOT}>
-          <Path d={WING_D} fill="url(#aliWingGrad2)" />
-          <Path d={WING_HIGHLIGHT_D} fill={cream} opacity={0.92} />
-        </AnimatedG>
-
-        {/* head group -- tilts/nods/droops as one unit */}
-        <AnimatedG rotation={headRotate} origin={`${HEAD.cx}, ${HEAD.cy}`}>
-          <Circle cx={HEAD.cx} cy={HEAD.cy} r={HEAD.r} fill={bg} />
-          <Path d={HEAD_TUFT_D} fill={bg} />
-
-          <G
-            scale={expr.eyeScale}
-            origin={`${EYE_WHITE.cx}, ${EYE_WHITE.cy}`}
-            translate={`0, ${expr.pupilOffsetY}`}
-          >
-            <Circle cx={EYE_WHITE.cx} cy={EYE_WHITE.cy} r={EYE_WHITE.r} fill={cream} />
-            <Circle cx={EYE_PUPIL.cx} cy={EYE_PUPIL.cy} r={EYE_PUPIL.r} fill="#0c0c10" />
-            <Circle
-              cx={EYE_HIGHLIGHT.cx}
-              cy={EYE_HIGHLIGHT.cy}
-              r={EYE_HIGHLIGHT.r}
-              fill="#ffffff"
-            />
-          </G>
+        {/* ground shadow */}
+        <AnimatedG translateX={ch.travelX}>
           <AnimatedEllipse
-            cx={EYELID.cx}
-            cy={EYELID.cy}
-            rx={EYELID.rx}
-            ry={EYELID.ry}
-            fill={bg}
-            opacity={eyelidOpacity}
+            cx={FEET.x}
+            cy={FEET.y + 6}
+            rx={ch.hop.interpolate({
+              inputRange: [0, 60],
+              outputRange: [70, 44],
+              extrapolate: 'clamp',
+            })}
+            ry={7}
+            fill="#000"
+            opacity={ch.hop.interpolate({
+              inputRange: [0, 60],
+              outputRange: [0.28, 0.1],
+              extrapolate: 'clamp',
+            })}
           />
-          {/* expression eyelid -- a held (not blinking) top-lid droop for CONCERNED/DISAPPOINTED/FOCUSED, distinct from the brief animated blink above */}
-          {expr.lidDroop > 0 && (
-            <Ellipse
-              cx={EYELID.cx}
-              cy={EYELID.cy - EYELID.ry * (1 - expr.lidDroop)}
-              rx={EYELID.rx}
-              ry={EYELID.ry * expr.lidDroop}
-              fill={bg}
-              opacity={0.9}
-            />
-          )}
-
-          <Circle
-            cx={MONOCLE_RING.cx}
-            cy={MONOCLE_RING.cy}
-            r={MONOCLE_RING.r}
-            fill="none"
-            stroke={gold}
-            strokeWidth={2.5}
-          />
-          <Path d={MONOCLE_ARM_D} stroke={gold} strokeWidth={2} fill="none" strokeLinecap="round" />
-          <AnimatedPath
-            d={GLINT_D}
-            stroke="#fff8e0"
-            strokeWidth={2.5}
-            fill="none"
-            strokeLinecap="round"
-            opacity={glintOpacity}
-          />
-
-          <Path d={BEAK_D} fill="url(#aliBeakGrad2)" stroke="#8a6a1f" strokeWidth={1.5} />
         </AnimatedG>
 
-        {/* glowing rune -- brighter/bigger for higher-energy expressions and higher intensity tiers */}
-        <AnimatedCircle
-          cx={RUNE_GLOW.cx}
-          cy={RUNE_GLOW.cy}
-          r={runeGlowR}
-          fill={accent}
-          opacity={runeGlowOpacity}
-        />
-        <Circle
-          cx={RUNE_CORE.cx}
-          cy={RUNE_CORE.cy}
-          r={RUNE_CORE.r}
-          fill="#efe6ff"
-          stroke="#6c4fd1"
-          strokeWidth={2}
-        />
-        <Path d={RUNE_MARK_D} stroke="#6c4fd1" strokeWidth={1.6} strokeLinecap="round" />
+        {resolved.glow > 0 && (
+          <Circle cx={230} cy={170} r={150} fill={`url(#${id('glow')})`} opacity={resolved.glow} />
+        )}
+
+        {/* the bird: lift + travel, then lean about the feet */}
+        <AnimatedG translateX={ch.travelX} translateY={hopLift}>
+          <AnimatedG rotation={ch.bodyRot} origin={originOf(FEET)}>
+            {/* far wing (only when the wings open) */}
+            {showFar && (
+              <AnimatedG
+                opacity={ch.wingSpread.interpolate({
+                  inputRange: [0.15, 0.35],
+                  outputRange: [0, 0.75],
+                  extrapolate: 'clamp',
+                })}
+                rotation={Animated.add(Animated.multiply(ch.wingLift, -0.6), -8)}
+                origin={originOf(WING_PIVOT)}
+              >
+                <G translate="-6, -6">
+                  {[...FAR_WING_FEATHER_INDEXES].reverse().map((i) => {
+                    const f = WING_FEATHERS[i];
+                    return (
+                      <AnimatedG
+                        key={`fw${i}`}
+                        rotation={spreadAngle(f.folded, f.open)}
+                        origin={originOf(WING_PIVOT)}
+                      >
+                        <Path
+                          d={f.d}
+                          fill={`url(#${id('wing')})`}
+                          stroke="#0c1f66"
+                          strokeWidth={1.2}
+                          strokeOpacity={0.55}
+                        />
+                      </AnimatedG>
+                    );
+                  })}
+                </G>
+              </AnimatedG>
+            )}
+
+            {/* tail fan */}
+            <AnimatedG rotation={ch.tailRot} origin={originOf(TAIL_PIVOT)}>
+              {TAIL_FEATHERS.map((_, i) => i)
+                .reverse()
+                .map((i) => {
+                  const f = TAIL_FEATHERS[i];
+                  return (
+                    <AnimatedG
+                      key={`t${i}`}
+                      rotation={tailAngle(f.folded, f.open)}
+                      origin={originOf(TAIL_PIVOT)}
+                    >
+                      <Path
+                        d={f.d}
+                        fill={`url(#${id('tail')})`}
+                        stroke="#0a1450"
+                        strokeWidth={1}
+                        strokeOpacity={0.5}
+                      />
+                      <Path d={f.shaft} stroke="#9de6d6" strokeWidth={1} opacity={0.3} />
+                    </AnimatedG>
+                  );
+                })}
+            </AnimatedG>
+
+            {/* legs */}
+            <AnimatedG opacity={ch.legs}>
+              {[legPath(230, -4), legPath(250, 6)].map((l, i) => (
+                <G key={`leg${i}`}>
+                  <Path d={l.leg} stroke="#2a2d44" strokeWidth={5} strokeLinecap="round" />
+                  <Path
+                    d={l.foot}
+                    stroke="#2a2d44"
+                    strokeWidth={4}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                </G>
+              ))}
+            </AnimatedG>
+
+            {/* body + belly (chest puff) */}
+            <AnimatedG scale={ch.puff} origin="236, 214">
+              <Path d={BODY_D} fill={`url(#${id('blk')})`} />
+              <Path d={BELLY_D} fill={`url(#${id('belly')})`} />
+              <Path
+                d={BELLY_LINE_D}
+                stroke="#aab4cc"
+                strokeWidth={2}
+                fill="none"
+                opacity={0.55}
+                strokeLinecap="round"
+              />
+            </AnimatedG>
+
+            {/* tucked quill — behind the head, ahead of the body; sways with the mood */}
+            <AnimatedG rotation={ch.quill} origin={originOf(QUILL)}>
+              <G rotation={QUILL.angle} origin={originOf(QUILL)}>
+                <Path
+                  d={QUILL_D}
+                  fill={`url(#${id('quill')})`}
+                  stroke="#b9b3a0"
+                  strokeWidth={1.4}
+                />
+                <Path d={QUILL_SHAFT_D} stroke="#a79f8a" strokeWidth={1.6} />
+                <Path d={QUILL_BARBS_D} stroke="#cfc9b6" strokeWidth={1.2} strokeLinecap="round" />
+              </G>
+            </AnimatedG>
+
+            {/* near wing */}
+            <AnimatedG rotation={negate(ch.wingLift)} origin={originOf(WING_PIVOT)}>
+              {WING_FEATHERS.map((_, i) => i)
+                .reverse()
+                .map((i) => {
+                  const f = WING_FEATHERS[i];
+                  return (
+                    <AnimatedG
+                      key={`w${i}`}
+                      rotation={spreadAngle(f.folded, f.open)}
+                      origin={originOf(WING_PIVOT)}
+                    >
+                      <Path
+                        d={f.d}
+                        fill={`url(#${id('wing')})`}
+                        stroke="#0c1f66"
+                        strokeWidth={1.2}
+                        strokeOpacity={0.55}
+                      />
+                      <Path d={f.shaft} stroke="#bfe9ff" strokeWidth={1} opacity={0.28} />
+                    </AnimatedG>
+                  );
+                })}
+              <AnimatedPath
+                d={COVERTS_D}
+                fill={`url(#${id('cov')})`}
+                opacity={ch.wingSpread.interpolate({ inputRange: [0, 1], outputRange: [1, 0.65] })}
+              />
+              <Path
+                d={COVERTS_LINES_D}
+                stroke="#7fb4ff"
+                strokeWidth={1.2}
+                fill="none"
+                opacity={0.35}
+              />
+            </AnimatedG>
+            <AnimatedPath
+              d={SHOULDER_STREAK_D}
+              fill="#f4f6fb"
+              opacity={ch.wingSpread.interpolate({
+                inputRange: [0, 0.8],
+                outputRange: [1, 0],
+                extrapolate: 'clamp',
+              })}
+            />
+
+            {/* head: tilts, nods, droops as one unit */}
+            <AnimatedG translateY={ch.headY} rotation={ch.headRot} origin={originOf(HEAD_PIVOT)}>
+              <G scale={1.1} origin="262, 150">
+                <Path d={HEAD_D} fill={`url(#${id('head')})`} />
+                <Path d={HEAD_SHEEN_D} fill="#5a6cc0" opacity={0.28} />
+
+                {/* gold bill: upper and lower mandible part with `beak` */}
+                <AnimatedG
+                  rotation={Animated.multiply(ch.beak, -5.4)}
+                  origin={originOf(BEAK_PIVOT)}
+                >
+                  <Path
+                    d={BILL_UPPER_D}
+                    fill={`url(#${id('gold')})`}
+                    stroke="#8a6a1f"
+                    strokeWidth={1}
+                  />
+                  <Path
+                    d={BILL_UPPER_SHEEN_D}
+                    stroke="#fff3bd"
+                    strokeWidth={1.5}
+                    opacity={0.7}
+                    fill="none"
+                  />
+                </AnimatedG>
+                <AnimatedG rotation={Animated.multiply(ch.beak, 12)} origin={originOf(BEAK_PIVOT)}>
+                  <Path d={BILL_LOWER_D} fill="#b8892f" stroke="#8a6a1f" strokeWidth={1} />
+                </AnimatedG>
+
+                {/* cream eye, dark pupil, highlight; gaze shifts the pupil */}
+                <Circle cx={EYE.x} cy={EYE.y} r={EYE.r} fill="#F4F1E8" />
+                <AnimatedG translateX={ch.gazeX} translateY={ch.gazeY}>
+                  <AnimatedCircle
+                    cx={EYE.x + 2.5}
+                    cy={EYE.y}
+                    r={Animated.multiply(ch.pupil, EYE.pupil)}
+                    fill="#0c0c10"
+                  />
+                  <Circle cx={EYE.x + 5.8} cy={EYE.y - 3.8} r={2.8} fill="#fff" />
+                </AnimatedG>
+
+                {/* held lids (clipped to the head so they never show outside it) */}
+                <G clipPath={`url(#${id('headClip')})`}>
+                  <AnimatedG rotation={ch.lidSlant} origin={eyeOrigin}>
+                    <AnimatedG translateY={Animated.multiply(ch.lid, 32)}>
+                      <Path
+                        d={`M${EYE.x - 20},${EYE.y - 54} L${EYE.x + 20},${EYE.y - 54} L${EYE.x + 20},${EYE.y - 17} Q${EYE.x},${EYE.y - 12} ${EYE.x - 20},${EYE.y - 17} Z`}
+                        fill="#16132f"
+                      />
+                    </AnimatedG>
+                  </AnimatedG>
+                  <AnimatedG translateY={Animated.multiply(ch.lower, -30)}>
+                    <Path
+                      d={`M${EYE.x - 20},${EYE.y + 54} L${EYE.x + 20},${EYE.y + 54} L${EYE.x + 20},${EYE.y + 17} Q${EYE.x},${EYE.y + 12} ${EYE.x - 20},${EYE.y + 17} Z`}
+                      fill="#16132f"
+                    />
+                  </AnimatedG>
+                </G>
+
+                {/* brow */}
+                <AnimatedG rotation={Animated.multiply(ch.lidSlant, 0.8)} origin={eyeOrigin}>
+                  <AnimatedG translateY={Animated.multiply(ch.brow, -4)}>
+                    <AnimatedPath
+                      d={`M${EYE.x - 15},${EYE.y - 23} Q${EYE.x},${EYE.y - 29} ${EYE.x + 15},${EYE.y - 22}`}
+                      stroke="#8a7fe6"
+                      strokeWidth={3.4}
+                      strokeLinecap="round"
+                      fill="none"
+                      opacity={ch.brow.interpolate({
+                        inputRange: [-1.2, -0.05, 0.05, 1.5],
+                        outputRange: [1, 0.3, 0.3, 1],
+                      })}
+                    />
+                  </AnimatedG>
+                </AnimatedG>
+
+                {/* gold monocle + chain */}
+                <Circle
+                  cx={EYE.x}
+                  cy={EYE.y}
+                  r={MONOCLE.r}
+                  fill="#C4B5FD"
+                  fillOpacity={0.12}
+                  stroke={gold}
+                  strokeWidth={3}
+                />
+                <Path
+                  d={MONOCLE_CHAIN_D}
+                  stroke={gold}
+                  strokeWidth={1.8}
+                  strokeDasharray="2.5 2.5"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <Path
+                  d={MONOCLE_GLINT_D}
+                  stroke="#fff8e0"
+                  strokeWidth={2.4}
+                  strokeLinecap="round"
+                  opacity={0.9}
+                />
+              </G>
+            </AnimatedG>
+          </AnimatedG>
+        </AnimatedG>
+
+        {/* the arcane rune, floating ahead of the beak */}
+        <AnimatedG
+          translateY={idle.rune.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, -4, 0] })}
+        >
+          <AnimatedCircle
+            cx={RUNE.x}
+            cy={RUNE.y}
+            r={ch.rune.interpolate({
+              inputRange: [0, 1.6],
+              outputRange: [RUNE.halo * 0.55, RUNE.halo * 1.5],
+              extrapolate: 'clamp',
+            })}
+            fill={`url(#${id('rune')})`}
+            opacity={ch.rune.interpolate({
+              inputRange: [0, 1.6],
+              outputRange: [0.15, 1],
+              extrapolate: 'clamp',
+            })}
+          />
+          <AnimatedG
+            opacity={ch.rune.interpolate({
+              inputRange: [0, 0.4],
+              outputRange: [0.4, 1],
+              extrapolate: 'clamp',
+            })}
+          >
+            <AnimatedG
+              rotation={idle.orbit.interpolate({ inputRange: [0, 1], outputRange: [0, 360] })}
+              origin={originOf(RUNE)}
+            >
+              <Circle
+                cx={RUNE.x}
+                cy={RUNE.y}
+                r={RUNE.orbit}
+                stroke="#C4B5FD"
+                strokeWidth={1}
+                strokeDasharray="3 4"
+                opacity={0.6}
+                fill="none"
+              />
+              {RUNE_ORBIT_DOTS.map((d, i) => (
+                <Circle key={`od${i}`} cx={d.x} cy={d.y} r={1.8} fill="#efe6ff" opacity={0.85} />
+              ))}
+            </AnimatedG>
+            <Circle
+              cx={RUNE.x}
+              cy={RUNE.y}
+              r={RUNE.core}
+              fill="#efe6ff"
+              stroke="#6c4fd1"
+              strokeWidth={2.2}
+            />
+            <Path d={RUNE_MARK_D} stroke="#6c4fd1" strokeWidth={1.9} strokeLinecap="round" />
+          </AnimatedG>
+        </AnimatedG>
+
+        {/* celebration sparkles */}
+        {SPARKLE_SPOTS.slice(0, resolved.sparkles).map((sp, i) => (
+          <AnimatedG
+            key={`sp${i}`}
+            opacity={
+              motion
+                ? idle.sparks[i].interpolate({
+                    inputRange: [0, 0.3, 0.6, 1],
+                    outputRange: [0, 1, 0.5, 0],
+                  })
+                : 0.85
+            }
+            scale={
+              motion
+                ? idle.sparks[i].interpolate({
+                    inputRange: [0, 0.4, 1],
+                    outputRange: [0.3, 1, 0.5],
+                  })
+                : 1
+            }
+            origin={`${sp.x}, ${sp.y}`}
+          >
+            <Path d={starPath(sp.x, sp.y, 11 * sp.s)} fill="#fff4c2" />
+            <Path d={starPath(sp.x, sp.y, 5 * sp.s)} fill="#ffffff" />
+          </AnimatedG>
+        ))}
       </Svg>
-    </AnimatedView>
+    </View>
   );
 }
-
-interface PoseTarget {
-  /** Extra rotation (degrees) added on top of the idle tail sway. */
-  tailRotate: number;
-  /** Extra rotation (degrees) added on top of the idle wing flutter. */
-  wingRotate: number;
-  /** Head-group rotation (degrees) — positive tilts toward the beak side. */
-  headRotate: number;
-  /** Wing group scale — >1 reads as a more "unfurled" wing without new artwork. */
-  wingScale: number;
-  /** A short repeating vertical bounce (hop/celebratory hop/takeoff). */
-  bounceLoop: boolean;
-  /** A couple of head-dip repeats (approving nod). */
-  nodLoop: boolean;
-  /** A faster, wider wing flutter than idle (flight/takeoff/twitch). */
-  fastFlap: boolean;
-}
-
-const BASE_TARGET: PoseTarget = {
-  tailRotate: 0,
-  wingRotate: 0,
-  headRotate: 0,
-  wingScale: 1,
-  bounceLoop: false,
-  nodLoop: false,
-  fastFlap: false,
-};
-
-/**
- * Bible §5's pose list, each expressed as a small set of offsets from
- * the idle rig rather than new artwork — see this file's top doc
- * comment for why. Grouped in the bible's own order. Flight-family
- * poses (TAKEOFF/FLIGHT/CIRCULAR_FLIGHT/LANDING) are the bird's own
- * body language (wide fast flap, streamlined tail) — actually moving
- * the character across the screen for a cinematic moment is a
- * screen-level concern layered on top, not this rig's job.
- */
-const POSE_TARGETS: Record<AliPose, PoseTarget> = {
-  PERCHED: BASE_TARGET,
-  STANDING: { ...BASE_TARGET, tailRotate: -2 },
-  HEAD_TILT: { ...BASE_TARGET, headRotate: 11 },
-  LOOK_AT_RESULT: { ...BASE_TARGET, headRotate: 6 },
-  HOP: { ...BASE_TARGET, bounceLoop: true, tailRotate: -3 },
-  WING_TWITCH: { ...BASE_TARGET, wingRotate: 10, fastFlap: true },
-  WING_SPREAD_PARTIAL: { ...BASE_TARGET, wingRotate: 18, wingScale: 1.08 },
-  WING_SPREAD_FULL: { ...BASE_TARGET, wingRotate: 32, wingScale: 1.18 },
-  TAKEOFF: { ...BASE_TARGET, wingRotate: 26, wingScale: 1.12, fastFlap: true, bounceLoop: true },
-  FLIGHT: { ...BASE_TARGET, wingRotate: 22, wingScale: 1.1, fastFlap: true, tailRotate: -8 },
-  CIRCULAR_FLIGHT: {
-    ...BASE_TARGET,
-    wingRotate: 22,
-    wingScale: 1.1,
-    fastFlap: true,
-    tailRotate: -8,
-  },
-  LANDING: { ...BASE_TARGET, wingRotate: 14, wingScale: 1.05, headRotate: -4 },
-  CELEBRATORY_HOP: { ...BASE_TARGET, bounceLoop: true, wingRotate: 14, tailRotate: -6 },
-  APPROVING_NOD: { ...BASE_TARGET, nodLoop: true },
-  CONCERN_DROP: { ...BASE_TARGET, headRotate: -9, wingRotate: -4, tailRotate: 2 },
-  FOCUSED_STANCE: { ...BASE_TARGET, wingRotate: -2 },
-};
-
-interface ExpressionTarget {
-  /** Uniform eye-group scale — >1 wide/alert, <1 narrowed/squinting. */
-  eyeScale: number;
-  /** Small vertical shift (SVG units) of the eye group — a soft downward look for gentler expressions. */
-  pupilOffsetY: number;
-  /** 0 = no held droop, up to ~0.5 = a sympathetic/sad upper-lid droop. Independent of the blink loop. */
-  lidDroop: number;
-  /** Added to the rune glow's base opacity — how much this expression "lights up". */
-  glowBoost: number;
-  /** Body group scale — a small proud puff or a small discouraged hunch. */
-  bodyScale: number;
-}
-
-const NEUTRAL_EXPR: ExpressionTarget = {
-  eyeScale: 1,
-  pupilOffsetY: 0,
-  lidDroop: 0,
-  glowBoost: 0,
-  bodyScale: 1,
-};
-
-/** Bible §4's expression list, each a small nudge on the same channels above. */
-const EXPRESSION_TARGETS: Record<AliExpression, ExpressionTarget> = {
-  NEUTRAL: NEUTRAL_EXPR,
-  CURIOUS: { ...NEUTRAL_EXPR, eyeScale: 1.08 },
-  PLEASED: { ...NEUTRAL_EXPR, glowBoost: 0.08, bodyScale: 1.02 },
-  EXCITED: { ...NEUTRAL_EXPR, eyeScale: 1.12, glowBoost: 0.18, bodyScale: 1.04 },
-  PROUD: { ...NEUTRAL_EXPR, glowBoost: 0.16, bodyScale: 1.06 },
-  SURPRISED: { ...NEUTRAL_EXPR, eyeScale: 1.3, pupilOffsetY: -1 },
-  CONCERNED: { ...NEUTRAL_EXPR, eyeScale: 0.92, lidDroop: 0.35, bodyScale: 0.98 },
-  DISAPPOINTED: {
-    ...NEUTRAL_EXPR,
-    eyeScale: 0.88,
-    lidDroop: 0.5,
-    bodyScale: 0.96,
-    pupilOffsetY: 1.5,
-  },
-  MISCHIEVOUS: { ...NEUTRAL_EXPR, eyeScale: 0.85, lidDroop: 0.2, glowBoost: 0.1 },
-  ENCOURAGING: { ...NEUTRAL_EXPR, eyeScale: 1.04, glowBoost: 0.06 },
-  FOCUSED: { ...NEUTRAL_EXPR, eyeScale: 0.82, lidDroop: 0.15 },
-  TRIUMPHANT: { ...NEUTRAL_EXPR, eyeScale: 1.1, glowBoost: 0.28, bodyScale: 1.08 },
-};

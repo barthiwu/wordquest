@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { Animated, Easing, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 import { AliCharacter } from '@/components/AliCharacter';
 import type { AliExpression, AliIntensity, AliPose } from '@/services/aliExpression';
@@ -76,6 +76,9 @@ export interface AliSceneProps {
  * AliCharacter rig: breathing, blinking, tail sway, wing flutter, rune
  * pulse, plus the pose/expression reactions).
  */
+/** The scholar magpie is a wider drawing than the old mark (long tail, wings, rune), so scene sizes are tuned up by this factor. */
+const ALI_ART_SCALE = 1.25;
+
 export function AliScene({
   variant = 'forest',
   height = 250,
@@ -93,11 +96,18 @@ export function AliScene({
 }: AliSceneProps) {
   const x = useProtoExtras();
   const uid = useUid();
-  const size = aliSize ?? Math.round(height * 0.62);
+  const size = Math.round((aliSize ?? height * 0.64) * ALI_ART_SCALE);
   const aliH = size * MAGPIE_ASPECT;
   const center = placement === 'center';
   return (
-    <SceneBackdrop variant={variant} height={height} perch={!center} fadeTo={fadeTo} animated={animated} style={style}>
+    <SceneBackdrop
+      variant={variant}
+      height={height}
+      perch={!center}
+      fadeTo={fadeTo}
+      animated={animated}
+      style={style}
+    >
       <View
         pointerEvents="none"
         style={[
@@ -122,7 +132,13 @@ export function AliScene({
             </Defs>
             <Circle cx={50} cy={50} r={50} fill={`url(#aliHalo-${uid})`} />
           </Svg>
-          <AliCharacter size={size} expression={expression} pose={pose} intensity={intensity} animated={animated} />
+          <AliCharacter
+            size={size}
+            expression={expression}
+            pose={pose}
+            intensity={intensity}
+            animated={animated}
+          />
         </View>
       </View>
       {message ? (
@@ -131,7 +147,12 @@ export function AliScene({
             styles.bubbleSlot,
             center
               ? { left: 24, right: 24, top: 12, alignItems: 'center' }
-              : { left: size * (size < 100 ? 1.02 : 0.78), right: 12, top: bubbleTop ?? Math.max(10, height * 0.1), alignItems: 'flex-start' },
+              : {
+                  left: size * (size < 100 ? 1.02 : 0.78),
+                  right: 12,
+                  top: bubbleTop ?? Math.max(10, height * 0.1),
+                  alignItems: 'flex-start',
+                },
           ]}
         >
           <ProtoBubble tail={center ? 'bottom' : 'left'}>{message}</ProtoBubble>

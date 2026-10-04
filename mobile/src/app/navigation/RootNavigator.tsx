@@ -28,6 +28,7 @@ import { SubmitEvidenceScreen } from '@/features/word-in-the-wild/SubmitEvidence
 import { EvidenceResultScreen } from '@/features/word-in-the-wild/EvidenceResultScreen';
 import { AchievementsScreen } from '@/features/achievements/AchievementsScreen';
 import { AliScreen } from '@/features/ali/AliScreen';
+import { AliGalleryScreen } from '@/features/ali/AliGalleryScreen';
 import { BossBattleScreen } from '@/features/boss-battle/BossBattleScreen';
 import { ScrambleQuestScreen } from '@/features/arcade/ScrambleQuestScreen';
 import { CompleteItScreen } from '@/features/arcade/CompleteItScreen';
@@ -95,6 +96,7 @@ export type RootStackParamList = {
   EvidenceResult: Submission;
   Achievements: undefined;
   Ali: undefined;
+  AliGallery: undefined;
   BossBattle: undefined;
   ScrambleQuest: undefined;
   WordDuel: undefined;
@@ -189,11 +191,15 @@ export function RootNavigator() {
         <Stack.Screen name="EvidenceResult" component={framed(EvidenceResultScreen)} />
         <Stack.Screen name="Achievements" component={framed(AchievementsScreen)} />
         <Stack.Screen name="Ali" component={framed(AliScreen)} />
+        <Stack.Screen name="AliGallery" component={framed(AliGalleryScreen)} />
         <Stack.Screen name="BossBattle" component={framed(BossBattleScreen)} />
         <Stack.Screen name="ScrambleQuest" component={framed(ScrambleQuestScreen)} />
         <Stack.Screen name="CompleteIt" component={framed(CompleteItScreen)} />
         <Stack.Screen name="WordDuel" component={framed(WordDuelScreen)} />
-        <Stack.Screen name="BossBattleLeaderboard" component={framed(BossBattleLeaderboardScreen)} />
+        <Stack.Screen
+          name="BossBattleLeaderboard"
+          component={framed(BossBattleLeaderboardScreen)}
+        />
         <Stack.Screen name="MasterChallenge" component={framed(MasterChallengeScreen)} />
         <Stack.Screen name="Order" component={framed(OrderScreen)} />
         <Stack.Screen name="Settings" component={framed(SettingsScreen)} />
