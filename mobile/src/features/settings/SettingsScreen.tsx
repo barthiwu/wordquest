@@ -5,6 +5,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from 'react-native';
@@ -14,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { useSelectedLanguage } from '@/state/languageStore';
+import { useUiVersionStore } from '@/state/uiVersionStore';
 import { logout } from '@/services/auth';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
@@ -47,6 +49,8 @@ export function SettingsScreen({ navigation }: Props) {
   const clearSession = useAuthStore((s) => s.clearSession);
   const user = useAuthStore((s) => s.user);
   const selectedLanguage = useSelectedLanguage();
+  const uiVersion = useUiVersionStore((s) => s.version);
+  const setUiVersion = useUiVersionStore((s) => s.setVersion);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const onLogout = async () => {
@@ -125,6 +129,19 @@ export function SettingsScreen({ navigation }: Props) {
             <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
           </View>
         </Pressable>
+        <View style={styles.row}>
+          <View style={styles.rowTextBlock}>
+            <Text style={styles.rowText}>{t('newLookRow')}</Text>
+            <Text style={styles.rowHint}>{t('newLookHint')}</Text>
+          </View>
+          <Switch
+            value={uiVersion === 'new'}
+            onValueChange={(on) => setUiVersion(on ? 'new' : 'classic')}
+            trackColor={{ false: colors.border, true: colors.arcane }}
+            thumbColor={colors.ink}
+            accessibilityLabel={t('newLookRow')}
+          />
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -249,6 +266,8 @@ function createStyles(colors: ThemeColors, topInset: number) {
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.sm,
     },
+    rowTextBlock: { flex: 1, gap: 2, paddingRight: spacing.md },
+    rowHint: { color: colors.inkMuted, fontSize: typography.scale.xs },
     rowText: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '600' },
     rowValue: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
     rowValueText: { color: colors.inkMuted, fontSize: typography.scale.sm },

@@ -378,6 +378,8 @@
     "preferencesSection": "Preferences",
     "languageRow": "Language",
     "languageRowLabel": "Language: {{language}}",
+    "newLookRow": "New look",
+    "newLookHint": "Try the redesigned WordQuest. Switch off any time to return to the classic look.",
     "moreSection": "More",
     "aboutRow": "About",
     "sendFeedbackRow": "Send Feedback",

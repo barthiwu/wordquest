@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useLanguageStore } from '@/state/languageStore';
 import { useTipsStore } from '@/state/tipsStore';
 import { useThemeStore } from '@/state/themeStore';
+import { useUiVersionStore } from '@/state/uiVersionStore';
 import { useAnalyticsQueueStore } from '@/state/analyticsQueueStore';
 import { flushAnalyticsQueue, trackEvent } from '@/services/analyticsClient';
 import { useFeedbackPromptStore } from '@/state/feedbackPromptStore';
@@ -47,6 +48,7 @@ export function AppProviders({ children }: PropsWithChildren) {
   const languageHydrated = useLanguageStore((s) => s.isHydrated);
   const hydrateTips = useTipsStore((s) => s.hydrate);
   const hydrateTheme = useThemeStore((s) => s.hydrate);
+  const hydrateUiVersion = useUiVersionStore((s) => s.hydrate);
   const hydrateAnalyticsQueue = useAnalyticsQueueStore((s) => s.hydrate);
   const hydrateFeedbackPrompt = useFeedbackPromptStore((s) => s.hydrate);
 
@@ -76,6 +78,12 @@ export function AppProviders({ children }: PropsWithChildren) {
   useEffect(() => {
     hydrateTheme();
   }, [hydrateTheme]);
+
+  // "New look" (UI redesign) opt-in -- same non-blocking hydration; the
+  // classic UI renders until/unless the stored choice says otherwise.
+  useEffect(() => {
+    hydrateUiVersion();
+  }, [hydrateUiVersion]);
 
   // Telemetry spec §24-25: rehydrate the local analytics queue (events
   // that never made it out before the app was last closed) and drain it
