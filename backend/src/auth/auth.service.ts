@@ -12,6 +12,10 @@ import { calculateAge, isValidPastDate } from '../common/age';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { RecoverAccountDto } from './dto/recover-account.dto';
+import { SocialLoginDto } from './dto/social-login.dto';
+import { TwoFactorService } from './two-factor/two-factor.service';
+import { SocialVerifierService } from './social/social-verifier.service';
 
 /** IP/user-agent for the security-event audit log — always optional, never required to authenticate. */
 export interface RequestMeta {
@@ -35,6 +39,15 @@ export interface AuthResult extends AuthTokens {
   };
 }
 
+/** Returned instead of tokens when the account has two-step verification on. */
+export interface TwoFactorChallenge {
+  twoFactorRequired: true;
+  challengeToken: string;
+}
+
+export type LoginResult = AuthResult | TwoFactorChallenge;
+
+const TWO_FACTOR_CHALLENGE_TTL = '5m';
 const VERIFICATION_TOKEN_TTL = '24h';
 // Shorter-lived than email verification — a password reset link grants
 // account access, a materially more sensitive action.
@@ -64,23 +77,12 @@ export class AuthService {
     private readonly config: AppConfigService,
     private readonly email: EmailService,
     private readonly analytics: AnalyticsService,
+    private readonly twoFactor: TwoFactorService,
+    private readonly social: SocialVerifierService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResult> {
-    const dateOfBirth = new Date(`${dto.dateOfBirth}T00:00:00Z`);
-    if (!isValidPastDate(dateOfBirth)) {
-      throw new BadRequestException('dateOfBirth must be a valid date in the past');
-    }
-
-    // Age gate (COPPA) — rejected before the account is ever created,
-    // not created-then-blocked, so an under-13 signup leaves no row
-    // behind to clean up or accidentally leak through a partial flow.
-    const { minimumAgeYears } = gameplayRules.auth;
-    if (calculateAge(dateOfBirth) < minimumAgeYears) {
-      throw new BadRequestException(
-        `You must be at least ${minimumAgeYears} years old to create a WordQuest account.`,
-      );
-    }
+    const dateOfBirth = this.parseAdultDateOfBirth(dto.dateOfBirth);
 
     const user = await this.users.create({
       email: dto.email,
@@ -100,7 +102,7 @@ export class AuthService {
     return { ...tokens, user: await this.toPublicUser(user) };
   }
 
-  async login(dto: LoginDto, meta: RequestMeta = {}): Promise<AuthResult> {
+  async login(dto: LoginDto, meta: RequestMeta = {}): Promise<LoginResult> {
     const user = await this.users.findByEmail(dto.email);
 
     // Locked accounts fail the SAME generic message as a wrong
@@ -127,6 +129,18 @@ export class AuthService {
       throw new UnauthorizedException('This account has been suspended.');
     }
 
+    return this.finishLogin(user, meta);
+  }
+
+  /**
+   * The step every first-factor success (password or social) shares:
+   * clear the lockout counters, then either hand back a short-lived 2FA
+   * challenge or — when 2FA is off — the real session.
+   */
+  private async finishLogin(
+    user: Awaited<ReturnType<UsersService['findById']>> & object,
+    meta: RequestMeta,
+  ): Promise<LoginResult> {
     if (user.failedLoginAttempts > 0 || user.lockedUntil) {
       await this.prisma.user.update({
         where: { id: user.id },
@@ -134,9 +148,183 @@ export class AuthService {
       });
     }
 
+    if (user.twoFactorEnabledAt) {
+      // Signed with a secret derived from (never equal to) the access
+      // secret, so a challenge token can never be replayed as a bearer token.
+      const challengeToken = await this.jwt.signAsync(
+        { sub: user.id, purpose: '2fa' },
+        { secret: this.twoFactorChallengeSecret(), expiresIn: TWO_FACTOR_CHALLENGE_TTL },
+      );
+      return { twoFactorRequired: true, challengeToken };
+    }
+
     const tokens = await this.issueTokens(user.id);
     this.logSecurityEvent(user.id, 'LOGIN_SUCCESS', meta);
     return { ...tokens, user: await this.toPublicUser(user) };
+  }
+
+  /** Second step of a 2FA login: exchange the challenge + a code for real tokens. */
+  async completeTwoFactorLogin(
+    challengeToken: string,
+    code: string,
+    meta: RequestMeta = {},
+  ): Promise<AuthResult> {
+    let payload: { sub: string; purpose?: string };
+    try {
+      payload = await this.jwt.verifyAsync(challengeToken, {
+        secret: this.twoFactorChallengeSecret(),
+      });
+    } catch {
+      throw new UnauthorizedException('This sign-in expired. Please start again.');
+    }
+    if (payload.purpose !== '2fa') {
+      throw new UnauthorizedException('This sign-in expired. Please start again.');
+    }
+
+    const user = await this.users.findById(payload.sub);
+    if (!user || user.status !== 'ACTIVE' || !user.twoFactorEnabledAt) {
+      throw new UnauthorizedException('This sign-in expired. Please start again.');
+    }
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      this.logSecurityEvent(user.id, 'LOGIN_BLOCKED_LOCKED', meta);
+      throw new UnauthorizedException('Invalid code');
+    }
+
+    if (!(await this.twoFactor.checkCode(user.id, code))) {
+      this.logSecurityEvent(user.id, 'TWO_FACTOR_FAILED', meta);
+      await this.registerFailedLogin(user.id);
+      throw new UnauthorizedException('Invalid code');
+    }
+
+    if (user.failedLoginAttempts > 0 || user.lockedUntil) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { failedLoginAttempts: 0, lockedUntil: null },
+      });
+    }
+    const tokens = await this.issueTokens(user.id);
+    this.logSecurityEvent(user.id, 'LOGIN_SUCCESS', meta);
+    return { ...tokens, user: await this.toPublicUser(user) };
+  }
+
+  /** Which social providers this deployment has configured (the app hides the rest). */
+  getSocialProviders() {
+    const a = this.social.availability();
+    return {
+      google: { enabled: a.google.enabled, clientIds: a.google.clientIds },
+      apple: { enabled: a.apple.enabled, clientIds: a.apple.clientIds },
+      facebook: { enabled: a.facebook.enabled, appId: a.facebook.appId },
+    };
+  }
+
+  /**
+   * Sign in (or up) with Google / Apple / Facebook. Resolution order:
+   * 1) a known provider identity → that account; 2) a provider-VERIFIED
+   * email matching an existing account → link and sign in; 3) otherwise a
+   * new account (age-gated like register()). An unverified provider email is
+   * never used to take over an existing account.
+   */
+  async socialLogin(dto: SocialLoginDto, meta: RequestMeta = {}): Promise<LoginResult> {
+    const profile = await this.social.verify(dto.provider, dto.credential);
+
+    const identity = await this.prisma.authIdentity.findUnique({
+      where: {
+        provider_providerSubject: { provider: dto.provider, providerSubject: profile.subject },
+      },
+    });
+
+    let user = identity ? await this.users.findById(identity.userId) : null;
+
+    if (!user) {
+      const email = profile.email?.toLowerCase() ?? null;
+      const existing = email ? await this.users.findByEmail(email) : null;
+
+      if (existing) {
+        if (!profile.emailVerified) {
+          throw new UnauthorizedException(
+            'That provider has not verified this email address, so it cannot be linked to an existing account.',
+          );
+        }
+        user = existing;
+        await this.prisma.authIdentity.create({
+          data: { userId: existing.id, provider: dto.provider, providerSubject: profile.subject, email },
+        });
+        if (!existing.emailVerifiedAt) {
+          await this.prisma.user.update({ where: { id: existing.id }, data: { emailVerifiedAt: new Date() } });
+        }
+        this.logSecurityEvent(existing.id, 'SOCIAL_LINKED', meta);
+      } else {
+        if (!email) {
+          throw new BadRequestException(
+            'That provider did not share an email address. Please use another sign-in method.',
+          );
+        }
+        if (!dto.dateOfBirth) {
+          // The client collects a birthdate and retries — see mobile SocialSignIn.
+          throw new BadRequestException({
+            code: 'DOB_REQUIRED',
+            message: 'Please confirm your date of birth to create your account.',
+          });
+        }
+        const dateOfBirth = this.parseAdultDateOfBirth(dto.dateOfBirth);
+        const displayName = this.socialDisplayName(profile.name ?? dto.displayName ?? null, email);
+
+        const created = await this.users.create({
+          email,
+          // Social accounts have no password; this random value is never
+          // shown or usable (they can set one via "forgot password").
+          password: randomBytes(32).toString('hex'),
+          displayName,
+          countryCode: dto.countryCode,
+          dateOfBirth,
+          englishVariant: dto.englishVariant,
+        });
+        await this.prisma.authIdentity.create({
+          data: { userId: created.id, provider: dto.provider, providerSubject: profile.subject, email },
+        });
+        if (profile.emailVerified) {
+          await this.prisma.user.update({ where: { id: created.id }, data: { emailVerifiedAt: new Date() } });
+        } else {
+          this.sendVerificationEmail(created.id).catch(() => undefined);
+        }
+        this.analytics.track(created.id, 'account_created', { countryCode: created.countryCode });
+        this.logSecurityEvent(created.id, 'SOCIAL_LOGIN', meta);
+        user = created;
+      }
+    }
+
+    if (user.status === 'DELETED') throw new UnauthorizedException('Invalid sign-in');
+    if (user.status === 'SUSPENDED') {
+      this.logSecurityEvent(user.id, 'LOGIN_FAILED', meta);
+      throw new UnauthorizedException('This account has been suspended.');
+    }
+    if (identity) this.logSecurityEvent(user.id, 'SOCIAL_LOGIN', meta);
+    return this.finishLogin(user, meta);
+  }
+
+  private socialDisplayName(name: string | null, email: string): string {
+    const base = (name?.trim() || email.split('@')[0]).replace(/\s+/g, ' ');
+    const clipped = base.slice(0, 40).trim();
+    return clipped.length >= 2 ? clipped : 'Player';
+  }
+
+  private twoFactorChallengeSecret(): string {
+    return `${this.config.jwtAccessSecret}:2fa-challenge`;
+  }
+
+  /** Shared COPPA age gate: parse a YYYY-MM-DD birthdate and enforce the minimum age. */
+  private parseAdultDateOfBirth(raw: string): Date {
+    const dateOfBirth = new Date(`${raw}T00:00:00Z`);
+    if (!isValidPastDate(dateOfBirth)) {
+      throw new BadRequestException('dateOfBirth must be a valid date in the past');
+    }
+    const { minimumAgeYears } = gameplayRules.auth;
+    if (calculateAge(dateOfBirth) < minimumAgeYears) {
+      throw new BadRequestException(
+        `You must be at least ${minimumAgeYears} years old to create a WordQuest account.`,
+      );
+    }
+    return dateOfBirth;
   }
 
   /** Account lockout (Sprint 5 "Authentication hardening") — see User.failedLoginAttempts/lockedUntil and gameplayRules.auth. */
@@ -448,7 +636,7 @@ export class AuthService {
   }
 
   /** Account recovery: the same credentials that worked before deletion restore access — this is not a password-reset-strength flow, since it requires knowing the password, not just the email. */
-  async recoverAccount(dto: LoginDto): Promise<AuthResult> {
+  async recoverAccount(dto: RecoverAccountDto): Promise<AuthResult> {
     const user = await this.users.findByEmail(dto.email);
     const passwordValid = user
       ? await this.users.verifyPassword(dto.password, user.passwordHash)
@@ -458,6 +646,18 @@ export class AuthService {
       throw new UnauthorizedException(
         'Invalid email or password, or this account is not eligible for recovery.',
       );
+    }
+
+    // A recovered account with 2FA on must prove the second factor too —
+    // otherwise recovery would be a way around it.
+    if (user.twoFactorEnabledAt) {
+      const ok = dto.twoFactorCode ? await this.twoFactor.checkCode(user.id, dto.twoFactorCode) : false;
+      if (!ok) {
+        this.logSecurityEvent(user.id, 'TWO_FACTOR_FAILED');
+        throw new UnauthorizedException(
+          'Invalid email or password, or this account is not eligible for recovery.',
+        );
+      }
     }
 
     await this.prisma.user.update({

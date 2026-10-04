@@ -66,6 +66,36 @@ export class AppConfigService {
     return secret;
   }
 
+  private csv(path: string): string[] {
+    return (this.config.get<string>(path, '') ?? '')
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
+  }
+
+  /** Allowed `aud` values for Google ID tokens. Empty = Google sign-in not offered. */
+  get googleClientIds(): string[] {
+    return this.csv('social.googleClientIds');
+  }
+
+  /** Allowed `aud` values for Apple identity tokens (bundle id / Services ID). Empty = Apple sign-in not offered. */
+  get appleClientIds(): string[] {
+    return this.csv('social.appleClientIds');
+  }
+
+  get facebookAppId(): string | undefined {
+    return this.config.get<string>('social.facebookAppId') || undefined;
+  }
+
+  get facebookAppSecret(): string | undefined {
+    return this.config.get<string>('social.facebookAppSecret') || undefined;
+  }
+
+  /** Optional dedicated 2FA encryption key (see configuration.ts). */
+  get twoFactorEncryptionKey(): string | undefined {
+    return this.config.get<string>('twoFactor.encryptionKey') || undefined;
+  }
+
   get jwtAccessExpiresIn(): StringValue {
     return this.parseDuration('auth.accessExpiresIn', '15m');
   }

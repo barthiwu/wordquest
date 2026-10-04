@@ -95,16 +95,26 @@ model User {
   englishVariant EnglishVariant?
 
   emailVerifiedAt DateTime?
+
+  // Two-step verification (TOTP). The shared secret is stored AES-256-GCM
+  // encrypted (see TwoFactorService), never in plaintext. Null secret =
+  // setup never started; secret set but twoFactorEnabledAt null = setup
+  // started, not yet confirmed with a first valid code. twoFactorLastStep
+  // is the last accepted TOTP time-step, so a code can't be replayed.
+  twoFactorSecretEnc String?
+  twoFactorEnabledAt DateTime?
+  twoFactorLastStep  Int?
+
   // Production auth (V1 Final Systems Spec): account status states.
   // ACTIVE is the default for a brand-new registration — email
   // verification is tracked via emailVerifiedAt above but doesn't block
   // basic app usage; SUSPENDED/DELETED both block login (checked in
   // AuthService.login), DELETED is a soft delete (deletedAt set, row
   // preserved) so "account recovery" has something to recover.
-  status          AccountStatus @default(ACTIVE)
-  deletedAt       DateTime?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  status    AccountStatus @default(ACTIVE)
+  deletedAt DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   // Account lockout (Sprint 5 "Authentication hardening"): a per-IP
   // rate limit alone doesn't stop an attacker who spreads guesses for
@@ -120,6 +130,8 @@ model User {
   clan   Clan?   @relation(fields: [clanId], references: [id])
 
   refreshTokens            RefreshToken[]
+  authIdentities           AuthIdentity[]
+  twoFactorRecoveryCodes   TwoFactorRecoveryCode[]
   xpTransactions           XpTransaction[]
   glyphTransactions        GlyphTransaction[]
   progression              UserProgression?
@@ -177,6 +189,42 @@ enum LearningGoal {
 enum EnglishVariant {
   US
   UK
+}
+
+enum AuthProvider {
+  GOOGLE
+  APPLE
+  FACEBOOK
+}
+
+/// A social account linked to a WordQuest user. (provider, providerSubject)
+/// is the stable identity — the provider's own immutable user id ("sub"),
+/// never the email, which a user can change at the provider.
+model AuthIdentity {
+  id              String       @id @default(uuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider        AuthProvider
+  providerSubject String
+  email           String?
+  createdAt       DateTime     @default(now())
+
+  @@unique([provider, providerSubject])
+  @@index([userId])
+  @@map("auth_identities")
+}
+
+/// One-time 2FA recovery codes, stored hashed (sha256) like refresh tokens.
+model TwoFactorRecoveryCode {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("two_factor_recovery_codes")
 }
 
 model RefreshToken {
@@ -1273,6 +1321,11 @@ enum SecurityEventType {
   REFRESH_TOKEN_REUSE_DETECTED
   SESSION_LIFETIME_EXCEEDED
   DATA_EXPORTED
+  SOCIAL_LOGIN
+  SOCIAL_LINKED
+  TWO_FACTOR_ENABLED
+  TWO_FACTOR_DISABLED
+  TWO_FACTOR_FAILED
 }
 
 model SecurityEvent {
@@ -1368,11 +1421,11 @@ model AliMessage {
   // deterministic visual cue (ali-expression.ts) computed alongside this
   // message, persisted so a historical AliMessage keeps the animation it
   // was generated with (same versioning guarantee as promptVersion/tone).
-  expression String  @default("NEUTRAL")
-  pose       String  @default("PERCHED")
-  intensity  Int     @default(0)
-  priority   Int     @default(0)
-  durationMs Int     @default(0)
+  expression     String       @default("NEUTRAL")
+  pose           String       @default("PERCHED")
+  intensity      Int          @default(0)
+  priority       Int          @default(0)
+  durationMs     Int          @default(0)
 
   createdAt DateTime @default(now())
 
@@ -1451,32 +1504,32 @@ model IdempotencyKey {
 // without inventing a placeholder user; every event wired up today
 // does have a userId.
 model AnalyticsEvent {
-  id         String   @id @default(uuid())
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  eventName  String
+  id            String   @id @default(uuid())
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventName     String
   // Groups events belonging to one play session (client-generated UUID,
   // stable for the lifetime of one app open — Telemetry spec §5/§9).
-  sessionId  String?
+  sessionId     String?
   // Client-generated UUID for idempotency: a retried client submission
   // of the same interaction must not create a duplicate row (spec §25).
   // Unique but nullable — server-authoritative events created directly
   // via track() don't set one, and Postgres allows any number of NULLs
   // in a unique column/index.
-  clientEventId String? @unique
+  clientEventId String?  @unique
   // "ios" | "android" | "web" — absent for events the backend itself
   // authored (e.g. quest_completed from QuestsService).
-  platform   String?
-  appVersion String?
+  platform      String?
+  appVersion    String?
   // Screen the event happened on, e.g. "WordDuel", "DailyQuest" (spec §5).
-  screen     String?
+  screen        String?
   // When the event actually happened on the client; falls back to
   // createdAt for server-authored events, which have no separate client
   // clock to report. `createdAt` doubles as the spec's `receivedAt` —
   // when this row was written — rather than carrying a redundant column.
-  occurredAt DateTime @default(now())
-  properties Json     @default("{}")
-  createdAt  DateTime @default(now())
+  occurredAt    DateTime @default(now())
+  properties    Json     @default("{}")
+  createdAt     DateTime @default(now())
 
   @@index([eventName, createdAt])
   @@index([userId])
@@ -1514,11 +1567,11 @@ enum FeedbackStatus {
 }
 
 model Feedback {
-  id       String @id @default(uuid())
-  userId   String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type     FeedbackType
-  category FeedbackCategory
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      FeedbackType
+  category  FeedbackCategory
   // The emoji-scale reaction as a 1-5 ordinal (spec §18's five-point
   // scales, e.g. Word Duel's "Too easy" .. "Too difficult") -- which
   // emoji/label maps to which number is a display-layer concern, kept
@@ -1526,19 +1579,19 @@ model Feedback {
   // different prompt copy (Daily Quest's own scale reads differently
   // from Word Duel's, same ordinal). Null for a FREEFORM submission
   // that's message-only.
-  rating   Int?
-  message  String?
+  rating    Int?
+  message   String?
   // Which screen this came from (e.g. "WordDuel", "DailyQuest") --
   // absent for a FREEFORM submission from the standalone Settings
   // screen, which isn't tied to any one screen.
-  screen   String?
+  screen    String?
   // Structured extras -- e.g. a PROMPT's selected "what made it
   // difficult" checkboxes ({ reasons: ["words_too_difficult"] }), or a
   // FREEFORM submission's matchId/questId if the player was mid-session
   // when they opened the feedback screen.
-  context  Json?          @default("{}")
-  status   FeedbackStatus @default(NEW)
-  createdAt DateTime      @default(now())
+  context   Json?            @default("{}")
+  status    FeedbackStatus   @default(NEW)
+  createdAt DateTime         @default(now())
 
   @@index([userId])
   @@index([category, createdAt])

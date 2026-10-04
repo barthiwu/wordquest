@@ -28,6 +28,27 @@ export default () => ({
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '30d',
   },
 
+  // Social sign-in (all optional — a provider with no credentials is simply
+  // not offered; see AuthService.getSocialProviders). Client IDs are public
+  // identifiers; only the Facebook app secret is sensitive.
+  social: {
+    // Comma-separated: the web, iOS and Android OAuth client IDs the Google
+    // ID token's `aud` may be.
+    googleClientIds: process.env.GOOGLE_CLIENT_IDS,
+    // Comma-separated: the iOS bundle id and/or the Services ID the Apple
+    // identity token's `aud` may be.
+    appleClientIds: process.env.APPLE_CLIENT_IDS,
+    facebookAppId: process.env.FACEBOOK_APP_ID,
+    facebookAppSecret: process.env.FACEBOOK_APP_SECRET,
+  },
+
+  twoFactor: {
+    // 32-byte key, base64 or hex. Falls back to a key derived from
+    // JWT_REFRESH_SECRET so 2FA works out of the box; set this to rotate
+    // the 2FA key independently of the JWT secrets.
+    encryptionKey: process.env.TWO_FACTOR_ENCRYPTION_KEY,
+  },
+
   storage: {
     endpoint: process.env.S3_ENDPOINT,
     region: process.env.S3_REGION,

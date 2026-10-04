@@ -1,7 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService, type AuthResult } from './auth.service';
+import { TwoFactorService } from './two-factor/two-factor.service';
+import { SocialVerifierService } from './social/social-verifier.service';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AppConfigService } from '../config/config.service';
@@ -109,6 +111,8 @@ describe('AuthService', () => {
         { provide: AppConfigService, useValue: configMock },
         { provide: EmailService, useValue: emailMock },
         { provide: AnalyticsService, useValue: analyticsMock },
+        { provide: TwoFactorService, useValue: { checkCode: jest.fn() } },
+        { provide: SocialVerifierService, useValue: { verify: jest.fn(), availability: jest.fn() } },
       ],
     }).compile();
 
@@ -231,7 +235,7 @@ describe('AuthService', () => {
   });
 
   it('login() succeeds and issues tokens for a valid credential pair', async () => {
-    const result = await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' });
+    const result = (await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' })) as AuthResult;
     expect(result.accessToken).toBe('signed.jwt.token');
     expect(result.refreshToken).toBe('signed.jwt.token');
   });
@@ -239,7 +243,7 @@ describe('AuthService', () => {
   it("login() resolves the returning player's existing avatar into the response (Sept 2026 -- Home's header showed only initials right after login because avatarUrl was missing here entirely)", async () => {
     usersMock.resolveAvatarUrl.mockResolvedValueOnce('https://signed-avatar-url.example.com');
 
-    const result = await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' });
+    const result = (await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' })) as AuthResult;
 
     expect(usersMock.resolveAvatarUrl).toHaveBeenCalledWith(fakeUser.avatarKey);
     expect(result.user.avatarUrl).toBe('https://signed-avatar-url.example.com');
@@ -265,7 +269,7 @@ describe('AuthService', () => {
     // in a comment.
     prismaMock.securityEvent.create.mockRejectedValueOnce(new Error('audit log DB unreachable'));
 
-    const result = await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' });
+    const result = (await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' })) as AuthResult;
     expect(result.accessToken).toBe('signed.jwt.token');
 
     // Let the fire-and-forget microtask (and its .catch) settle before
@@ -350,7 +354,7 @@ describe('AuthService', () => {
         lockedUntil: new Date(Date.now() - 60_000), // in the past
       });
 
-      const result = await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' });
+      const result = (await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' })) as AuthResult;
       expect(result.accessToken).toBe('signed.jwt.token');
       expect(usersMock.verifyPassword).toHaveBeenCalled();
     });
