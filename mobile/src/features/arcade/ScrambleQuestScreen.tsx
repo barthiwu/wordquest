@@ -25,6 +25,7 @@ import { useAuthStore } from '@/state/authStore';
 import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
+import { ProtoGameHeader } from '@/features/proto/ProtoGameHeader';
 import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
@@ -82,6 +83,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation(['scrambleQuest', 'arcade']);
+  const { t: tp } = useTranslation('proto');
   const accessToken = useAuthStore((s) => s.accessToken);
 
   const [phase, setPhase] = useState<Phase>('loading');
@@ -320,6 +322,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
       )}
       <ScrollView contentContainerStyle={styles.container}>
         <BackButton onPress={() => navigation.goBack()} />
+        <ProtoGameHeader line={tp('gameScramble')} />
 
         <View style={styles.headerRow}>
           <Text style={styles.progressLabel}>

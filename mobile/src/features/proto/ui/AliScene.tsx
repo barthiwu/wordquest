@@ -1,11 +1,12 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { Animated, Easing, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 import { AliCharacter } from '@/components/AliCharacter';
 import type { AliExpression, AliIntensity, AliPose } from '@/services/aliExpression';
 import { MAGPIE_ASPECT } from '@/components/aliMagpieShapes';
 import { SceneBackdrop, type SceneVariant } from './SceneBackdrop';
 import { useProtoExtras } from './useProtoExtras';
+import { useUid } from './useUid';
 
 /** White speech bubble with a tail pointing toward ALI (bottom-left). */
 export function ProtoBubble({
@@ -90,6 +91,8 @@ export function AliScene({
   style,
   children,
 }: AliSceneProps) {
+  const x = useProtoExtras();
+  const uid = useUid();
   const size = aliSize ?? Math.round(height * 0.62);
   const aliH = size * MAGPIE_ASPECT;
   const center = placement === 'center';
@@ -103,7 +106,24 @@ export function AliScene({
           { height: aliH },
         ]}
       >
-        <AliCharacter size={size} expression={expression} pose={pose} intensity={intensity} animated={animated} />
+        <View style={{ width: size, height: aliH }}>
+          {/* Soft halo so ALI's deep-navy plumage always reads against dark scenes. */}
+          <Svg
+            width={size * 1.9}
+            height={size * 1.9}
+            viewBox="0 0 100 100"
+            style={{ position: 'absolute', left: -size * 0.45, top: aliH / 2 - size * 0.95 }}
+          >
+            <Defs>
+              <RadialGradient id={`aliHalo-${uid}`} cx="0.5" cy="0.5" r="0.5">
+                <Stop offset="0" stopColor={x.cta[0]} stopOpacity={0.38} />
+                <Stop offset="1" stopColor={x.cta[0]} stopOpacity={0} />
+              </RadialGradient>
+            </Defs>
+            <Circle cx={50} cy={50} r={50} fill={`url(#aliHalo-${uid})`} />
+          </Svg>
+          <AliCharacter size={size} expression={expression} pose={pose} intensity={intensity} animated={animated} />
+        </View>
       </View>
       {message ? (
         <View
@@ -111,7 +131,7 @@ export function AliScene({
             styles.bubbleSlot,
             center
               ? { left: 24, right: 24, top: 12, alignItems: 'center' }
-              : { left: size * 0.78, right: 12, top: bubbleTop ?? Math.max(10, height * 0.1), alignItems: 'flex-start' },
+              : { left: size * (size < 100 ? 1.02 : 0.78), right: 12, top: bubbleTop ?? Math.max(10, height * 0.1), alignItems: 'flex-start' },
           ]}
         >
           <ProtoBubble tail={center ? 'bottom' : 'left'}>{message}</ProtoBubble>

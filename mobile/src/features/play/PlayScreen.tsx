@@ -7,6 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { useIsPrototype } from '@/state/uiVersionStore';
+import { ProtoPlayView } from '@/features/proto/ProtoPlayView';
 import { ResponsiveContainer } from '@/components/layout/ResponsiveContainer';
 import {
   listQuests,
@@ -74,6 +76,7 @@ export function PlayScreen({ navigation }: Props) {
   const accessToken = useAuthStore((s) => s.accessToken);
   const bp = useBreakpoint();
   const wide = !bp.isMobile;
+  const proto = useIsPrototype();
 
   const [catalog, setCatalog] = useState<QuestCatalogEntry[] | null>(null);
   const [summary, setSummary] = useState<TodayQuestSummary | null>(null);
@@ -301,6 +304,47 @@ export function PlayScreen({ navigation }: Props) {
 
     </View>
   );
+
+  if (proto) {
+    const toProto = (q: PlayQuestEntry) => ({
+      key: q.key,
+      title: q.title,
+      window:
+        q.windowStartHour !== null
+          ? `${String(q.windowStartHour).padStart(2, '0')}:00${
+              q.windowEndHour !== null ? `-${String(q.windowEndHour).padStart(2, '0')}:59` : ''
+            }`
+          : null,
+      completed: q.completed,
+      locked: isLocked(q),
+      unlockTime: `${String(q.windowStartHour ?? 0).padStart(2, '0')}:00`,
+    });
+    return (
+      <ProtoPlayView
+        selected={selected ? toProto(selected) : null}
+        others={otherQuests.map(toProto)}
+        allDone={allDone}
+        loading={!catalog && !error}
+        error={error}
+        onStartQuest={(key) => navigation.navigate('DailyQuest', { questKey: key })}
+        onSelectQuest={setSelectedKey}
+        onPlay={(game) =>
+          selectGame(
+            game,
+            game === 'SCRAMBLE_QUEST'
+              ? 'ScrambleQuest'
+              : game === 'WORD_DUEL'
+                ? 'WordDuel'
+                : game === 'COMPLETE_IT'
+                  ? 'CompleteIt'
+                  : 'BossBattle',
+          )
+        }
+        bossBadge={battleCountdown?.compact}
+        bossSubtext={battleCountdown?.subtitle}
+      />
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={[styles.container, styles.containerNew]}>

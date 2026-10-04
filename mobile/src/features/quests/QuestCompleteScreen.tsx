@@ -11,6 +11,8 @@ import { FadeInUp } from '@/components/FadeInUp';
 import { GlyphCoin } from '@/components/GlyphIcon';
 import { RichAliText } from '@/components/RichAliText';
 import { AliMarkAnimated } from '@/components/AliMarkAnimated';
+import { useIsPrototype } from '@/state/uiVersionStore';
+import { ProtoQuestCompleteView } from '@/features/proto/ProtoQuestCompleteView';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -32,6 +34,7 @@ export function QuestCompleteScreen({ route, navigation }: Props) {
   const { t } = useTranslation('questComplete');
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
+  const proto = useIsPrototype();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const {
     xpAwarded,
@@ -76,15 +79,29 @@ export function QuestCompleteScreen({ route, navigation }: Props) {
     setQueuedIndex((i) => i + 1);
   };
 
+  const popup = aliQueue.active ? (
+    <AliReactionPopup cue={aliQueue.active} colors={colors} onDismiss={handleAliReactionDismiss} />
+  ) : null;
+
+  if (proto) {
+    return (
+      <ProtoQuestCompleteView
+        xpAwarded={xpAwarded}
+        glyphAwarded={glyphAwarded}
+        correctCount={correctCount}
+        totalCount={totalCount}
+        aliMessage={aliMessage}
+        calibrationJustCompleted={calibrationJustCompleted}
+        onCalibration={() => navigation.replace('CalibrationResult')}
+        onDone={() => navigation.replace('Main', { screen: 'Home' })}
+        popup={popup}
+      />
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {aliQueue.active && (
-        <AliReactionPopup
-          cue={aliQueue.active}
-          colors={colors}
-          onDismiss={handleAliReactionDismiss}
-        />
-      )}
+      {popup}
       <FadeInUp style={styles.hero}>
         <Text style={styles.title}>{t('title')}</Text>
         <Text style={styles.subtitle}>

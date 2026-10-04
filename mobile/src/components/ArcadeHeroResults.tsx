@@ -3,6 +3,8 @@ import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-nativ
 import Svg, { Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { darkColors, radius, spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useIsPrototype } from '@/state/uiVersionStore';
+import { ProtoArcadeResults } from '@/features/proto/ProtoArcadeResults';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -57,7 +59,19 @@ export interface ArcadeHeroResultsProps {
  * It fills in once on mount rather than looping/pulsing — this is a
  * results screen, not a live countdown (contrast CountdownRing).
  */
-export function ArcadeHeroResults({
+/** Standard hero ring, or the illustrated "New look" result — one switch
+ * covers ScrambleQuest, Complete It, Word Duel and Boss Battle. */
+export function ArcadeHeroResults(props: ArcadeHeroResultsProps) {
+  const proto = useIsPrototype();
+  if (proto) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { colors: _colors, ...rest } = props;
+    return <ProtoArcadeResults {...rest} />;
+  }
+  return <StandardArcadeHeroResults {...props} />;
+}
+
+function StandardArcadeHeroResults({
   colors,
   title,
   subtitle,

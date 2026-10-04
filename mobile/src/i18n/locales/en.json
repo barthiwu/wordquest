@@ -1109,6 +1109,26 @@
     "weeklyChallenge": "Weekly challenge",
     "nextWorld": "Next: {{name}}",
     "masteredOf": "{{done}} / {{total}} words mastered",
-    "toGo": "{{count}} to go"
+    "toGo": "{{count}} to go",
+    "stepGuess": "Guess",
+    "stepSentence": "Sentence",
+    "stepParagraph": "Paragraph",
+    "aliGuess": "Can you work out the word from the clue?",
+    "aliSentence": "Now use it in a sentence of your own.",
+    "aliParagraph": "Last step — weave it into a short paragraph.",
+    "aliGood": "Lovely work! Take a look at your feedback.",
+    "aliMiss": "Not quite — here's what to learn from this one.",
+    "aliWild": "Spot this word out in the wild for a bonus?",
+    "questDoneBubble": "Another word added to your collection!",
+    "questDoneHint": "Your progress is saved.",
+    "playBubble": "Pick your challenge — I'll cheer you on!",
+    "arcadeHeading": "Arcade",
+    "gameScramble": "Unscramble the letters before time runs out!",
+    "gameComplete": "Fill in the missing word.",
+    "gameDuel": "Outscore your rival — answer fast!",
+    "bossHubWait": "The boss gathers strength. Sharpen your words!",
+    "bossHubLive": "The battle is live — join the fight!",
+    "bossBattleLine": "Hold the line!",
+    "bossHealth": "BOSS"
   }
 }

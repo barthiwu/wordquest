@@ -1,3 +1,4 @@
+import { useUid } from './useUid';
 import Svg, {
   Circle,
   Defs,
@@ -55,6 +56,7 @@ const LETTERS: Record<string, string> = {
 };
 
 export function ArcadeArt({ kind, width = 120, height = 90, style }: { kind: ArtKind; width?: number; height?: number; style?: StyleProp<ViewStyle> }) {
+  const uid = useUid();
   // Wider-than-4:3 tiles reveal extra sky/ground at the sides instead of
   // cropping the art vertically; taller tiles crop the sides.
   const ratio = width / height;
@@ -63,17 +65,17 @@ export function ArcadeArt({ kind, width = 120, height = 90, style }: { kind: Art
     <View style={[{ width, height, overflow: 'hidden' }, style]}>
       <Svg width="100%" height="100%" viewBox={`${60 - vbW / 2} 0 ${vbW} 90`} preserveAspectRatio="xMidYMid slice">
         <Defs>
-          <LinearGradient id={`bg-${kind}`} x1="0" y1="0" x2="0" y2="1">
+          <LinearGradient id={`bg-${uid}`} x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor={BG[kind][0]} />
             <Stop offset="1" stopColor={BG[kind][1]} />
           </LinearGradient>
-          <RadialGradient id={`gl-${kind}`} cx="0.5" cy="0.5" r="0.5">
+          <RadialGradient id={`gl-${uid}`} cx="0.5" cy="0.5" r="0.5">
             <Stop offset="0" stopColor={BG[kind][2]} stopOpacity="0.9" />
             <Stop offset="1" stopColor={BG[kind][2]} stopOpacity="0" />
           </RadialGradient>
         </Defs>
-        <Rect x={-300} width={720} height={90} fill={`url(#bg-${kind})`} />
-        <Circle cx={60} cy={44} r={52} fill={`url(#gl-${kind})`} />
+        <Rect x={-300} width={720} height={90} fill={`url(#bg-${uid})`} />
+        <Circle cx={60} cy={44} r={52} fill={`url(#gl-${uid})`} />
         {kind === 'scramble' && (
           <G>
             <Path d="M0,72 C20,60 40,66 60,58 C80,66 100,58 120,70 L120,90 L0,90 Z" fill="#0B3B1F" opacity={0.7} />
@@ -144,15 +146,16 @@ function BossHead({ kind }: { kind: ArtKind }) {
 // ---------------------------------------------------------------------------
 
 export function TrophyArt({ size = 72 }: { size?: number }) {
+  const uid = useUid();
   return (
     <Svg width={size} height={size} viewBox="0 0 100 100">
       <Defs>
-        <LinearGradient id="trophy" x1="0" y1="0" x2="0" y2="1">
+        <LinearGradient id={`trophy-${uid}`} x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0" stopColor="#FFE38A" />
           <Stop offset="1" stopColor="#D9961E" />
         </LinearGradient>
       </Defs>
-      <Path d="M28,14 h44 v24 a22,22 0 0 1 -44,0 z" fill="url(#trophy)" />
+      <Path d="M28,14 h44 v24 a22,22 0 0 1 -44,0 z" fill={`url(#trophy-${uid})`} />
       <Path d="M28,20 C10,20 10,44 30,46" fill="none" stroke="#F2C14E" strokeWidth={5} />
       <Path d="M72,20 C90,20 90,44 70,46" fill="none" stroke="#F2C14E" strokeWidth={5} />
       <Rect x={44} y={58} width={12} height={14} fill="#D9961E" />

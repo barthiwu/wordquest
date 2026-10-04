@@ -27,6 +27,7 @@ import { AliBubble } from '@/components/AliBubble';
 import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
+import { ProtoGameHeader } from '@/features/proto/ProtoGameHeader';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
 import { trackEvent } from '@/services/analyticsClient';
@@ -86,6 +87,7 @@ export function CompleteItScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation(['completeIt', 'scrambleQuest', 'arcade']);
+  const { t: tp } = useTranslation('proto');
   const accessToken = useAuthStore((s) => s.accessToken);
 
   const [phase, setPhase] = useState<Phase>('loading');
@@ -295,6 +297,7 @@ export function CompleteItScreen({ navigation }: Props) {
       )}
       <ScrollView contentContainerStyle={styles.container}>
         <BackButton onPress={() => navigation.goBack()} />
+        <ProtoGameHeader line={tp('gameComplete')} />
 
         <View style={styles.headerRow}>
           <Text style={styles.progressLabel}>

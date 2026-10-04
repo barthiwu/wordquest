@@ -23,6 +23,9 @@ import { DuelTicketResult } from '@/components/DuelTicketResult';
 import { WordDuelFeedbackPrompt } from '@/components/WordDuelFeedbackPrompt';
 import { DuelPrepJourney } from './DuelPrepJourney';
 import { BackButton } from '@/components/BackButton';
+import { ProtoGameHeader } from '@/features/proto/ProtoGameHeader';
+import { useIsPrototype } from '@/state/uiVersionStore';
+import { ProtoDuelNoOpponent, ProtoDuelSearch } from '@/features/proto/ProtoDuelSearch';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
 import { AvatarActionMenu } from '@/components/AvatarActionMenu';
@@ -95,6 +98,8 @@ export function WordDuelScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation(['wordDuel', 'arcade', 'scrambleQuest']);
+  const { t: tp } = useTranslation('proto');
+  const proto = useIsPrototype();
   const accessToken = useAuthStore((s) => s.accessToken);
   const userAvatarUrl = useAuthStore((s) => s.user?.avatarUrl ?? null);
   const userUsername = useAuthStore((s) => s.user?.username ?? null);
@@ -326,6 +331,17 @@ export function WordDuelScreen({ navigation }: Props) {
   }
 
   if (phase === 'waiting') {
+    if (proto) {
+      return (
+        <ProtoDuelSearch
+          title={t('waitingTitle')}
+          subtitle={t('waitingSubtitle')}
+          wordTipLabel={t('wordTipLabel')}
+          cancelLabel={t('cancelSearch')}
+          onCancel={() => navigation.goBack()}
+        />
+      );
+    }
     return (
       <DuelPrepJourney
         colors={colors}
@@ -339,6 +355,18 @@ export function WordDuelScreen({ navigation }: Props) {
   }
 
   if (phase === 'no-opponent') {
+    if (proto) {
+      return (
+        <ProtoDuelNoOpponent
+          title={t('noOpponentTitle')}
+          subtitle={t('noOpponentSubtitle')}
+          retryLabel={t('tryAgain')}
+          backLabel={t('arcade:backToPlay')}
+          onRetry={join}
+          onBack={() => navigation.goBack()}
+        />
+      );
+    }
     return (
       <View style={styles.centered}>
         <BackButton onPress={() => navigation.goBack()} />
@@ -520,6 +548,7 @@ export function WordDuelScreen({ navigation }: Props) {
       )}
       <ScrollView contentContainerStyle={styles.container}>
         <BackButton onPress={() => navigation.goBack()} />
+        <ProtoGameHeader line={tp('gameDuel')} />
 
         {state.matchEndsAt && (
           <>

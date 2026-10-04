@@ -30,6 +30,7 @@ import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
+import { ProtoBossHeader } from '@/features/proto/ProtoBossHeader';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
@@ -271,6 +272,7 @@ export function BossBattleScreen({ navigation }: Props) {
     return (
       <ScrollView style={styles.flexFill} contentContainerStyle={styles.siegeContent}>
         <BackButton onPress={() => navigation.goBack()} />
+        <ProtoBossHeader mode="hub" live={upcoming.status === 'LIVE'} />
 
         <View style={styles.siegeHeader}>
           <Text style={styles.siegeKicker}>{t('kicker')}</Text>
@@ -369,6 +371,12 @@ export function BossBattleScreen({ navigation }: Props) {
           />
         )}
         <ScrollView contentContainerStyle={styles.container}>
+          <ProtoBossHeader
+            mode="battle"
+            answered={challenge.questionsAnswered}
+            total={challenge.maxQuestions}
+            expression={phase === 'feedback' && feedback ? (feedback.isCorrect ? 'TRIUMPHANT' : 'CONCERNED') : undefined}
+          />
           <View style={styles.progressRow}>
             <Text style={styles.progressLabel}>{t('progressLabel')}</Text>
             <Text style={styles.progressCount}>

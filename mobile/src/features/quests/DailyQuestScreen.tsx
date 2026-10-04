@@ -53,6 +53,7 @@ import { useEvidenceModeStore, type EvidenceMode } from '@/state/evidenceModeSto
 import { FadeInUp } from '@/components/FadeInUp';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
+import { ProtoQuestHeader, type QuestMood } from '@/features/proto/ProtoQuestHeader';
 import { AffordanceChip } from '@/components/AffordanceChip';
 import { trackEvent } from '@/services/analyticsClient';
 import { ScoreRing } from '@/components/ScoreRing';
@@ -800,6 +801,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
           />
         )}
         <ScrollView contentContainerStyle={styles.container}>
+          <ProtoQuestHeader step={0} mood={stage === 'guessFeedback' && guessFeedback ? (guessFeedback.isCorrect ? 'good' : 'miss') : 'ask'} />
           <Text style={styles.progressLabel}>{t('progressGuess')}</Text>
 
           <View style={styles.clueCard}>
@@ -1004,6 +1006,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   if (stage === 'understanding' && understanding) {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <ProtoQuestHeader step={0} mood="good" />
         <Text style={styles.progressLabel}>{t('progressUnderstanding')}</Text>
         <Text style={styles.wordTitle}>{understanding.word}</Text>
         <Text style={styles.partOfSpeech}>{understanding.partOfSpeech}</Text>
@@ -1033,6 +1036,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   if (stage === 'sentence') {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <ProtoQuestHeader step={1} mood="ask" />
         <Text style={styles.progressLabel}>{t('progressSentence')}</Text>
         <Text style={styles.definition}>
           {t('writeSentenceInstruction', { word: understanding?.word ?? t('theWordFallback') })}
@@ -1089,6 +1093,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
     ];
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <ProtoQuestHeader step={1} mood={(Object.values(sentenceResult.scores).reduce((a, b) => a + b, 0) / 5 >= 50 ? 'good' : 'miss') as QuestMood} />
         <View style={styles.paragraphHeaderRow}>
           <Text style={styles.progressLabel}>{t('progressSentence')}</Text>
           <View style={styles.xpPill}>
@@ -1171,6 +1176,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   if (stage === 'paragraph') {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <ProtoQuestHeader step={2} mood="ask" />
         <Text style={styles.progressLabel}>{t('progressParagraph')}</Text>
         <Text style={styles.definition}>
           {t('paragraphInstruction', { word: understanding?.word ?? t('theWordFallback') })}
@@ -1230,6 +1236,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
     ];
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <ProtoQuestHeader step={2} mood={(Object.values(paragraphResult.scores).filter((v): v is number => typeof v === 'number').reduce((a, b, _, arr) => a + b / arr.length, 0) >= 50 ? 'good' : 'miss') as QuestMood} />
         <View style={styles.paragraphHeaderRow}>
           <Text style={styles.progressLabel}>{t('progressParagraph')}</Text>
           <View style={styles.xpPill}>
@@ -1304,6 +1311,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
     const wildSubmitDisabled = wildBusy || (wildMode === 'TEXT' ? !wildText.trim() : !wildPhoto);
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <ProtoQuestHeader step={3} mood="wild" />
         <Text style={styles.progressLabel}>{t('progressOptionalWild')}</Text>
         <Text style={styles.definition}>
           {t('wildInstruction', { word: understanding?.word ?? t('thisWordFallback') })}
