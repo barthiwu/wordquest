@@ -29,6 +29,7 @@
           "color": "#12102A"
         }
       ],
+      "expo-apple-authentication",
       [
         "expo-build-properties",
         {
@@ -61,7 +62,8 @@
           }
         },
         "NSLocalNetworkUsageDescription": "WordQuest uses your local network to connect to the Metro development server while testing a development build."
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
@@ -80,6 +82,10 @@
       "apiUrl": "http://localhost:3002/api/v1",
       "eas": {
         "projectId": "0ef38d51-a343-43ae-83ef-fe83e173374d"
+      },
+      "social": {
+        "googleWebClientId": "",
+        "googleIosClientId": ""
       }
     },
     "owner": "barthiwus-team",

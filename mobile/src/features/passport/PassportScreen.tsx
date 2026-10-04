@@ -15,6 +15,8 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { useIsPrototype } from '@/state/uiVersionStore';
+import { ProtoProfileView } from '@/features/proto/ProtoProfileView';
 import { getMyPassport, type PassportView } from '@/services/passport';
 import { useAuthStore } from '@/state/authStore';
 import { countryCodeToFlagEmoji } from '@/utils/countryFlag';
@@ -43,6 +45,7 @@ export function PassportScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { isMobile } = useBreakpoint();
   const wide = !isMobile;
+  const proto = useIsPrototype();
   const styles = useMemo(() => createStyles(colors, insets.top, wide), [colors, insets.top, wide]);
   const { t } = useTranslation('passport');
   const accessToken = useAuthStore((s) => s.accessToken);
@@ -83,6 +86,15 @@ export function PassportScreen({ navigation }: Props) {
       <View style={styles.centered}>
         <ActivityIndicator color={colors.arcaneSoft} />
       </View>
+    );
+  }
+
+  if (proto) {
+    return (
+      <ProtoProfileView
+        passport={passport}
+        navigate={(route, params) => (navigation.navigate as unknown as (r: string, p?: object) => void)(route, params)}
+      />
     );
   }
 

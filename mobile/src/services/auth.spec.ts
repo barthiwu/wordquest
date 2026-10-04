@@ -1,4 +1,8 @@
 import {
+  completeTwoFactorLogin,
+  isDobRequiredError,
+  isTwoFactorChallenge,
+  socialLogin,
   deleteAccount,
   login,
   logout,
@@ -110,5 +114,34 @@ describe('auth service', () => {
       method: 'POST',
       body: { email: 'a@b.com', password: 'password1' },
     });
+  });
+
+  it('completes a two-step login with the challenge and a code', async () => {
+    (apiRequest as jest.Mock).mockResolvedValueOnce({});
+    await completeTwoFactorLogin({ challengeToken: 'chal', code: '123456' });
+    expect(apiRequest).toHaveBeenCalledWith('/auth/2fa/login', {
+      method: 'POST',
+      body: { challengeToken: 'chal', code: '123456' },
+    });
+  });
+
+  it('sends a social credential to /auth/social', async () => {
+    (apiRequest as jest.Mock).mockResolvedValueOnce({});
+    await socialLogin({ provider: 'GOOGLE', credential: 'idtok' });
+    expect(apiRequest).toHaveBeenCalledWith('/auth/social', {
+      method: 'POST',
+      body: { provider: 'GOOGLE', credential: 'idtok' },
+    });
+  });
+
+  it('tells a 2FA challenge from a session, and spots DOB_REQUIRED bodies', () => {
+    expect(isTwoFactorChallenge({ twoFactorRequired: true, challengeToken: 'x' })).toBe(true);
+    expect(
+      isTwoFactorChallenge({ accessToken: 'a', refreshToken: 'r', user: {} as never }),
+    ).toBe(false);
+    expect(isDobRequiredError({ code: 'DOB_REQUIRED' })).toBe(true);
+    expect(isDobRequiredError({ message: { code: 'DOB_REQUIRED' } })).toBe(true);
+    expect(isDobRequiredError({ message: 'nope' })).toBe(false);
+    expect(isDobRequiredError(undefined)).toBe(false);
   });
 });

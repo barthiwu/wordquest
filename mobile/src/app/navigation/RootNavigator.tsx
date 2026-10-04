@@ -7,6 +7,7 @@ import { withResponsiveFrame as framed } from '@/components/layout/withResponsiv
 import { SplashScreen } from '@/features/splash/SplashScreen';
 import { WelcomeScreen } from '@/features/welcome/WelcomeScreen';
 import { RegistrationScreen } from '@/features/auth/RegistrationScreen';
+import { TwoFactorSettingsScreen } from '@/features/settings/TwoFactorSettingsScreen';
 import { LoginScreen } from '@/features/auth/LoginScreen';
 import { ForgotPasswordScreen } from '@/features/auth/ForgotPasswordScreen';
 import { RecoverAccountScreen } from '@/features/auth/RecoverAccountScreen';
@@ -116,6 +117,7 @@ export type RootStackParamList = {
   AgeRestriction: undefined;
   Language: undefined;
   About: undefined;
+  TwoFactor: undefined;
   SendFeedback: undefined;
   AdminDashboard: undefined;
   Friends: undefined;
@@ -195,6 +197,7 @@ export function RootNavigator() {
         <Stack.Screen name="MasterChallenge" component={framed(MasterChallengeScreen)} />
         <Stack.Screen name="Order" component={framed(OrderScreen)} />
         <Stack.Screen name="Settings" component={framed(SettingsScreen)} />
+        <Stack.Screen name="TwoFactor" component={framed(TwoFactorSettingsScreen)} />
         <Stack.Screen name="ProfileSettings" component={framed(ProfileSettingsScreen)} />
         <Stack.Screen name="Shop" component={framed(ShopScreen)} />
         <Stack.Screen name="Notifications" component={framed(NotificationsScreen)} />

@@ -12,8 +12,9 @@ const STAGE_SCENES: Record<string, SceneVariant> = {
   legend: 'legend',
 };
 
-/** Journey stage key → the scene art that represents it. */
-export function sceneForStage(stageKey: string | undefined | null): SceneVariant {
-  if (!stageKey) return 'forest';
-  return STAGE_SCENES[stageKey.toLowerCase()] ?? 'forest';
+/** Journey stage key (or display name, e.g. "The Village") → scene art. */
+export function sceneForStage(stage: string | undefined | null): SceneVariant {
+  if (!stage) return 'forest';
+  const key = stage.trim().toLowerCase().replace(/^the\s+/, '');
+  return STAGE_SCENES[key] ?? 'forest';
 }

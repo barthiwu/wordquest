@@ -28,6 +28,18 @@ export interface AuthResult {
   user: AuthUser;
 }
 
+/** Returned instead of tokens when the account has two-step verification turned on. */
+export interface TwoFactorChallenge {
+  twoFactorRequired: true;
+  challengeToken: string;
+}
+
+export type LoginResult = AuthResult | TwoFactorChallenge;
+
+export function isTwoFactorChallenge(result: LoginResult): result is TwoFactorChallenge {
+  return (result as TwoFactorChallenge).twoFactorRequired === true;
+}
+
 export function register(input: {
   email: string;
   password: string;
@@ -39,8 +51,75 @@ export function register(input: {
   return apiRequest<AuthResult>('/auth/register', { method: 'POST', body: input });
 }
 
-export function login(input: { email: string; password: string }): Promise<AuthResult> {
-  return apiRequest<AuthResult>('/auth/login', { method: 'POST', body: input });
+export function login(input: { email: string; password: string }): Promise<LoginResult> {
+  return apiRequest<LoginResult>('/auth/login', { method: 'POST', body: input });
+}
+
+/** Second step of a two-step-verification login: the challenge from login()/socialLogin() plus an authenticator or recovery code. */
+export function completeTwoFactorLogin(input: { challengeToken: string; code: string }): Promise<AuthResult> {
+  return apiRequest<AuthResult>('/auth/2fa/login', { method: 'POST', body: input });
+}
+
+export type SocialProvider = 'GOOGLE' | 'APPLE' | 'FACEBOOK';
+
+export interface SocialProvidersInfo {
+  google: { enabled: boolean; clientIds: string[] };
+  apple: { enabled: boolean; clientIds: string[] };
+  facebook: { enabled: boolean; appId: string | null };
+}
+
+/** Which social sign-in providers the server has configured — the app only shows those. */
+export function getSocialProviders(): Promise<SocialProvidersInfo> {
+  return apiRequest<SocialProvidersInfo>('/auth/providers');
+}
+
+export interface SocialLoginInput {
+  provider: SocialProvider;
+  /** Google/Apple: the OIDC ID token. Facebook: the user access token. */
+  credential: string;
+  /** Apple only shares the name once, to the client. */
+  displayName?: string;
+  /** "YYYY-MM-DD" — only needed when this creates a NEW account (the server answers DOB_REQUIRED). */
+  dateOfBirth?: string;
+}
+
+export function socialLogin(input: SocialLoginInput): Promise<LoginResult> {
+  return apiRequest<LoginResult>('/auth/social', { method: 'POST', body: input });
+}
+
+/** True when the server asked for a birthdate before it can create a social account. */
+export function isDobRequiredError(body: unknown): boolean {
+  const b = body as { code?: string; message?: { code?: string } } | undefined;
+  return b?.code === 'DOB_REQUIRED' || b?.message?.code === 'DOB_REQUIRED';
+}
+
+// --- Two-step verification (Settings → Security) -----------------------------
+
+export interface TwoFactorStatus {
+  enabled: boolean;
+  recoveryCodesRemaining: number;
+}
+
+export function getTwoFactorStatus(accessToken: string): Promise<TwoFactorStatus> {
+  return apiRequest<TwoFactorStatus>('/auth/2fa/status', { accessToken });
+}
+
+/** Starts enrolment: returns the secret + otpauth:// URL to show as a QR code. Not active until confirmed. */
+export function beginTwoFactorSetup(accessToken: string): Promise<{ secret: string; otpauthUrl: string }> {
+  return apiRequest('/auth/2fa/setup', { method: 'POST', accessToken });
+}
+
+/** Confirms enrolment with a first valid code; returns the one-time recovery codes. */
+export function enableTwoFactor(accessToken: string, code: string): Promise<{ recoveryCodes: string[] }> {
+  return apiRequest('/auth/2fa/enable', { method: 'POST', accessToken, body: { code } });
+}
+
+export function disableTwoFactor(accessToken: string, code: string): Promise<void> {
+  return apiRequest<void>('/auth/2fa/disable', { method: 'POST', accessToken, body: { code } });
+}
+
+export function regenerateRecoveryCodes(accessToken: string, code: string): Promise<{ recoveryCodes: string[] }> {
+  return apiRequest('/auth/2fa/recovery-codes', { method: 'POST', accessToken, body: { code } });
 }
 
 /** Rotates a refresh token for a fresh access/refresh pair — same shape as login/register, so the caller can hand the result straight to authStore.setSession. */
@@ -75,6 +154,11 @@ export function deleteAccount(accessToken: string): Promise<void> {
 }
 
 /** Restores a DELETED account back to ACTIVE and issues a fresh session — same credential shape as login. */
-export function recoverAccount(input: { email: string; password: string }): Promise<AuthResult> {
+export function recoverAccount(input: {
+  email: string;
+  password: string;
+  /** Needed when the account has two-step verification on. */
+  twoFactorCode?: string;
+}): Promise<AuthResult> {
   return apiRequest<AuthResult>('/auth/recover-account', { method: 'POST', body: input });
 }

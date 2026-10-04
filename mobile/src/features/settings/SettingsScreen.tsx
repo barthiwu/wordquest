@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -16,7 +16,8 @@ import { radius, spacing, typography, type ThemeColors } from '@/constants/theme
 import { useThemeColors } from '@/state/themeStore';
 import { useSelectedLanguage } from '@/state/languageStore';
 import { useUiVersionStore } from '@/state/uiVersionStore';
-import { logout } from '@/services/auth';
+import { getTwoFactorStatus, logout } from '@/services/auth';
+import { ProtoSettingsView, type ProtoSettingsGroup } from '@/features/proto/ProtoSettingsView';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -51,7 +52,25 @@ export function SettingsScreen({ navigation }: Props) {
   const selectedLanguage = useSelectedLanguage();
   const uiVersion = useUiVersionStore((s) => s.version);
   const setUiVersion = useUiVersionStore((s) => s.setVersion);
+  const accessToken = useAuthStore((s) => s.accessToken);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [twoFactorOn, setTwoFactorOn] = useState<boolean | null>(null);
+
+  // Refresh whenever Settings regains focus (returning from the 2FA screen).
+  useEffect(() => {
+    if (!accessToken) return undefined;
+    let cancelled = false;
+    const load = () =>
+      getTwoFactorStatus(accessToken)
+        .then((s) => !cancelled && setTwoFactorOn(s.enabled))
+        .catch(() => undefined);
+    load();
+    const unsubscribe = navigation.addListener('focus', load);
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [accessToken, navigation]);
 
   const onLogout = async () => {
     setLoggingOut(true);
@@ -64,6 +83,76 @@ export function SettingsScreen({ navigation }: Props) {
       navigation.replace('Login');
     }
   };
+
+  // New look: the same rows, drawn as the prototype's grouped settings hub.
+  // (All hooks above run unconditionally; this only chooses what to render.)
+  if (uiVersion === 'prototype') {
+    const groups: ProtoSettingsGroup[] = [
+      {
+        key: 'preferences',
+        title: t('preferencesSection'),
+        rows: [
+          {
+            key: 'language',
+            icon: 'language-outline',
+            label: t('languageRow'),
+            value: selectedLanguage.name,
+            accessibilityLabel: t('languageRowLabel', { language: selectedLanguage.name }),
+            onPress: () => navigation.navigate('Language'),
+          },
+          {
+            key: 'newLook',
+            icon: 'sparkles-outline',
+            tint: '#FFC933',
+            label: t('newLookRow'),
+            hint: t('newLookHint'),
+            toggle: { value: true, onChange: (on) => setUiVersion(on ? 'prototype' : 'standard') },
+          },
+        ],
+      },
+      {
+        key: 'security',
+        title: t('securitySection'),
+        rows: [
+          {
+            key: 'twoFactor',
+            icon: 'shield-checkmark-outline',
+            tint: '#43D9A3',
+            label: t('twoFactorRow'),
+            hint: t('twoFactorRowHint'),
+            value: twoFactorOn === null ? undefined : twoFactorOn ? t('twoFactorOn') : t('twoFactorOff'),
+            onPress: () => navigation.navigate('TwoFactor'),
+          },
+        ],
+      },
+      {
+        key: 'more',
+        title: t('moreSection'),
+        rows: [
+          ...(user?.role === 'ADMIN' || user?.role === 'SUPPORT'
+            ? [{ key: 'admin', icon: 'stats-chart-outline' as const, label: t('adminDashboardRow'), onPress: () => navigation.navigate('AdminDashboard') }]
+            : []),
+          { key: 'feedback', icon: 'chatbubble-ellipses-outline', label: t('sendFeedbackRow'), onPress: () => navigation.navigate('SendFeedback') },
+          { key: 'about', icon: 'information-circle-outline', label: t('aboutRow'), onPress: () => navigation.navigate('About') },
+        ],
+      },
+    ];
+    return (
+      <ProtoSettingsView
+        title={t('title')}
+        profile={{
+          name: user?.displayName ?? t('profileSection'),
+          username: user?.username,
+          avatarUrl: user?.avatarUrl,
+          label: t('profileSection'),
+          onPress: () => navigation.navigate('ProfileSettings'),
+        }}
+        groups={groups}
+        logout={{ label: t('logOut'), busy: loggingOut, onPress: onLogout }}
+        onBack={() => navigation.goBack()}
+      />
+    );
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -135,13 +224,34 @@ export function SettingsScreen({ navigation }: Props) {
             <Text style={styles.rowHint}>{t('newLookHint')}</Text>
           </View>
           <Switch
-            value={uiVersion === 'prototype'}
+            value={false}
             onValueChange={(on) => setUiVersion(on ? 'prototype' : 'standard')}
             trackColor={{ false: colors.border, true: colors.arcane }}
             thumbColor={colors.ink}
             accessibilityLabel={t('newLookRow')}
           />
         </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('securitySection')}</Text>
+        <Pressable
+          style={styles.row}
+          onPress={() => navigation.navigate('TwoFactor')}
+          accessibilityRole="button"
+          accessibilityLabel={t('twoFactorRow')}
+        >
+          <View style={styles.rowTextBlock}>
+            <Text style={styles.rowText}>{t('twoFactorRow')}</Text>
+            <Text style={styles.rowHint}>{t('twoFactorRowHint')}</Text>
+          </View>
+          <View style={styles.rowValue}>
+            {twoFactorOn !== null && (
+              <Text style={styles.rowValueText}>{twoFactorOn ? t('twoFactorOn') : t('twoFactorOff')}</Text>
+            )}
+            <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
+          </View>
+        </Pressable>
       </View>
 
       <View style={styles.section}>

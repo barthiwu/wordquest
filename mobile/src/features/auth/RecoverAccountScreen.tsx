@@ -38,6 +38,8 @@ export function RecoverAccountScreen({ navigation }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+
   const canSubmit = email.includes('@') && password.length > 0;
 
   const onSubmit = async () => {
@@ -45,7 +47,11 @@ export function RecoverAccountScreen({ navigation }: Props) {
     setSubmitting(true);
     setError(null);
     try {
-      const result = await recoverAccount({ email: email.trim(), password });
+      const result = await recoverAccount({
+        email: email.trim(),
+        password,
+        twoFactorCode: twoFactorCode.trim() || undefined,
+      });
       await setSession(result);
       navigation.replace('Main');
     } catch (err) {
@@ -88,6 +94,17 @@ export function RecoverAccountScreen({ navigation }: Props) {
           onChangeText={setPassword}
           secureTextEntry
           accessibilityLabel={t('recoverAccount.passwordPlaceholder')}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder={t('recoverAccount.twoFactorPlaceholder')}
+          placeholderTextColor={colors.inkMuted}
+          value={twoFactorCode}
+          onChangeText={setTwoFactorCode}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          maxLength={16}
+          accessibilityLabel={t('recoverAccount.twoFactorPlaceholder')}
         />
 
         {error && <Text style={styles.error}>{error}</Text>}

@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { useIsPrototype } from '@/state/uiVersionStore';
+import { ProtoJourneyView } from '@/features/proto/ProtoJourneyView';
 import { getMyJourney, type JourneyView } from '@/services/journey';
 import { useAuthStore } from '@/state/authStore';
 import { journeyVisualFor, LEGEND_STAGE_KEY } from '@/constants/journeyVisuals';
@@ -52,6 +54,7 @@ export function JourneyScreen({ navigation }: Props) {
   const { t } = useTranslation('journey');
   const { isMobile } = useBreakpoint();
   const wideGrid = !isMobile;
+  const proto = useIsPrototype();
   const accessToken = useAuthStore((s) => s.accessToken);
   const countryCode = useAuthStore((s) => s.user?.countryCode);
   const [journey, setJourney] = useState<JourneyView | null>(null);
@@ -98,6 +101,29 @@ export function JourneyScreen({ navigation }: Props) {
   const showFlag = journey.currentStage.stage >= castleStage && countryCode;
   const showOrderLink = journey.currentStage.stage >= kingdomStage;
   const flagEmoji = showFlag ? countryCodeToFlagEmoji(countryCode) : null;
+
+  if (proto) {
+    return (
+      <ProtoJourneyView
+        journey={journey}
+        flagEmoji={flagEmoji}
+        showOrderLink={showOrderLink}
+        onOrder={() => navigation.navigate('Order')}
+        onSkillRadar={() => navigation.navigate('SkillRadar')}
+        onWordInWild={() => navigation.navigate('WordInTheWild')}
+        celebration={
+          celebrating ? (
+            <JourneyCelebration
+              stageName={journey.currentStage.name}
+              primaryTitle={journey.currentStage.primaryTitle}
+              stageKey={journey.currentStage.key}
+              onDismiss={() => setCelebrating(false)}
+            />
+          ) : null
+        }
+      />
+    );
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>

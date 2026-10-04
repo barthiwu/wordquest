@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
+import { useIsPrototype } from '@/state/uiVersionStore';
+import { ProtoLeaderboardView } from '@/features/proto/ProtoLeaderboardView';
 import {
   getBossBattleXpLeaderboard,
   getClanLeaderboard,
@@ -74,6 +76,7 @@ export function LeaderboardScreen(_props: Props) {
   const { t } = useTranslation('leaderboards');
   const accessToken = useAuthStore((s) => s.accessToken);
   const [category, setCategory] = useState<Category>('global');
+  const proto = useIsPrototype();
   const [view, setView] = useState<LeaderboardView | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -133,6 +136,26 @@ export function LeaderboardScreen(_props: Props) {
     setCategory(cat);
     load(cat);
   };
+
+  if (proto) {
+    return (
+      <ProtoLeaderboardView
+        tabs={[
+          { key: 'global', label: t('tabGlobal') },
+          { key: 'clan', label: t('tabClan') },
+          { key: 'country', label: t('tabCountry') },
+          { key: 'friend', label: t('tabFriend') },
+          { key: 'bossBattle', label: t('tabBossBattle') },
+        ]}
+        category={category}
+        onCategory={(key) => selectCategory(key as Category)}
+        view={view}
+        error={error}
+        emptyMessage={categoryEmptyMessage[category]}
+        showLevel={category !== 'bossBattle'}
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>

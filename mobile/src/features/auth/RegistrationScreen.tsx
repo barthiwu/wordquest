@@ -14,12 +14,18 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors, useThemeStore } from '@/state/themeStore';
-import { register } from '@/services/auth';
+import { register, type AuthResult } from '@/services/auth';
+import { getMe } from '@/services/users';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
 import { syncPushToken } from '@/utils/pushNotifications';
 import { MINIMUM_AGE_YEARS, calculateAge, toIsoDate } from '@/utils/age';
 import { DobPicker } from '@/components/DobPicker';
+import { SocialButtons } from './social/SocialButtons';
+import { useSocialAuth } from './social/useSocialAuth';
+import { TwoFactorStep } from './TwoFactorStep';
+import { SocialDobStep } from './SocialDobStep';
+import { completeTwoFactorLogin } from '@/services/auth';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -81,6 +87,43 @@ export function RegistrationScreen({ navigation }: Props) {
     return d;
   }, []);
 
+  // Continue with Google/Apple/Facebook from the sign-up screen: an existing
+  // account just signs in; a new one is created (birthdate sent up front when
+  // already picked above, asked for otherwise).
+  const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  const [twoFactorError, setTwoFactorError] = useState<string | null>(null);
+  const enterFromSocial = async (result: AuthResult) => {
+    await setSession(result);
+    syncPushToken(result.accessToken);
+    let next: 'Main' | 'Biodata' = 'Main';
+    try {
+      const me = await getMe(result.accessToken);
+      if (!me.onboardingCompletedAt) next = 'Biodata';
+    } catch {
+      // Can't tell: Main is the safe default.
+    }
+    navigation.replace(next);
+  };
+  const social = useSocialAuth({
+    onSession: enterFromSocial,
+    onChallenge: setChallengeToken,
+    dateOfBirth: dobValid && dobParts ? toIsoDate(dobParts.year, dobParts.month, dobParts.day) : undefined,
+  });
+  const onTwoFactor = async (code: string) => {
+    if (!challengeToken || submitting) return;
+    setSubmitting(true);
+    setTwoFactorError(null);
+    try {
+      await enterFromSocial(await completeTwoFactorLogin({ challengeToken, code: code.trim() }));
+    } catch (err) {
+      setTwoFactorError(
+        err instanceof ApiError && err.status === 401 ? t('twoFactor.errorIncorrect') : t('registration.errorGeneric'),
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const onSubmit = async () => {
     if (!canSubmit || submitting || !dobParts) return;
     setSubmitting(true);
@@ -101,6 +144,28 @@ export function RegistrationScreen({ navigation }: Props) {
       setSubmitting(false);
     }
   };
+
+  if (challengeToken) {
+    return (
+      <TwoFactorStep
+        onSubmit={onTwoFactor}
+        onBack={() => setChallengeToken(null)}
+        submitting={submitting}
+        error={twoFactorError}
+      />
+    );
+  }
+
+  if (social.needsDob) {
+    return (
+      <SocialDobStep
+        onSubmit={social.submitDob}
+        onCancel={social.cancelDob}
+        submitting={social.busy !== null}
+        error={social.error}
+      />
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -193,6 +258,13 @@ export function RegistrationScreen({ navigation }: Props) {
             <Text style={styles.buttonText}>{t('registration.submit')}</Text>
           )}
         </Pressable>
+
+        <SocialButtons
+          providers={social.available}
+          busy={social.busy}
+          onPress={social.start}
+          error={social.error}
+        />
 
         <Text style={styles.legalNote}>
           {t('registration.legalNotePrefix')}

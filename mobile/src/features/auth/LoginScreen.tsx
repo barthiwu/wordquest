@@ -14,10 +14,15 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
-import { login } from '@/services/auth';
+import { completeTwoFactorLogin, isTwoFactorChallenge, login, type AuthResult } from '@/services/auth';
+import { getMe } from '@/services/users';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
 import { syncPushToken } from '@/utils/pushNotifications';
+import { SocialButtons } from './social/SocialButtons';
+import { useSocialAuth } from './social/useSocialAuth';
+import { TwoFactorStep } from './TwoFactorStep';
+import { SocialDobStep } from './SocialDobStep';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -35,7 +40,52 @@ export function LoginScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  // Set once the first factor succeeded for an account with two-step verification.
+  const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  const [twoFactorError, setTwoFactorError] = useState<string | null>(null);
+
   const canSubmit = email.includes('@') && password.length > 0;
+
+  /** Password/2FA logins go straight in; a social sign-in that just created the account continues into onboarding. */
+  const enter = async (result: AuthResult, fromSocial = false) => {
+    await setSession(result);
+    syncPushToken(result.accessToken);
+    let next: 'Main' | 'Biodata' = 'Main';
+    if (fromSocial) {
+      try {
+        const me = await getMe(result.accessToken);
+        if (!me.onboardingCompletedAt) next = 'Biodata';
+      } catch {
+        // Can't tell: Main is the safe default.
+      }
+    }
+    navigation.replace(next);
+  };
+
+  const social = useSocialAuth({
+    onSession: (result) => enter(result, true),
+    onChallenge: setChallengeToken,
+  });
+
+  const onTwoFactor = async (code: string) => {
+    if (!challengeToken || submitting) return;
+    setSubmitting(true);
+    setTwoFactorError(null);
+    try {
+      await enter(await completeTwoFactorLogin({ challengeToken, code: code.trim() }));
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401 && /expired/i.test(err.message)) {
+        setChallengeToken(null);
+        setError(t('twoFactor.errorExpired'));
+      } else {
+        setTwoFactorError(
+          err instanceof ApiError && err.status === 401 ? t('twoFactor.errorIncorrect') : t('login.errorGeneric'),
+        );
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const onSubmit = async () => {
     if (!canSubmit || submitting) return;
@@ -43,9 +93,11 @@ export function LoginScreen({ navigation }: Props) {
     setError(null);
     try {
       const result = await login({ email: email.trim(), password });
-      await setSession(result);
-      syncPushToken(result.accessToken);
-      navigation.replace('Main');
+      if (isTwoFactorChallenge(result)) {
+        setChallengeToken(result.challengeToken);
+        return;
+      }
+      await enter(result);
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 401
@@ -56,6 +108,31 @@ export function LoginScreen({ navigation }: Props) {
       setSubmitting(false);
     }
   };
+
+  if (challengeToken) {
+    return (
+      <TwoFactorStep
+        onSubmit={onTwoFactor}
+        onBack={() => {
+          setChallengeToken(null);
+          setTwoFactorError(null);
+        }}
+        submitting={submitting}
+        error={twoFactorError}
+      />
+    );
+  }
+
+  if (social.needsDob) {
+    return (
+      <SocialDobStep
+        onSubmit={social.submitDob}
+        onCancel={social.cancelDob}
+        submitting={social.busy !== null}
+        error={social.error}
+      />
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -120,6 +197,13 @@ export function LoginScreen({ navigation }: Props) {
             <Text style={styles.buttonText}>{t('login.submit')}</Text>
           )}
         </Pressable>
+
+        <SocialButtons
+          providers={social.available}
+          busy={social.busy}
+          onPress={social.start}
+          error={social.error}
+        />
 
         <Pressable
           onPress={() => navigation.navigate('ForgotPassword')}

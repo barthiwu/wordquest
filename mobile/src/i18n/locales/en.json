@@ -211,7 +211,8 @@
       "errorIncorrect": "Incorrect email or password, or this account is not deleted.",
       "errorGeneric": "Something went wrong. Please try again.",
       "submit": "Recover account",
-      "submitHint": "Restores a deleted account to active"
+      "submitHint": "Restores a deleted account to active",
+      "twoFactorPlaceholder": "Two-step code (only if you use it)"
     },
     "resetPassword": {
       "doneTitle": "Your password has been reset.",
@@ -232,6 +233,32 @@
       "errorSubtitle": "Request a new verification email from Settings and try again.",
       "missingTitle": "No verification code found",
       "missingSubtitle": "Open the link from your verification email again."
+    },
+    "social": {
+      "or": "or continue with",
+      "working": "Connecting…",
+      "continueWith": {
+        "GOOGLE": "Continue with Google",
+        "APPLE": "Continue with Apple",
+        "FACEBOOK": "Continue with Facebook"
+      },
+      "errorGeneric": "We couldn't sign you in that way. Please try again.",
+      "dobTitle": "One last thing",
+      "dobSubtitle": "Confirm your date of birth to create your WordQuest account.",
+      "dobBubble": "Nearly there — just your birthday!",
+      "dobSubmit": "Create my account",
+      "cancel": "Cancel"
+    },
+    "twoFactor": {
+      "title": "Two-step verification",
+      "subtitle": "Enter the 6-digit code from your authenticator app to finish signing in.",
+      "aliBubble": "Quick check — is it really you?",
+      "codePlaceholder": "123456",
+      "submit": "Verify",
+      "recoveryHint": "Lost your phone? Enter one of your recovery codes instead.",
+      "back": "Back to log in",
+      "errorIncorrect": "That code didn't work. Check the app and try again.",
+      "errorExpired": "This sign-in expired. Please log in again."
     }
   },
   "onboarding": {
@@ -384,7 +411,40 @@
     "moreSection": "More",
     "aboutRow": "About",
     "sendFeedbackRow": "Send Feedback",
-    "adminDashboardRow": "Analytics Dashboard"
+    "adminDashboardRow": "Analytics Dashboard",
+    "securitySection": "Security",
+    "twoFactorRow": "Two-step verification",
+    "twoFactorRowHint": "Ask for a code from an authenticator app when you log in",
+    "twoFactorOn": "On",
+    "twoFactorOff": "Off",
+    "twoFactor": {
+      "title": "Two-step verification",
+      "intro": "Add a second lock to your account. After your password, WordQuest asks for a 6-digit code from an authenticator app (Google Authenticator, 1Password, Authy…).",
+      "aliOff": "A second lock keeps your streak safe!",
+      "aliOn": "Your account is double-locked.",
+      "turnOn": "Turn on",
+      "statusOn": "Two-step verification is on",
+      "recoveryLeft_one": "{{count}} recovery code left.",
+      "recoveryLeft_other": "{{count}} recovery codes left.",
+      "regenerate": "Get new recovery codes",
+      "turnOff": "Turn off",
+      "enterToDisable": "Enter a code from your authenticator app (or a recovery code) to turn it off.",
+      "enterToRegenerate": "Enter a code from your authenticator app (or a recovery code) to get new recovery codes. The old ones stop working.",
+      "turnOffConfirm": "Turn off two-step verification",
+      "regenerateConfirm": "Get new codes",
+      "cancel": "Cancel",
+      "step1": "1. Scan this with your authenticator app",
+      "manualKey": "Can't scan? Type this key in instead:",
+      "step2": "2. Enter the 6-digit code it shows",
+      "confirm": "Confirm and turn on",
+      "codePlaceholder": "123456",
+      "codesIntro": "Save these recovery codes somewhere safe. Each works once if you lose your phone. They won't be shown again.",
+      "shareCodes": "Save or share codes",
+      "shareHeader": "My WordQuest recovery codes",
+      "savedThem": "I've saved them",
+      "errorCode": "That code didn't work. Check the app and try again.",
+      "errorGeneric": "Something went wrong. Please try again."
+    }
   },
   "leaderboards": {
     "title": "Leaderboard",
@@ -1129,6 +1189,10 @@
     "bossHubWait": "The boss gathers strength. Sharpen your words!",
     "bossHubLive": "The battle is live — join the fight!",
     "bossBattleLine": "Hold the line!",
-    "bossHealth": "BOSS"
+    "bossHealth": "BOSS",
+    "worlds": "Worlds",
+    "worldsUnlocked": "{{done}} of {{total}} unlocked",
+    "here": "You're here",
+    "boardBubble": "Climb the ranks!"
   }
 }
