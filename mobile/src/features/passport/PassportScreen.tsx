@@ -14,6 +14,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
+import { useIsNewLook } from '@/state/uiVersionStore';
+import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { getMyPassport, type PassportView } from '@/services/passport';
 import { useAuthStore } from '@/state/authStore';
 import { countryCodeToFlagEmoji } from '@/utils/countryFlag';
@@ -40,7 +42,8 @@ type Props = CompositeScreenProps<
 export function PassportScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
+  const wide = useIsNewLook() && !useBreakpoint().isMobile;
+  const styles = useMemo(() => createStyles(colors, insets.top, wide), [colors, insets.top, wide]);
   const { t } = useTranslation('passport');
   const accessToken = useAuthStore((s) => s.accessToken);
   const [passport, setPassport] = useState<PassportView | null>(null);
@@ -323,7 +326,7 @@ function ListRow({
   );
 }
 
-function createStyles(colors: ThemeColors, topInset: number) {
+function createStyles(colors: ThemeColors, topInset: number, wide = false) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     content: { padding: spacing.xl, paddingTop: topInset + spacing.xxl, gap: spacing.lg },
@@ -375,7 +378,8 @@ function createStyles(colors: ThemeColors, topInset: number) {
     meta: { color: colors.inkMuted, fontSize: typography.scale.sm },
     statGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
     stat: {
-      flexBasis: '47%',
+      flexBasis: wide ? 200 : '47%',
+      flexGrow: wide ? 1 : 0,
       backgroundColor: colors.surface,
       borderRadius: radius.md,
       borderWidth: 1,

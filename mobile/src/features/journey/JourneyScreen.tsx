@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
+import { useIsNewLook } from '@/state/uiVersionStore';
+import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { getMyJourney, type JourneyView } from '@/services/journey';
 import { useAuthStore } from '@/state/authStore';
 import { journeyVisualFor, LEGEND_STAGE_KEY } from '@/constants/journeyVisuals';
@@ -49,6 +51,7 @@ export function JourneyScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation('journey');
+  const wideGrid = useIsNewLook() && !useBreakpoint().isMobile;
   const accessToken = useAuthStore((s) => s.accessToken);
   const countryCode = useAuthStore((s) => s.user?.countryCode);
   const [journey, setJourney] = useState<JourneyView | null>(null);
@@ -203,7 +206,7 @@ export function JourneyScreen({ navigation }: Props) {
         </View>
       )}
 
-      <View style={styles.stageList}>
+      <View style={[styles.stageList, wideGrid && styles.stageListWide]}>
         {journey.stages.map((stage) => {
           const visual = journeyVisualFor(stage.key);
           return (
@@ -211,6 +214,7 @@ export function JourneyScreen({ navigation }: Props) {
               key={stage.key}
               style={[
                 styles.stageRow,
+                wideGrid && styles.stageRowWide,
                 stage.current && { borderColor: visual.color },
                 !stage.unlocked && styles.stageRowLocked,
               ]}
@@ -334,6 +338,8 @@ function createStyles(colors: ThemeColors, topInset: number) {
     orderBannerTitle: { fontSize: typography.scale.md, fontWeight: typography.display.weight },
     orderBannerSubtitle: { color: colors.inkMuted, fontSize: typography.scale.xs, marginTop: 2 },
     stageList: { gap: spacing.sm },
+    stageListWide: { flexDirection: 'row', flexWrap: 'wrap' },
+    stageRowWide: { flexGrow: 1, flexBasis: 300, minWidth: 0 },
     stageRow: {
       flexDirection: 'row',
       alignItems: 'center',

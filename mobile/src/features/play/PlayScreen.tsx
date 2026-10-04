@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, type ComponentType, useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -304,11 +304,11 @@ export function PlayScreen({ navigation }: Props) {
     </View>
   );
 
-  const Wrapper = newLook ? ResponsiveContainer : Fragment;
+  const Wrapper: ComponentType<any> = newLook ? ResponsiveContainer : Fragment;
 
   return (
     <ScrollView contentContainerStyle={[styles.container, newLook && styles.containerNew]}>
-      <Wrapper>
+      <Wrapper {...(newLook ? { style: styles.hubStack } : {})}>
       <Text style={styles.title}>{newLook ? t('common:tabs.play') : t('play:title')}</Text>
       {newLook && <Text style={styles.subtitle}>{t('arcade:subtitle')}</Text>}
 
@@ -414,13 +414,21 @@ function createStyles(colors: ThemeColors, topInset: number) {
       gap: spacing.md,
     },
     containerNew: { paddingHorizontal: spacing.md },
-    subtitle: { color: colors.inkMuted, fontSize: typography.scale.md, marginTop: -spacing.sm },
+    subtitle: { color: colors.inkMuted, fontSize: typography.scale.md },
+    hubStack: { gap: spacing.md },
     hubRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.lg },
     hubQuestCol: { flex: 2, gap: spacing.md },
     hubGamesCol: { flex: 3 },
     gamesBlock: { gap: spacing.md },
     gamesGrid: { flexDirection: 'row', flexWrap: 'wrap' },
-    cardGrid: { flexGrow: 1, flexBasis: 280, minWidth: 0 },
+    cardGrid: {
+      flexGrow: 1,
+      flexBasis: 260,
+      minWidth: 0,
+      flexDirection: 'column',
+      alignItems: 'stretch',
+      gap: spacing.sm,
+    },
     centered: { alignItems: 'center', paddingVertical: spacing.xl },
     empty: {
       backgroundColor: colors.surface,

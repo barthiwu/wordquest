@@ -199,7 +199,7 @@ export function NewHomeScreen({ navigation }: Props) {
         <Text style={styles.cardSub}>{t('practiceEmpty')}</Text>
       ) : (
         <View style={[styles.grid, wide && styles.gridRow]}>
-          {wordMastery.slice(0, bp.isDesktop ? 6 : 3).map((item) => (
+          {wordMastery.slice(0, bp.isDesktop ? 5 : bp.isTablet ? 2 : 3).map((item) => (
             <View key={item.wordId} style={wide ? styles.cell : undefined}>
               <WordMasteryCard
                 item={item}
@@ -229,7 +229,7 @@ export function NewHomeScreen({ navigation }: Props) {
               <Text style={styles.avatarText}>{initial}</Text>
             </View>
           )}
-          <Text style={styles.greeting} numberOfLines={1}>
+          <Text style={styles.greeting} numberOfLines={2}>
             {timeOfDayGreeting()}
             {displayName ? `, ${displayName}` : ''}
           </Text>
@@ -289,11 +289,11 @@ export function NewHomeScreen({ navigation }: Props) {
         {/* 6. Compact social/competitive */}
         {ranks}
 
-        {/* 7 + 8. Journey and Free Practice — paired from tablet up */}
-        <View style={[styles.lowerRow, wide && styles.lowerRowWide]}>
-          <View style={wide ? styles.lowerCol : undefined}>{journeyBlock}</View>
-          <View style={wide ? styles.lowerCol : undefined}>{practice}</View>
-        </View>
+        {/* 7. Your Journey (full width — the stage rail is a horizontal strip) */}
+        {journeyBlock}
+
+        {/* 8. Free Practice */}
+        {practice}
       </ResponsiveContainer>
     </ScrollView>
   );
@@ -316,7 +316,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
       justifyContent: 'center',
     },
     avatarText: { color: colors.arcaneSoft, fontSize: typography.scale.md, fontWeight: '700' },
-    greeting: { flex: 1, color: colors.ink, fontSize: typography.scale.lg, fontWeight: '700' },
+    greeting: { flex: 1, minWidth: 0, color: colors.ink, fontSize: typography.scale.lg, fontWeight: '700' },
     pillRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
     iconPill: {
       width: 44,
@@ -422,8 +422,5 @@ function createStyles(colors: ThemeColors, topInset: number) {
     arcadeText: { flex: 1, gap: 2 },
     cardTitle: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
     cardSub: { color: colors.inkMuted, fontSize: typography.scale.sm },
-    lowerRow: { gap: spacing.lg },
-    lowerRowWide: { flexDirection: 'row', alignItems: 'flex-start' },
-    lowerCol: { flex: 1 },
   });
 }
