@@ -5,7 +5,7 @@ import { useThemeColors } from '@/state/themeStore';
 import { useIsNewLook } from '@/state/uiVersionStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { ResponsiveTabBar, navInset } from './ResponsiveTabBar';
-import { HomeScreen } from '@/features/home/HomeScreen';
+import { HomeEntry } from '@/features/home/HomeEntry';
 import { PlayScreen } from '@/features/play/PlayScreen';
 import { JourneyScreen } from '@/features/journey/JourneyScreen';
 import { LeaderboardScreen } from '@/features/leaderboards/LeaderboardScreen';
@@ -67,7 +67,7 @@ export function MainTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: t('tabs.home') }} />
+      <Tab.Screen name="Home" component={HomeEntry} options={{ tabBarLabel: t('tabs.home') }} />
       <Tab.Screen name="Play" component={PlayScreen} options={{ tabBarLabel: t('tabs.play') }} />
       <Tab.Screen
         name="Journey"
