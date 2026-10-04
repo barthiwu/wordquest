@@ -269,6 +269,8 @@ export function parseWordRecords(rawRecords: Record<string, string>[]): WordImpo
   const rows: WordImportRow[] = [];
   const seenWords = new Set<string>();
   const seenIds = new Set<string>();
+  // normalized definition -> headword that first used it (vocabulary quality audit, 2026-09/10)
+  const seenDefinitions = new Map<string, string>();
 
   records.forEach((record, i) => {
     const line = i + 2; // header is line 1, first data row is line 2
@@ -336,6 +338,29 @@ export function parseWordRecords(rawRecords: Record<string, string>[]): WordImpo
       return;
     }
 
+    // Quality gate (vocabulary audit): the example must literally contain the
+    // headword (inflected headwords must appear exactly as written), or the
+    // sentence teaches a different word than the one being guessed.
+    if (!exampleSentence.toLowerCase().includes(normalizedWord)) {
+      errors.push({
+        line,
+        reason: `"${word}": exampleSentence does not contain the word itself`,
+      });
+      return;
+    }
+
+    // Quality gate (vocabulary audit): two words sharing one definition make
+    // guessing from the definition ambiguous.
+    const normalizedDefinition = definition.toLowerCase().replace(/\s+/g, ' ');
+    const definitionOwner = seenDefinitions.get(normalizedDefinition);
+    if (definitionOwner !== undefined) {
+      errors.push({
+        line,
+        reason: `"${word}": definition is identical to the one used for "${definitionOwner}" — each word needs a distinct definition`,
+      });
+      return;
+    }
+
     const rawCefr = record.cefrLevel?.trim().toUpperCase();
     if (rawCefr && !VALID_CEFR.has(rawCefr)) {
       errors.push({
@@ -378,6 +403,7 @@ export function parseWordRecords(rawRecords: Record<string, string>[]): WordImpo
     }
 
     seenWords.add(normalizedWord);
+    seenDefinitions.set(normalizedDefinition, word);
 
     rows.push({
       word,

@@ -14,6 +14,17 @@ const validRecord = {
   synonyms: 'escapade',
 };
 
+/** A valid record for `word`, with an example containing it and a definition unique to it. */
+function withWord(word: string, extra: Record<string, string> = {}) {
+  return {
+    ...validRecord,
+    definition: `A distinct meaning for ${word}.`,
+    exampleSentence: `Everyone remembered the word ${word} afterwards.`,
+    word,
+    ...extra,
+  };
+}
+
 describe('parseWordRecords', () => {
   it('parses a fully valid row', () => {
     const result = parseWordRecords([validRecord]);
@@ -51,8 +62,8 @@ describe('parseWordRecords', () => {
 
   it('rejects a word shorter than the 3-letter minimum (spec §2, as lowered for the Vocabulary Vault short-word expansion), continuing past it', () => {
     const result = parseWordRecords([
-      { ...validRecord, word: 'ok' },
-      { ...validRecord, word: 'Beautiful' },
+      withWord('ok'),
+      withWord('Beautiful'),
     ]);
     expect(result.rows).toHaveLength(1);
     expect(result.rows[0].word).toBe('Beautiful');
@@ -63,7 +74,7 @@ describe('parseWordRecords', () => {
   it(`accepts a word exactly at the ${MIN_WORD_LENGTH}-letter minimum`, () => {
     const threeLetters = 'cat';
     expect(threeLetters).toHaveLength(MIN_WORD_LENGTH);
-    const result = parseWordRecords([{ ...validRecord, word: threeLetters }]);
+    const result = parseWordRecords([withWord(threeLetters)]);
     expect(result.errors).toHaveLength(0);
     expect(result.rows[0].word).toBe(threeLetters);
   });
@@ -71,8 +82,8 @@ describe('parseWordRecords', () => {
   it('rejects a word longer than the 15-letter maximum (2026-09-30 decision, after alpha-test feedback that very long words were unguessable), continuing past it', () => {
     const tooLong = 'Methylenedioxymethamphetamine'; // 29 letters -- an actual pre-cap vault entry
     const result = parseWordRecords([
-      { ...validRecord, word: tooLong },
-      { ...validRecord, word: 'Beautiful' },
+      withWord(tooLong),
+      withWord('Beautiful'),
     ]);
     expect(result.rows).toHaveLength(1);
     expect(result.rows[0].word).toBe('Beautiful');
@@ -86,7 +97,7 @@ describe('parseWordRecords', () => {
   it(`accepts a word exactly at the ${MAX_WORD_LENGTH}-letter maximum`, () => {
     const fifteenLetters = 'Congratulations';
     expect(fifteenLetters).toHaveLength(MAX_WORD_LENGTH);
-    const result = parseWordRecords([{ ...validRecord, word: fifteenLetters }]);
+    const result = parseWordRecords([withWord(fifteenLetters)]);
     expect(result.errors).toHaveLength(0);
     expect(result.rows[0].word).toBe(fifteenLetters);
   });
@@ -129,8 +140,8 @@ describe('parseWordRecords', () => {
 
   it('reports the correct 1-based CSV line number for each row (header is line 1)', () => {
     const result = parseWordRecords([
-      { ...validRecord, word: 'ok' },
-      { ...validRecord, word: 'hi' },
+      withWord('ok'),
+      withWord('hi'),
     ]);
     expect(result.errors[0].line).toBe(2);
     expect(result.errors[1].line).toBe(3);
@@ -202,9 +213,9 @@ describe('parseWordRecords', () => {
 
   it('processes independent rows even when one has an error', () => {
     const result = parseWordRecords([
-      { ...validRecord, word: 'Beautiful' },
-      { ...validRecord, word: 'ok' }, // too short
-      { ...validRecord, word: 'Excellent' },
+      withWord('Beautiful'),
+      withWord('ok'), // too short
+      withWord('Excellent'),
     ]);
     expect(result.rows.map((r) => r.word)).toEqual(['Beautiful', 'Excellent']);
     expect(result.errors).toHaveLength(1);
@@ -236,8 +247,8 @@ describe('parseWordRecords', () => {
 
   it('rejects a duplicate ID within the same file (V20 Vocabulary Vault §1)', () => {
     const result = parseWordRecords([
-      { ...validRecord, id: '501', word: 'Beautiful' },
-      { ...validRecord, id: '501', word: 'Excellent' },
+      withWord('Beautiful', { id: '501' }),
+      withWord('Excellent', { id: '501' }),
     ]);
     expect(result.rows).toHaveLength(1);
     expect(result.rows[0].word).toBe('Beautiful');
@@ -246,11 +257,36 @@ describe('parseWordRecords', () => {
 
   it('does not flag duplicate IDs when the ID column is absent entirely', () => {
     const result = parseWordRecords([
-      { ...validRecord, word: 'Beautiful' },
-      { ...validRecord, word: 'Excellent' },
+      withWord('Beautiful'),
+      withWord('Excellent'),
     ]);
     expect(result.rows).toHaveLength(2);
     expect(result.errors).toHaveLength(0);
+  });
+
+  it('rejects a row whose example sentence does not contain the headword (vocabulary quality audit)', () => {
+    const result = parseWordRecords([
+      { ...validRecord, word: 'Chairman', exampleSentence: 'Address your remarks to the chairperson.' },
+    ]);
+    expect(result.rows).toHaveLength(0);
+    expect(result.errors[0].reason).toContain('does not contain the word itself');
+  });
+
+  it('accepts an example that contains the headword in a different case', () => {
+    const result = parseWordRecords([
+      { ...validRecord, exampleSentence: 'ADVENTURE awaits those who look for it.' },
+    ]);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it('rejects a second word that reuses an earlier definition, naming the first owner (vocabulary quality audit)', () => {
+    const result = parseWordRecords([
+      withWord('Car', { definition: 'A motor vehicle with four wheels.' }),
+      withWord('Auto', { definition: 'A motor vehicle  with four wheels.' }),
+    ]);
+    expect(result.rows.map((r) => r.word)).toEqual(['Car']);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].reason).toContain('identical to the one used for "Car"');
   });
 
   describe('Vocabulary Vault V2 CSV shape (Correction & Completion Spec §5)', () => {
