@@ -42,7 +42,11 @@ type Props = CompositeScreenProps<
 export function PassportScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
-  const wide = useIsNewLook() && !useBreakpoint().isMobile;
+  // Both hooks must run on every render (never short-circuited), or flipping
+  // the New look flag at runtime changes the hook count and crashes the screen.
+  const newLook = useIsNewLook();
+  const { isMobile } = useBreakpoint();
+  const wide = newLook && !isMobile;
   const styles = useMemo(() => createStyles(colors, insets.top, wide), [colors, insets.top, wide]);
   const { t } = useTranslation('passport');
   const accessToken = useAuthStore((s) => s.accessToken);

@@ -51,7 +51,11 @@ export function JourneyScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation('journey');
-  const wideGrid = useIsNewLook() && !useBreakpoint().isMobile;
+  // Both hooks must run on every render (never short-circuited), or flipping
+  // the New look flag at runtime changes the hook count and crashes the screen.
+  const newLook = useIsNewLook();
+  const { isMobile } = useBreakpoint();
+  const wideGrid = newLook && !isMobile;
   const accessToken = useAuthStore((s) => s.accessToken);
   const countryCode = useAuthStore((s) => s.user?.countryCode);
   const [journey, setJourney] = useState<JourneyView | null>(null);
