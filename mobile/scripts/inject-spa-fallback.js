@@ -29,6 +29,23 @@ const path = require('path');
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 const PATH_SEGMENTS_TO_KEEP = 1;
 
+// Public pages that third parties fetch directly (Meta's app settings
+// validate the privacy-policy / data-deletion URLs, store listings link to
+// them). GitHub Pages answers a missing file with HTTP 404 *before* the
+// 404.html redirect runs, which fails those validators -- so each gets a
+// real index.html (a copy of the app shell; the app then routes to the page
+// from the URL) and returns 200.
+const PUBLIC_PATHS = ['privacy-policy', 'terms', 'data-deletion'];
+
+function writePublicPages(shellHtml) {
+  for (const p of PUBLIC_PATHS) {
+    const dir = path.join(DIST_DIR, p);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'index.html'), shellHtml);
+  }
+  console.log(`Wrote real index.html pages for: ${PUBLIC_PATHS.join(', ')}.`);
+}
+
 const notFoundHtml = `<!DOCTYPE html>
 <html>
   <head>
@@ -83,6 +100,7 @@ function main() {
   const indexHtml = fs.readFileSync(indexPath, 'utf8');
   if (indexHtml.includes('spa-github-pages')) {
     console.log('index.html already has the SPA fallback script -- skipping.');
+    writePublicPages(indexHtml);
     return;
   }
   if (!indexHtml.includes('</head>')) {
@@ -91,6 +109,7 @@ function main() {
   }
   const patched = indexHtml.replace('</head>', `${restoreScript}</head>`);
   fs.writeFileSync(indexPath, patched);
+  writePublicPages(patched);
 
   console.log(
     'Wrote dist/404.html and injected the SPA-fallback restore script into dist/index.html.',
