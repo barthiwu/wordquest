@@ -6,7 +6,7 @@
     "scheme": [
       "wordquest",
       "com.googleusercontent.apps.892492379290-mu333c5l4e78uoj0l3ir7e686p3f4sdm",
-      "fb1848144926356124"
+      "fb4063672970608828"
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -90,7 +90,7 @@
       "social": {
         "googleWebClientId": "892492379290-il1iugg5fa0knln86p4797op1l6tu6eb.apps.googleusercontent.com",
         "googleIosClientId": "892492379290-mu333c5l4e78uoj0l3ir7e686p3f4sdm.apps.googleusercontent.com",
-        "facebookAppId": "1848144926356124"
+        "facebookAppId": "4063672970608828"
       }
     },
     "owner": "barthiwus-team",
