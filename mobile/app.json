@@ -3,7 +3,7 @@
     "name": "WordQuest",
     "slug": "wordquest",
     "version": "0.1.0",
-    "scheme": "wordquest",
+    "scheme": ["wordquest", "com.googleusercontent.apps.892492379290-mu333c5l4e78uoj0l3ir7e686p3f4sdm"],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -84,8 +84,8 @@
         "projectId": "0ef38d51-a343-43ae-83ef-fe83e173374d"
       },
       "social": {
-        "googleWebClientId": "",
-        "googleIosClientId": ""
+        "googleWebClientId": "892492379290-il1iugg5fa0knln86p4797op1l6tu6eb.apps.googleusercontent.com",
+        "googleIosClientId": "892492379290-mu333c5l4e78uoj0l3ir7e686p3f4sdm.apps.googleusercontent.com"
       }
     },
     "owner": "barthiwus-team",
