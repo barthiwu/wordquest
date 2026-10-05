@@ -9,7 +9,7 @@ import { Platform } from 'react-native';
  * A provider with no ID for the current platform is simply not offered.
  */
 const extra = (Constants.expoConfig?.extra ?? {}) as {
-  social?: { googleWebClientId?: string; googleIosClientId?: string };
+  social?: { googleWebClientId?: string; googleIosClientId?: string; facebookAppId?: string };
 };
 
 const clean = (v: string | undefined | null) => (v && v.trim().length > 0 ? v.trim() : undefined);
@@ -24,6 +24,21 @@ export function googleClientIdForPlatform(): string | undefined {
   }
   // Android Google sign-in needs a registered package-scheme redirect; not offered yet.
   return undefined;
+}
+
+/**
+ * The Facebook App ID this build has registered as a URL scheme ("fb<id>").
+ * Facebook only returns to an app through that scheme, so native Facebook
+ * sign-in is offered only when it is set here AND matches the server's ID.
+ * Web needs no build-time ID (the server hands it out).
+ */
+export function facebookNativeAppId(): string | undefined {
+  return clean(process.env.EXPO_PUBLIC_FACEBOOK_APP_ID) ?? clean(extra.social?.facebookAppId);
+}
+
+/** Facebook's native redirect: "fb<appId>://authorize". */
+export function facebookNativeRedirectUri(appId: string): string {
+  return `fb${appId}://authorize`;
 }
 
 /** Google's iOS redirect scheme is the client ID reversed: "123-abc.apps.googleusercontent.com" → "com.googleusercontent.apps.123-abc". */

@@ -116,7 +116,7 @@ export class SocialVerifierService {
     }
 
     const me = (await this.fetchJson(
-      `https://graph.facebook.com/v19.0/me?${new URLSearchParams({
+      `https://graph.facebook.com/v25.0/me?${new URLSearchParams({
         fields: 'id,name,email',
         access_token: accessToken,
       }).toString()}`,

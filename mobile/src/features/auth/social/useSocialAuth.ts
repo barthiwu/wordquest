@@ -15,6 +15,7 @@ import {
   isAppleAvailable,
   isGoogleConfigured,
   signInWithApple,
+  isFacebookUsable,
   signInWithFacebook,
   signInWithGoogle,
   type SocialCredential,
@@ -51,7 +52,7 @@ export function useSocialAuth({ onSession, onChallenge, dateOfBirth }: UseSocial
         const list: SocialProvider[] = [];
         if (info.google.enabled && isGoogleConfigured()) list.push('GOOGLE');
         if (info.apple.enabled && (await isAppleAvailable())) list.push('APPLE');
-        if (info.facebook.enabled && info.facebook.appId) {
+        if (info.facebook.enabled && info.facebook.appId && isFacebookUsable(info.facebook.appId)) {
           facebookAppId.current = info.facebook.appId;
           list.push('FACEBOOK');
         }

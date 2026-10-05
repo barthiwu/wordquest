@@ -85,7 +85,8 @@
       },
       "social": {
         "googleWebClientId": "892492379290-il1iugg5fa0knln86p4797op1l6tu6eb.apps.googleusercontent.com",
-        "googleIosClientId": "892492379290-mu333c5l4e78uoj0l3ir7e686p3f4sdm.apps.googleusercontent.com"
+        "googleIosClientId": "892492379290-mu333c5l4e78uoj0l3ir7e686p3f4sdm.apps.googleusercontent.com",
+        "facebookAppId": ""
       }
     },
     "owner": "barthiwus-team",

@@ -117,7 +117,7 @@ describe('SocialVerifierService', () => {
 
   describe('Facebook', () => {
     const debugUrl = 'https://graph.facebook.com/debug_token';
-    const meUrl = 'https://graph.facebook.com/v19.0/me';
+    const meUrl = 'https://graph.facebook.com/v25.0/me';
 
     it('accepts a valid token for this app', async () => {
       const svc = build();

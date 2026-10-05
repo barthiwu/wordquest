@@ -3,7 +3,12 @@ import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import * as Crypto from 'expo-crypto';
 import type { SocialProvider } from '@/services/auth';
-import { googleClientIdForPlatform, googleIosRedirectUri } from './socialConfig';
+import {
+  facebookNativeAppId,
+  facebookNativeRedirectUri,
+  googleClientIdForPlatform,
+  googleIosRedirectUri,
+} from './socialConfig';
 
 // Lets the web popup/redirect hand its result back to the opener.
 WebBrowser.maybeCompleteAuthSession();
@@ -36,8 +41,8 @@ const GOOGLE_DISCOVERY: AuthSession.DiscoveryDocument = {
   tokenEndpoint: 'https://oauth2.googleapis.com/token',
 };
 const FACEBOOK_DISCOVERY: AuthSession.DiscoveryDocument = {
-  authorizationEndpoint: 'https://www.facebook.com/v19.0/dialog/oauth',
-  tokenEndpoint: 'https://graph.facebook.com/v19.0/oauth/access_token',
+  authorizationEndpoint: 'https://www.facebook.com/v25.0/dialog/oauth',
+  tokenEndpoint: 'https://graph.facebook.com/v25.0/oauth/access_token',
 };
 
 /** The `params` of a successful auth session; throws SocialCancelledError if the person backed out. */
@@ -123,13 +128,27 @@ export async function signInWithApple(): Promise<SocialCredential> {
   }
 }
 
+/**
+ * Whether Facebook can be offered on this device. Web always can; iOS only
+ * when this build registered the server's App ID as its "fb<id>" URL scheme
+ * (Facebook won't redirect back to an unregistered/custom scheme); Android
+ * isn't set up yet.
+ */
+export function isFacebookUsable(serverAppId: string): boolean {
+  if (Platform.OS === 'web') return true;
+  if (Platform.OS === 'ios') return facebookNativeAppId() === serverAppId;
+  return false;
+}
+
 export async function signInWithFacebook(appId: string): Promise<SocialCredential> {
   const request = new AuthSession.AuthRequest({
     clientId: appId,
-    redirectUri: AuthSession.makeRedirectUri(),
+    redirectUri:
+      Platform.OS === 'web' ? AuthSession.makeRedirectUri() : facebookNativeRedirectUri(appId),
     scopes: ['public_profile', 'email'],
     responseType: AuthSession.ResponseType.Token,
     usePKCE: false,
+    extraParams: { display: 'popup' },
   });
   const result = await request.promptAsync(FACEBOOK_DISCOVERY);
   const accessToken = successParams(result).access_token;
