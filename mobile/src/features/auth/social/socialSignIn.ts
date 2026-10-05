@@ -1,7 +1,5 @@
 import { Platform } from 'react-native';
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
-import * as Crypto from 'expo-crypto';
+import type * as AuthSessionTypes from 'expo-auth-session';
 import type { SocialProvider } from '@/services/auth';
 import {
   facebookNativeAppId,
@@ -10,8 +8,33 @@ import {
   googleIosRedirectUri,
 } from './socialConfig';
 
-// Lets the web popup/redirect hand its result back to the opener.
-WebBrowser.maybeCompleteAuthSession();
+// expo-auth-session / expo-web-browser / expo-crypto are loaded lazily, on
+// first use. They need native modules, and a dev-client or store build made
+// before they were added doesn't contain them: importing them at startup used
+// to take the whole app down to a blank screen. Now only the social buttons
+// are affected (they simply aren't offered / report "not available").
+async function loadAuthModules() {
+  try {
+    const [AuthSession, WebBrowser, Crypto] = await Promise.all([
+      import('expo-auth-session'),
+      import('expo-web-browser'),
+      import('expo-crypto'),
+    ]);
+    // Lets the web popup/redirect hand its result back to the opener.
+    WebBrowser.maybeCompleteAuthSession();
+    return { AuthSession, Crypto };
+  } catch {
+    throw new SocialUnavailableError('GOOGLE');
+  }
+}
+
+// On web the popup's redirect page must complete the session as soon as it
+// loads, before anyone taps a button.
+if (Platform.OS === 'web') {
+  import('expo-web-browser')
+    .then((WebBrowser) => WebBrowser.maybeCompleteAuthSession())
+    .catch(() => undefined);
+}
 
 /** What a provider handed back — sent verbatim to POST /auth/social. */
 export interface SocialCredential {
@@ -36,17 +59,17 @@ export class SocialUnavailableError extends Error {
   }
 }
 
-const GOOGLE_DISCOVERY: AuthSession.DiscoveryDocument = {
+const GOOGLE_DISCOVERY: AuthSessionTypes.DiscoveryDocument = {
   authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
   tokenEndpoint: 'https://oauth2.googleapis.com/token',
 };
-const FACEBOOK_DISCOVERY: AuthSession.DiscoveryDocument = {
+const FACEBOOK_DISCOVERY: AuthSessionTypes.DiscoveryDocument = {
   authorizationEndpoint: 'https://www.facebook.com/v25.0/dialog/oauth',
   tokenEndpoint: 'https://graph.facebook.com/v25.0/oauth/access_token',
 };
 
 /** The `params` of a successful auth session; throws SocialCancelledError if the person backed out. */
-function successParams(result: AuthSession.AuthSessionResult): Record<string, string> {
+function successParams(result: AuthSessionTypes.AuthSessionResult): Record<string, string> {
   if (result.type === 'success') return result.params;
   if (result.type === 'error') throw new Error(result.error?.message ?? 'Sign-in failed');
   throw new SocialCancelledError();
@@ -60,6 +83,7 @@ export function isGoogleConfigured(): boolean {
 export async function signInWithGoogle(): Promise<SocialCredential> {
   const clientId = googleClientIdForPlatform();
   if (!clientId) throw new SocialUnavailableError('GOOGLE');
+  const { AuthSession, Crypto } = await loadAuthModules();
 
   if (Platform.OS === 'web') {
     // Web clients can't do a secret-less code exchange, so use the implicit ID-token flow.
@@ -141,6 +165,7 @@ export function isFacebookUsable(serverAppId: string): boolean {
 }
 
 export async function signInWithFacebook(appId: string): Promise<SocialCredential> {
+  const { AuthSession } = await loadAuthModules();
   const request = new AuthSession.AuthRequest({
     clientId: appId,
     redirectUri:
