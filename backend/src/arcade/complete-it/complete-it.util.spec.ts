@@ -18,10 +18,10 @@ describe('blankSentence', () => {
     expect(result.sentenceWithBlank).toContain('_'.repeat('compassion'.length));
   });
 
-  it('only blanks the first whole-word occurrence, leaving a repeat untouched', () => {
+  it('blanks every whole-word occurrence, so a repeat cannot give the answer away', () => {
     const result = blankSentence('Run, just run, as fast as you can.', 'run');
     expect(result.found).toBe(true);
-    expect(result.sentenceWithBlank).toBe('___, just run, as fast as you can.');
+    expect(result.sentenceWithBlank).toBe('___, just ___, as fast as you can.');
   });
 
   it('does not match a substring inside a longer word', () => {

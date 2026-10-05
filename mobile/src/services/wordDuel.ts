@@ -148,3 +148,11 @@ export function revealWordDuelClue(
     accessToken,
   });
 }
+
+/** Cancels the opponent search: closes this player's WAITING match (no-op once it's ACTIVE). */
+export function leaveWordDuelQueue(accessToken: string, matchId: string): Promise<{ left: boolean }> {
+  return apiRequest<{ left: boolean }>(`/arcade/word-duel/${matchId}/leave`, {
+    method: 'POST',
+    accessToken,
+  });
+}

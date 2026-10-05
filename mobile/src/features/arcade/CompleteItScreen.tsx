@@ -93,6 +93,9 @@ export function CompleteItScreen({ navigation }: Props) {
   const [phase, setPhase] = useState<Phase>('loading');
   const [challenge, setChallenge] = useState<CompleteItChallenge | null>(null);
   const [answer, setAnswer] = useState('');
+  const answerRef = useRef('');
+  answerRef.current = answer;
+  const submitRef = useRef<(typed: string) => void>(() => undefined);
   const [feedback, setFeedback] = useState<CompleteItAnswerResult | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const autoSubmittedRef = useRef(false);
@@ -153,7 +156,9 @@ export function CompleteItScreen({ navigation }: Props) {
       }
       if (secondsLeft <= 0 && !autoSubmittedRef.current) {
         autoSubmittedRef.current = true;
-        handleSubmit(answer);
+        // Refs, not the values captured when this effect started: the timer
+        // used to auto-submit whatever was typed back then (usually '').
+        submitRef.current(answerRef.current);
       }
     };
     tick();
@@ -191,6 +196,9 @@ export function CompleteItScreen({ navigation }: Props) {
       });
       setPhase('error');
     }
+  };
+  submitRef.current = (typed: string) => {
+    void handleSubmit(typed);
   };
 
   const handleHint = async () => {

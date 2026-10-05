@@ -27,12 +27,14 @@ function escapeRegExp(value: string): string {
  * convention ScrambleQuest (wordLength) and Daily Quest (missingIndexes/
  * displayPattern) already use elsewhere in the app. */
 export function blankSentence(sentence: string, word: string): BlankedSentence {
-  const pattern = new RegExp(`\\b${escapeRegExp(word)}\\b`, 'i');
-  if (!pattern.test(sentence)) {
+  // Every occurrence is blanked ('g'): a sentence that repeats the word
+  // used to keep the second one visible, giving the answer away.
+  const source = `\\b${escapeRegExp(word)}\\b`;
+  if (!new RegExp(source, 'i').test(sentence)) {
     return { sentenceWithBlank: sentence, found: false };
   }
   const blank = '_'.repeat(word.length);
-  return { sentenceWithBlank: sentence.replace(pattern, blank), found: true };
+  return { sentenceWithBlank: sentence.replace(new RegExp(source, 'gi'), blank), found: true };
 }
 
 /**

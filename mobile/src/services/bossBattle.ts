@@ -103,7 +103,7 @@ export function joinBattle(accessToken: string): Promise<BattleChallengeView> {
  * key before, this just needs to be unique per attempt, not
  * cryptographically strong.
  */
-function generateIdempotencyKey(): string {
+export function generateIdempotencyKey(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 

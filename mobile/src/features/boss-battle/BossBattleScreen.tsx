@@ -21,6 +21,7 @@ import {
   getBattleLeaderboard,
   getUpcomingBattle,
   joinBattle,
+  generateIdempotencyKey,
   submitBattleAnswer,
   type BattleChallengeView,
   type UpcomingBattle,
@@ -83,6 +84,9 @@ export function BossBattleScreen({ navigation }: Props) {
   const [errorMessage, setErrorMessage] = useState(t('genericError'));
   const [upcoming, setUpcoming] = useState<UpcomingBattle | null>(null);
   const [challenge, setChallenge] = useState<BattleChallengeView | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
+  const answerKeyRef = useRef<string | null>(null);
   const [answer, setAnswer] = useState('');
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [aliBubble, setAliBubble] = useState<{
@@ -212,9 +216,16 @@ export function BossBattleScreen({ navigation }: Props) {
   };
 
   const onSubmit = async () => {
-    if (!accessToken || !answer.trim()) return;
+    // One answer in flight at a time (the button and Enter both land here),
+    // with ONE idempotency key per question, kept across retries, so a double
+    // tap can never be scored twice or spill onto the next word.
+    if (!accessToken || !answer.trim() || submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
+    if (!answerKeyRef.current) answerKeyRef.current = generateIdempotencyKey();
     try {
-      const result = await submitBattleAnswer(accessToken, answer.trim());
+      const result = await submitBattleAnswer(accessToken, answer.trim(), answerKeyRef.current);
+      answerKeyRef.current = null;
       setFeedback({
         isCorrect: result.isCorrect,
         correctAnswer: result.correctAnswer,
@@ -235,6 +246,9 @@ export function BossBattleScreen({ navigation }: Props) {
       setPhase(result.battleEnded ? 'ended' : 'feedback');
     } catch {
       setPhase('error');
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   };
 
@@ -409,9 +423,9 @@ export function BossBattleScreen({ navigation }: Props) {
                 onSubmitEditing={onSubmit}
               />
               <Pressable
-                style={[styles.button, !answer.trim() && styles.buttonDisabled]}
+                style={[styles.button, (!answer.trim() || submitting) && styles.buttonDisabled]}
                 onPress={onSubmit}
-                disabled={!answer.trim()}
+                disabled={!answer.trim() || submitting}
                 accessibilityRole="button"
                 accessibilityLabel={t('submit')}
               >

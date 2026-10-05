@@ -544,6 +544,24 @@ export class WordDuelService {
     return this.buildStateView(playerState.id);
   }
 
+  /**
+   * Cancelling the opponent search. Only a still-WAITING match the caller is
+   * in can be closed; once it's ACTIVE (someone joined) this does nothing,
+   * and the match plays out or times out as usual.
+   */
+  async leaveQueue(userId: string, matchId: string): Promise<{ left: boolean }> {
+    const playerState = await this.prisma.wordDuelPlayerState.findFirst({
+      where: { matchId, userId },
+      select: { id: true },
+    });
+    if (!playerState) throw new NotFoundException('Word Duel match not found');
+    const closed = await this.prisma.wordDuelMatch.updateMany({
+      where: { id: matchId, status: 'WAITING' },
+      data: { status: 'ABANDONED' },
+    });
+    return { left: closed.count > 0 };
+  }
+
   private isStaleWaitingMatch(createdAt: Date): boolean {
     const cutoffMs = Date.now() - WORD_DUEL_CONFIG.MATCHMAKING_TIMEOUT_SECONDS * 1000;
     return createdAt.getTime() < cutoffMs;
@@ -561,6 +579,13 @@ export class WordDuelService {
     const match = await this.prisma.wordDuelMatch.findUniqueOrThrow({ where: { id: matchId } });
     if (match.status !== 'ACTIVE') {
       throw new BadRequestException('This Word Duel match is not active');
+    }
+    // The clock is the server's: an answer or clue arriving after endsAt is
+    // refused, even if the match hasn't been finalized by a poll yet (it used
+    // to be scored and could change the winner).
+    if (match.endsAt && match.endsAt.getTime() <= Date.now()) {
+      await this.finalizeIfNeeded(matchId);
+      throw new BadRequestException('Time is up for this Word Duel match');
     }
     if (playerState.currentIndex >= match.wordIds.length) {
       throw new BadRequestException('You have already answered every word in this match');

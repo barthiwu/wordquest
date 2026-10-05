@@ -89,6 +89,9 @@ export function ScrambleQuestScreen({ navigation }: Props) {
   const [phase, setPhase] = useState<Phase>('loading');
   const [challenge, setChallenge] = useState<ScrambleQuestChallenge | null>(null);
   const [answer, setAnswer] = useState('');
+  const answerRef = useRef('');
+  answerRef.current = answer;
+  const submitRef = useRef<(typed: string) => void>(() => undefined);
   const [feedback, setFeedback] = useState<ScrambleQuestAnswerResult | null>(null);
   const [showMeaning, setShowMeaning] = useState(false);
   const [showSynonyms, setShowSynonyms] = useState(false);
@@ -161,7 +164,9 @@ export function ScrambleQuestScreen({ navigation }: Props) {
       }
       if (secondsLeft <= 0 && !autoSubmittedRef.current) {
         autoSubmittedRef.current = true;
-        handleSubmit(answer);
+        // Refs, not the values captured when this effect started: the timer
+        // used to auto-submit whatever was typed back then (usually '').
+        submitRef.current(answerRef.current);
       }
     };
     tick();
@@ -203,6 +208,9 @@ export function ScrambleQuestScreen({ navigation }: Props) {
       });
       setPhase('error');
     }
+  };
+  submitRef.current = (typed: string) => {
+    void handleSubmit(typed);
   };
 
   const handleHint = async () => {

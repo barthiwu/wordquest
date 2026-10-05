@@ -9,6 +9,7 @@ import { useThemeColors } from '@/state/themeStore';
 import {
   getWordDuelState,
   joinWordDuelQueue,
+  leaveWordDuelQueue,
   revealWordDuelClue,
   submitWordDuelAnswer,
   type WordDuelStateView,
@@ -305,12 +306,29 @@ export function WordDuelScreen({ navigation }: Props) {
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         // Lost the race — another tap already revealed this clue.
+      } else if (err instanceof ApiError && err.status === 400) {
+        // The match ended as the clue was tapped: show the real state
+        // (usually the results), not a dead error screen.
+        try {
+          applyState(await getWordDuelState(accessToken, state.matchId));
+        } catch {
+          setPhase('error');
+        }
       } else {
         setPhase('error');
       }
     } finally {
       setRevealingClue(false);
     }
+  };
+
+  // Leaving the search closes the waiting match on the server, so the next
+  // player isn't paired with an empty seat for five minutes.
+  const onCancelSearch = () => {
+    if (accessToken && state?.matchId) {
+      leaveWordDuelQueue(accessToken, state.matchId).catch(() => undefined);
+    }
+    navigation.goBack();
   };
 
   if (phase === 'loading') {
@@ -338,7 +356,7 @@ export function WordDuelScreen({ navigation }: Props) {
           subtitle={t('waitingSubtitle')}
           wordTipLabel={t('wordTipLabel')}
           cancelLabel={t('cancelSearch')}
-          onCancel={() => navigation.goBack()}
+          onCancel={onCancelSearch}
         />
       );
     }
@@ -349,7 +367,7 @@ export function WordDuelScreen({ navigation }: Props) {
         subtitle={t('waitingSubtitle')}
         wordTipLabel={t('wordTipLabel')}
         cancelLabel={t('cancelSearch')}
-        onCancel={() => navigation.goBack()}
+        onCancel={onCancelSearch}
       />
     );
   }
@@ -687,7 +705,7 @@ export function WordDuelScreen({ navigation }: Props) {
               onChangeText={setAnswer}
               length={state.current.displayHint.split(' ').length}
               colors={colors}
-              editable={!submitting}
+              editable={!submitting && remainingSeconds > 0}
               accessibilityLabel={t('yourAnswerLabel')}
               onSubmitEditing={handleSubmit}
             />
@@ -698,9 +716,12 @@ export function WordDuelScreen({ navigation }: Props) {
                 own guard is just `!answer.trim() || submitting`, no clue
                 gate). */}
             <Pressable
-              style={[styles.button, (!answer.trim() || submitting) && styles.buttonDisabled]}
+              style={[
+                styles.button,
+                (!answer.trim() || submitting || remainingSeconds <= 0) && styles.buttonDisabled,
+              ]}
               onPress={handleSubmit}
-              disabled={!answer.trim() || submitting}
+              disabled={!answer.trim() || submitting || remainingSeconds <= 0}
               accessibilityRole="button"
               accessibilityLabel={t('lockInButton')}
             >

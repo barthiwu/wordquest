@@ -53,6 +53,13 @@ export class WordDuelController {
     return this.wordDuel.submitAnswer(userId, matchId, dto.answer);
   }
 
+  /** Leaving the opponent search: closes this player's WAITING match so nobody gets paired with an empty seat. */
+  @Post(':matchId/leave')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  leaveQueue(@CurrentUserId() userId: string, @Param('matchId') matchId: string) {
+    return this.wordDuel.leaveQueue(userId, matchId);
+  }
+
   @Post(':matchId/clue')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   requestClue(@CurrentUserId() userId: string, @Param('matchId') matchId: string) {

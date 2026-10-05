@@ -885,8 +885,9 @@ describe('WordDuelService', () => {
       expect(progressionMock.awardXp).not.toHaveBeenCalled();
     });
 
-    it('completes the match once the deadline passes, crediting daily activity for both players', async () => {
-      seedActiveMatch({ wordIds: ['w1'], endsAt: new Date(Date.now() - 1_000) });
+    it('completes the match once both players are done, crediting daily activity for both players', async () => {
+      seedActiveMatch({ wordIds: ['w1'], endsAt: new Date(Date.now() + 60_000) });
+      store.playerStates.get('ps2')!.currentIndex = 1; // opponent already done: u1's answer ends it
       rewardEngineMock.calculate.mockReturnValue({
         baseXp: 30,
         speedModifier: 1,
@@ -915,7 +916,8 @@ describe('WordDuelService', () => {
     });
 
     it('reads back a STREAK_MILESTONE and any deferred reactions once the match completes (task #99 follow-up)', async () => {
-      seedActiveMatch({ wordIds: ['w1'], endsAt: new Date(Date.now() - 1_000) });
+      seedActiveMatch({ wordIds: ['w1'], endsAt: new Date(Date.now() + 60_000) });
+      store.playerStates.get('ps2')!.currentIndex = 1; // opponent already done: u1's answer ends it
       rewardEngineMock.calculate.mockReturnValue({
         baseXp: 30,
         speedModifier: 1,
@@ -971,7 +973,7 @@ describe('WordDuelService', () => {
     });
 
     it('breaks a tie in correctCount by whoever reached their final total earliest', async () => {
-      seedActiveMatch({ wordIds: ['w1'], endsAt: new Date(Date.now() - 1_000) });
+      seedActiveMatch({ wordIds: ['w1'], endsAt: new Date(Date.now() + 60_000) });
       const earlier = new Date(Date.now() - 30_000);
       store.playerStates.get('ps2')!.currentIndex = 1;
       store.playerStates.get('ps2')!.correctCount = 1;
@@ -1007,6 +1009,16 @@ describe('WordDuelService', () => {
       const match = store.matches.get('m1')!;
       expect(match.tieBreakReason).toBe(WORD_DUEL_TIEBREAK_DESCRIPTION);
       expect(match.winnerId).toBe('u2'); // reached their final total earlier
+    });
+
+    it('refuses an answer that arrives after the deadline, and finalizes the match without scoring it', async () => {
+      seedActiveMatch({ wordIds: ['w1'], endsAt: new Date(Date.now() - 1_000) });
+
+      await expect(service.submitAnswer('u1', 'm1', 'train')).rejects.toThrow('Time is up');
+
+      expect(store.matches.get('m1')?.status).toBe('COMPLETED');
+      expect(store.playerStates.get('ps1')!.correctCount).toBe(0);
+      expect(rewardEngineMock.calculate).not.toHaveBeenCalled();
     });
   });
 
