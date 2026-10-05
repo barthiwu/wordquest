@@ -662,6 +662,25 @@ export class ProgressionService {
   }
 
   /**
+   * The streak as the player should see it right now. The stored
+   * currentStreak only changes when they next play, so after missing days
+   * it kept showing the old number; a streak whose last active day is
+   * before yesterday (player-local) is really 0.
+   */
+  async effectiveCurrentStreak(userId: string, db: Db = this.prisma): Promise<number> {
+    const progression = await db.userProgression.findUniqueOrThrow({ where: { userId } });
+    if (!progression.lastActiveOn || progression.currentStreak === 0) return 0;
+    const user = db.user
+      ? await db.user.findUnique({ where: { id: userId }, select: { timezone: true } })
+      : null;
+    const tz = user?.timezone ?? null;
+    const today = this.localDateIdentity(playerLocalDate(tz, new Date()));
+    const lastActive = this.localDateIdentity(playerLocalDate(tz, progression.lastActiveOn));
+    const daysSince = Math.round((today.getTime() - lastActive.getTime()) / 86_400_000);
+    return daysSince > 1 ? 0 : progression.currentStreak;
+  }
+
+  /**
    * Boxes a "YYYY-MM-DD" local-date string as a UTC-midnight Date purely
    * as a comparable/diffable identity — never a real instant, never
    * written back to the database. Both sides of every comparison in this

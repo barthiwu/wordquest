@@ -101,9 +101,9 @@ export class FriendsService {
   async searchByUsername(viewerId: string, username: string): Promise<FriendPublicView | null> {
     const target = await this.prisma.user.findUnique({
       where: { username },
-      select: { id: true, username: true, avatarKey: true },
+      select: { id: true, username: true, avatarKey: true, status: true },
     });
-    if (!target || target.id === viewerId) return null;
+    if (!target || target.id === viewerId || target.status === 'DELETED') return null;
     if (await this.isBlockedEitherWay(viewerId, target.id)) return null;
     return this.toPublicView(target);
   }
@@ -168,9 +168,11 @@ export class FriendsService {
   ): Promise<FriendRequestView | { accepted: true }> {
     const target = await this.prisma.user.findUnique({
       where: { username },
-      select: { id: true, username: true, avatarKey: true },
+      select: { id: true, username: true, avatarKey: true, status: true },
     });
-    if (!target) throw new NotFoundException('No player with that username.');
+    if (!target || target.status === 'DELETED') {
+      throw new NotFoundException('No player with that username.');
+    }
     if (target.id === requesterId) {
       throw new BadRequestException('You cannot add yourself as a friend.');
     }
@@ -306,11 +308,24 @@ export class FriendsService {
         username: true,
         avatarKey: true,
         createdAt: true,
+        status: true,
         clan: { select: { name: true } },
         progression: { select: { level: true, currentStreak: true } },
       },
     });
-    if (!target) throw new NotFoundException('Player not found.');
+    if (!target || target.status === 'DELETED') throw new NotFoundException('Player not found.');
+    // Someone who blocked the viewer looks exactly like a player that
+    // doesn't exist (same as search). Showing them as "Blocked" told the
+    // viewer they'd been blocked and offered an Unblock that did nothing.
+    if (
+      target.id !== viewerId &&
+      (await this.prisma.block.findFirst({
+        where: { blockerId: target.id, blockedId: viewerId },
+        select: { id: true },
+      }))
+    ) {
+      throw new NotFoundException('Player not found.');
+    }
 
     const relationship = await this.relationshipWith(viewerId, target.id);
 
@@ -331,7 +346,13 @@ export class FriendsService {
     targetUserId: string,
   ): Promise<FriendRelationship> {
     if (viewerId === targetUserId) return 'SELF';
-    if (await this.isBlockedEitherWay(viewerId, targetUserId)) return 'BLOCKED';
+    // Only the viewer's own block shows as BLOCKED (they can lift it);
+    // being blocked by the target never reaches here (getProfile 404s).
+    const viewerBlocked = await this.prisma.block.findFirst({
+      where: { blockerId: viewerId, blockedId: targetUserId },
+      select: { id: true },
+    });
+    if (viewerBlocked) return 'BLOCKED';
 
     const friendship = await this.prisma.friendship.findFirst({
       where: {

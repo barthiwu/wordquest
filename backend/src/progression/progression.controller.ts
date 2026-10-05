@@ -21,13 +21,16 @@ export class ProgressionController {
   @Get('me')
   async me(@CurrentUserId() userId: string) {
     const progression = await this.prisma.userProgression.findUniqueOrThrow({ where: { userId } });
-    const playedToday = await this.progression.hasRecordedActivityToday(userId);
+    const [playedToday, currentStreak] = await Promise.all([
+      this.progression.hasRecordedActivityToday(userId),
+      this.progression.effectiveCurrentStreak(userId),
+    ]);
     return {
       level: progression.level,
       totalXp: progression.totalXp,
       glyphBalance: progression.glyphBalance,
       journeyStage: progression.journeyStage,
-      currentStreak: progression.currentStreak,
+      currentStreak,
       longestStreak: progression.longestStreak,
       // Whether recordDailyActivity has already fired for today's local
       // date -- Daily Quest completion OR any completed Arcade session

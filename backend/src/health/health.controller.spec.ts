@@ -25,10 +25,11 @@ describe('HealthController', () => {
     expect(result.service).toBe('wordquest-backend');
   });
 
-  it('reports degraded when the database check fails', async () => {
+  it('answers 503 (degraded, database down) when the database check fails', async () => {
     prismaMock.$queryRaw.mockRejectedValueOnce(new Error('connection refused'));
-    const result = await controller.check();
-    expect(result.status).toBe('degraded');
-    expect(result.database).toBe('down');
+    await expect(controller.check()).rejects.toMatchObject({
+      status: 503,
+      response: expect.objectContaining({ status: 'degraded', database: 'down' }),
+    });
   });
 });

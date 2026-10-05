@@ -1039,7 +1039,10 @@ export class BossBattleService {
         where: { id: group.id },
         data: { status: 'COMPLETED' },
       });
-    });
+      // Up to ~15 queries per player for a 20-player group: Prisma's 5s
+      // default could time out on a slow database, roll back, and leave the
+      // group stuck in FINALIZING with rewards never landing.
+    }, { timeout: 60_000, maxWait: 10_000 });
   }
 
   private normalize(value: string): string {

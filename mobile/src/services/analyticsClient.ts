@@ -165,8 +165,18 @@ export async function flushAnalyticsQueue(): Promise<void> {
       .getState()
       .removeByClientEventIds(batch.map((event) => event.clientEventId));
     succeeded = true;
-  } catch {
-    // Left queued — see the doc comment above. Deliberately NOT
+  } catch (error) {
+    // A 4xx means the server will never accept this batch (an event name it
+    // no longer knows, a bad field): drop it, or it blocks every later event
+    // forever. 401 is the exception (a session refresh will fix it).
+    // (Duck-typed, not instanceof ApiError: apiClient imports this module.)
+    const status = (error as { status?: unknown } | null)?.status;
+    if (typeof status === 'number' && status >= 400 && status < 500 && status !== 401 && status !== 429) {
+      useAnalyticsQueueStore
+        .getState()
+        .removeByClientEventIds(batch.map((event) => event.clientEventId));
+    }
+    // Otherwise left queued — see the doc comment above. Deliberately NOT
     // rescheduled below: retrying every few seconds while offline would
     // burn battery/requests for nothing. The next natural trigger
     // (another trackEvent, app foreground, reconnect) tries again.

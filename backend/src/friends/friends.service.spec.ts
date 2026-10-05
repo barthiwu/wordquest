@@ -300,7 +300,7 @@ describe('FriendsService', () => {
       expect(prismaMock.friendship.findFirst).not.toHaveBeenCalled();
     });
 
-    it('reports BLOCKED when either side has blocked the other', async () => {
+    it("reports BLOCKED when the viewer blocked them (so they can lift it)", async () => {
       prismaMock.user.findUnique.mockResolvedValueOnce({
         id: 'u2',
         username: 'bo',
@@ -309,12 +309,41 @@ describe('FriendsService', () => {
         clan: null,
         progression: null,
       });
-      prismaMock.block.findFirst.mockResolvedValueOnce({ id: 'block-1' });
+      prismaMock.block.findFirst
+        .mockResolvedValueOnce(null) // the target did not block the viewer
+        .mockResolvedValueOnce({ id: 'block-1' }); // the viewer blocked the target
 
       const result = await service.getProfile('u1', 'u2');
 
       expect(result.relationship).toBe('BLOCKED');
       expect(prismaMock.friendship.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('treats a player who blocked the viewer as not found (no "you were blocked" leak)', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({
+        id: 'u2',
+        username: 'bo',
+        avatarKey: null,
+        createdAt: new Date('2026-01-01T00:00:00Z'),
+        clan: null,
+        progression: null,
+      });
+      prismaMock.block.findFirst.mockResolvedValueOnce({ id: 'block-by-target' });
+
+      await expect(service.getProfile('u1', 'u2')).rejects.toThrow('Player not found.');
+    });
+
+    it('hides deleted accounts', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({
+        id: 'u2',
+        username: 'bo',
+        avatarKey: null,
+        status: 'DELETED',
+        createdAt: new Date('2026-01-01T00:00:00Z'),
+        clan: null,
+        progression: null,
+      });
+      await expect(service.getProfile('u1', 'u2')).rejects.toThrow('Player not found.');
     });
 
     it('reports REQUEST_SENT vs REQUEST_RECEIVED depending on who initiated', async () => {

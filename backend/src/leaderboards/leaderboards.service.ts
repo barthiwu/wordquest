@@ -70,6 +70,13 @@ const MAX_LIMIT = 100;
  * methods below were never removed, so this restore is UI-only on the
  * mobile side; see LeaderboardScreen.
  */
+/**
+ * Who may appear on a leaderboard: deleted accounts never do (their
+ * usernames, clans and activity used to stay listed). Suspended players
+ * stay ranked, matching how their progress is kept.
+ */
+const LISTED_PLAYER = { status: { not: 'DELETED' as const } };
+
 @Injectable()
 export class LeaderboardsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -78,6 +85,7 @@ export class LeaderboardsService {
     const clampedLimit = this.clampLimit(limit);
 
     const rows = await this.prisma.userProgression.findMany({
+      where: { user: LISTED_PLAYER },
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       take: clampedLimit,
       include: {
@@ -104,7 +112,7 @@ export class LeaderboardsService {
     }
 
     const rows = await this.prisma.userProgression.findMany({
-      where: { user: { clanId: viewer.clanId } },
+      where: { user: { clanId: viewer.clanId, ...LISTED_PLAYER } },
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       include: {
         user: {
@@ -143,7 +151,7 @@ export class LeaderboardsService {
     }
 
     const rows = await this.prisma.userProgression.findMany({
-      where: { user: { countryCode: viewer.countryCode } },
+      where: { user: { countryCode: viewer.countryCode, ...LISTED_PLAYER } },
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       include: {
         user: {
@@ -180,7 +188,7 @@ export class LeaderboardsService {
     }
 
     const rows = await this.prisma.userProgression.findMany({
-      where: { user: { countryCode: { in: countryCodesForContinent(continent) } } },
+      where: { user: { countryCode: { in: countryCodesForContinent(continent) }, ...LISTED_PLAYER } },
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       include: {
         user: {
@@ -231,7 +239,7 @@ export class LeaderboardsService {
    */
   async getRankForXp(totalXp: number): Promise<number> {
     const aheadCount = await this.prisma.userProgression.count({
-      where: { totalXp: { gt: totalXp } },
+      where: { totalXp: { gt: totalXp }, user: LISTED_PLAYER },
     });
     return aheadCount + 1;
   }
@@ -254,7 +262,7 @@ export class LeaderboardsService {
     const memberIds = [userId, ...friendIds];
 
     const rows = await this.prisma.userProgression.findMany({
-      where: { userId: { in: memberIds } },
+      where: { userId: { in: memberIds }, OR: [{ userId }, { user: LISTED_PLAYER }] },
       orderBy: [{ totalXp: 'desc' }, { userId: 'asc' }],
       include: {
         user: {
@@ -299,13 +307,16 @@ export class LeaderboardsService {
         username: true,
         clan: { select: { name: true } },
         countryCode: true,
+        status: true,
         progression: { select: { lastActiveOn: true } },
       },
     });
     const userById = new Map(users.map((u) => [u.id, u]));
 
-    const entries: LeaderboardEntry[] = grouped.map(
-      (g: { userId: string; _sum: { rewardXp: number | null } }, index: number) => {
+    const entries: LeaderboardEntry[] = grouped
+      // groupBy can't filter on the user relation: drop deleted accounts here.
+      .filter((g: { userId: string }) => userById.get(g.userId)?.status !== 'DELETED')
+      .map((g: { userId: string; _sum: { rewardXp: number | null } }, index: number) => {
         const user = userById.get(g.userId);
         return {
           rank: index + 1,
@@ -317,8 +328,7 @@ export class LeaderboardsService {
           totalXp: g._sum.rewardXp ?? 0,
           lastActiveOn: user?.progression?.lastActiveOn ?? null,
         };
-      },
-    );
+      });
 
     const viewer = await this.getBossBattleViewerEntry(userId);
     return { entries, viewer };

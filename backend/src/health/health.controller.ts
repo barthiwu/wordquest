@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
@@ -20,7 +20,7 @@ export class HealthController {
       database = 'down';
     }
 
-    return {
+    const body = {
       status: database === 'up' ? 'ok' : 'degraded',
       service: 'wordquest-backend',
       database,
@@ -28,5 +28,9 @@ export class HealthController {
       checkedInMs: Date.now() - startedAt,
       timestamp: new Date().toISOString(),
     };
+    // 503 when the database is unreachable, so a deploy's health check
+    // fails a build that can't reach it instead of passing it.
+    if (database === 'down') throw new HttpException(body, HttpStatus.SERVICE_UNAVAILABLE);
+    return body;
   }
 }
