@@ -44,7 +44,7 @@ export function LegalDocScreen({ title, lastUpdated, intro, sections, onBack }: 
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <BackButton onPress={onBack} />
+      <BackButton onPress={onBack} fallbackHome={false} />
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.lastUpdated}>{t('lastUpdated', { date: lastUpdated })}</Text>
       <Text style={styles.paragraph}>{intro}</Text>

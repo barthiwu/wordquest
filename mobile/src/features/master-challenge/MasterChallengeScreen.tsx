@@ -124,7 +124,10 @@ export function MasterChallengeScreen({ navigation }: Props) {
       trackEvent('MASTER_CHALLENGE_COMPLETED');
       setResult(r);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : t('submitError'));
+      // Only the player-fixable rule messages (400, e.g. word count) are shown
+      // as-is; anything else (AI not configured, server errors) gets the
+      // friendly generic line instead of raw server text.
+      setError(err instanceof ApiError && err.status === 400 ? err.message : t('submitError'));
       trackEvent('GAMEPLAY_ERROR', {
         step: 'masterChallengeSubmit',
         status: err instanceof ApiError ? err.status : undefined,

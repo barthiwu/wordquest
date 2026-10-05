@@ -277,10 +277,14 @@ export function ProtoHomeScreen({ navigation }: Props) {
         variant="forest"
         height={heroHeight}
         message={
-          <View>
+          <Pressable
+            onPress={() => navigation.navigate('Ali')}
+            accessibilityRole="button"
+            accessibilityLabel={t('home:openAli')}
+          >
             <Text style={styles.bubbleTitle}>{greeting}</Text>
             <Text style={styles.bubbleSub}>{aliLine}</Text>
-          </View>
+          </Pressable>
         }
         expression={wordsRemaining === 0 ? 'PROUD' : 'PLEASED'}
         pose="PERCHED"
@@ -298,6 +302,22 @@ export function ProtoHomeScreen({ navigation }: Props) {
         {!wide ? <View style={{ marginTop: -28 }}>{questCard}</View> : null}
         {progression ? <StreakMilestoneRibbon currentStreak={progression.currentStreak} /> : null}
         <VerificationBanner onPress={() => navigation.navigate('Settings')} />
+        {data.masterChallenge?.status === 'AVAILABLE' ? (
+          <Pressable
+            onPress={() => navigation.navigate('MasterChallenge')}
+            accessibilityRole="button"
+            accessibilityLabel={t('home:masterChallengeCta')}
+          >
+            <Panel style={[styles.masterCard, { borderColor: colors.glyph }]}>
+              <Ionicons name="trophy" size={24} color={colors.glyph} />
+              <View style={styles.flex1}>
+                <Text style={[styles.masterTitle, { color: colors.ink }]}>{t('home:masterChallengeTitle')}</Text>
+                <Text style={{ color: colors.inkMuted, fontSize: 13 }}>{t('home:masterChallengeSub')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.glyph} />
+            </Panel>
+          </Pressable>
+        ) : null}
         {data.failed ? <Text style={{ color: colors.danger }}>{t('home:errorGeneric')}</Text> : null}
         {!progression && !data.failed ? <ActivityIndicator color={colors.arcaneSoft} /> : null}
 
@@ -331,6 +351,8 @@ const styles = StyleSheet.create({
   row: { gap: 14 },
   rowWide: { flexDirection: 'row' },
   flex1: { flex: 1 },
+  masterCard: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5 },
+  masterTitle: { fontSize: 16, fontWeight: '800' },
   flex2: { flex: 2 },
   goalRow: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 12 },
   goalCell: { alignItems: 'center', gap: 6, flex: 1 },

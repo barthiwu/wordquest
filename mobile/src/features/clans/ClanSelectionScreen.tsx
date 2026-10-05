@@ -19,7 +19,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ClanSelection'>;
  * GET /api/v1/clans (seeded via prisma/seed.ts) and persists the choice
  * via PATCH /users/me — this is real selection, not a local-only UI state.
  */
-export function ClanSelectionScreen({ navigation }: Props) {
+export function ClanSelectionScreen({ navigation, route }: Props) {
+  const fromHome = route.params?.fromHome === true;
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -34,7 +35,7 @@ export function ClanSelectionScreen({ navigation }: Props) {
   const reachedNextRef = useRef(false);
   useEffect(() => {
     return () => {
-      if (!reachedNextRef.current) trackEvent('ONBOARDING_ABANDONED', { step: 'clan' });
+      if (!reachedNextRef.current && !fromHome) trackEvent('ONBOARDING_ABANDONED', { step: 'clan' });
     };
   }, []);
 
@@ -55,7 +56,12 @@ export function ClanSelectionScreen({ navigation }: Props) {
     try {
       await updateMe(accessToken, { clanId: selectedId });
       reachedNextRef.current = true;
-      navigation.replace('AppIntro');
+      // From Home: just go back. Only onboarding continues to the app intro
+      // (it used to replay onboarding and stack a second Home).
+      if (fromHome) navigation.goBack();
+      else navigation.replace('AppIntro');
+    } catch {
+      setError(t('saveError'));
     } finally {
       setConfirming(false);
     }
@@ -63,7 +69,8 @@ export function ClanSelectionScreen({ navigation }: Props) {
 
   const onSkip = () => {
     reachedNextRef.current = true;
-    navigation.replace('AppIntro');
+    if (fromHome) navigation.goBack();
+    else navigation.replace('AppIntro');
   };
 
   return (

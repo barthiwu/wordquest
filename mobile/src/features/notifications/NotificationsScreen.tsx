@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useLinkTo } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -42,6 +42,7 @@ const PREFERENCE_TOGGLES: { key: keyof NotificationPreferences; labelKey: string
  * separate preferences screen would just be an extra tap for no benefit.
  */
 export function NotificationsScreen({ navigation }: Props) {
+  const linkTo = useLinkTo();
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -163,6 +164,21 @@ export function NotificationsScreen({ navigation }: Props) {
 
   const unreadCount = notifications.filter((n) => !n.readAt).length;
 
+
+  // A notification's own link (e.g. wordquest://play, wordquest://daily-quest/...)
+  // opens its screen, resolved through the same linking config a tapped push
+  // uses. Older reminders were sent with "wordquest://quest", which has no
+  // screen; those open Play.
+  const openDeepLink = (deepLink: string | null) => {
+    if (!deepLink) return;
+    const path = deepLink.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '').replace(/^\/+/, '');
+    if (!path) return;
+    try {
+      linkTo(`/${path === 'quest' ? 'play' : path}`);
+    } catch {
+      // An unknown link just leaves the player on this list.
+    }
+  };
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <BackButton onPress={() => navigation.goBack()} />
@@ -189,7 +205,10 @@ export function NotificationsScreen({ navigation }: Props) {
         <Pressable
           key={n.id}
           style={[styles.card, !n.readAt && styles.cardUnread]}
-          onPress={() => onMarkRead(n.id)}
+          onPress={() => {
+            onMarkRead(n.id);
+            openDeepLink(n.deepLink);
+          }}
           accessibilityRole="button"
           accessibilityLabel={n.title}
           accessibilityHint={n.readAt ? undefined : t('markAsReadHint')}

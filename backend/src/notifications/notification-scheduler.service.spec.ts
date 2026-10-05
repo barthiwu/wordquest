@@ -122,7 +122,7 @@ describe('NotificationSchedulerService', () => {
         'REVIEW_REMINDER',
         expect.any(String),
         expect.stringContaining('3 words'),
-        { deepLink: 'wordquest://quest' },
+        { deepLink: 'wordquest://play' },
       );
     });
 
@@ -291,7 +291,7 @@ describe('NotificationSchedulerService', () => {
         'FORGETTING_CURVE_REMINDER',
         expect.any(String),
         "You're forgetting 'ephemeral' — quick review?",
-        { data: { wordsNeedingReview: ['ephemeral'] }, deepLink: 'wordquest://quest' },
+        { data: { wordsNeedingReview: ['ephemeral'] }, deepLink: 'wordquest://play' },
       );
     });
 
@@ -428,7 +428,7 @@ describe('NotificationSchedulerService', () => {
         'STREAK_AT_RISK',
         expect.any(String),
         expect.stringContaining('4-day streak'),
-        { data: { localHour: 18, currentStreak: 4 }, deepLink: 'wordquest://quest' },
+        { data: { localHour: 18, currentStreak: 4 }, deepLink: 'wordquest://play' },
       );
     });
 
@@ -448,7 +448,7 @@ describe('NotificationSchedulerService', () => {
           'STREAK_AT_RISK',
           expect.any(String),
           expect.stringContaining('2-day streak'),
-          { data: { localHour: hour, currentStreak: 2 }, deepLink: 'wordquest://quest' },
+          { data: { localHour: hour, currentStreak: 2 }, deepLink: 'wordquest://play' },
         );
         notificationsMock.notifyFireAndForget.mockClear();
       }
@@ -492,7 +492,7 @@ describe('NotificationSchedulerService', () => {
         'STREAK_AT_RISK',
         expect.any(String),
         expect.not.stringContaining('day streak'),
-        { data: { localHour: 18, currentStreak: 0 }, deepLink: 'wordquest://quest' },
+        { data: { localHour: 18, currentStreak: 0 }, deepLink: 'wordquest://play' },
       );
     });
 
@@ -513,7 +513,7 @@ describe('NotificationSchedulerService', () => {
         'STREAK_AT_RISK',
         expect.any(String),
         expect.any(String),
-        { data: { localHour: 18, currentStreak: 1 }, deepLink: 'wordquest://quest' },
+        { data: { localHour: 18, currentStreak: 1 }, deepLink: 'wordquest://play' },
       );
     });
 

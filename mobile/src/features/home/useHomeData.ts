@@ -10,6 +10,7 @@ import {
   type LeaderboardEntry,
 } from '@/services/leaderboards';
 import { listMyWordMastery, type WordMasteryListItem } from '@/services/users';
+import { getMasterChallengeStatus, type MasterChallengeStatus } from '@/services/masterChallenge';
 import { useAuthStore } from '@/state/authStore';
 
 export interface HomeData {
@@ -21,6 +22,8 @@ export interface HomeData {
   friendRankViewer: LeaderboardEntry | null;
   friendCount: number | null;
   wordMastery: WordMasteryListItem[] | null;
+  /** Today's Master Challenge state; Home shows its entry card when AVAILABLE. */
+  masterChallenge: MasterChallengeStatus | null;
   /** True when the one page-level fetch (progression) failed. */
   failed: boolean;
 }
@@ -42,6 +45,7 @@ export function useHomeData(): HomeData {
   const [friendRankViewer, setFriendRankViewer] = useState<LeaderboardEntry | null>(null);
   const [friendCount, setFriendCount] = useState<number | null>(null);
   const [wordMastery, setWordMastery] = useState<WordMasteryListItem[] | null>(null);
+  const [masterChallenge, setMasterChallenge] = useState<MasterChallengeStatus | null>(null);
   const [failed, setFailed] = useState(false);
 
   const load = useCallback(() => {
@@ -67,6 +71,7 @@ export function useHomeData(): HomeData {
       })
       .catch(() => {});
     listMyWordMastery(accessToken).then(setWordMastery).catch(() => {});
+    getMasterChallengeStatus(accessToken).then(setMasterChallenge).catch(() => {});
   }, [accessToken]);
 
   useEffect(load, [load]);
@@ -81,6 +86,7 @@ export function useHomeData(): HomeData {
     friendRankViewer,
     friendCount,
     wordMastery,
+    masterChallenge,
     failed,
   };
 }

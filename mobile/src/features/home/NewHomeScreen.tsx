@@ -158,7 +158,7 @@ export function NewHomeScreen({ navigation }: Props) {
           colors={colors}
           viewer={data.clanViewer}
           onPress={() =>
-            data.clanViewer?.clanName ? goCompete() : navigation.navigate('ClanSelection')
+            data.clanViewer?.clanName ? goCompete() : navigation.navigate('ClanSelection', { fromHome: true })
           }
         />
       </View>
@@ -274,12 +274,34 @@ export function NewHomeScreen({ navigation }: Props) {
         {data.failed && <Text style={styles.error}>{t('errorGeneric')}</Text>}
 
         {/* 2. ALI contextual greeting (text only; ALI reactions stay in AliService) */}
-        <View style={styles.aliRow} accessibilityRole="text">
+        <Pressable
+          style={styles.aliRow}
+          onPress={() => navigation.navigate('Ali')}
+          accessibilityRole="button"
+          accessibilityLabel={t('openAli')}
+        >
           <View style={styles.aliBadge}>
             <AliMark size={18} />
           </View>
           <Text style={styles.aliText}>{aliLine}</Text>
-        </View>
+          <Ionicons name="chevron-forward" size={16} color={colors.inkMuted} />
+        </Pressable>
+
+        {data.masterChallenge?.status === 'AVAILABLE' && (
+          <Pressable
+            style={styles.masterCard}
+            onPress={() => navigation.navigate('MasterChallenge')}
+            accessibilityRole="button"
+            accessibilityLabel={t('masterChallengeCta')}
+          >
+            <Ionicons name="trophy" size={22} color={colors.glyph} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.masterTitle}>{t('masterChallengeTitle')}</Text>
+              <Text style={styles.heroSub}>{t('masterChallengeSub')}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.glyph} />
+          </Pressable>
+        )}
 
         {/* 3 + 4. Hero and Daily Goals — side by side from tablet up */}
         <View style={[styles.heroRow, wide && styles.heroRowWide]}>
@@ -368,6 +390,17 @@ function createStyles(colors: ThemeColors, topInset: number) {
     aliText: { flex: 1, color: colors.ink, fontSize: typography.scale.sm, fontWeight: '600' },
     heroRow: { gap: spacing.lg },
     heroRowWide: { flexDirection: 'row', alignItems: 'stretch' },
+    masterCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+      padding: spacing.md,
+      borderRadius: radius.lg,
+      borderWidth: 1.5,
+      borderColor: colors.glyph,
+      backgroundColor: colors.surfaceRaised,
+    },
+    masterTitle: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '800' },
     heroCol: { flex: 3 },
     goalsCol: { flex: 2 },
     hero: {

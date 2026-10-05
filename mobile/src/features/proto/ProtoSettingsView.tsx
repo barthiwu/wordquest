@@ -46,7 +46,7 @@ export function ProtoSettingsView({ title, profile, groups, logout, onBack }: Pr
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={[styles.scroll, wide && styles.scrollWide]} showsVerticalScrollIndicator={false}>
-      <BackButton onPress={onBack} />
+      <BackButton onPress={onBack} fallbackHome={false} />
       <Text style={[styles.title, { color: colors.ink }]}>{title}</Text>
 
       <Pressable onPress={profile.onPress} accessibilityRole="button" accessibilityLabel={profile.label}>

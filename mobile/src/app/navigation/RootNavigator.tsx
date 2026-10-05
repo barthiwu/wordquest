@@ -89,7 +89,8 @@ export type RootStackParamList = {
   ResetPassword: { token?: string } | undefined;
   Biodata: undefined;
   OnboardingGoal: undefined;
-  ClanSelection: undefined;
+  /** fromHome: joining a clan later from Home, not during onboarding (returns to Home after). */
+  ClanSelection: { fromHome?: boolean } | undefined;
   AppIntro: undefined;
   Main: NavigatorScreenParams<MainTabParamList> | undefined;
   DailyQuest: { questKey: string };

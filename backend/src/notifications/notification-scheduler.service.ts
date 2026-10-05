@@ -142,7 +142,7 @@ export class NotificationSchedulerService {
           'REVIEW_REMINDER',
           'Words are ready for review',
           `${dueCount} word${dueCount === 1 ? '' : 's'} could use a review today.`,
-          { deepLink: 'wordquest://quest' },
+          { deepLink: 'wordquest://play' },
         );
       }
     } catch (err) {
@@ -291,7 +291,7 @@ export class NotificationSchedulerService {
           'FORGETTING_CURVE_REMINDER',
           'Slipping away?',
           reminder.text,
-          { data: { wordsNeedingReview }, deepLink: 'wordquest://quest' },
+          { data: { wordsNeedingReview }, deepLink: 'wordquest://play' },
         );
       }
     } catch (err) {
@@ -409,7 +409,7 @@ export class NotificationSchedulerService {
         const { title, body } = this.streakAtRiskCopy(localHour, progression.currentStreak);
         this.notifications.notifyFireAndForget(user.id, 'STREAK_AT_RISK', title, body, {
           data: { localHour, currentStreak: progression.currentStreak },
-          deepLink: 'wordquest://quest',
+          deepLink: 'wordquest://play',
         });
       }
     } catch (err) {
