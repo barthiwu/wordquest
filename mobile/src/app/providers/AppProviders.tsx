@@ -11,6 +11,11 @@ import { flushAnalyticsQueue, trackEvent } from '@/services/analyticsClient';
 import { useFeedbackPromptStore } from '@/state/feedbackPromptStore';
 import { DEFAULT_LANGUAGE_CODE } from '@/constants/languages';
 import i18n, { initI18n } from '@/i18n';
+import { wakeBackend } from '@/services/apiClient';
+import { installStaleBundleRecovery } from '@/utils/staleBundle';
+
+/** Away longer than this, and returning to the app pings the backend awake. */
+const WAKE_AFTER_IDLE_MS = 5 * 60 * 1000;
 
 // Boots i18next once, at module load, with the default language --
 // synchronous and side-effect-free from the component's point of view,
@@ -101,6 +106,25 @@ export function AppProviders({ children }: PropsWithChildren) {
     });
     return () => subscription.remove();
   }, [hydrateAnalyticsQueue]);
+
+  // Coming back after a long time away (a phone tab left open for days, the
+  // app in the background overnight): the backend may be asleep or have
+  // redeployed. Start waking it at once, so the first real request finds it
+  // up; apiClient also retries safe requests while it boots. On web, a tab
+  // older than the latest deploy reloads itself when it hits missing code.
+  useEffect(() => installStaleBundleRecovery(), []);
+  useEffect(() => {
+    let hiddenAt: number | null = null;
+    const subscription = AppState.addEventListener('change', (state: AppStateStatus) => {
+      if (state !== 'active') {
+        if (hiddenAt === null) hiddenAt = Date.now();
+        return;
+      }
+      if (hiddenAt !== null && Date.now() - hiddenAt > WAKE_AFTER_IDLE_MS) wakeBackend();
+      hiddenAt = null;
+    });
+    return () => subscription.remove();
+  }, []);
 
   // Session events (Telemetry spec §7). APP_OPENED + SESSION_STARTED
   // fire exactly once per app process, right alongside the analyticsClient

@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import type * as AuthSessionTypes from 'expo-auth-session';
 import type { SocialProvider } from '@/services/auth';
+import { reloadIfStaleBundle } from '@/utils/staleBundle';
 import {
   facebookNativeAppId,
   facebookNativeRedirectUri,
@@ -23,7 +24,9 @@ async function loadAuthModules() {
     // Lets the web popup/redirect hand its result back to the opener.
     WebBrowser.maybeCompleteAuthSession();
     return { AuthSession, Crypto };
-  } catch {
+  } catch (error) {
+    // A web tab older than the latest deploy can't fetch these files; reload it.
+    reloadIfStaleBundle(error);
     throw new SocialUnavailableError('GOOGLE');
   }
 }

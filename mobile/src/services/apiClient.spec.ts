@@ -1,4 +1,5 @@
 import { apiRequest, ApiError } from './apiClient';
+import { useTokenStore } from '@/state/tokenStore';
 import { env } from '@/app/config/env';
 
 function mockFetchResponse(options: {
@@ -150,5 +151,75 @@ describe('apiRequest', () => {
     );
 
     await expect(apiRequest('/api/v1/quests/missing')).rejects.toBeInstanceOf(ApiError);
+  });
+});
+
+describe('apiRequest resilience (backend asleep / redeploying)', () => {
+  beforeEach(() => {
+    global.fetch = jest.fn();
+    // Skip the real back-off waits.
+    jest.spyOn(global, 'setTimeout').mockImplementation(((fn: () => void) => {
+      fn();
+      return 0;
+    }) as unknown as typeof setTimeout);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+  });
+
+  it('retries a GET through transient 503s and returns the eventual success', async () => {
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce(mockFetchResponse({ ok: false, status: 503 }))
+      .mockResolvedValueOnce(mockFetchResponse({ ok: false, status: 504 }))
+      .mockResolvedValueOnce(mockFetchResponse({ ok: true, json: { id: 'me' } }));
+
+    await expect(apiRequest('/users/me')).resolves.toEqual({ id: 'me' });
+    expect(global.fetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('retries a GET after a network failure', async () => {
+    (global.fetch as jest.Mock)
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockResolvedValueOnce(mockFetchResponse({ ok: true, json: { ok: true } }));
+
+    await expect(apiRequest('/users/me')).resolves.toEqual({ ok: true });
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('never repeats a POST on a transient error', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce(
+      mockFetchResponse({ ok: false, status: 503 }),
+    );
+
+    await expect(apiRequest('/quests/answer', { method: 'POST', body: {} })).rejects.toBeInstanceOf(
+      ApiError,
+    );
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the session when the token refresh fails because the server is down', async () => {
+    useTokenStore.setState({ accessToken: 'old', refreshToken: 'rt' });
+    const clear = jest.spyOn(useTokenStore.getState(), 'clearTokens');
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce(mockFetchResponse({ ok: false, status: 401 }))
+      .mockResolvedValue(mockFetchResponse({ ok: false, status: 503 }));
+
+    await expect(apiRequest('/users/me', { accessToken: 'old' })).rejects.toMatchObject({
+      status: 503,
+    });
+    expect(clear).not.toHaveBeenCalled();
+  });
+
+  it('signs out only when the server rejects the refresh token', async () => {
+    useTokenStore.setState({ accessToken: 'old', refreshToken: 'rt' });
+    const clear = jest.spyOn(useTokenStore.getState(), 'clearTokens').mockResolvedValue(undefined);
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce(mockFetchResponse({ ok: false, status: 401 }))
+      .mockResolvedValueOnce(mockFetchResponse({ ok: false, status: 401 }));
+
+    await expect(apiRequest('/users/me', { accessToken: 'old' })).rejects.toBeInstanceOf(ApiError);
+    expect(clear).toHaveBeenCalled();
   });
 });

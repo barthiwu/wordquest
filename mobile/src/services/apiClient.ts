@@ -35,19 +35,70 @@ interface RequestOptions {
   headers?: Record<string, string>;
 }
 
-let refreshPromise: Promise<string | null> | null = null;
+/**
+ * Statuses that mean "the server isn't answering right now", not "your
+ * request was wrong": the hosting proxy returns these while the backend is
+ * restarting, redeploying or waking from sleep. A tab left open for hours
+ * and resumed lands exactly there.
+ */
+const TRANSIENT_STATUSES = new Set([502, 503, 504]);
+/** Back-off between attempts, ~10s in all: long enough for a cold backend. */
+const RETRY_DELAYS_MS = [1000, 3000, 6000];
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-async function refreshAccessToken(): Promise<string | null> {
+/**
+ * Runs `send`, retrying network failures and transient 5xx responses when
+ * `retry` is set. Only requests that are safe to repeat (GETs, the token
+ * refresh) retry; a quest answer or purchase is never sent twice from here.
+ */
+async function fetchWithRetry(send: () => Promise<Response>, retry: boolean): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    const last = !retry || attempt >= RETRY_DELAYS_MS.length;
+    try {
+      const response = await send();
+      if (last || !TRANSIENT_STATUSES.has(response.status)) return response;
+    } catch (error) {
+      if (last) throw error;
+    }
+    await sleep(RETRY_DELAYS_MS[attempt]);
+  }
+}
+
+/** Fire-and-forget ping that starts waking a sleeping backend before the screen asks it for data. */
+export function wakeBackend(): void {
+  fetch(`${env.apiUrl}/health`).catch(() => undefined);
+}
+
+/**
+ * accessToken = the new token; rejected = the server refused the refresh
+ * token (sign in again). Neither = the server couldn't be reached, so the
+ * session must be KEPT: logging someone out because the backend was asleep
+ * is what made long-idle tabs come back signed out.
+ */
+interface RefreshOutcome {
+  accessToken: string | null;
+  rejected: boolean;
+}
+
+let refreshPromise: Promise<RefreshOutcome> | null = null;
+
+async function refreshAccessToken(): Promise<RefreshOutcome> {
   const { refreshToken } = useTokenStore.getState();
-  if (!refreshToken) return null;
+  if (!refreshToken) return { accessToken: null, rejected: true };
 
   try {
-    const response = await fetch(`${env.apiUrl}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
-    if (!response.ok) return null;
+    const response = await fetchWithRetry(
+      () =>
+        fetch(`${env.apiUrl}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        }),
+      true,
+    );
+    if (!response.ok) {
+      return { accessToken: null, rejected: [400, 401, 403].includes(response.status) };
+    }
 
     const result = await response.json();
     // Only accessToken/refreshToken -- /auth/refresh never returns `user`
@@ -56,9 +107,9 @@ async function refreshAccessToken(): Promise<string | null> {
     // silent refresh rotates the tokens without clobbering the cached
     // user profile with an undefined one.
     await useTokenStore.getState().setTokens(result.accessToken, result.refreshToken);
-    return result.accessToken as string;
+    return { accessToken: result.accessToken as string, rejected: false };
   } catch {
-    return null;
+    return { accessToken: null, rejected: false };
   }
 }
 
@@ -76,7 +127,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       body: body ? JSON.stringify(body) : undefined,
     });
 
-  let response = await doFetch(accessToken);
+  const retry = method === 'GET';
+  let response = await fetchWithRetry(() => doFetch(accessToken), retry);
 
   if (response.status === 401 && accessToken && path !== '/auth/refresh') {
     if (!refreshPromise) {
@@ -84,12 +136,15 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
         refreshPromise = null;
       });
     }
-    const newAccessToken = await refreshPromise;
+    const outcome = await refreshPromise;
 
-    if (newAccessToken) {
-      response = await doFetch(newAccessToken);
-    } else {
+    if (outcome.accessToken) {
+      const token = outcome.accessToken;
+      response = await fetchWithRetry(() => doFetch(token), retry);
+    } else if (outcome.rejected) {
       await useTokenStore.getState().clearTokens();
+    } else {
+      throw new ApiError('WordQuest is reconnecting. Please try again in a moment.', 503);
     }
   }
 
