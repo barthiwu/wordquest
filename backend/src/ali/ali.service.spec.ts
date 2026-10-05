@@ -23,6 +23,7 @@ describe('AliService', () => {
     aliMessage: {
       create: jest.fn().mockResolvedValue({}),
       findMany: jest.fn(),
+      count: jest.fn().mockResolvedValue(0),
     },
     userProgression: {
       findUnique: jest.fn(),
@@ -411,6 +412,16 @@ describe('AliService', () => {
       expect(prismaMock.aliMessage.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: { userId: 'u1' }, orderBy: { createdAt: 'desc' } }),
       );
+    });
+  });
+  describe('on-demand daily cap', () => {
+    it('refuses with 429 once the player has used the daily allowance, without calling the AI', async () => {
+      prismaMock.aliMessage.count.mockResolvedValueOnce(40);
+      await expect(
+        service.suggestVocabularyAlternatives('u1', { word: 'x' }),
+      ).rejects.toMatchObject({
+        status: 429,
+      });
     });
   });
 });

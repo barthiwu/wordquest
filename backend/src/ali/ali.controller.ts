@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AliService } from './ali.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user.decorator';
@@ -19,14 +20,20 @@ export class AliController {
 
   @Get('me')
   getMyMessages(@CurrentUserId() userId: string, @Query('limit') limit?: string) {
-    return this.ali.getMyMessages(userId, limit ? Number(limit) : undefined);
+    // Clamp to 1-50: a junk value used to give NaN (a 500) and a huge one the whole history.
+    const parsed = Number.parseInt(limit ?? '', 10);
+    const safe = Number.isFinite(parsed) ? Math.min(Math.max(parsed, 1), 50) : undefined;
+    return this.ali.getMyMessages(userId, safe);
   }
 
+  // Each of these three is a paid AI call: 10 a minute per player, plus a daily cap in AliService.
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Post('explain-mistake')
   explainMistake(@CurrentUserId() userId: string, @Body() dto: ExplainMistakeDto) {
     return this.ali.explainMistake(userId, dto);
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Post('vocabulary-alternatives')
   suggestVocabularyAlternatives(
     @CurrentUserId() userId: string,
@@ -35,6 +42,7 @@ export class AliController {
     return this.ali.suggestVocabularyAlternatives(userId, dto);
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Post('writing-feedback')
   reviewWriting(@CurrentUserId() userId: string, @Body() dto: WritingFeedbackDto) {
     return this.ali.reviewWriting(userId, dto);

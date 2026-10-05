@@ -93,6 +93,14 @@ export class MasterChallengeService {
     localDate: string,
     paragraph: string,
   ): Promise<MasterChallengeResult> {
+    // Same bounds as the Daily Quest paragraph, plus room for three words.
+    // Checked before anything else: a one-word or giant entry used to go
+    // straight to the paid AI judge.
+    const wordCount = paragraph.trim() ? paragraph.trim().split(/\s+/).length : 0;
+    if (wordCount < 30 || wordCount > 150) {
+      throw new BadRequestException(`Your paragraph must be 30-150 words (got ${wordCount}).`);
+    }
+
     const status = await this.getStatus(userId, localDate);
     if (!status.eligible) {
       throw new BadRequestException(

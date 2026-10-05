@@ -1,4 +1,4 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { PrismaService } from '../prisma/prisma.service';
 import { AppConfigService } from '../config/config.service';
@@ -119,6 +119,9 @@ const PROMPT_VERSION = 'v2';
  * versioning requirement only means anything if there's a durable
  * record to version.
  */
+/** Most on-demand ALI tutor answers (explain / alternatives / writing feedback) one player gets per day. */
+export const ON_DEMAND_DAILY_CAP = 40;
+
 @Injectable()
 export class AliService {
   private client: Anthropic | null = null;
@@ -209,6 +212,7 @@ export class AliService {
       stage: 'GUESS' | 'SENTENCE' | 'PARAGRAPH';
     },
   ): Promise<AliResponse> {
+    await this.assertOnDemandAllowance(userId);
     return this.reactWithPlayerContext(userId, 'MISTAKE_EXPLANATION', params);
   }
 
@@ -217,12 +221,36 @@ export class AliService {
     userId: string,
     params: { word: string },
   ): Promise<AliResponse> {
+    await this.assertOnDemandAllowance(userId);
     return this.reactWithPlayerContext(userId, 'VOCABULARY_ALTERNATIVES', params);
   }
 
   /** AI Tutor (spec §4.2): concise feedback on a piece of player-submitted writing, on demand. */
   async reviewWriting(userId: string, params: { text: string }): Promise<AliResponse> {
+    await this.assertOnDemandAllowance(userId);
     return this.reactWithPlayerContext(userId, 'WRITING_FEEDBACK', params);
+  }
+
+  /**
+   * Daily cap on the on-demand tutor calls (each one is a paid AI request).
+   * Counted from the AliMessage rows those calls already write, per UTC day.
+   */
+  private async assertOnDemandAllowance(userId: string): Promise<void> {
+    const startOfDayUtc = new Date();
+    startOfDayUtc.setUTCHours(0, 0, 0, 0);
+    const usedToday = await this.prisma.aliMessage.count({
+      where: {
+        userId,
+        eventType: { in: ['MISTAKE_EXPLANATION', 'VOCABULARY_ALTERNATIVES', 'WRITING_FEEDBACK'] },
+        createdAt: { gte: startOfDayUtc },
+      },
+    });
+    if (usedToday >= ON_DEMAND_DAILY_CAP) {
+      throw new HttpException(
+        `ALI has answered ${ON_DEMAND_DAILY_CAP} questions for you today. Ask again tomorrow.`,
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
   }
 
   /**

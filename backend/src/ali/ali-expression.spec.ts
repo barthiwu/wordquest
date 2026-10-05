@@ -145,7 +145,9 @@ describe('aliExpressionForEvent', () => {
       expect(aliExpressionForEvent('MASTERY_EVENT', { firstAttempt: false }).sequence).toBe(
         'MASTERY_AFTER_STRUGGLE',
       );
-      expect(aliExpressionForEvent('BOSS_BATTLE_RESULT', { rank: 1 }).sequence).toBe('BOSS_VICTORY');
+      expect(aliExpressionForEvent('BOSS_BATTLE_RESULT', { rank: 1 }).sequence).toBe(
+        'BOSS_VICTORY',
+      );
       expect(aliExpressionForEvent('BOSS_BATTLE_RESULT', { rank: 4 }).sequence).toBe('BOSS_DEFEAT');
     });
 

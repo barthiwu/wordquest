@@ -6,6 +6,8 @@ import { ProgressionService } from '../progression/progression.service';
 import { MasterChallengeEvaluationService } from './master-challenge-evaluation.service';
 import { AliService } from '../ali/ali.service';
 
+const LONG_PARAGRAPH = Array.from({ length: 40 }, (_, i) => `word${i}`).join(' ');
+
 describe('MasterChallengeService', () => {
   let service: MasterChallengeService;
 
@@ -160,7 +162,7 @@ describe('MasterChallengeService', () => {
       prismaMock.quest.count.mockResolvedValueOnce(3);
       prismaMock.dailyMasterChallenge.findUnique.mockResolvedValueOnce(null);
 
-      await expect(service.submit('u1', '2026-08-14', 'paragraph')).rejects.toThrow(
+      await expect(service.submit('u1', '2026-08-14', LONG_PARAGRAPH)).rejects.toThrow(
         BadRequestException,
       );
       expect(evaluationMock.evaluate).not.toHaveBeenCalled();
@@ -182,7 +184,7 @@ describe('MasterChallengeService', () => {
         status: 'COMPLETED',
       });
 
-      await expect(service.submit('u1', '2026-08-14', 'paragraph')).rejects.toThrow(
+      await expect(service.submit('u1', '2026-08-14', LONG_PARAGRAPH)).rejects.toThrow(
         BadRequestException,
       );
       expect(evaluationMock.evaluate).not.toHaveBeenCalled();
@@ -204,17 +206,13 @@ describe('MasterChallengeService', () => {
       prismaMock.word.findMany.mockResolvedValueOnce(words);
       evaluationMock.evaluate.mockResolvedValueOnce(evaluation);
 
-      await service.submit('u1', '2026-08-14', 'A paragraph using all three words.');
+      await service.submit('u1', '2026-08-14', LONG_PARAGRAPH);
 
       expect(prismaMock.word.findMany).toHaveBeenCalledWith({
         where: { id: { in: threeWordIds } },
         select: { word: true, definition: true },
       });
-      expect(evaluationMock.evaluate).toHaveBeenCalledWith(
-        words,
-        'A paragraph using all three words.',
-        null,
-      );
+      expect(evaluationMock.evaluate).toHaveBeenCalledWith(words, LONG_PARAGRAPH, null);
     });
 
     it("passes the player's native language through to the evaluator", async () => {
@@ -234,13 +232,9 @@ describe('MasterChallengeService', () => {
       prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'hi' });
       evaluationMock.evaluate.mockResolvedValueOnce(evaluation);
 
-      await service.submit('u1', '2026-08-14', 'A paragraph using all three words.');
+      await service.submit('u1', '2026-08-14', LONG_PARAGRAPH);
 
-      expect(evaluationMock.evaluate).toHaveBeenCalledWith(
-        words,
-        'A paragraph using all three words.',
-        'hi',
-      );
+      expect(evaluationMock.evaluate).toHaveBeenCalledWith(words, LONG_PARAGRAPH, 'hi');
     });
 
     it('awards XP via ProgressionService with a MASTER_CHALLENGE reason, separate from any quest', async () => {
@@ -259,7 +253,7 @@ describe('MasterChallengeService', () => {
       prismaMock.word.findMany.mockResolvedValueOnce(words);
       evaluationMock.evaluate.mockResolvedValueOnce(evaluation);
 
-      await service.submit('u1', '2026-08-14', 'paragraph');
+      await service.submit('u1', '2026-08-14', LONG_PARAGRAPH);
 
       expect(progressionMock.awardXp).toHaveBeenCalledWith(
         'u1',
@@ -288,13 +282,13 @@ describe('MasterChallengeService', () => {
       prismaMock.word.findMany.mockResolvedValueOnce(words);
       evaluationMock.evaluate.mockResolvedValueOnce(evaluation);
 
-      await service.submit('u1', '2026-08-14', 'paragraph text');
+      await service.submit('u1', '2026-08-14', LONG_PARAGRAPH);
 
       expect(prismaMock.dailyMasterChallenge.updateMany).toHaveBeenCalledWith({
         where: { id: 'mc1', status: { not: 'COMPLETED' } },
         data: {
           status: 'COMPLETED',
-          paragraphText: 'paragraph text',
+          paragraphText: LONG_PARAGRAPH,
           scores: evaluation.scores,
           xpAwarded: 200,
           completedAt: expect.any(Date),
@@ -319,7 +313,7 @@ describe('MasterChallengeService', () => {
       evaluationMock.evaluate.mockResolvedValueOnce(evaluation);
       prismaMock.dailyMasterChallenge.updateMany.mockResolvedValueOnce({ count: 0 });
 
-      await expect(service.submit('u1', '2026-08-14', 'paragraph text')).rejects.toThrow(
+      await expect(service.submit('u1', '2026-08-14', LONG_PARAGRAPH)).rejects.toThrow(
         "Today's Master Challenge has already been completed.",
       );
 
@@ -342,7 +336,7 @@ describe('MasterChallengeService', () => {
       prismaMock.word.findMany.mockResolvedValueOnce(words);
       evaluationMock.evaluate.mockResolvedValueOnce(evaluation);
 
-      const result = await service.submit('u1', '2026-08-14', 'paragraph');
+      const result = await service.submit('u1', '2026-08-14', LONG_PARAGRAPH);
 
       expect(result).toEqual({
         scores: evaluation.scores,
@@ -405,7 +399,7 @@ describe('MasterChallengeService', () => {
         durationMs: 3000,
       });
 
-      const result = await service.submit('u1', '2026-08-14', 'paragraph');
+      const result = await service.submit('u1', '2026-08-14', LONG_PARAGRAPH);
 
       expect(result.deferredAliReactions).toEqual([
         {
@@ -418,6 +412,11 @@ describe('MasterChallengeService', () => {
           durationMs: 3000,
         },
       ]);
+    });
+  });
+  describe('paragraph bounds', () => {
+    it('rejects a paragraph under 30 words before any lookups or AI call', async () => {
+      await expect(service.submit('u1', '2026-08-14', 'too short')).rejects.toThrow(/30-150 words/);
     });
   });
 });
