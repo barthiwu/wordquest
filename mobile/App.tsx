@@ -1,3 +1,4 @@
+import '@/app/webRuntime';
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { AppProviders } from '@/app/providers/AppProviders';
