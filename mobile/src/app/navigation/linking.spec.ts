@@ -112,6 +112,32 @@ describe('linking (web subpath)', () => {
       expect(linking.getStateFromPath!('/wordquest/', linking.config)).toBeUndefined();
     });
 
+    it('keeps the baseUrl on the path React Navigation remembers, so the address bar is not rewritten without it', () => {
+      const linking = requireWebLinking('/wordquest');
+      const state = linking.getStateFromPath!('/wordquest/data-deletion', linking.config);
+      expect(state?.routes).toEqual([
+        expect.objectContaining({ name: 'DataDeletion', path: '/wordquest/data-deletion' }),
+      ]);
+    });
+
+    it('re-prefixes nested routes too (a restored tab such as /wordquest/home)', () => {
+      const linking = requireWebLinking('/wordquest');
+      const state = linking.getStateFromPath!('/wordquest/home', linking.config);
+      const main = state?.routes.at(0);
+      expect(main?.name).toBe('Main');
+      expect(main?.state?.routes.at(0)).toEqual(
+        expect.objectContaining({ name: 'Home', path: '/wordquest/home' }),
+      );
+    });
+
+    it('treats a trailing slash (GitHub Pages adds one) like the plain path', () => {
+      const linking = requireWebLinking('/wordquest');
+      const state = linking.getStateFromPath!('/wordquest/data-deletion/', linking.config);
+      expect(state?.routes).toEqual([
+        expect.objectContaining({ name: 'DataDeletion', path: '/wordquest/data-deletion' }),
+      ]);
+    });
+
     it('leaves getStateFromPath unset when there is no configured baseUrl (local web dev)', () => {
       const linking = requireWebLinking('');
 

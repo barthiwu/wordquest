@@ -135,13 +135,48 @@ export const linking: LinkingOptions<RootStackParamList> = {
         // silently falls back to Splash -> Welcome/Main, discarding
         // whatever the link pointed at.
         getStateFromPath: (path, options) => {
-          const strippedPath = path.startsWith(webBaseUrl)
-            ? path.slice(webBaseUrl.length) || '/'
-            : path;
-          return getStateFromPathDefault(strippedPath, options);
+          const state = getStateFromPathDefault(stripWebBase(path, webBaseUrl), options);
+          return state ? withWebBase(state, webBaseUrl) : state;
         },
         getPathFromState: (state, options) =>
           `${webBaseUrl}${getPathFromStateDefault(state, options)}`,
       }
     : {}),
 };
+
+/**
+ * The incoming web path, made matchable: the GitHub Pages subpath
+ * ("/wordquest") removed, and a trailing slash removed too. GitHub Pages
+ * answers "/wordquest/data-deletion" with a redirect to
+ * "/wordquest/data-deletion/", and that trailing slash used to resolve to a
+ * blank screen.
+ */
+export function stripWebBase(path: string, base: string): string {
+  const withoutBase = base && path.startsWith(base) ? path.slice(base.length) : path;
+  const queryAt = withoutBase.indexOf('?');
+  const pathname = queryAt === -1 ? withoutBase : withoutBase.slice(0, queryAt);
+  const query = queryAt === -1 ? '' : withoutBase.slice(queryAt);
+  const trimmed = pathname.replace(/\/+$/, '');
+  return `${trimmed || '/'}${query}`;
+}
+
+type ResolvedState = NonNullable<ReturnType<typeof getStateFromPathDefault>>;
+
+/**
+ * React Navigation remembers the path each route was matched from (`route.path`)
+ * and, on first render, writes that path straight back to the address bar.
+ * The path it matched is the stripped one, so without this the bar lost
+ * "/wordquest" (e.g. "/wordquest/home" became "/home"), and the next reload,
+ * such as a phone restoring a tab after hours away, hit GitHub's 404.
+ */
+export function withWebBase<S extends ResolvedState>(state: S, base: string): S {
+  if (!base) return state;
+  return {
+    ...state,
+    routes: state.routes.map((route) => ({
+      ...route,
+      ...(route.path ? { path: `${base}${route.path.startsWith('/') ? '' : '/'}${route.path}` } : {}),
+      ...(route.state ? { state: withWebBase(route.state as ResolvedState, base) } : {}),
+    })),
+  } as S;
+}
