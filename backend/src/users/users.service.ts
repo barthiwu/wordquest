@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  PayloadTooLargeException,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -11,7 +12,12 @@ import * as bcrypt from 'bcryptjs';
 import { isValidTimezone } from '../common/timezone';
 import { getAgeRange } from '../common/age';
 import { gameplayRules } from '../config/gameplay-rules';
-import { ObjectStorageService, type UploadContentType } from '../storage/object-storage.service';
+import {
+  MAX_UPLOAD_BYTES,
+  ObjectStorageService,
+  UPLOAD_TOO_LARGE_MESSAGE,
+  type UploadContentType,
+} from '../storage/object-storage.service';
 
 const PASSWORD_SALT_ROUNDS = 12;
 
@@ -162,6 +168,15 @@ export class UsersService {
   async confirmAvatar(userId: string, key: string) {
     if (!key.startsWith(`avatars/${userId}/`)) {
       throw new ForbiddenException('That upload key does not belong to you');
+    }
+    if (this.storage.isStorageConfigured()) {
+      // The presigned upload can't cap the size, so check what actually landed.
+      const size = await this.storage.getObjectSize(key);
+      if (size === null) throw new BadRequestException('Upload not found. Please try again.');
+      if (size > MAX_UPLOAD_BYTES) {
+        await this.storage.delete(key).catch(() => undefined);
+        throw new PayloadTooLargeException(UPLOAD_TOO_LARGE_MESSAGE);
+      }
     }
 
     const existing = await this.prisma.user.findUnique({

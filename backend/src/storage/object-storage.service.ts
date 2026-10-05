@@ -1,7 +1,8 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, PayloadTooLargeException, ServiceUnavailableException } from '@nestjs/common';
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -11,6 +12,14 @@ import { AppConfigService } from '../config/config.service';
 
 const UPLOAD_URL_EXPIRY_SECONDS = 5 * 60; // 5 minutes to actually perform the PUT
 const DOWNLOAD_URL_EXPIRY_SECONDS = 60 * 60; // long enough to view, short enough not to be a permanent public link
+
+/**
+ * Largest photo we accept (avatars and Word in the Wild evidence). Kept
+ * under Anthropic's 5 MB per-image limit so evidence photos can always be
+ * judged; the app shrinks photos before upload, so real ones sit far below.
+ */
+export const MAX_UPLOAD_BYTES = 4.5 * 1024 * 1024;
+export const UPLOAD_TOO_LARGE_MESSAGE = 'That photo is too large. Please use one under 4.5 MB.';
 
 export type UploadContentType = 'image/jpeg' | 'image/png';
 
@@ -82,17 +91,38 @@ export class ObjectStorageService {
    * URL Claude would have to fetch itself. Distinct from
    * getDownloadUrl(), which is for the mobile app to display the photo.
    */
-  async getObjectBytes(key: string): Promise<Buffer> {
+  async getObjectBytes(key: string, maxBytes = MAX_UPLOAD_BYTES): Promise<Buffer> {
     const client = this.getClient();
     const response = await client.send(
       new GetObjectCommand({ Bucket: this.config.storageBucket, Key: key }),
     );
+    // The presigned PUT can't cap the size, so the cap is enforced here,
+    // before (and while) the bytes are read into memory.
+    if (typeof response.ContentLength === 'number' && response.ContentLength > maxBytes) {
+      throw new PayloadTooLargeException(UPLOAD_TOO_LARGE_MESSAGE);
+    }
     const stream = response.Body as unknown as AsyncIterable<Uint8Array>;
     const chunks: Uint8Array[] = [];
+    let total = 0;
     for await (const chunk of stream) {
+      total += chunk.length;
+      if (total > maxBytes) throw new PayloadTooLargeException(UPLOAD_TOO_LARGE_MESSAGE);
       chunks.push(chunk);
     }
     return Buffer.concat(chunks);
+  }
+
+  /** Size of a stored object in bytes, or null when it doesn't exist. */
+  async getObjectSize(key: string): Promise<number | null> {
+    const client = this.getClient();
+    try {
+      const head = await client.send(
+        new HeadObjectCommand({ Bucket: this.config.storageBucket, Key: key }),
+      );
+      return head.ContentLength ?? 0;
+    } catch {
+      return null;
+    }
   }
 
   async delete(key: string): Promise<void> {

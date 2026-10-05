@@ -76,6 +76,12 @@ interface SubmissionRow {
  * player otherwise knows well shouldn't cost them anything; it just
  * doesn't earn the reward this time.
  */
+/** Matches only evidence keys issued to this player by createPhotoUploadTarget. */
+const ownEvidenceKey = (userId: string) =>
+  new RegExp(
+    `^word-in-the-wild/${userId.replace(/[^A-Za-z0-9-]/g, '')}/[0-9a-f-]{36}\\.(jpg|png)$`,
+  );
+
 @Injectable()
 export class WordInTheWildService {
   constructor(
@@ -150,11 +156,14 @@ export class WordInTheWildService {
       );
     }
 
-    const result = await this.assessment.assess({
-      targetWord: mission.word.word,
-      definition: mission.word.definition,
-      textEvidence: text,
-    });
+    await this.claimMission(userId, mission.id);
+    const result = await this.releaseOnFailure(mission.id, () =>
+      this.assessment.assess({
+        targetWord: mission.word.word,
+        definition: mission.word.definition,
+        textEvidence: text,
+      }),
+    );
 
     return this.finalizeSubmission(
       userId,
@@ -170,20 +179,28 @@ export class WordInTheWildService {
     missionId: string,
     photoKey: string,
   ): Promise<SubmissionView> {
+    // The key must be one this player was issued (word-in-the-wild/<their id>/<uuid>.jpg|png).
+    // Without this check a player could point a submission at someone else's
+    // object, e.g. an avatar, and then have it judged and deleted.
+    if (!ownEvidenceKey(userId).test(photoKey)) {
+      throw new ForbiddenException('That upload key does not belong to you');
+    }
     const mission = await this.loadOpenMission(userId, missionId);
     await this.checkDailyCap(userId);
     if (!this.storage.isStorageConfigured() || !this.assessment.isConfigured()) {
       throw new ServiceUnavailableException('Photo evidence is not available yet.');
     }
 
+    await this.claimMission(userId, mission.id);
     const contentType = photoKey.endsWith('.png') ? 'image/png' : 'image/jpeg';
-    const bytes = await this.storage.getObjectBytes(photoKey);
-
-    const result = await this.assessment.assess({
-      targetWord: mission.word.word,
-      definition: mission.word.definition,
-      photoBytes: bytes,
-      photoContentType: contentType,
+    const result = await this.releaseOnFailure(mission.id, async () => {
+      const bytes = await this.storage.getObjectBytes(photoKey);
+      return this.assessment.assess({
+        targetWord: mission.word.word,
+        definition: mission.word.definition,
+        photoBytes: bytes,
+        photoContentType: contentType,
+      });
     });
 
     return this.finalizeSubmission(
@@ -253,6 +270,58 @@ export class WordInTheWildService {
         `Daily Word in the Wild limit reached (${gameplayRules.wordInTheWild.dailySubmissionCap}/day). Try again tomorrow.`,
       );
     }
+  }
+
+  /**
+   * Takes the mission (OPEN -> SUBMITTED) before the paid AI call, so two
+   * parallel submits can't both be judged and paid. Then re-checks the daily
+   * cap counting missions claimed but not yet finished, so parallel submits
+   * across several missions can't slip past it either.
+   */
+  private async claimMission(userId: string, missionId: string): Promise<void> {
+    const claimed = await this.prisma.wordInTheWildMission.updateMany({
+      where: { id: missionId, userId, status: 'OPEN' },
+      data: { status: 'SUBMITTED' },
+    });
+    if (claimed.count === 0) {
+      throw new BadRequestException('This mission already has a submission');
+    }
+
+    const startOfDayUtc = new Date();
+    startOfDayUtc.setUTCHours(0, 0, 0, 0);
+    const [submittedToday, inFlight] = await Promise.all([
+      this.prisma.wordInTheWildSubmission.count({
+        where: { userId, createdAt: { gte: startOfDayUtc } },
+      }),
+      this.prisma.wordInTheWildMission.count({
+        where: { userId, status: 'SUBMITTED', submission: null },
+      }),
+    ]);
+    if (submittedToday + inFlight > gameplayRules.wordInTheWild.dailySubmissionCap) {
+      await this.reopenMission(missionId);
+      throw new BadRequestException(
+        `Daily Word in the Wild limit reached (${gameplayRules.wordInTheWild.dailySubmissionCap}/day). Try again tomorrow.`,
+      );
+    }
+  }
+
+  /** Runs the judging step; if it fails, the mission is handed back so the player can retry. */
+  private async releaseOnFailure<T>(missionId: string, run: () => Promise<T>): Promise<T> {
+    try {
+      return await run();
+    } catch (error) {
+      await this.reopenMission(missionId);
+      throw error;
+    }
+  }
+
+  private async reopenMission(missionId: string): Promise<void> {
+    await this.prisma.wordInTheWildMission
+      .updateMany({
+        where: { id: missionId, status: 'SUBMITTED', submission: null },
+        data: { status: 'OPEN' },
+      })
+      .catch(() => undefined);
   }
 
   private async loadOpenMission(userId: string, missionId: string): Promise<MissionRow> {

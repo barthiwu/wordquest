@@ -13,6 +13,9 @@ import { ObjectStorageService } from '../storage/object-storage.service';
 import { EvidenceAssessmentService } from '../assessment/evidence-assessment.service';
 import { gameplayRules } from '../config/gameplay-rules';
 
+const KEY_JPG = 'word-in-the-wild/u1/11111111-2222-3333-4444-555555555555.jpg';
+const KEY_PNG = 'word-in-the-wild/u1/11111111-2222-3333-4444-555555555555.png';
+
 describe('WordInTheWildService', () => {
   let service: WordInTheWildService;
 
@@ -23,6 +26,8 @@ describe('WordInTheWildService', () => {
       findUnique: jest.fn(),
       create: jest.fn(),
       update: jest.fn().mockResolvedValue({}),
+      updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+      count: jest.fn().mockResolvedValue(0),
     },
     wordInTheWildSubmission: {
       findUnique: jest.fn(),
@@ -416,7 +421,7 @@ describe('WordInTheWildService', () => {
       prismaMock.wordInTheWildMission.findUnique.mockResolvedValueOnce(openMission);
       prismaMock.wordInTheWildSubmission.count.mockResolvedValueOnce(6);
 
-      await expect(service.submitPhotoEvidence('u1', 'm1', 'key.jpg')).rejects.toThrow(
+      await expect(service.submitPhotoEvidence('u1', 'm1', KEY_JPG)).rejects.toThrow(
         BadRequestException,
       );
       expect(storageMock.getObjectBytes).not.toHaveBeenCalled();
@@ -426,7 +431,7 @@ describe('WordInTheWildService', () => {
     it('throws ServiceUnavailableException when storage or assessment is not configured', async () => {
       prismaMock.wordInTheWildMission.findUnique.mockResolvedValueOnce(openMission);
       storageMock.isStorageConfigured.mockReturnValueOnce(false);
-      await expect(service.submitPhotoEvidence('u1', 'm1', 'key.jpg')).rejects.toThrow(
+      await expect(service.submitPhotoEvidence('u1', 'm1', KEY_JPG)).rejects.toThrow(
         ServiceUnavailableException,
       );
     });
@@ -451,9 +456,9 @@ describe('WordInTheWildService', () => {
         createdAt: new Date(),
       });
 
-      await service.submitPhotoEvidence('u1', 'm1', 'word-in-the-wild/u1/abc.png');
+      await service.submitPhotoEvidence('u1', 'm1', KEY_PNG);
 
-      expect(storageMock.getObjectBytes).toHaveBeenCalledWith('word-in-the-wild/u1/abc.png');
+      expect(storageMock.getObjectBytes).toHaveBeenCalledWith(KEY_PNG);
       expect(assessmentMock.assess).toHaveBeenCalledWith({
         targetWord: 'resilient',
         definition: 'able to recover quickly',
@@ -477,7 +482,7 @@ describe('WordInTheWildService', () => {
         createdAt: new Date(),
       });
 
-      await service.submitPhotoEvidence('u1', 'm1', 'word-in-the-wild/u1/abc.jpg');
+      await service.submitPhotoEvidence('u1', 'm1', KEY_JPG);
 
       expect(assessmentMock.assess).toHaveBeenCalledWith(
         expect.objectContaining({ photoContentType: 'image/jpeg' }),
@@ -504,11 +509,47 @@ describe('WordInTheWildService', () => {
         createdAt: new Date(),
       });
 
-      await service.submitPhotoEvidence('u1', 'm1', 'k.jpg');
+      await service.submitPhotoEvidence('u1', 'm1', KEY_JPG);
 
       expect(prismaMock.wordInTheWildSubmission.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ evidenceText: 'read from photo', photoKey: 'k.jpg' }),
+        data: expect.objectContaining({ evidenceText: 'read from photo', photoKey: KEY_JPG }),
       });
+    });
+    it("rejects a key that wasn't issued to this player (e.g. another player's avatar)", async () => {
+      await expect(
+        service.submitPhotoEvidence(
+          'u1',
+          'm1',
+          'avatars/u2/11111111-2222-3333-4444-555555555555.jpg',
+        ),
+      ).rejects.toThrow(ForbiddenException);
+      await expect(
+        service.submitPhotoEvidence(
+          'u1',
+          'm1',
+          'word-in-the-wild/u2/11111111-2222-3333-4444-555555555555.jpg',
+        ),
+      ).rejects.toThrow(ForbiddenException);
+      expect(storageMock.getObjectBytes).not.toHaveBeenCalled();
+      expect(assessmentMock.assess).not.toHaveBeenCalled();
+    });
+
+    it('does not judge (or pay for) a mission another request already claimed', async () => {
+      prismaMock.wordInTheWildMission.findUnique.mockResolvedValueOnce(openMission);
+      prismaMock.wordInTheWildMission.updateMany.mockResolvedValueOnce({ count: 0 });
+      await expect(service.submitPhotoEvidence('u1', 'm1', KEY_JPG)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(assessmentMock.assess).not.toHaveBeenCalled();
+    });
+
+    it('hands the mission back when judging fails, so the player can retry', async () => {
+      prismaMock.wordInTheWildMission.findUnique.mockResolvedValueOnce(openMission);
+      storageMock.getObjectBytes.mockRejectedValueOnce(new Error('too large'));
+      await expect(service.submitPhotoEvidence('u1', 'm1', KEY_JPG)).rejects.toThrow('too large');
+      expect(prismaMock.wordInTheWildMission.updateMany).toHaveBeenLastCalledWith(
+        expect.objectContaining({ data: { status: 'OPEN' } }),
+      );
     });
   });
 
