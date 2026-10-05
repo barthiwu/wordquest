@@ -40,6 +40,12 @@ async function bootstrap() {
     throw new Error('Required startup configuration is missing.'); // unreachable — the getters above throw first
   }
 
+  // Railway (and any hosting edge) sits in front of this server, so the TCP
+  // peer is the proxy, not the player. Trust the first proxy hop so req.ip
+  // is the real client: rate limits (ThrottlerGuard) and security-event IPs
+  // are per player, not one shared bucket for everyone.
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+
   app.use(helmet());
   app.enableCors({ origin: config.corsOrigin, credentials: true });
 

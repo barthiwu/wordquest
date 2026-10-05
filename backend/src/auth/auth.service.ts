@@ -141,7 +141,11 @@ export class AuthService {
     user: Awaited<ReturnType<UsersService['findById']>> & object,
     meta: RequestMeta,
   ): Promise<LoginResult> {
-    if (user.failedLoginAttempts > 0 || user.lockedUntil) {
+    // With two-step on, the failure counter is only cleared once the CODE
+    // succeeds (completeTwoFactorLogin). Clearing it here, after the password
+    // alone, let someone with a stolen password try 4 codes, log in again,
+    // and repeat without ever reaching the lockout.
+    if (!user.twoFactorEnabledAt && (user.failedLoginAttempts > 0 || user.lockedUntil)) {
       await this.prisma.user.update({
         where: { id: user.id },
         data: { failedLoginAttempts: 0, lockedUntil: null },
@@ -247,10 +251,39 @@ export class AuthService {
         }
         user = existing;
         await this.prisma.authIdentity.create({
-          data: { userId: existing.id, provider: dto.provider, providerSubject: profile.subject, email },
+          data: {
+            userId: existing.id,
+            provider: dto.provider,
+            providerSubject: profile.subject,
+            email,
+          },
         });
         if (!existing.emailVerifiedAt) {
-          await this.prisma.user.update({ where: { id: existing.id }, data: { emailVerifiedAt: new Date() } });
+          // The account claimed this email but never proved it; the provider
+          // just did. Whoever registered it may not be its owner (someone can
+          // sign up with your address before you do), so the proven owner
+          // takes it over clean: their password, sessions and two-step setup
+          // are cleared. Without this, the squatter's password kept working
+          // and their 2FA could lock the real owner out.
+          const throwawayPassword = await this.users.hashPassword(randomBytes(32).toString('hex'));
+          await this.prisma.$transaction([
+            this.prisma.user.update({
+              where: { id: existing.id },
+              data: {
+                emailVerifiedAt: new Date(),
+                passwordHash: throwawayPassword,
+                twoFactorSecretEnc: null,
+                twoFactorEnabledAt: null,
+                twoFactorLastStep: null,
+              },
+            }),
+            this.prisma.twoFactorRecoveryCode.deleteMany({ where: { userId: existing.id } }),
+            this.prisma.refreshToken.updateMany({
+              where: { userId: existing.id, revokedAt: null },
+              data: { revokedAt: new Date() },
+            }),
+          ]);
+          user = (await this.users.findById(existing.id)) ?? existing;
         }
         this.logSecurityEvent(existing.id, 'SOCIAL_LINKED', meta);
       } else {
@@ -280,10 +313,18 @@ export class AuthService {
           englishVariant: dto.englishVariant,
         });
         await this.prisma.authIdentity.create({
-          data: { userId: created.id, provider: dto.provider, providerSubject: profile.subject, email },
+          data: {
+            userId: created.id,
+            provider: dto.provider,
+            providerSubject: profile.subject,
+            email,
+          },
         });
         if (profile.emailVerified) {
-          await this.prisma.user.update({ where: { id: created.id }, data: { emailVerifiedAt: new Date() } });
+          await this.prisma.user.update({
+            where: { id: created.id },
+            data: { emailVerifiedAt: new Date() },
+          });
         } else {
           this.sendVerificationEmail(created.id).catch(() => undefined);
         }
@@ -651,7 +692,9 @@ export class AuthService {
     // A recovered account with 2FA on must prove the second factor too —
     // otherwise recovery would be a way around it.
     if (user.twoFactorEnabledAt) {
-      const ok = dto.twoFactorCode ? await this.twoFactor.checkCode(user.id, dto.twoFactorCode) : false;
+      const ok = dto.twoFactorCode
+        ? await this.twoFactor.checkCode(user.id, dto.twoFactorCode)
+        : false;
       if (!ok) {
         this.logSecurityEvent(user.id, 'TWO_FACTOR_FAILED');
         throw new UnauthorizedException(

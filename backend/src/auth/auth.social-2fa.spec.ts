@@ -33,10 +33,16 @@ describe('AuthService — two-step verification & social sign-in', () => {
     findByEmail: jest.fn(),
     findById: jest.fn(),
     verifyPassword: jest.fn(),
+    hashPassword: jest.fn().mockResolvedValue('hashed-throwaway'),
     resolveAvatarUrl: jest.fn().mockResolvedValue(null),
   };
   const prisma = {
-    refreshToken: { create: jest.fn().mockResolvedValue({}) },
+    refreshToken: {
+      create: jest.fn().mockResolvedValue({}),
+      updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+    },
+    twoFactorRecoveryCode: { deleteMany: jest.fn().mockResolvedValue({ count: 0 }) },
+    $transaction: jest.fn((ops: unknown[]) => Promise.all(ops)),
     user: { update: jest.fn().mockResolvedValue({ failedLoginAttempts: 1 }) },
     authIdentity: { findUnique: jest.fn(), create: jest.fn().mockResolvedValue({}) },
     securityEvent: { create: jest.fn().mockResolvedValue({}) },
@@ -57,6 +63,7 @@ describe('AuthService — two-step verification & social sign-in', () => {
     jwt.signAsync.mockResolvedValue('signed.jwt');
     users.verifyPassword.mockResolvedValue(true);
     users.resolveAvatarUrl.mockResolvedValue(null);
+    users.hashPassword.mockResolvedValue('hashed-throwaway');
     prisma.user.update.mockResolvedValue({ failedLoginAttempts: 1 });
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -87,6 +94,14 @@ describe('AuthService — two-step verification & social sign-in', () => {
         expect.objectContaining({ secret: 'access:2fa-challenge', expiresIn: '5m' }),
       );
       expect(prisma.refreshToken.create).not.toHaveBeenCalled();
+    });
+
+    it('does not clear the failure counter after the password alone when 2FA is on', async () => {
+      users.findByEmail.mockResolvedValue({ ...user2fa, failedLoginAttempts: 4 });
+      await service.login({ email: user2fa.email, password: 'x' });
+      expect(prisma.user.update).not.toHaveBeenCalledWith(
+        expect.objectContaining({ data: { failedLoginAttempts: 0, lockedUntil: null } }),
+      );
     });
 
     it('completes the login with a valid code', async () => {
@@ -152,6 +167,39 @@ describe('AuthService — two-step verification & social sign-in', () => {
       expect(prisma.authIdentity.create).toHaveBeenCalledWith({
         data: { userId: 'user-1', provider: 'GOOGLE', providerSubject: 'g-123', email: 'ada@example.com' },
       });
+    });
+
+    it('when the existing account never verified its email, the proven owner takes it over clean', async () => {
+      social.verify.mockResolvedValue(profile);
+      prisma.authIdentity.findUnique.mockResolvedValue(null);
+      users.findByEmail.mockResolvedValue({ ...baseUser, emailVerifiedAt: null, twoFactorEnabledAt: new Date() });
+      users.findById.mockResolvedValue({ ...baseUser, emailVerifiedAt: new Date(), twoFactorEnabledAt: null });
+
+      const result = (await service.socialLogin({ provider: 'GOOGLE', credential: 'tok' })) as AuthResult;
+
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: expect.objectContaining({
+          passwordHash: 'hashed-throwaway',
+          twoFactorEnabledAt: null,
+          twoFactorSecretEnc: null,
+        }),
+      });
+      expect(prisma.twoFactorRecoveryCode.deleteMany).toHaveBeenCalledWith({ where: { userId: 'user-1' } });
+      expect(prisma.refreshToken.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { userId: 'user-1', revokedAt: null } }),
+      );
+      // The squatter's 2FA no longer stands between the owner and the account.
+      expect(result.accessToken).toBe('signed.jwt');
+    });
+
+    it('leaves an already-verified account alone when linking', async () => {
+      social.verify.mockResolvedValue(profile);
+      prisma.authIdentity.findUnique.mockResolvedValue(null);
+      users.findByEmail.mockResolvedValue({ ...baseUser, emailVerifiedAt: new Date() });
+      await service.socialLogin({ provider: 'GOOGLE', credential: 'tok' });
+      expect(users.hashPassword).not.toHaveBeenCalled();
+      expect(prisma.twoFactorRecoveryCode.deleteMany).not.toHaveBeenCalled();
     });
 
     it('refuses to link an UNVERIFIED provider email to an existing account', async () => {
