@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/state/themeStore';
 import { useProtoExtras } from './useProtoExtras';
+import { WordmarkLogo } from '@/components/WordmarkLogo';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -105,13 +106,9 @@ export function SectionHeader({ title, caption, right }: { title: string; captio
 // ---------------------------------------------------------------------------
 // Small widgets
 
+/** The brand lockup (gold vowels over dashes) in one line, for nav chrome. */
 export function Wordmark({ size = 16 }: { size?: number }) {
-  const colors = useThemeColors();
-  return (
-    <Text accessibilityRole="header" style={{ fontSize: size, fontWeight: '900', letterSpacing: 1.5, color: colors.ink }}>
-      WORD<Text style={{ color: colors.arcane }}>QUEST</Text>
-    </Text>
-  );
+  return <WordmarkLogo variant="inline" fontSize={size} />;
 }
 
 export function IconBadge({ name, color, size = 40, tint }: { name: IconName; color: string; size?: number; tint?: string }) {

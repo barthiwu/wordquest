@@ -40,6 +40,7 @@ import {
 import type { MainTabParamList } from '@/app/navigation/MainTabNavigator';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 import { useHomeData } from './useHomeData';
+import { WordmarkLogo } from '@/components/WordmarkLogo';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, 'Home'>,
@@ -220,6 +221,9 @@ export function NewHomeScreen({ navigation }: Props) {
       showsVerticalScrollIndicator={false}
     >
       <ResponsiveContainer style={styles.page}>
+        {/* 0. Brand mark */}
+        {!wide && <WordmarkLogo variant="inline" fontSize={18} style={styles.brandMark} />}
+
         {/* 1. Identity + utilities */}
         <View style={styles.identityRow}>
           {avatarUrl ? (
@@ -304,6 +308,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
     container: { flex: 1, backgroundColor: colors.background },
     content: { flexGrow: 1, paddingTop: topInset + spacing.md, paddingBottom: spacing.xxl },
     page: { paddingHorizontal: spacing.md, gap: spacing.lg },
+    brandMark: { alignSelf: 'flex-start' },
     identityRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
     avatar: {
       width: 44,

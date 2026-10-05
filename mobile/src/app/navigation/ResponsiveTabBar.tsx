@@ -8,6 +8,7 @@ import { useThemeColors } from '@/state/themeStore';
 import { useBreakpoint, type Breakpoint } from '@/hooks/useBreakpoint';
 import { useIsPrototype } from '@/state/uiVersionStore';
 import { ProtoNav } from '@/features/proto/ui/ProtoNav';
+import { WordmarkLogo } from '@/components/WordmarkLogo';
 
 export const RAIL_WIDTH = 88;
 export const SIDEBAR_WIDTH = 248;
@@ -60,7 +61,9 @@ function SideNav({
 
   return (
     <View style={styles.nav} accessibilityRole="tablist">
-      {expanded && <Text style={styles.brand}>WordQuest</Text>}
+      <View style={styles.brand}>
+        <WordmarkLogo variant={expanded ? 'inline' : 'stacked'} fontSize={expanded ? 22 : 11} />
+      </View>
       {state.routes.map((route, index) => {
         const focused = state.index === index;
         const { options } = descriptors[route.key];
@@ -123,10 +126,8 @@ function createStyles(colors: ThemeColors, expanded: boolean, topInset: number, 
       gap: spacing.xs,
     },
     brand: {
-      color: colors.ink,
-      fontSize: typography.scale.lg,
-      fontWeight: typography.display.weight,
-      paddingHorizontal: spacing.md,
+      alignItems: expanded ? 'flex-start' : 'center',
+      paddingHorizontal: expanded ? spacing.md : 0,
       paddingBottom: spacing.lg,
     },
     item: {

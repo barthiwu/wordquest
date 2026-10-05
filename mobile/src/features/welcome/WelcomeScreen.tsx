@@ -6,6 +6,7 @@ import { radius, spacing, typography, type ThemeColors } from '@/constants/theme
 import { useThemeColors } from '@/state/themeStore';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
+import { WordmarkLogo } from '@/components/WordmarkLogo';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
@@ -22,6 +23,7 @@ export function WelcomeScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.copy}>
+        <WordmarkLogo align="start" fontSize={52} style={styles.logo} />
         <Text style={styles.title}>{t('title')}</Text>
         <Text style={styles.subtitle}>{t('subtitle')}</Text>
       </View>
@@ -60,6 +62,10 @@ function createStyles(colors: ThemeColors, topInset: number) {
     },
     copy: {
       gap: spacing.sm,
+    },
+    logo: {
+      alignSelf: 'flex-start',
+      marginBottom: spacing.lg,
     },
     title: {
       color: colors.ink,

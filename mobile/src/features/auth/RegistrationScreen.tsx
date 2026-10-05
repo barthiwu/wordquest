@@ -28,6 +28,7 @@ import { SocialDobStep } from './SocialDobStep';
 import { completeTwoFactorLogin } from '@/services/auth';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
+import { WordmarkLogo } from '@/components/WordmarkLogo';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Registration'>;
 
@@ -173,6 +174,7 @@ export function RegistrationScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
+        <WordmarkLogo align="start" fontSize={30} style={{ alignSelf: 'flex-start', marginBottom: 12 }} />
         <Text style={styles.title}>{t('registration.title')}</Text>
         <Text style={styles.subtitle}>{t('registration.subtitle')}</Text>
       </View>

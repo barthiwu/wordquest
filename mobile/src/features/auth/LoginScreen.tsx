@@ -25,6 +25,7 @@ import { TwoFactorStep } from './TwoFactorStep';
 import { SocialDobStep } from './SocialDobStep';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
+import { WordmarkLogo } from '@/components/WordmarkLogo';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -140,6 +141,7 @@ export function LoginScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
+        <WordmarkLogo align="start" fontSize={30} style={{ alignSelf: 'flex-start', marginBottom: 12 }} />
         <Text style={styles.title}>{t('login.title')}</Text>
         <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
       </View>
