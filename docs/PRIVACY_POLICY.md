@@ -1,6 +1,6 @@
 # WordQuest Privacy Policy
 
-**Last updated:** September 21, 2026
+**Last updated:** October 5, 2026
 
 WordQuest is a language-learning app. This policy explains what information WordQuest collects, why, and what choices you have about it. It's written in plain language rather than dense legal text — if anything here isn't clear, email us (contact info below) and we'll clarify or fix it.
 
@@ -43,6 +43,16 @@ You must be **at least 13 years old** to create a WordQuest account. This is enf
 
 WordQuest logs basic usage events (e.g., account created, quest completed, Boss Battle played) to our own backend and database — not to a third-party analytics company. This data is used only to understand how the app is used in aggregate and improve it; it is not sold, shared with advertisers, or used to build advertising profiles.
 
+## Signing in with Google, Apple, or Facebook
+
+If you choose to continue with Google, Apple, or Facebook, that provider tells us your name, your email address, and its own unique ID for you. Apple may give us a private relay address instead of your real email if you choose to hide it.
+
+We use this only to create or sign you in to your WordQuest account and to link it to an existing account with the same verified email. We never post to your social accounts, and we don't read your friends, contacts, photos, or any other data from them.
+
+If Facebook (or another provider) doesn't share an email, we can't create an account from it, and you can sign up with email instead.
+
+You can remove WordQuest's access at any time in your Google, Apple, or Facebook account settings. That stops that provider from signing you in; to delete your WordQuest data, see "Your choices and rights".
+
 ## Third parties we work with
 
 WordQuest relies on a small number of service providers to operate. Each only receives the specific data needed to do its job:
@@ -52,6 +62,7 @@ WordQuest relies on a small number of service providers to operate. Each only re
 - **Expo (push notifications)** — delivers push notifications to your device, if you enable them.
 - **Cloudflare R2 / S3-compatible object storage** — stores Word in the Wild photo uploads.
 - **Railway** — hosts our backend application and database.
+- **Google, Apple, and Facebook** — only if you choose to sign in with them (see above).
 - **Sentry** (only if enabled on a given environment) — receives error/crash reports to help us fix bugs. These reports do not include your password or full submission content.
 
 We do not sell your personal information to anyone, and we don't share it with third parties for their own marketing purposes.

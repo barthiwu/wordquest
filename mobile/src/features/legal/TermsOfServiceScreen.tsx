@@ -24,7 +24,7 @@ export function TermsOfServiceScreen({ navigation }: Props) {
       lastUpdated={TERMS_OF_SERVICE_LAST_UPDATED}
       intro={TERMS_OF_SERVICE_INTRO}
       sections={TERMS_OF_SERVICE_SECTIONS}
-      onBack={() => navigation.goBack()}
+      onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.replace('Welcome'))}
     />
   );
 }

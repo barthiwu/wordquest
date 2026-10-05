@@ -30,7 +30,7 @@ export function PrivacyPolicyScreen({ navigation }: Props) {
       lastUpdated={PRIVACY_POLICY_LAST_UPDATED}
       intro={PRIVACY_POLICY_INTRO}
       sections={PRIVACY_POLICY_SECTIONS}
-      onBack={() => navigation.goBack()}
+      onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.replace('Welcome'))}
     />
   );
 }

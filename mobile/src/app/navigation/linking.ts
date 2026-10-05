@@ -99,6 +99,10 @@ export const linking: LinkingOptions<RootStackParamList> = {
       DailyQuest: 'daily-quest/:questKey',
       Achievements: 'achievements',
       AliGallery: 'ali-gallery',
+      // Public legal pages (Facebook / store listings link to these).
+      PrivacyPolicy: 'privacy-policy',
+      TermsOfService: 'terms',
+      DataDeletion: 'data-deletion',
       BossBattle: 'boss-battle',
       BossBattleLeaderboard: 'boss-battle-leaderboard',
       SkillRadar: 'skill-radar',

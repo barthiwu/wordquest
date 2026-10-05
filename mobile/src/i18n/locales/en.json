@@ -917,6 +917,9 @@
     "termsOfService": {
       "title": "Terms of Service"
     },
+    "dataDeletion": {
+      "title": "Delete your data"
+    },
     "ageRestriction": {
       "title": "Age Restriction"
     }

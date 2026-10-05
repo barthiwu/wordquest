@@ -6,7 +6,7 @@
  * PrivacyPolicyScreen's rendering (plain data, no markdown parser
  * dependency needed for a document this size).
  */
-export const PRIVACY_POLICY_LAST_UPDATED = 'September 21, 2026';
+export const PRIVACY_POLICY_LAST_UPDATED = 'October 5, 2026';
 
 export const PRIVACY_POLICY_CONTACT_EMAIL = 'bartholomewiwuoha@gmail.com';
 
@@ -66,6 +66,15 @@ export const PRIVACY_POLICY_SECTIONS: PrivacyPolicySection[] = [
     body: "WordQuest logs basic usage events (e.g. account created, quest completed) to our own backend and database — not to a third-party analytics company. This data is used only to understand aggregate usage and improve the app; it's never sold or shared with advertisers.",
   },
   {
+    heading: 'Signing in with Google, Apple, or Facebook',
+    body: [
+      'If you choose to continue with Google, Apple, or Facebook, that provider tells us your name, your email address, and its own unique ID for you. Apple may give us a private relay address instead of your real email if you choose to hide it.',
+      "We use this only to create or sign you in to your WordQuest account and to link it to an existing account with the same verified email. We never post to your social accounts, and we don't read your friends, contacts, photos, or any other data from them.",
+      "If Facebook (or another provider) doesn't share an email, we can't create an account from it, and you can sign up with email instead.",
+      'You can remove WordQuest\'s access at any time in your Google, Apple, or Facebook account settings. That stops that provider from signing you in; to delete your WordQuest data, see "Your choices and rights".',
+    ],
+  },
+  {
     heading: 'Third parties we work with',
     body: [
       'Anthropic (Claude API) — evaluates Word in the Wild evidence and writing exercises',
@@ -73,6 +82,7 @@ export const PRIVACY_POLICY_SECTIONS: PrivacyPolicySection[] = [
       'Expo — delivers push notifications, if enabled',
       'Cloudflare R2 / S3-compatible storage — stores Word in the Wild photo uploads',
       'Railway — hosts our backend and database',
+      'Google, Apple, and Facebook — only if you choose to sign in with them (see above)',
       'Sentry (only where enabled) — receives error/crash reports, never your password or full submission content',
     ],
   },

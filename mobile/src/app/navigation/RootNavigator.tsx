@@ -48,6 +48,7 @@ import { WordPracticeScreen } from '@/features/passport/WordPracticeScreen';
 import { LevelRoadmapScreen } from '@/features/passport/LevelRoadmapScreen';
 import { PrivacyPolicyScreen } from '@/features/legal/PrivacyPolicyScreen';
 import { TermsOfServiceScreen } from '@/features/legal/TermsOfServiceScreen';
+import { DataDeletionScreen } from '@/features/legal/DataDeletionScreen';
 import { AgeRestrictionScreen } from '@/features/legal/AgeRestrictionScreen';
 import { LanguageScreen } from '@/features/settings/LanguageScreen';
 import { AboutScreen } from '@/features/settings/AboutScreen';
@@ -116,6 +117,7 @@ export type RootStackParamList = {
   LevelRoadmap: { currentLevel: number; totalXp: number };
   PrivacyPolicy: undefined;
   TermsOfService: undefined;
+  DataDeletion: undefined;
   AgeRestriction: undefined;
   Language: undefined;
   About: undefined;
@@ -215,6 +217,7 @@ export function RootNavigator() {
         <Stack.Screen name="LevelRoadmap" component={framed(LevelRoadmapScreen)} />
         <Stack.Screen name="PrivacyPolicy" component={framed(PrivacyPolicyScreen)} />
         <Stack.Screen name="TermsOfService" component={framed(TermsOfServiceScreen)} />
+        <Stack.Screen name="DataDeletion" component={framed(DataDeletionScreen)} />
         <Stack.Screen name="AgeRestriction" component={framed(AgeRestrictionScreen)} />
         <Stack.Screen name="Language" component={framed(LanguageScreen)} />
         <Stack.Screen name="About" component={framed(AboutScreen)} />
