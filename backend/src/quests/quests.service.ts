@@ -139,7 +139,8 @@ export interface AnswerResult {
   isCorrect: boolean;
   /** True when the 2-minute Guess timer had already expired — isCorrect is meaningless in this case, the answer was never evaluated. */
   timedOut: boolean;
-  correctAnswer: string;
+  /** The word, revealed only on a timeout or a correct answer; null after a wrong guess (they can keep trying). */
+  correctAnswer: string | null;
   xpAwarded: number;
   masteryLevel: MasteryLevel;
   /** Non-null only when isCorrect — the Understanding stage content the player now transitions to (spec §3.10: Guess -> Understanding, not straight to quest completion). */
@@ -371,6 +372,7 @@ export class QuestsService {
     questKey: string,
     localDate: string,
     localHour: number,
+    retried = false,
   ): Promise<ChallengeView> {
     const quest = await this.prisma.quest.findUnique({ where: { key: questKey } });
     if (!quest || !quest.isActive) {
@@ -402,6 +404,15 @@ export class QuestsService {
         inProgress.wordIds,
         inProgress.currentIndex,
         resumeStage,
+        this.prisma,
+        // Reopening mid-Guess must show the SAME blanks (and any letters
+        // already revealed), not a fresh random pattern.
+        resumeStage === 'GUESSING' && inProgress.currentDisplayPattern
+          ? {
+              displayPattern: inProgress.currentDisplayPattern,
+              missingIndexes: inProgress.currentMissingIndexes,
+            }
+          : undefined,
       );
     }
 
@@ -436,17 +447,51 @@ export class QuestsService {
       gameplayRules.quest.minWordLength,
     );
 
+    // A timed-out attempt for this same quest and day (status ABANDONED)
+    // still holds the one-per-day unique slot, so "Try again" must restart
+    // THAT row with fresh words. Creating a new one hit P2002 every time and
+    // the old retry below then looped forever on the server.
+    const todaysRow = await this.prisma.questAttempt.findUnique({
+      where: { userId_questId_localDate: { userId, questId: quest.id, localDate } },
+    });
+    const abandonedToday = todaysRow?.status === 'ABANDONED' ? todaysRow : null;
+
     let attempt;
     try {
-      attempt = await this.prisma.questAttempt.create({
-        data: {
-          userId,
-          questId: quest.id,
-          localDate,
-          wordIds,
-          guessStartedAt: new Date(), // the 2-minute Guess timer starts now, server-side — never trust a client-reported start time
-        },
-      });
+      attempt = abandonedToday
+        ? await this.prisma.questAttempt.update({
+            where: { id: abandonedToday.id },
+            data: {
+              status: 'IN_PROGRESS',
+              wordIds,
+              currentIndex: 0,
+              wordStage: 'GUESSING',
+              currentDisplayPattern: null,
+              currentMissingIndexes: [],
+              guessStartedAt: new Date(),
+              wrongAttempts: 0,
+              hintsUsed: 0,
+              synonymsUsed: 0,
+              lettersRevealed: 0,
+              sentenceText: null,
+              sentenceScores: Prisma.DbNull,
+              sentenceXpAwarded: 0,
+              paragraphText: null,
+              paragraphScores: Prisma.DbNull,
+              paragraphEstimatedProficiency: null,
+              paragraphXpAwarded: 0,
+              completedAt: null,
+            },
+          })
+        : await this.prisma.questAttempt.create({
+            data: {
+              userId,
+              questId: quest.id,
+              localDate,
+              wordIds,
+              guessStartedAt: new Date(), // the 2-minute Guess timer starts now, server-side — never trust a client-reported start time
+            },
+          });
     } catch (err) {
       // Daily quest locking (10,000-Word Adaptive Distribution spec §19):
       // the @@unique([userId, questId, localDate]) constraint on
@@ -461,8 +506,14 @@ export class QuestsService {
       // this pick's own `wordIds` is simply discarded, which is why
       // recordGlobalExposure below only ever runs for the request that
       // actually won.
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-        return this.startTimedQuest(userId, questKey, localDate, localHour);
+      // One retry only: a second collision means something other than a
+      // concurrent double-tap holds the slot, and retrying again would loop.
+      if (
+        !retried &&
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2002'
+      ) {
+        return this.startTimedQuest(userId, questKey, localDate, localHour, true);
       }
       throw err;
     }
@@ -601,9 +652,16 @@ export class QuestsService {
       : Infinity; // no recorded start (shouldn't happen for a real attempt) is treated as already-expired, not as "unlimited time"
 
     if (elapsedSeconds > gameplayRules.guessStage.timerSeconds) {
-      await this.prisma.questAttempt.update({
-        where: { id: attempt.id },
-        data: { status: 'ABANDONED' },
+      await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        await tx.questAttempt.update({
+          where: { id: attempt.id },
+          data: { status: 'ABANDONED' },
+        });
+        // A word the player ran out of time on counts as a miss for mastery
+        // and spaced review (once per word: an earlier wrong guess already did).
+        if (attempt.wrongAttempts === 0) {
+          await this.mastery.recordAnswer(userId, wordId, false, tx);
+        }
       });
       return {
         isCorrect: false,
@@ -646,12 +704,21 @@ export class QuestsService {
           where: { id: attempt.id },
           data: { wrongAttempts: { increment: 1 } },
         });
+        // The first miss on a word reaches Mastery (demotion, timesIncorrect,
+        // spaced review, no "perfect first try"). Later misses on the same
+        // word don't pile on.
+        if (attempt.wrongAttempts === 0) {
+          await this.mastery.recordAnswer(userId, wordId, false, tx);
+        }
       });
 
       return {
         isCorrect: false,
         timedOut: false,
-        correctAnswer: rendered.text,
+        // The player can keep guessing until time runs out, so the answer is
+        // only revealed on timeout. Sending it here let a player type junk,
+        // read the word, then type it for a near-full score.
+        correctAnswer: null,
         xpAwarded: 0,
         masteryLevel: await this.mastery.getLevel(userId, wordId),
         understanding: null,
@@ -1358,6 +1425,7 @@ export class QuestsService {
     wordIndex: number,
     wordStage: WordStage = 'GUESSING',
     db: Db = this.prisma,
+    stored?: { displayPattern: string; missingIndexes: number[] },
   ): Promise<ChallengeView> {
     const wordId = wordIds[wordIndex];
     const word = await db.word.findUniqueOrThrow({ where: { id: wordId } });
@@ -1365,19 +1433,23 @@ export class QuestsService {
     const variant = await resolveEnglishVariant(this.prisma, userId);
     const rendered = renderWord(word, variant);
 
-    const challenge = generateOmissionChallenge({
-      word: rendered.text,
-      baseDifficulty: word.baseDifficulty,
-      masteryLevel,
-    });
+    const challenge =
+      stored ??
+      generateOmissionChallenge({
+        word: rendered.text,
+        baseDifficulty: word.baseDifficulty,
+        masteryLevel,
+      });
 
-    await db.questAttempt.update({
-      where: { id: questAttemptId },
-      data: {
-        currentDisplayPattern: challenge.displayPattern,
-        currentMissingIndexes: challenge.missingIndexes,
-      },
-    });
+    if (!stored) {
+      await db.questAttempt.update({
+        where: { id: questAttemptId },
+        data: {
+          currentDisplayPattern: challenge.displayPattern,
+          currentMissingIndexes: challenge.missingIndexes,
+        },
+      });
+    }
 
     return {
       questAttemptId,

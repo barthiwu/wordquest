@@ -559,6 +559,50 @@ describe('QuestsService', () => {
         // exposure counts for words this player was never actually shown.
         expect(wordsMock.recordGlobalExposure).not.toHaveBeenCalled();
       });
+
+      it('"Try again" after a timeout restarts the abandoned row with fresh words instead of looping on P2002', async () => {
+        const questRow = { id: 'q1', isActive: true, wordCount: 3, windowStartHour: null, windowEndHour: null };
+        prismaMock.quest.findUnique.mockResolvedValueOnce(questRow);
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce(null); // inProgress
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce(null); // completedToday
+        wordsMock.pickWordsForQuest.mockResolvedValueOnce(['n1', 'n2', 'n3']);
+        prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ id: 'old', status: 'ABANDONED' });
+        prismaMock.questAttempt.update.mockResolvedValueOnce({
+          id: 'old',
+          wordIds: ['n1', 'n2', 'n3'],
+          currentIndex: 0,
+        });
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
+
+        const view = await service.startTimedQuest('u1', 'morning-quest', '2026-08-14', 8);
+
+        expect(view.questAttemptId).toBe('old');
+        expect(prismaMock.questAttempt.create).not.toHaveBeenCalled();
+        expect(prismaMock.questAttempt.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            where: { id: 'old' },
+            data: expect.objectContaining({ status: 'IN_PROGRESS', wordIds: ['n1', 'n2', 'n3'], wrongAttempts: 0 }),
+          }),
+        );
+      });
+
+      it('gives up after one P2002 retry instead of recursing forever', async () => {
+        const questRow = { id: 'q1', isActive: true, wordCount: 3, windowStartHour: null, windowEndHour: null };
+        prismaMock.quest.findUnique.mockResolvedValue(questRow);
+        prismaMock.questAttempt.findFirst.mockResolvedValue(null);
+        wordsMock.pickWordsForQuest.mockResolvedValue(['w1', 'w2', 'w3']);
+        const p2002 = Object.assign(new Error('Unique constraint failed'), { code: 'P2002' });
+        Object.setPrototypeOf(p2002, Prisma.PrismaClientKnownRequestError.prototype);
+        prismaMock.questAttempt.create.mockRejectedValue(p2002);
+
+        await expect(service.startTimedQuest('u1', 'morning-quest', '2026-08-14', 8)).rejects.toBe(p2002);
+        expect(prismaMock.questAttempt.create).toHaveBeenCalledTimes(2);
+
+        prismaMock.quest.findUnique.mockReset();
+        prismaMock.questAttempt.findFirst.mockReset();
+        wordsMock.pickWordsForQuest.mockReset();
+        prismaMock.questAttempt.create.mockReset();
+      });
     });
   });
 
@@ -867,17 +911,29 @@ describe('QuestsService', () => {
         });
       });
 
-      it('does not evaluate the submitted answer or touch mastery/XP when timed out', async () => {
+      it('does not evaluate the submitted answer or award XP when timed out, but records the miss for mastery', async () => {
         jest.useFakeTimers().setSystemTime(new Date(guessStartedAt.getTime() + 121_000));
         prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...inProgressAttempt });
         prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
         masteryMock.getLevel.mockResolvedValueOnce('NEW');
 
-        await service.submitAnswer('u1', 'a1', 'greeting'); // even the objectively correct answer
+        const result = await service.submitAnswer('u1', 'a1', 'greeting'); // even the objectively correct answer
+
+        expect(result.timedOut).toBe(true);
+        expect(result.correctAnswer?.toLowerCase()).toBe('greeting');
+        expect(masteryMock.recordAnswer).toHaveBeenCalledWith('u1', 'w1', false, prismaMock);
+        expect(progressionMock.awardXp).not.toHaveBeenCalled();
+      });
+
+      it('does not record a second miss on timeout when the word already had a wrong guess', async () => {
+        jest.useFakeTimers().setSystemTime(new Date(guessStartedAt.getTime() + 121_000));
+        prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...inProgressAttempt, wrongAttempts: 2 });
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
+        masteryMock.getLevel.mockResolvedValueOnce('NEW');
+
+        await service.submitAnswer('u1', 'a1', 'nope');
 
         expect(masteryMock.recordAnswer).not.toHaveBeenCalled();
-        expect(progressionMock.awardXp).not.toHaveBeenCalled();
-        expect(prismaMock.$transaction).not.toHaveBeenCalled();
       });
 
       it('is still answerable right up to the exact 120-second boundary', async () => {
@@ -943,15 +999,23 @@ describe('QuestsService', () => {
         });
       });
 
-      it('never calls mastery.recordAnswer or awards XP for a wrong guess', async () => {
+      it('records only the FIRST wrong guess on a word for mastery, awards no XP, and never reveals the answer', async () => {
         jest.useFakeTimers().setSystemTime(new Date(guessStartedAt.getTime() + 5_000));
         prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...inProgressAttempt });
         prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
 
-        await service.submitAnswer('u1', 'a1', 'wrong-guess');
+        const first = await service.submitAnswer('u1', 'a1', 'wrong-guess');
 
-        expect(masteryMock.recordAnswer).not.toHaveBeenCalled();
+        expect(first.correctAnswer).toBeNull();
+        expect(masteryMock.recordAnswer).toHaveBeenCalledTimes(1);
+        expect(masteryMock.recordAnswer).toHaveBeenCalledWith('u1', 'w1', false, prismaMock);
         expect(progressionMock.awardXp).not.toHaveBeenCalled();
+
+        masteryMock.recordAnswer.mockClear();
+        prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...inProgressAttempt, wrongAttempts: 1 });
+        prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
+        await service.submitAnswer('u1', 'a1', 'still-wrong');
+        expect(masteryMock.recordAnswer).not.toHaveBeenCalled();
       });
     });
 
@@ -2124,7 +2188,8 @@ describe('QuestsService', () => {
       const result = await service.submitAnswer('u1', 'a1', 'color');
 
       expect(result.isCorrect).toBe(false);
-      expect(result.correctAnswer).toBe('Colour');
+      // A wrong guess no longer reveals the word (it's shown only on timeout).
+      expect(result.correctAnswer).toBeNull();
       jest.useRealTimers();
     });
 

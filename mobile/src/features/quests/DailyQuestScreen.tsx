@@ -89,7 +89,7 @@ type Stage =
 interface GuessFeedback {
   isCorrect: boolean;
   timedOut: boolean;
-  correctAnswer: string;
+  correctAnswer: string | null;
   playerAnswer: string;
   xpAwarded: number;
   aliQuickReaction: string | null;
@@ -460,7 +460,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
   // called automatically, matching ali.service's own doc comment for
   // explainMistake ("never called reactively").
   const onExplainMistake = async () => {
-    if (!accessToken || !guessFeedback || guessFeedback.isCorrect) return;
+    if (!accessToken || !guessFeedback || guessFeedback.isCorrect || !guessFeedback.correctAnswer) return;
     setMistakeExplanationLoading(true);
     try {
       const result = await explainMistake(accessToken, {
@@ -949,7 +949,7 @@ export function DailyQuestScreen({ route, navigation }: Props) {
                 )}
               </View>
 
-              {!guessFeedback.isCorrect && (
+              {!guessFeedback.isCorrect && guessFeedback.correctAnswer && (
                 <FadeInUp style={[styles.feedbackCard, styles.feedbackCardPolish]} delay={100}>
                   <View style={styles.feedbackCardHeader}>
                     <Ionicons name="locate-outline" size={15} color={colors.warning} />
@@ -960,7 +960,10 @@ export function DailyQuestScreen({ route, navigation }: Props) {
                   <Text style={styles.feedbackCardText}>{guessFeedback.correctAnswer}</Text>
                 </FadeInUp>
               )}
-              {!guessFeedback.isCorrect && !guessFeedback.timedOut && !mistakeExplanation && (
+              {!guessFeedback.isCorrect &&
+                guessFeedback.timedOut &&
+                guessFeedback.correctAnswer &&
+                !mistakeExplanation && (
                 <Pressable
                   style={styles.explainButton}
                   onPress={onExplainMistake}

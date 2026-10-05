@@ -49,7 +49,8 @@ export interface AnswerResult {
   isCorrect: boolean;
   /** True when the 2-minute Guess timer had already expired — isCorrect is meaningless in this case. */
   timedOut: boolean;
-  correctAnswer: string;
+  /** Revealed only on a timeout (or a correct answer); null after a wrong guess, since the player can keep trying. */
+  correctAnswer: string | null;
   xpAwarded: number;
   masteryLevel: MasteryLevel;
   /** Non-null only when isCorrect — the Understanding content the player now transitions to. */
