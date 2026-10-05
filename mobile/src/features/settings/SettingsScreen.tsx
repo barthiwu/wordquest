@@ -22,6 +22,7 @@ import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
+import { unsyncPushToken } from '@/utils/pushNotifications';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
@@ -75,12 +76,15 @@ export function SettingsScreen({ navigation }: Props) {
   const onLogout = async () => {
     setLoggingOut(true);
     try {
+      if (accessToken) await unsyncPushToken(accessToken);
       if (refreshToken) await logout(refreshToken);
     } catch {
       // A failed revoke call shouldn't trap the player in a session they're trying to leave.
     } finally {
       await clearSession();
-      navigation.replace('Login');
+      // Reset, not replace: the signed-in screens must not stay under Login
+      // for Back (Android or the browser) to return to.
+      navigation.reset({ index: 1, routes: [{ name: 'Welcome' }, { name: 'Login' }] });
     }
   };
 

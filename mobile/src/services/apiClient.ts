@@ -42,6 +42,8 @@ interface RequestOptions {
  * and resumed lands exactly there.
  */
 const TRANSIENT_STATUSES = new Set([502, 503, 504]);
+/** For the token refresh: only statuses that prove the request never reached the app. */
+const REFRESH_RETRY_STATUSES = new Set([502, 503]);
 /** Back-off between attempts, ~10s in all: long enough for a cold backend. */
 const RETRY_DELAYS_MS = [1000, 3000, 6000];
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -51,14 +53,19 @@ const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve,
  * `retry` is set. Only requests that are safe to repeat (GETs, the token
  * refresh) retry; a quest answer or purchase is never sent twice from here.
  */
-async function fetchWithRetry(send: () => Promise<Response>, retry: boolean): Promise<Response> {
+async function fetchWithRetry(
+  send: () => Promise<Response>,
+  retry: boolean,
+  retryStatuses: Set<number> = TRANSIENT_STATUSES,
+): Promise<Response> {
+  const retryNetworkErrors = retryStatuses === TRANSIENT_STATUSES;
   for (let attempt = 0; ; attempt++) {
     const last = !retry || attempt >= RETRY_DELAYS_MS.length;
     try {
       const response = await send();
-      if (last || !TRANSIENT_STATUSES.has(response.status)) return response;
+      if (last || !retryStatuses.has(response.status)) return response;
     } catch (error) {
-      if (last) throw error;
+      if (last || !retryNetworkErrors) throw error;
     }
     await sleep(RETRY_DELAYS_MS[attempt]);
   }
@@ -83,10 +90,23 @@ interface RefreshOutcome {
 let refreshPromise: Promise<RefreshOutcome> | null = null;
 
 async function refreshAccessToken(): Promise<RefreshOutcome> {
-  const { refreshToken } = useTokenStore.getState();
+  // Another tab (web) may already have rotated the refresh token; the one in
+  // memory would then be "reused" and the server would revoke every session.
+  // Re-read storage first and, if it moved on, use the newer access token.
+  const inMemory = useTokenStore.getState().refreshToken;
+  const stored = await useTokenStore.getState().peekTokens().catch(() => null);
+  if (stored?.refreshToken && stored.refreshToken !== inMemory && stored.accessToken) {
+    await useTokenStore.getState().setTokens(stored.accessToken, stored.refreshToken);
+    return { accessToken: stored.accessToken, rejected: false };
+  }
+  const refreshToken = stored?.refreshToken ?? inMemory;
   if (!refreshToken) return { accessToken: null, rejected: true };
 
   try {
+    // Refresh tokens are single-use: re-sending one the server already
+    // rotated looks like theft and revokes every session. So retry ONLY when
+    // the proxy says the app was never reached (502/503), never after a
+    // timeout (504) or a dropped connection, where it may have been used.
     const response = await fetchWithRetry(
       () =>
         fetch(`${env.apiUrl}/auth/refresh`, {
@@ -95,6 +115,7 @@ async function refreshAccessToken(): Promise<RefreshOutcome> {
           body: JSON.stringify({ refreshToken }),
         }),
       true,
+      REFRESH_RETRY_STATUSES,
     );
     if (!response.ok) {
       return { accessToken: null, rejected: [400, 401, 403].includes(response.status) };

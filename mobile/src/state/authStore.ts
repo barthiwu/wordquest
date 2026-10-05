@@ -31,7 +31,13 @@ interface AuthState {
  */
 export const useAuthStore = create<AuthState>((set) => {
   useTokenStore.subscribe((tokenState) => {
-    set({ accessToken: tokenState.accessToken, refreshToken: tokenState.refreshToken });
+    set({
+      accessToken: tokenState.accessToken,
+      refreshToken: tokenState.refreshToken,
+      // Signed out (logout, or the server rejected the session): drop the
+      // cached profile too, so nothing shows the old player's name.
+      ...(tokenState.refreshToken ? {} : { user: null }),
+    });
   });
 
   // Both SplashScreen (the normal cold-start path) and RootNavigator (so a

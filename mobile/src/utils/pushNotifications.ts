@@ -1,7 +1,7 @@
 import { Linking, Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
-import { registerPushToken } from '@/services/notifications';
+import { registerPushToken, unregisterPushToken } from '@/services/notifications';
 
 export interface DevicePushToken {
   token: string;
@@ -64,6 +64,26 @@ export function syncPushToken(accessToken: string): void {
     .catch(() => {
       // Best-effort — a failure here must never disrupt login/onboarding/app-start.
     });
+}
+
+/**
+ * Detaches this device from the account on logout or account deletion, so a
+ * logged-out (or handed-down) phone stops receiving that player's pushes.
+ * Never prompts for permission and never throws; waits at most 3 seconds so
+ * signing out is never held up by a slow network.
+ */
+export async function unsyncPushToken(accessToken: string): Promise<void> {
+  try {
+    if (!Device.isDevice || (Platform.OS !== 'ios' && Platform.OS !== 'android')) return;
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') return;
+    const work = Notifications.getExpoPushTokenAsync().then(({ data }) =>
+      unregisterPushToken(accessToken, data),
+    );
+    await Promise.race([work, new Promise((resolve) => setTimeout(resolve, 3000))]);
+  } catch {
+    // Best-effort, like syncPushToken.
+  }
 }
 
 /**

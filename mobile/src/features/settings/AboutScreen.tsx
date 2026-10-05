@@ -18,6 +18,8 @@ import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
+import { confirmAction } from '@/utils/dialogs';
+import { unsyncPushToken } from '@/utils/pushNotifications';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'About'>;
 
@@ -47,26 +49,26 @@ export function AboutScreen({ navigation }: Props) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const onDeleteAccount = () => {
-    Alert.alert(t('about.deleteConfirmTitle'), t('about.deleteConfirmMessage'), [
-      { text: t('about.deleteConfirmCancel'), style: 'cancel' },
-      {
-        text: t('about.deleteConfirmDelete'),
-        style: 'destructive',
-        onPress: async () => {
-          if (!accessToken) return;
-          setBusy(true);
-          try {
-            await deleteAccount(accessToken);
-            await clearSession();
-            navigation.replace('Login');
-          } catch {
-            setMessage(t('about.errorDelete'));
-            setBusy(false);
-          }
-        },
-      },
-    ]);
+  const onDeleteAccount = async () => {
+    const confirmed = await confirmAction(
+      t('about.deleteConfirmTitle'),
+      t('about.deleteConfirmMessage'),
+      t('about.deleteConfirmDelete'),
+      t('about.deleteConfirmCancel'),
+    );
+    if (!confirmed || !accessToken) return;
+    setBusy(true);
+    try {
+      await unsyncPushToken(accessToken);
+      await deleteAccount(accessToken);
+      await clearSession();
+      // Reset, not replace: nothing signed-in may remain under the login
+      // screen for Back (Android or the browser) to return to.
+      navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
+    } catch {
+      setMessage(t('about.errorDelete'));
+      setBusy(false);
+    }
   };
 
   const legalRows: Array<{ id: string; label: string; onPress: () => void }> = [

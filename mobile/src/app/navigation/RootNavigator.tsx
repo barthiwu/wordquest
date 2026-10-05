@@ -1,8 +1,13 @@
 import { useEffect } from 'react';
-import { NavigationContainer, type NavigatorScreenParams } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+  type NavigatorScreenParams,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useThemeColors, useThemeStore } from '@/state/themeStore';
 import { useAuthStore } from '@/state/authStore';
+import { useTokenStore } from '@/state/tokenStore';
 import { withResponsiveFrame as framed } from '@/components/layout/withResponsiveFrame';
 import { SplashScreen } from '@/features/splash/SplashScreen';
 import { WelcomeScreen } from '@/features/welcome/WelcomeScreen';
@@ -130,6 +135,22 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+/** Screens that work without a session; a session ending here doesn't redirect. */
+const SIGNED_OUT_ROUTES = new Set<string>([
+  'Splash',
+  'Welcome',
+  'Registration',
+  'Login',
+  'ForgotPassword',
+  'RecoverAccount',
+  'VerifyEmail',
+  'ResetPassword',
+  'PrivacyPolicy',
+  'TermsOfService',
+  'AgeRestriction',
+  'DataDeletion',
+]);
+
 export function RootNavigator() {
   const colors = useThemeColors();
   const mode = useThemeStore((s) => s.mode);
@@ -154,8 +175,27 @@ export function RootNavigator() {
     hydrate();
   }, [hydrate]);
 
+  // When the session ends underneath the player (the server rejected the
+  // refresh token: expired, revoked, signed out elsewhere), send them to
+  // Welcome. Before, the tokens were cleared but the app stayed on Main,
+  // showing empty screens that could never load.
+  const navigationRef = useNavigationContainerRef<RootStackParamList>();
+  useEffect(
+    () =>
+      useTokenStore.subscribe((state, previous) => {
+        if (previous.refreshToken && !state.refreshToken && navigationRef.isReady()) {
+          const current = navigationRef.getCurrentRoute()?.name;
+          if (current && !SIGNED_OUT_ROUTES.has(current)) {
+            navigationRef.reset({ index: 0, routes: [{ name: 'Welcome' }] });
+          }
+        }
+      }),
+    [navigationRef],
+  );
+
   return (
     <NavigationContainer
+      ref={navigationRef}
       linking={linking}
       theme={{
         dark: mode === 'dark',

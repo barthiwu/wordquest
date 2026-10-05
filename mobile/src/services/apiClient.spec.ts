@@ -212,6 +212,34 @@ describe('apiRequest resilience (backend asleep / redeploying)', () => {
     expect(clear).not.toHaveBeenCalled();
   });
 
+  it('never re-sends the single-use refresh token after a 504 (it may already have been used)', async () => {
+    useTokenStore.setState({ accessToken: 'old', refreshToken: 'rt' });
+    const clear = jest.spyOn(useTokenStore.getState(), 'clearTokens');
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce(mockFetchResponse({ ok: false, status: 401 }))
+      .mockResolvedValueOnce(mockFetchResponse({ ok: false, status: 504 }));
+
+    await expect(apiRequest('/users/me', { accessToken: 'old' })).rejects.toMatchObject({ status: 503 });
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(clear).not.toHaveBeenCalled();
+  });
+
+  it('uses the token another tab already rotated instead of refreshing again', async () => {
+    useTokenStore.setState({ accessToken: 'old', refreshToken: 'rt-old' });
+    jest
+      .spyOn(useTokenStore.getState(), 'peekTokens')
+      .mockResolvedValue({ accessToken: 'fresh', refreshToken: 'rt-new' });
+    jest.spyOn(useTokenStore.getState(), 'setTokens').mockResolvedValue(undefined);
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce(mockFetchResponse({ ok: false, status: 401 }))
+      .mockResolvedValueOnce(mockFetchResponse({ ok: true, json: { id: 'me' } }));
+
+    await expect(apiRequest('/users/me', { accessToken: 'old' })).resolves.toEqual({ id: 'me' });
+    const urls = (global.fetch as jest.Mock).mock.calls.map((c) => String(c[0]));
+    expect(urls.some((u) => u.includes('/auth/refresh'))).toBe(false);
+    expect((global.fetch as jest.Mock).mock.calls[1][1].headers.Authorization).toBe('Bearer fresh');
+  });
+
   it('signs out only when the server rejects the refresh token', async () => {
     useTokenStore.setState({ accessToken: 'old', refreshToken: 'rt' });
     const clear = jest.spyOn(useTokenStore.getState(), 'clearTokens').mockResolvedValue(undefined);

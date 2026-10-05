@@ -10,6 +10,8 @@ interface TokenState {
   refreshToken: string | null;
   /** Reads both tokens from SecureStore into memory (app launch) and returns them. */
   loadTokens: () => Promise<{ accessToken: string | null; refreshToken: string | null }>;
+  /** Reads the stored tokens WITHOUT touching memory (no subscriber fires). */
+  peekTokens: () => Promise<{ accessToken: string | null; refreshToken: string | null }>;
   /** Persists a fresh access/refresh pair (login, register, or a silent refresh). */
   setTokens: (accessToken: string, refreshToken: string) => Promise<void>;
   /** Wipes both tokens from SecureStore and memory (logout, or a dead refresh token). */
@@ -89,6 +91,14 @@ export const useTokenStore = create<TokenState>((set) => ({
       storage.getItemAsync(REFRESH_TOKEN_KEY),
     ]);
     set({ accessToken, refreshToken });
+    return { accessToken, refreshToken };
+  },
+
+  peekTokens: async () => {
+    const [accessToken, refreshToken] = await Promise.all([
+      storage.getItemAsync(ACCESS_TOKEN_KEY),
+      storage.getItemAsync(REFRESH_TOKEN_KEY),
+    ]);
     return { accessToken, refreshToken };
   },
 

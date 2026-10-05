@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Alert, Modal, Pressable, StyleSheet, Text } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -7,6 +7,7 @@ import { useThemeColors } from '@/state/themeStore';
 import { fileReport, type ReportTargetType } from '@/services/reports';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
+import { notify } from '@/utils/dialogs';
 
 const REASONS = [
   'Inappropriate name',
@@ -56,9 +57,9 @@ export function ReportButton({ targetType, targetId, label }: Props) {
     try {
       await fileReport(accessToken, { targetType, targetId, reason });
       setOpen(false);
-      Alert.alert(t('reportButton.sentTitle'), t('reportButton.sentMessage'));
+      notify(t('reportButton.sentTitle'), t('reportButton.sentMessage'));
     } catch (err) {
-      Alert.alert(
+      notify(
         t('reportButton.errorTitle'),
         err instanceof ApiError ? err.message : t('reportButton.errorFallback'),
       );

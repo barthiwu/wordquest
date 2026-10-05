@@ -1,7 +1,7 @@
-import { Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/state/authStore';
 import { ApiError } from '@/services/apiClient';
+import { confirmAction, notify } from '@/utils/dialogs';
 import {
   acceptFriendRequest,
   blockPlayer,
@@ -26,16 +26,11 @@ export function useFriendActions() {
   const accessToken = useAuthStore((s) => s.accessToken);
 
   function confirm(title: string, message: string, confirmLabel: string): Promise<boolean> {
-    return new Promise((resolve) => {
-      Alert.alert(title, message, [
-        { text: t('common:cancel'), style: 'cancel', onPress: () => resolve(false) },
-        { text: confirmLabel, style: 'destructive', onPress: () => resolve(true) },
-      ]);
-    });
+    return confirmAction(title, message, confirmLabel, t('common:cancel'));
   }
 
   function reportError(title: string, err: unknown) {
-    Alert.alert(title, err instanceof ApiError ? err.message : t('common:errorGeneric'));
+    notify(title, err instanceof ApiError ? err.message : t('common:errorGeneric'));
   }
 
   /** Sends a friend request by username and surfaces the result — a
@@ -47,13 +42,13 @@ export function useFriendActions() {
     try {
       const result = await sendFriendRequest(accessToken, username);
       if ('accepted' in result) {
-        Alert.alert(
+        notify(
           t('friends:popup.nowFriendsTitle'),
           t('friends:popup.nowFriendsMessage', { username }),
         );
         return 'friends';
       }
-      Alert.alert(
+      notify(
         t('friends:popup.addFriendSentTitle'),
         t('friends:popup.addFriendSentMessage', { username }),
       );
