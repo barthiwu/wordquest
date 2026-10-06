@@ -95,7 +95,7 @@ export class LeaderboardsService {
       },
     });
 
-    const entries = rows.map((row: ProgressionRow, index: number) => this.toEntry(row, index + 1));
+    const entries = this.toRankedEntries(rows);
     const viewer = await this.getViewerEntry(userId);
 
     return { entries, viewer };
@@ -121,7 +121,7 @@ export class LeaderboardsService {
       },
     });
 
-    const entries = rows.map((row: ProgressionRow, index: number) => this.toEntry(row, index + 1));
+    const entries = this.toRankedEntries(rows);
     const viewerEntry = entries.find((e: LeaderboardEntry) => e.userId === userId);
     if (!viewerEntry) {
       // Should be unreachable — the viewer is necessarily a member of
@@ -160,7 +160,7 @@ export class LeaderboardsService {
       },
     });
 
-    const entries = rows.map((row: ProgressionRow, index: number) => this.toEntry(row, index + 1));
+    const entries = this.toRankedEntries(rows);
     const viewerEntry = entries.find((e: LeaderboardEntry) => e.userId === userId);
     if (!viewerEntry) {
       throw new BadRequestException('Could not locate your entry on the country leaderboard.');
@@ -197,7 +197,7 @@ export class LeaderboardsService {
       },
     });
 
-    const entries = rows.map((row: ProgressionRow, index: number) => this.toEntry(row, index + 1));
+    const entries = this.toRankedEntries(rows);
     const viewerEntry = entries.find((e: LeaderboardEntry) => e.userId === userId);
     if (!viewerEntry) {
       throw new BadRequestException('Could not locate your entry on the continent leaderboard.');
@@ -271,7 +271,7 @@ export class LeaderboardsService {
       },
     });
 
-    const entries = rows.map((row: ProgressionRow, index: number) => this.toEntry(row, index + 1));
+    const entries = this.toRankedEntries(rows);
     const viewerEntry = entries.find((e: LeaderboardEntry) => e.userId === userId);
     if (!viewerEntry) {
       // Should be unreachable -- the viewer is always in memberIds -- but
@@ -369,6 +369,19 @@ export class LeaderboardsService {
       totalXp: totalBossXp,
       lastActiveOn: user.progression?.lastActiveOn ?? null,
     };
+  }
+
+  /**
+   * Standard competition ranking (1, 2, 2, 4): players tied on XP share a
+   * rank. Matches getRankForXp, so the viewer's own "rank" line never
+   * disagrees with the row they appear on in the list.
+   */
+  private toRankedEntries(rows: ProgressionRow[]): LeaderboardEntry[] {
+    let rank = 1;
+    return rows.map((row, index) => {
+      if (index > 0 && row.totalXp !== rows[index - 1].totalXp) rank = index + 1;
+      return this.toEntry(row, rank);
+    });
   }
 
   private toEntry(row: ProgressionRow, rank: number): LeaderboardEntry {

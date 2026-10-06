@@ -74,6 +74,24 @@ describe('LeaderboardsService', () => {
       expect(result.entries[0]).toMatchObject({ userId: 'u1', username: 'Ada', totalXp: 900 });
     });
 
+    it('gives players tied on XP the same rank (1, 2, 2, 4), matching the viewer rank formula', async () => {
+      prismaMock.userProgression.findMany.mockResolvedValueOnce([
+        progressionRow({ userId: 'u1', username: 'Ada', totalXp: 900 }),
+        progressionRow({ userId: 'u2', username: 'Bo', totalXp: 500 }),
+        progressionRow({ userId: 'u3', username: 'Cy', totalXp: 500 }),
+        progressionRow({ userId: 'u4', username: 'Di', totalXp: 100 }),
+      ]);
+      prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
+        progressionRow({ userId: 'u3', username: 'Cy', totalXp: 500 }),
+      );
+      prismaMock.userProgression.count.mockResolvedValueOnce(1);
+
+      const result = await service.getGlobal('u3');
+
+      expect(result.entries.map((e) => e.rank)).toEqual([1, 2, 2, 4]);
+      expect(result.viewer.rank).toBe(2);
+    });
+
     it('orders the Prisma query by totalXp desc with a stable secondary key', async () => {
       prismaMock.userProgression.findMany.mockResolvedValueOnce([]);
       prismaMock.userProgression.findUniqueOrThrow.mockResolvedValueOnce(
