@@ -116,19 +116,16 @@ describe('HangmanService', () => {
   });
 
   describe('start (daily play cap)', () => {
-    it('takes one play before a new solo session and reports the notice', async () => {
+    it('only checks the cap when a solo session starts (the play is counted on finish)', async () => {
       prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
       challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w1' } }]);
       prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
-      playLimitMock.consumePlay.mockResolvedValueOnce({
-        game: 'HANGMAN', used: 5, limit: 10, remaining: 5, percent: 50,
-      });
 
       const view = await service.start('u1');
 
       expect(playLimitMock.assertCanPlay).toHaveBeenCalledWith('u1', 'HANGMAN');
-      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'HANGMAN');
-      expect(view.playLimit).toEqual(expect.objectContaining({ used: 5, percent: 50 }));
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+      expect(view.playLimit).toBeUndefined();
     });
 
     it('refuses a new solo play at the cap and creates nothing', async () => {
@@ -483,8 +480,8 @@ describe('HangmanService', () => {
         where: { id: 's1', currentIndex: 1, currentWordGuessCount: 2 },
         data: expect.objectContaining({ status: 'COMPLETED' }),
       });
-      // A solo play was already counted when it started.
-      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+      // A solo play is counted once it is finished.
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'HANGMAN', { force: true });
     });
 
     it('counts a head-to-head play once the last word is answered (not before)', async () => {
@@ -508,6 +505,30 @@ describe('HangmanService', () => {
         data: expect.objectContaining({ status: 'COMPLETED' }),
       });
       expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'HANGMAN', { force: true });
+    });
+
+
+    it('never counts a Group Play round against the daily cap', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        groupId: 'g1',
+        currentIndex: 1,
+        currentWordGuesses: ['c', 'a'],
+        currentWordGuessCount: 2,
+      });
+      prismaMock.arcadeAnswer.count.mockResolvedValueOnce(2);
+
+      const result = await service.guessLetter('u1', 's1', 't');
+
+      expect(result.completion?.sessionComplete).toBe(true);
+      expect(result.completion?.nextChallenge).toBeNull();
+      expect(result.completion?.correctCount).toBe(2);
+      expect(progressionMock.recordDailyActivity).toHaveBeenCalled();
+      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith({
+        where: { id: 's1', currentIndex: 1, currentWordGuessCount: 2 },
+        data: expect.objectContaining({ status: 'COMPLETED' }),
+      });
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
     });
 
     it('does not double-award when the claim loses a race', async () => {

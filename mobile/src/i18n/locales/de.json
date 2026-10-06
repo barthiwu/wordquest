@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "Reise fortgeschritten"
     },
-    "themeToggleButton": {
-      "switchToLight": "Zu hellem Modus wechseln",
-      "switchToDark": "Zu dunklem Modus wechseln"
-    },
     "tabs": {
       "home": "Start",
       "journey": "Reise",
@@ -417,6 +413,8 @@
     "languageRowLabel": "Sprache: {{language}}",
     "newLookRow": "Neues Design",
     "newLookHint": "Probiere das illustrierte WordQuest-Design aus. Du kannst jederzeit zurückwechseln.",
+    "darkModeRow": "Dunkelmodus",
+    "darkModeHint": "Ein dunkles Design, das nachts angenehmer für die Augen ist.",
     "moreSection": "Mehr",
     "aboutRow": "Über",
     "sendFeedbackRow": "Feedback senden",

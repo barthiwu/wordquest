@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "यात्रा आगे बढ़ी"
     },
-    "themeToggleButton": {
-      "switchToLight": "लाइट मोड पर स्विच करें",
-      "switchToDark": "डार्क मोड पर स्विच करें"
-    },
     "tabs": {
       "home": "होम",
       "journey": "यात्रा",
@@ -417,6 +413,8 @@
     "languageRowLabel": "भाषा: {{language}}",
     "newLookRow": "नया लुक",
     "newLookHint": "WordQuest का चित्रों वाला नया लुक आज़माएं। कभी भी बंद करके पुराने लुक पर लौटें।",
+    "darkModeRow": "डार्क मोड",
+    "darkModeHint": "रात में आँखों के लिए आरामदायक गहरा थीम इस्तेमाल करें।",
     "moreSection": "और अधिक",
     "aboutRow": "हमारे बारे में",
     "sendFeedbackRow": "फ़ीडबैक भेजें",

@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
-import { useThemeColors } from '@/state/themeStore';
+import { useThemeColors, useThemeStore } from '@/state/themeStore';
 import { useSelectedLanguage } from '@/state/languageStore';
 import { useUiVersionStore } from '@/state/uiVersionStore';
 import { getTwoFactorStatus, logout } from '@/services/auth';
@@ -51,6 +51,8 @@ export function SettingsScreen({ navigation }: Props) {
   const clearSession = useAuthStore((s) => s.clearSession);
   const user = useAuthStore((s) => s.user);
   const selectedLanguage = useSelectedLanguage();
+  const themeMode = useThemeStore((s) => s.mode);
+  const setThemeMode = useThemeStore((s) => s.setMode);
   const uiVersion = useUiVersionStore((s) => s.version);
   const setUiVersion = useUiVersionStore((s) => s.setVersion);
   const accessToken = useAuthStore((s) => s.accessToken);
@@ -103,6 +105,14 @@ export function SettingsScreen({ navigation }: Props) {
             value: selectedLanguage.name,
             accessibilityLabel: t('languageRowLabel', { language: selectedLanguage.name }),
             onPress: () => navigation.navigate('Language'),
+          },
+          {
+            key: 'darkMode',
+            icon: themeMode === 'dark' ? 'moon' : 'moon-outline',
+            tint: '#8C7BFF',
+            label: t('darkModeRow'),
+            hint: t('darkModeHint'),
+            toggle: { value: themeMode === 'dark', onChange: (on) => setThemeMode(on ? 'dark' : 'light') },
           },
           {
             key: 'newLook',
@@ -222,6 +232,19 @@ export function SettingsScreen({ navigation }: Props) {
             <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
           </View>
         </Pressable>
+        <View style={styles.row}>
+          <View style={styles.rowTextBlock}>
+            <Text style={styles.rowText}>{t('darkModeRow')}</Text>
+            <Text style={styles.rowHint}>{t('darkModeHint')}</Text>
+          </View>
+          <Switch
+            value={themeMode === 'dark'}
+            onValueChange={(on) => setThemeMode(on ? 'dark' : 'light')}
+            trackColor={{ false: colors.border, true: colors.arcane }}
+            thumbColor={colors.ink}
+            accessibilityLabel={t('darkModeRow')}
+          />
+        </View>
         <View style={styles.row}>
           <View style={styles.rowTextBlock}>
             <Text style={styles.rowText}>{t('newLookRow')}</Text>

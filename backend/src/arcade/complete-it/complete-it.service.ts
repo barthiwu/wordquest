@@ -204,8 +204,9 @@ export class CompleteItService {
       throw new BadRequestException('No words are available for Complete It right now.');
     }
 
-    // Taken before the session exists, so a refused (raced) play never leaves a free session behind.
-    const playLimit = await this.playLimit.consumePlay(userId, 'COMPLETE_IT');
+    // A solo play counts only once the player finishes it (see submitAnswer):
+    // starting just checked (above) that today's plays are not used up, and an
+    // abandoned run never costs one.
     const session = await this.prisma.arcadeGameSession.create({
       data: {
         userId,
@@ -215,7 +216,7 @@ export class CompleteItService {
       },
     });
 
-    return { ...(await this.buildChallengeView(session, variant)), playLimit };
+    return this.buildChallengeView(session, variant);
   }
 
   /**
@@ -510,11 +511,12 @@ export class CompleteItService {
       }
     }
 
-    // A head-to-head play counts only once the player has played it to the
-    // end: dropping out midway never uses up one of the day's plays. The
-    // match is already committed, so this is recorded, never refused.
+    // A solo or head-to-head play counts only once the player has played it
+    // to the end: dropping out midway never uses up one of the day's plays.
+    // The run is already committed, so this is recorded, never refused.
+    // (Group Play rounds are not counted against the daily limit.)
     let playLimit: ArcadePlayNotice | undefined;
-    if (isLastWord && session.versusMatchId) {
+    if (isLastWord && !session.groupId) {
       playLimit = await this.playLimit
         .consumePlay(userId, 'COMPLETE_IT', { force: true })
         .catch(() => undefined);

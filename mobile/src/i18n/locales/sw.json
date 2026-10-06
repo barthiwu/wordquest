@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "Safari imesonga mbele"
     },
-    "themeToggleButton": {
-      "switchToLight": "Badili kwenda hali angavu",
-      "switchToDark": "Badili kwenda hali ya giza"
-    },
     "tabs": {
       "home": "Nyumbani",
       "journey": "Safari",
@@ -417,6 +413,8 @@
     "languageRowLabel": "Lugha: {{language}}",
     "newLookRow": "Muonekano mpya",
     "newLookHint": "Jaribu muonekano wa WordQuest wenye michoro. Zima wakati wowote kurudi nyuma.",
+    "darkModeRow": "Hali ya giza",
+    "darkModeHint": "Tumia mandhari ya giza inayopendeza zaidi machoni usiku.",
     "moreSection": "Zaidi",
     "aboutRow": "Kuhusu",
     "sendFeedbackRow": "Tuma Maoni",

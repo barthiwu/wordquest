@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "Travesía avanzada"
     },
-    "themeToggleButton": {
-      "switchToLight": "Cambiar a modo claro",
-      "switchToDark": "Cambiar a modo oscuro"
-    },
     "tabs": {
       "home": "Inicio",
       "journey": "Travesía",
@@ -417,6 +413,8 @@
     "languageRowLabel": "Idioma: {{language}}",
     "newLookRow": "Nuevo aspecto",
     "newLookHint": "Prueba el aspecto ilustrado de WordQuest. Desactívalo cuando quieras para volver al anterior.",
+    "darkModeRow": "Modo oscuro",
+    "darkModeHint": "Usa un tema oscuro que cansa menos la vista por la noche.",
     "moreSection": "Más",
     "aboutRow": "Acerca de",
     "sendFeedbackRow": "Enviar comentarios",

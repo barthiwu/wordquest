@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "Parcours avancé"
     },
-    "themeToggleButton": {
-      "switchToLight": "Passer en mode clair",
-      "switchToDark": "Passer en mode sombre"
-    },
     "tabs": {
       "home": "Accueil",
       "journey": "Parcours",
@@ -417,6 +413,8 @@
     "languageRowLabel": "Langue : {{language}}",
     "newLookRow": "Nouveau style",
     "newLookHint": "Essayez le style illustré de WordQuest. Désactivez-le à tout moment pour revenir en arrière.",
+    "darkModeRow": "Mode sombre",
+    "darkModeHint": "Un thème sombre plus reposant pour les yeux la nuit.",
     "moreSection": "Plus",
     "aboutRow": "À propos",
     "sendFeedbackRow": "Envoyer un avis",
@@ -946,7 +944,7 @@
     "wordDuelSubtitle": "Affronte un autre joueur avec des indices progressifs",
     "completeItTitle": "Complète-le",
     "completeItSubtitle": "Trouve le mot manquant",
-    "hangmanTitle": "Le Pendu",
+    "hangmanTitle": "Hangman",
     "hangmanSubtitle": "Trouve le mot avant que le bonhomme soit pendu",
     "backToPlay": "Retour à Jouer",
     "plays": {
@@ -1151,9 +1149,9 @@
     "backToArcade": "Retour à l'Arcade"
   },
   "hangman": {
-    "genericError": "Impossible de joindre Le Pendu pour le moment.",
+    "genericError": "Impossible de joindre Hangman pour le moment.",
     "retry": "Réessayer",
-    "title": "Le Pendu",
+    "title": "Hangman",
     "streakLabel": "Série",
     "progressLabel": "Mot {{current}} sur {{total}}",
     "mistakesLabel": "Erreurs",
@@ -1333,7 +1331,7 @@
     "arcadeSection": "Arcade",
     "scrambleQuestSubheading": "ScrambleQuest",
     "completeItSubheading": "Complète-le",
-    "hangmanSubheading": "Le Pendu",
+    "hangmanSubheading": "Hangman",
     "sessionsActive": "Sessions en cours",
     "sessionsCompleted": "Sessions terminées",
     "sessionsAbandoned": "Sessions abandonnées",

@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "تقدّمت الرحلة"
     },
-    "themeToggleButton": {
-      "switchToLight": "التبديل إلى الوضع الفاتح",
-      "switchToDark": "التبديل إلى الوضع الداكن"
-    },
     "tabs": {
       "home": "الرئيسية",
       "journey": "الرحلة",
@@ -417,6 +413,8 @@
     "languageRowLabel": "اللغة: {{language}}",
     "newLookRow": "مظهر جديد",
     "newLookHint": "جرّب مظهر WordQuest المصوَّر. يمكنك إيقافه في أي وقت للعودة.",
+    "darkModeRow": "الوضع الداكن",
+    "darkModeHint": "استخدم مظهرًا داكنًا أكثر راحة للعين في الليل.",
     "moreSection": "المزيد",
     "aboutRow": "حول التطبيق",
     "sendFeedbackRow": "إرسال ملاحظات",

@@ -125,19 +125,16 @@ describe('CompleteItService', () => {
   });
 
   describe('start (daily play cap)', () => {
-    it('takes one play before a new solo session and reports the notice', async () => {
+    it('only checks the cap when a solo session starts (the play is counted on finish)', async () => {
       prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
       challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w1' } }]);
       prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
-      playLimitMock.consumePlay.mockResolvedValueOnce({
-        game: 'COMPLETE_IT', used: 5, limit: 10, remaining: 5, percent: 50,
-      });
 
       const view = await service.start('u1');
 
       expect(playLimitMock.assertCanPlay).toHaveBeenCalledWith('u1', 'COMPLETE_IT');
-      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'COMPLETE_IT');
-      expect(view.playLimit).toEqual(expect.objectContaining({ used: 5, percent: 50 }));
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+      expect(view.playLimit).toBeUndefined();
     });
 
     it('refuses a new solo play at the cap and creates nothing', async () => {
@@ -603,8 +600,8 @@ describe('CompleteItService', () => {
           data: expect.objectContaining({ status: 'COMPLETED' }),
         }),
       );
-      // A solo play was already counted when it started.
-      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+      // A solo play is counted once it is finished.
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'COMPLETE_IT', { force: true });
     });
 
     it('counts a head-to-head play once the last word is answered (not before)', async () => {
@@ -632,6 +629,34 @@ describe('CompleteItService', () => {
         }),
       );
       expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'COMPLETE_IT', { force: true });
+    });
+
+
+    it('never counts a Group Play round against the daily cap', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        groupId: 'g1',
+        currentIndex: 2, // last of 3 words (0-based)
+      });
+      rewardEngineMock.calculate.mockReturnValueOnce({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+
+      const result = await service.submitAnswer('u1', 's1', 'train');
+
+      expect(result.sessionComplete).toBe(true);
+      expect(result.nextChallenge).toBeNull();
+      expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u1', prismaMock, []);
+      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ status: 'COMPLETED' }),
+        }),
+      );
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
     });
 
     it('resolves a STREAK_MILESTONE reaction live on the last word (task #99 follow-up: anchored to the streak container)', async () => {

@@ -53,7 +53,8 @@ export interface ArcadePlayNotice {
  * The free plan's daily cap on Arcade plays (max ARCADE_DAILY_PLAY_LIMIT per
  * game per player-local day; WordQuest+ is unlimited). Every game calls
  * `assertCanPlay` before it lets someone start (queue, invite, accept) and
- * `consumePlay` at the moment a session / match really starts.
+ * `consumePlay` once the play is finished (solo, head-to-head and Word Duel
+ * alike -- an abandoned run never costs a play; Group Play is not counted).
  */
 @Injectable()
 export class ArcadePlayLimitService {

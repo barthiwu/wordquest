@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "سفر پیشرفت کرد"
     },
-    "themeToggleButton": {
-      "switchToLight": "تغییر به حالت روشن",
-      "switchToDark": "تغییر به حالت تاریک"
-    },
     "tabs": {
       "home": "خانه",
       "journey": "سفر",
@@ -417,6 +413,8 @@
     "languageRowLabel": "زبان: {{language}}",
     "newLookRow": "ظاهر جدید",
     "newLookHint": "ظاهر تصویری جدید WordQuest را امتحان کنید. هر زمان خواستید خاموشش کنید تا به حالت قبل برگردید.",
+    "darkModeRow": "حالت تاریک",
+    "darkModeHint": "از یک پوسته تیره استفاده کنید که شب برای چشم راحت‌تر است.",
     "moreSection": "بیشتر",
     "aboutRow": "درباره",
     "sendFeedbackRow": "ارسال بازخورد",

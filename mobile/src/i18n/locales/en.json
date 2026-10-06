@@ -116,10 +116,6 @@
     "journeyCelebration": {
       "eyebrow": "Journey advanced"
     },
-    "themeToggleButton": {
-      "switchToLight": "Switch to light mode",
-      "switchToDark": "Switch to dark mode"
-    },
     "tabs": {
       "home": "Home",
       "journey": "Journey",
@@ -417,6 +413,8 @@
     "languageRowLabel": "Language: {{language}}",
     "newLookRow": "New look",
     "newLookHint": "Try the illustrated WordQuest look. Switch off any time to go back.",
+    "darkModeRow": "Dark mode",
+    "darkModeHint": "Use a dark theme that’s easier on the eyes at night.",
     "moreSection": "More",
     "aboutRow": "About",
     "sendFeedbackRow": "Send Feedback",

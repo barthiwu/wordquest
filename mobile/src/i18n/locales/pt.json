@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "Jornada avançou"
     },
-    "themeToggleButton": {
-      "switchToLight": "Mudar para modo claro",
-      "switchToDark": "Mudar para modo escuro"
-    },
     "tabs": {
       "home": "Início",
       "journey": "Jornada",
@@ -417,6 +413,8 @@
     "languageRowLabel": "Idioma: {{language}}",
     "newLookRow": "Novo visual",
     "newLookHint": "Experimente o visual ilustrado do WordQuest. Desative quando quiser para voltar.",
+    "darkModeRow": "Modo escuro",
+    "darkModeHint": "Use um tema escuro, mais confortável para os olhos à noite.",
     "moreSection": "Mais",
     "aboutRow": "Sobre",
     "sendFeedbackRow": "Enviar feedback",
@@ -946,7 +944,7 @@
     "wordDuelSubtitle": "Compita com outro jogador usando dicas progressivas",
     "completeItTitle": "Complete a Palavra",
     "completeItSubtitle": "Complete a palavra que falta",
-    "hangmanTitle": "Forca",
+    "hangmanTitle": "Hangman",
     "hangmanSubtitle": "Descubra a palavra antes que a forca seja completada",
     "backToPlay": "Voltar para Jogar",
     "plays": {
@@ -1151,9 +1149,9 @@
     "backToArcade": "Voltar ao Arcade"
   },
   "hangman": {
-    "genericError": "Não foi possível acessar a Forca agora.",
+    "genericError": "Não foi possível acessar o Hangman agora.",
     "retry": "Tentar novamente",
-    "title": "Forca",
+    "title": "Hangman",
     "streakLabel": "Sequência",
     "progressLabel": "Palavra {{current}} de {{total}}",
     "mistakesLabel": "Erros",
@@ -1333,7 +1331,7 @@
     "arcadeSection": "Arcade",
     "scrambleQuestSubheading": "ScrambleQuest",
     "completeItSubheading": "Complete a Palavra",
-    "hangmanSubheading": "Forca",
+    "hangmanSubheading": "Hangman",
     "sessionsActive": "Sessões ativas",
     "sessionsCompleted": "Sessões concluídas",
     "sessionsAbandoned": "Sessões abandonadas",

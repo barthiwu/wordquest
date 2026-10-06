@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "Путь продвинулся"
     },
-    "themeToggleButton": {
-      "switchToLight": "Переключить на светлую тему",
-      "switchToDark": "Переключить на тёмную тему"
-    },
     "tabs": {
       "home": "Главная",
       "journey": "Путь",
@@ -417,6 +413,8 @@
     "languageRowLabel": "Язык: {{language}}",
     "newLookRow": "Новый облик",
     "newLookHint": "Попробуйте иллюстрированный облик WordQuest. Его можно выключить в любой момент и вернуться назад.",
+    "darkModeRow": "Тёмная тема",
+    "darkModeHint": "Тёмное оформление, которое меньше напрягает глаза ночью.",
     "moreSection": "Ещё",
     "aboutRow": "О приложении",
     "sendFeedbackRow": "Отправить отзыв",
@@ -948,7 +946,7 @@
     "wordDuelSubtitle": "Соревнуйтесь с другим игроком, используя подсказки",
     "completeItTitle": "Заполни слово",
     "completeItSubtitle": "Впишите пропущенное слово",
-    "hangmanTitle": "Виселица",
+    "hangmanTitle": "Hangman",
     "hangmanSubtitle": "Найдите слово, пока человечка не повесили",
     "backToPlay": "Назад к разделу «Играть»",
     "plays": {
@@ -1159,9 +1157,9 @@
     "backToArcade": "Назад в Аркаду"
   },
   "hangman": {
-    "genericError": "Не удалось подключиться к «Виселице».",
+    "genericError": "Не удалось подключиться к Hangman.",
     "retry": "Повторить попытку",
-    "title": "Виселица",
+    "title": "Hangman",
     "streakLabel": "Серия",
     "progressLabel": "Слово {{current}} из {{total}}",
     "mistakesLabel": "Ошибки",
@@ -1341,7 +1339,7 @@
     "arcadeSection": "Аркада",
     "scrambleQuestSubheading": "ScrambleQuest",
     "completeItSubheading": "Заполни слово",
-    "hangmanSubheading": "Виселица",
+    "hangmanSubheading": "Hangman",
     "sessionsActive": "Активные сессии",
     "sessionsCompleted": "Завершённые сессии",
     "sessionsAbandoned": "Брошенные сессии",

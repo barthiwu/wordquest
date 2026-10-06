@@ -98,10 +98,6 @@
     "journeyCelebration": {
       "eyebrow": "旅程推进"
     },
-    "themeToggleButton": {
-      "switchToLight": "切换到浅色模式",
-      "switchToDark": "切换到深色模式"
-    },
     "tabs": {
       "home": "首页",
       "journey": "旅程",
@@ -417,6 +413,8 @@
     "languageRowLabel": "语言：{{language}}",
     "newLookRow": "新外观",
     "newLookHint": "试试插画风格的 WordQuest 外观。随时可以关闭并切换回来。",
+    "darkModeRow": "深色模式",
+    "darkModeHint": "使用更护眼的深色主题，夜间更舒适。",
     "moreSection": "更多",
     "aboutRow": "关于",
     "sendFeedbackRow": "发送反馈",
