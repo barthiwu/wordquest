@@ -6,10 +6,11 @@ import { AliModule } from '../../ali/ali.module';
 import { AnalyticsModule } from '../../analytics/analytics.module';
 import { WordDuelService } from './word-duel.service';
 import { WordDuelController } from './word-duel.controller';
+import { WordDuelChatService } from './word-duel-chat.service';
 
 @Module({
   imports: [ArcadeModule, ProgressionModule, FriendsModule, AliModule, AnalyticsModule],
   controllers: [WordDuelController],
-  providers: [WordDuelService],
+  providers: [WordDuelService, WordDuelChatService],
 })
 export class WordDuelModule {}

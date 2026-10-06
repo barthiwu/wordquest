@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { WordDuelService } from './word-duel.service';
+import { WordDuelChatService } from './word-duel-chat.service';
+import { SendDuelMessageDto } from './dto/send-duel-message.dto';
 import { SubmitWordDuelAnswerDto } from './dto/submit-word-duel-answer.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../../auth/guards/email-verification.guard';
@@ -11,6 +13,7 @@ import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
  * GET  /api/v1/arcade/word-duel/:matchId
  * POST /api/v1/arcade/word-duel/:matchId/answer
  * POST /api/v1/arcade/word-duel/:matchId/clue
+ * POST /api/v1/arcade/word-duel/:matchId/chat   { body }
  *
  * REST + client-polling transport for now (see the doc comment atop
  * WordDuelService) — no WebSocket gateway exists in this codebase yet
@@ -29,7 +32,10 @@ import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
 @Controller('arcade/word-duel')
 @UseGuards(JwtAuthGuard, EmailVerificationGuard)
 export class WordDuelController {
-  constructor(private readonly wordDuel: WordDuelService) {}
+  constructor(
+    private readonly wordDuel: WordDuelService,
+    private readonly chat: WordDuelChatService,
+  ) {}
 
   @Post('join')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
@@ -37,10 +43,38 @@ export class WordDuelController {
     return this.wordDuel.joinQueue(userId);
   }
 
+  /**
+   * The polling read. With `?chatAfter=<seq>` it also carries any chat
+   * messages newer than that cursor (pass 0 on the first call), so chat
+   * rides the same request the screen already makes every couple of
+   * seconds instead of adding a second poll.
+   */
   @Get(':matchId')
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
-  getState(@CurrentUserId() userId: string, @Param('matchId') matchId: string) {
-    return this.wordDuel.getState(userId, matchId);
+  async getState(
+    @CurrentUserId() userId: string,
+    @Param('matchId') matchId: string,
+    @Query('chatAfter') chatAfter?: string,
+  ) {
+    const state = await this.wordDuel.getState(userId, matchId);
+    if (chatAfter === undefined) return state;
+    const cursor = Number.parseInt(chatAfter, 10);
+    const messages = await this.chat.listForViewer(
+      userId,
+      matchId,
+      Number.isFinite(cursor) ? cursor : 0,
+    );
+    return { ...state, chat: messages };
+  }
+
+  @Post(':matchId/chat')
+  @Throttle({ default: { limit: 40, ttl: 60_000 } })
+  sendChat(
+    @CurrentUserId() userId: string,
+    @Param('matchId') matchId: string,
+    @Body() dto: SendDuelMessageDto,
+  ) {
+    return this.chat.send(userId, matchId, dto.body);
   }
 
   @Post(':matchId/answer')

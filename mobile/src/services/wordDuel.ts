@@ -87,6 +87,19 @@ export interface WordDuelStateView {
   streakReaction: AliDisplayMessage | null;
   /** Populated once status is COMPLETED — a "while your match ran..." recap of any Level-up/Journey/Mastery/Achievement reaction. Always [] before COMPLETED. */
   deferredAliReactions: AliDisplayMessage[];
+  /** In-game chat messages newer than the `chatAfter` cursor the poll sent. Only present on getWordDuelState calls that passed a cursor. */
+  chat?: WordDuelChatMessage[];
+}
+
+/** One in-game chat message (backend WordDuelChatMessageView). `seq` is the polling cursor. */
+export interface WordDuelChatMessage {
+  id: string;
+  seq: number;
+  senderId: string;
+  /** True when this player wrote it. */
+  mine: boolean;
+  body: string;
+  createdAt: string;
 }
 
 export interface WordDuelAnswerResult {
@@ -119,8 +132,27 @@ export function joinWordDuelQueue(accessToken: string): Promise<WordDuelStateVie
  * over time, and the match ending. No REST push/socket exists yet
  * (REST + client polling was the deliberate, Barth-approved transport
  * choice for now — see WordDuelService's own doc comment). */
-export function getWordDuelState(accessToken: string, matchId: string): Promise<WordDuelStateView> {
-  return apiRequest<WordDuelStateView>(`/arcade/word-duel/${matchId}`, { accessToken });
+export function getWordDuelState(
+  accessToken: string,
+  matchId: string,
+  /** When set, the response also carries chat messages with seq above this (pass 0 for the first call). */
+  chatAfter?: number,
+): Promise<WordDuelStateView> {
+  const query = chatAfter === undefined ? '' : `?chatAfter=${chatAfter}`;
+  return apiRequest<WordDuelStateView>(`/arcade/word-duel/${matchId}${query}`, { accessToken });
+}
+
+/** Sends a chat message to the opponent. The server rejects links, contact details, bad language and spam with a message that is safe to show the player. */
+export function sendWordDuelMessage(
+  accessToken: string,
+  matchId: string,
+  body: string,
+): Promise<WordDuelChatMessage> {
+  return apiRequest<WordDuelChatMessage>(`/arcade/word-duel/${matchId}/chat`, {
+    method: 'POST',
+    body: { body },
+    accessToken,
+  });
 }
 
 export function submitWordDuelAnswer(

@@ -11,7 +11,9 @@ import {
   joinWordDuelQueue,
   leaveWordDuelQueue,
   revealWordDuelClue,
+  sendWordDuelMessage,
   submitWordDuelAnswer,
+  type WordDuelChatMessage,
   type WordDuelStateView,
 } from '@/services/wordDuel';
 import { ApiError } from '@/services/apiClient';
@@ -31,6 +33,7 @@ import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
 import { AvatarActionMenu } from '@/components/AvatarActionMenu';
 import { AvatarBubble } from '@/components/AvatarBubble';
+import { DuelChat } from '@/components/DuelChat';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -45,6 +48,9 @@ type Phase = 'loading' | 'waiting' | 'active' | 'no-opponent' | 'complete' | 'er
  * 120-req/min budget on the state endpoint. Clue reveals themselves are
  * player-triggered (requestClue/revealWordDuelClue), not polled for. */
 const POLL_INTERVAL_MS = 2000;
+
+/** How long after the match ends the chat keeps updating (mirrors the server's POST_MATCH_GRACE_MINUTES). */
+const CHAT_AFTER_MATCH_MS = 5 * 60_000;
 /** How long a correct/incorrect flash stays up before clearing itself —
  * a duel doesn't pause for the player to hit "Continue" the way
  * ScrambleQuest does, since the opponent isn't waiting either. */
@@ -125,6 +131,20 @@ export function WordDuelScreen({ navigation }: Props) {
   // comment).
   const [opponentMenuOpen, setOpponentMenuOpen] = useState(false);
 
+  // In-game chat. Messages arrive on the same poll as the match state (the
+  // poll sends the highest seq it has), and are merged here by id so a
+  // re-fetch never duplicates one. Unread counts only the opponent's
+  // messages that landed while the panel was closed.
+  const [chatMessages, setChatMessages] = useState<WordDuelChatMessage[]>([]);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatUnread, setChatUnread] = useState(0);
+  const [chatUnavailable, setChatUnavailable] = useState(false);
+  const chatSeqRef = useRef(0);
+  const chatIdsRef = useRef<Set<string>>(new Set());
+  const chatOpenRef = useRef(false);
+  chatOpenRef.current = chatOpen;
+  const completeAtRef = useRef<number | null>(null);
+
   // Telemetry (spec §4B/§12) — refs so the unmount cleanup below always
   // reads the CURRENT phase/state rather than whatever was in scope
   // when that effect first ran; a plain render-time assignment (not an
@@ -134,19 +154,47 @@ export function WordDuelScreen({ navigation }: Props) {
   latestRef.current = { phase, state };
   const trackedWordIndexRef = useRef<number | null>(null);
 
-  const applyState = useCallback((view: WordDuelStateView) => {
-    setState(view);
-    if (view.status === 'WAITING') setPhase('waiting');
-    else if (view.status === 'ACTIVE') setPhase('active');
-    else if (view.status === 'COMPLETED') setPhase('complete');
-    else setPhase('no-opponent'); // ABANDONED — this player's own stale queue entry
+  const mergeChat = useCallback((incoming: WordDuelChatMessage[]) => {
+    const fresh = incoming.filter((m) => !chatIdsRef.current.has(m.id));
+    if (fresh.length === 0) return;
+    fresh.forEach((m) => {
+      chatIdsRef.current.add(m.id);
+      chatSeqRef.current = Math.max(chatSeqRef.current, m.seq);
+    });
+    setChatMessages((prev) => [...prev, ...fresh].sort((a, b) => a.seq - b.seq));
+    if (!chatOpenRef.current) {
+      const fromOpponent = fresh.filter((m) => !m.mine).length;
+      if (fromOpponent > 0) setChatUnread((n) => n + fromOpponent);
+    }
   }, []);
+
+  const applyState = useCallback(
+    (view: WordDuelStateView) => {
+      if (view.chat) mergeChat(view.chat);
+      setState(view);
+      if (view.status === 'WAITING') setPhase('waiting');
+      else if (view.status === 'ACTIVE') setPhase('active');
+      else if (view.status === 'COMPLETED') {
+        if (completeAtRef.current === null) completeAtRef.current = Date.now();
+        setPhase('complete');
+      } else setPhase('no-opponent'); // ABANDONED — this player's own stale queue entry
+    },
+    [mergeChat],
+  );
 
   const join = useCallback(async () => {
     if (!accessToken) return;
     setPhase('loading');
     setFeedback(null);
     setAnswer('');
+    // A new match starts a new conversation.
+    setChatMessages([]);
+    setChatUnread(0);
+    setChatOpen(false);
+    setChatUnavailable(false);
+    chatSeqRef.current = 0;
+    chatIdsRef.current = new Set();
+    completeAtRef.current = null;
     try {
       const view = await joinWordDuelQueue(accessToken);
       applyState(view);
@@ -193,18 +241,27 @@ export function WordDuelScreen({ navigation }: Props) {
   // on a failed tick (a transient network hiccup shouldn't flash an
   // error over an otherwise-fine match).
   useEffect(() => {
-    if (!accessToken || !state || (phase !== 'waiting' && phase !== 'active')) return undefined;
+    // After the final bell the poll only keeps running while the chat is
+    // open (players can still say "gg" for a few minutes).
+    const chatStillOpen =
+      phase === 'complete' &&
+      chatOpen &&
+      completeAtRef.current !== null &&
+      Date.now() - completeAtRef.current < CHAT_AFTER_MATCH_MS;
+    if (!accessToken || !state || (phase !== 'waiting' && phase !== 'active' && !chatStillOpen)) {
+      return undefined;
+    }
     const matchId = state.matchId;
     const interval = setInterval(async () => {
       try {
-        const fresh = await getWordDuelState(accessToken, matchId);
+        const fresh = await getWordDuelState(accessToken, matchId, chatSeqRef.current);
         applyState(fresh);
       } catch {
         // transient — next tick will retry
       }
     }, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [accessToken, state, phase, applyState]);
+  }, [accessToken, state, phase, chatOpen, applyState]);
 
   // Cosmetic match countdown, ticked from the server-issued matchEndsAt.
   useEffect(() => {
@@ -320,6 +377,27 @@ export function WordDuelScreen({ navigation }: Props) {
     } finally {
       setRevealingClue(false);
     }
+  };
+
+  // Sends a chat message. Resolves when the server accepted it; rejects with
+  // a player-safe message (filtered language, too fast, blocked...) that the
+  // chat panel shows under the box.
+  const handleSendChat = async (body: string) => {
+    if (!accessToken || !state) return;
+    try {
+      const message = await sendWordDuelMessage(accessToken, state.matchId, body);
+      mergeChat([message]);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 403) setChatUnavailable(true);
+      throw new Error(err instanceof ApiError ? err.message : '');
+    }
+  };
+
+  const toggleChat = () => {
+    setChatOpen((open) => {
+      if (!open) setChatUnread(0);
+      return !open;
+    });
   };
 
   // Leaving the search closes the waiting match on the server, so the next
@@ -532,6 +610,21 @@ export function WordDuelScreen({ navigation }: Props) {
           style={styles.deferredRecap}
         />
         <WordDuelFeedbackPrompt matchId={state.matchId} />
+        {opponentIdentity && (
+          <View style={styles.chatWrap}>
+            <DuelChat
+              colors={colors}
+              messages={chatMessages}
+              opponentName={opponentIdentity.username}
+              open={chatOpen}
+              onToggle={toggleChat}
+              unread={chatUnread}
+              onSend={handleSendChat}
+              onOpponentMenu={() => setOpponentMenuOpen(true)}
+              unavailable={chatUnavailable}
+            />
+          </View>
+        )}
         {opponentIdentity && (
           <AvatarActionMenu
             visible={opponentMenuOpen}
@@ -754,6 +847,30 @@ export function WordDuelScreen({ navigation }: Props) {
             <Text style={styles.subtitle}>{t('waitingForOpponentSubtitle')}</Text>
           </View>
         )}
+
+        {state.opponent?.userId && state.opponent.username && (
+          <>
+            <DuelChat
+              colors={colors}
+              messages={chatMessages}
+              opponentName={state.opponent.username}
+              open={chatOpen}
+              onToggle={toggleChat}
+              unread={chatUnread}
+              onSend={handleSendChat}
+              onOpponentMenu={() => setOpponentMenuOpen(true)}
+              unavailable={chatUnavailable}
+            />
+            <AvatarActionMenu
+              visible={opponentMenuOpen}
+              onClose={() => setOpponentMenuOpen(false)}
+              userId={state.opponent.userId}
+              username={state.opponent.username}
+              avatarUrl={state.opponent.avatarUrl}
+              onOpenProfile={(userId) => navigation.navigate('PublicProfile', { userId })}
+            />
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -761,6 +878,7 @@ export function WordDuelScreen({ navigation }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
+    chatWrap: { alignSelf: 'stretch', maxWidth: 420, width: '100%' },
     flexFill: { flex: 1 },
     container: {
       flexGrow: 1,

@@ -59,7 +59,7 @@ export class ModerationService {
     targetId: string,
     reason: string,
   ): Promise<{ id: string }> {
-    await this.assertTargetExists(targetType, targetId);
+    await this.assertTargetExists(targetType, targetId, reporterId);
 
     const report = await this.prisma.report.create({
       data: { reporterId, targetType, targetId, reason: reason.trim() },
@@ -68,7 +68,11 @@ export class ModerationService {
     return report;
   }
 
-  private async assertTargetExists(targetType: ReportTargetType, targetId: string): Promise<void> {
+  private async assertTargetExists(
+    targetType: ReportTargetType,
+    targetId: string,
+    reporterId: string,
+  ): Promise<void> {
     switch (targetType) {
       case 'USER': {
         const user = await this.prisma.user.findUnique({ where: { id: targetId }, select: { id: true } });
@@ -86,6 +90,24 @@ export class ModerationService {
           select: { id: true },
         });
         if (!submission) throw new BadRequestException('Reported submission not found');
+        return;
+      }
+      case 'WORD_DUEL_MESSAGE': {
+        // Only the player on the receiving end of a message can report it,
+        // and the report never confirms a message id to anyone else.
+        const message = await this.prisma.wordDuelMessage.findUnique({
+          where: { id: targetId },
+          select: { matchId: true, senderId: true },
+        });
+        const reporterInMatch = message
+          ? await this.prisma.wordDuelPlayerState.findFirst({
+              where: { matchId: message.matchId, userId: reporterId },
+              select: { id: true },
+            })
+          : null;
+        if (!message || !reporterInMatch || message.senderId === reporterId) {
+          throw new BadRequestException('Reported message not found');
+        }
         return;
       }
     }
@@ -126,6 +148,15 @@ export class ModerationService {
       where: { id: reportId },
       data: { status, reviewNotes: reviewNotes ?? null, reviewedById: reviewerId, reviewedAt: new Date() },
     });
+
+    // Actioning a report against a Word Duel message takes it down for both
+    // players. The row stays as evidence until the retention window passes.
+    if (status === 'ACTIONED' && report.targetType === 'WORD_DUEL_MESSAGE') {
+      await this.prisma.wordDuelMessage.updateMany({
+        where: { id: report.targetId },
+        data: { hidden: true },
+      });
+    }
   }
 
   async listPhotoQueue(): Promise<PhotoQueueItemView[]> {

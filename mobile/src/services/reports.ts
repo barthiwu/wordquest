@@ -1,6 +1,6 @@
 import { apiRequest } from './apiClient';
 
-export type ReportTargetType = 'USER' | 'CLAN' | 'WORD_IN_THE_WILD_SUBMISSION';
+export type ReportTargetType = 'USER' | 'CLAN' | 'WORD_IN_THE_WILD_SUBMISSION' | 'WORD_DUEL_MESSAGE';
 
 /** Files a moderation report — see backend ModerationService.fileReport. Reviewed by admin/support only; the reporter never sees the outcome in-app. */
 export function fileReport(

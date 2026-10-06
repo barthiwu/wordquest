@@ -161,6 +161,7 @@ model User {
   analyticsEvents          AnalyticsEvent[]
   feedback                 Feedback[]
   arcadeGameSessions       ArcadeGameSession[]
+  wordDuelMessages         WordDuelMessage[]         @relation("WordDuelMessageSender")
   wordDuelPlayerStates     WordDuelPlayerState[]
   // Friends (2026-09, Barth) -- see the Friendship/Block models near the
   // end of this file for the full design notes.
@@ -1605,6 +1606,7 @@ enum ReportTargetType {
   USER // a player's profile (display name, avatar)
   CLAN // a clan's name
   WORD_IN_THE_WILD_SUBMISSION // a piece of evidence (photo or text)
+  WORD_DUEL_MESSAGE // a chat message sent during a Word Duel
 }
 
 enum ReportStatus {
@@ -1805,13 +1807,38 @@ model WordDuelMatch {
   // disputed result is auditable rather than "the code did something."
   tieBreakReason String?
 
-  players WordDuelPlayerState[]
-  answers WordDuelAnswer[]
+  players  WordDuelPlayerState[]
+  answers  WordDuelAnswer[]
+  messages WordDuelMessage[]
 
   createdAt DateTime @default(now())
 
   @@index([status])
   @@map("word_duel_matches")
+}
+
+// One in-game chat message between the two players of a Word Duel (2026-10
+// request). seq is a global increasing counter, used purely as the polling
+// cursor ("give me messages after seq N") so two messages created in the
+// same millisecond can never be skipped. hidden is the moderation switch: a
+// reviewer who actions a report against a message hides it for both players
+// without deleting the evidence. Old, unreported messages are purged by
+// WordDuelChatService's daily cleanup.
+model WordDuelMessage {
+  id       String        @id @default(uuid())
+  seq      Int           @default(autoincrement())
+  matchId  String
+  match    WordDuelMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  senderId String
+  sender   User          @relation("WordDuelMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  body     String        @db.VarChar(200)
+  hidden   Boolean       @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([matchId, seq])
+  @@index([createdAt])
+  @@map("word_duel_messages")
 }
 
 // One player's state within one WordDuelMatch. A match always has

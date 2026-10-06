@@ -1,5 +1,6 @@
 import {
   getWordDuelState,
+  sendWordDuelMessage,
   joinWordDuelQueue,
   revealWordDuelClue,
   submitWordDuelAnswer,
@@ -43,6 +44,24 @@ describe('wordDuel service', () => {
     await revealWordDuelClue('tok', 'm1');
     expect(apiRequest).toHaveBeenCalledWith('/arcade/word-duel/m1/clue', {
       method: 'POST',
+      accessToken: 'tok',
+    });
+  });
+
+  it('asks for chat after a cursor when polling with one', async () => {
+    (apiRequest as jest.Mock).mockResolvedValueOnce({});
+    await getWordDuelState('tok', 'm1', 12);
+    expect(apiRequest).toHaveBeenCalledWith('/arcade/word-duel/m1?chatAfter=12', {
+      accessToken: 'tok',
+    });
+  });
+
+  it('sends a chat message', async () => {
+    (apiRequest as jest.Mock).mockResolvedValueOnce({});
+    await sendWordDuelMessage('tok', 'm1', 'Good luck!');
+    expect(apiRequest).toHaveBeenCalledWith('/arcade/word-duel/m1/chat', {
+      method: 'POST',
+      body: { body: 'Good luck!' },
       accessToken: 'tok',
     });
   });

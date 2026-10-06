@@ -7,6 +7,8 @@ describe('ModerationService', () => {
     clan: { findUnique: jest.fn() },
     wordInTheWildSubmission: { findUnique: jest.fn(), findMany: jest.fn(), update: jest.fn() },
     report: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn() },
+    wordDuelMessage: { findUnique: jest.fn(), updateMany: jest.fn() },
+    wordDuelPlayerState: { findFirst: jest.fn() },
   };
   const storageMock = {
     isStorageConfigured: jest.fn().mockReturnValue(true),
@@ -61,7 +63,70 @@ describe('ModerationService', () => {
     });
   });
 
+  describe('fileReport for a Word Duel message', () => {
+    it("files a report from the other player in that message's match", async () => {
+      prismaMock.wordDuelMessage.findUnique.mockResolvedValue({ matchId: 'm1', senderId: 'rival' });
+      prismaMock.wordDuelPlayerState.findFirst.mockResolvedValue({ id: 'ps1' });
+      prismaMock.report.create.mockResolvedValue({ id: 'report-9' });
+
+      const result = await service.fileReport('me', 'WORD_DUEL_MESSAGE', 'msg-1', 'Harassment');
+
+      expect(result).toEqual({ id: 'report-9' });
+      expect(prismaMock.wordDuelPlayerState.findFirst).toHaveBeenCalledWith({
+        where: { matchId: 'm1', userId: 'me' },
+        select: { id: true },
+      });
+    });
+
+    it('rejects a message that does not exist', async () => {
+      prismaMock.wordDuelMessage.findUnique.mockResolvedValue(null);
+      await expect(
+        service.fileReport('me', 'WORD_DUEL_MESSAGE', 'ghost', 'Spam'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rejects a reporter who was not in that match, without confirming the message exists', async () => {
+      prismaMock.wordDuelMessage.findUnique.mockResolvedValue({ matchId: 'm1', senderId: 'rival' });
+      prismaMock.wordDuelPlayerState.findFirst.mockResolvedValue(null);
+      await expect(
+        service.fileReport('stranger', 'WORD_DUEL_MESSAGE', 'msg-1', 'Spam'),
+      ).rejects.toThrow('Reported message not found');
+      expect(prismaMock.report.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects reporting your own message', async () => {
+      prismaMock.wordDuelMessage.findUnique.mockResolvedValue({ matchId: 'm1', senderId: 'me' });
+      prismaMock.wordDuelPlayerState.findFirst.mockResolvedValue({ id: 'ps1' });
+      await expect(
+        service.fileReport('me', 'WORD_DUEL_MESSAGE', 'msg-1', 'Spam'),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
   describe('reviewReport', () => {
+    it('hides a Word Duel message when its report is actioned', async () => {
+      prismaMock.report.findUnique.mockResolvedValue({
+        id: 'report-9',
+        targetType: 'WORD_DUEL_MESSAGE',
+        targetId: 'msg-1',
+      });
+      await service.reviewReport('admin-1', 'report-9', 'ACTIONED', undefined);
+      expect(prismaMock.wordDuelMessage.updateMany).toHaveBeenCalledWith({
+        where: { id: 'msg-1' },
+        data: { hidden: true },
+      });
+    });
+
+    it('leaves a Word Duel message visible when its report is dismissed', async () => {
+      prismaMock.report.findUnique.mockResolvedValue({
+        id: 'report-9',
+        targetType: 'WORD_DUEL_MESSAGE',
+        targetId: 'msg-1',
+      });
+      await service.reviewReport('admin-1', 'report-9', 'DISMISSED', undefined);
+      expect(prismaMock.wordDuelMessage.updateMany).not.toHaveBeenCalled();
+    });
+
     it('marks a report reviewed with the reviewer and timestamp', async () => {
       prismaMock.report.findUnique.mockResolvedValue({ id: 'report-1' });
 

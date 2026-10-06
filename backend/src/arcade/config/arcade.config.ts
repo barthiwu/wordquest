@@ -207,6 +207,24 @@ export const WORD_DUEL_CONFIG = {
   MAX_WORD_LENGTH: 10,
 } as const;
 
+/** In-game chat during a Word Duel (2026-10 request). Text only, short,
+ * rate-limited, and filtered: opponents can be strangers. */
+export const WORD_DUEL_CHAT_CONFIG = {
+  MAX_LENGTH: 200,
+  // Minimum gap between one player's messages.
+  MIN_INTERVAL_MS: 1500,
+  MAX_MESSAGES_PER_PLAYER_PER_MATCH: 60,
+  // The same text sent twice inside this window counts as spam.
+  DUPLICATE_WINDOW_MS: 10_000,
+  // Players can still chat ("gg") for a few minutes after the final bell.
+  POST_MATCH_GRACE_MINUTES: 5,
+  // Most messages one poll returns.
+  FETCH_LIMIT: 50,
+  // Unreported messages are deleted after this long. Reported ones are kept
+  // for the moderation team.
+  RETENTION_DAYS: 30,
+} as const;
+
 /**
  * Whether Arcade play counts toward the player's existing daily-activity
  * streak (UserProgression.currentStreak via ProgressionService.
