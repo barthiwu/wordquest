@@ -2,6 +2,7 @@ import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { CompleteItService } from './complete-it.service';
 import { SubmitCompleteItAnswerDto } from './dto/submit-complete-it-answer.dto';
+import { StartArcadeGameDto } from '../dto/start-arcade-game.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../../auth/guards/email-verification.guard';
 import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
@@ -26,8 +27,8 @@ export class CompleteItController {
 
   @Post('start')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  start(@CurrentUserId() userId: string) {
-    return this.completeIt.start(userId);
+  start(@CurrentUserId() userId: string, @Body() dto: StartArcadeGameDto) {
+    return this.completeIt.start(userId, dto?.versusMatchId);
   }
 
   @Post(':sessionId/hint')

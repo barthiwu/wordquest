@@ -250,3 +250,36 @@ export const ARCADE_AWARDS_GLYPHS = false;
  * WordDuelMatch.tieBreakReason for the audit trail.
  */
 export const WORD_DUEL_TIEBREAK_DESCRIPTION = 'most_correct_answers_then_earliest_final_score';
+
+// ── Head-to-head (versus) matches ──────────────────────────────────────
+// ScrambleQuest, Complete It and Hangman can be played against another
+// player (2026-10 request). Both players play their own ordinary session
+// on the same words; the higher number of correct answers wins, faster
+// total time breaks a tie. Word Duel is a different, real-time model and
+// is multiplayer-only.
+export const ARCADE_VERSUS_GAMES = ['SCRAMBLE_QUEST', 'COMPLETE_IT', 'HANGMAN'] as const;
+
+export const ARCADE_VERSUS_CONFIG = {
+  // How long a random-queue search waits for an opponent before the match
+  // expires and the player is offered solo play instead.
+  QUEUE_TIMEOUT_SECONDS: 45,
+  // A friend challenge stays open this long for the friend to accept.
+  INVITE_TTL_HOURS: 24,
+  // Once both players are in: the longest a random match can run (the
+  // slowest solo run is 20 words x 30s, so this is generous)...
+  RANDOM_PLAY_WINDOW_MINUTES: 25,
+  // ...and, once one player finishes, how much longer the other gets
+  // before the match is settled on what they have answered so far.
+  RANDOM_FINISH_GRACE_MINUTES: 6,
+  // Friend matches are asynchronous: the friend may play hours later.
+  FRIEND_PLAY_WINDOW_HOURS: 24,
+  FRIEND_FINISH_GRACE_HOURS: 24,
+  // XP bonus for winning a RANDOM match (no bonus for friend matches, so
+  // two friends cannot trade wins to farm XP). Answer XP is awarded as
+  // usual by each game, this is only the win bonus.
+  WIN_BONUS_XP: 40,
+  // Cap on open friend challenges one player can have outstanding.
+  MAX_OPEN_INVITES: 5,
+  // Sweep cadence is in the service (@Cron); history kept for the lists.
+  RECENT_RESULTS_SHOWN: 10,
+} as const;

@@ -2,6 +2,7 @@ import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ScrambleQuestService } from './scramble-quest.service';
 import { SubmitScrambleAnswerDto } from './dto/submit-scramble-answer.dto';
+import { StartArcadeGameDto } from '../dto/start-arcade-game.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../../auth/guards/email-verification.guard';
 import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
@@ -24,8 +25,8 @@ export class ScrambleQuestController {
 
   @Post('start')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  start(@CurrentUserId() userId: string) {
-    return this.scrambleQuest.start(userId);
+  start(@CurrentUserId() userId: string, @Body() dto: StartArcadeGameDto) {
+    return this.scrambleQuest.start(userId, dto?.versusMatchId);
   }
 
   @Post(':sessionId/hint')

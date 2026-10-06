@@ -162,6 +162,8 @@ model User {
   feedback                 Feedback[]
   arcadeGameSessions       ArcadeGameSession[]
   wordDuelMessages         WordDuelMessage[]         @relation("WordDuelMessageSender")
+  arcadeVersusHosted       ArcadeVersusMatch[]       @relation("ArcadeVersusHost")
+  arcadeVersusJoined       ArcadeVersusMatch[]       @relation("ArcadeVersusGuest")
   wordDuelPlayerStates     WordDuelPlayerState[]
   // Friends (2026-09, Barth) -- see the Friendship/Block models near the
   // end of this file for the full design notes.
@@ -1249,6 +1251,11 @@ enum NotificationType {
   // before that window closes). See NotificationSchedulerService.
   // sendMonthEndCatchUpReminders.
   MONTH_END_CATCH_UP
+  // Arcade head-to-head (2026-10): a friend challenged you, a versus match
+  // finished, or you passed 50/70/90/100% of a game's daily play limit.
+  ARCADE_CHALLENGE
+  ARCADE_RESULT
+  ARCADE_PLAY_LIMIT
 }
 
 // A notification is always written here first (in-app history/inbox),
@@ -1728,13 +1735,22 @@ model ArcadeGameSession {
   currentWordGuesses    String[] @default([])
   currentWordGuessCount Int      @default(0)
 
+  // Set when this session is one player's half of a head-to-head match
+  // (ArcadeVersusMatch). Solo sessions leave it null. At most one session
+  // per player per match (see the unique below -- Postgres treats nulls as
+  // distinct, so solo sessions are unaffected).
+  versusMatchId String?
+  versusMatch   ArcadeVersusMatch? @relation(fields: [versusMatchId], references: [id], onDelete: SetNull)
+
   startedAt DateTime  @default(now())
   endedAt   DateTime?
 
   answers ArcadeAnswer[]
 
+  @@unique([versusMatchId, userId])
   @@index([userId, game])
   @@index([status])
+  @@index([versusMatchId])
   @@map("arcade_game_sessions")
 }
 
@@ -1774,6 +1790,66 @@ model ArcadeAnswer {
   @@unique([sessionId, wordIndex])
   @@index([sessionId])
   @@map("arcade_answers")
+}
+
+enum ArcadeVersusKind {
+  RANDOM // matched by the queue
+  FRIEND // a friend challenge
+}
+
+enum ArcadeVersusStatus {
+  SEARCHING // RANDOM, waiting in the queue for an opponent
+  INVITED // FRIEND, waiting for the friend to accept
+  ACTIVE // both players in; each plays their own session on the same words
+  COMPLETED
+  DECLINED
+  CANCELLED // the host backed out (queue / invite)
+  EXPIRED // queue or invite timed out with no opponent, or nobody finished
+}
+
+// A head-to-head match for ScrambleQuest / Complete It / Hangman (2026-10).
+// Both players play an ordinary ArcadeGameSession on the SAME wordIds
+// (picked once, by whichever player starts first), so every existing rule
+// -- server timers, hints, XP, variant spelling -- applies unchanged. The
+// match only adds pairing, a shared word list and a result. Word Duel keeps
+// its own, separate model: it is real-time and multiplayer-only.
+model ArcadeVersusMatch {
+  id     String             @id @default(uuid())
+  game   ArcadeGame
+  kind   ArcadeVersusKind
+  status ArcadeVersusStatus
+
+  hostId  String
+  host    User    @relation("ArcadeVersusHost", fields: [hostId], references: [id], onDelete: Cascade)
+  guestId String?
+  guest   User?   @relation("ArcadeVersusGuest", fields: [guestId], references: [id], onDelete: Cascade)
+
+  // Chosen once, at the first start from either player (compare-and-swap on
+  // wordsPickedAt), then read by the other.
+  wordIds       String[]
+  wordsPickedAt DateTime?
+
+  winnerId     String?
+  // WIN | DRAW | FORFEIT | NO_CONTEST -- why the match ended the way it did.
+  resultReason String?
+  hostCorrect  Int?
+  guestCorrect Int?
+  hostTimeMs   Int?
+  guestTimeMs  Int?
+
+  createdAt   DateTime  @default(now())
+  activatedAt DateTime?
+  // Queue / invite expiry while waiting; the play deadline once ACTIVE.
+  expiresAt   DateTime
+  settledAt   DateTime?
+
+  sessions ArcadeGameSession[]
+
+  @@index([status, game, kind])
+  @@index([hostId, status])
+  @@index([guestId, status])
+  @@index([expiresAt])
+  @@map("arcade_versus_matches")
 }
 
 enum WordDuelMatchStatus {

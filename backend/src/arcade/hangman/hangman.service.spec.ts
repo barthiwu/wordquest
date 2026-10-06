@@ -11,6 +11,7 @@ import { ArcadeChallengeService } from '../challenge.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { ProgressionService } from '../../progression/progression.service';
 import { AliService } from '../../ali/ali.service';
+import { ArcadeVersusService } from '../versus/versus.service';
 
 describe('HangmanService', () => {
   let service: HangmanService;
@@ -57,6 +58,7 @@ describe('HangmanService', () => {
     $transaction: jest.fn((cb: (tx: any) => unknown): unknown => cb(prismaMock)),
   };
   const challengesMock = { pickChallenges: jest.fn() };
+  const versusMock = { resolveStart: jest.fn() };
   const rewardEngineMock = { calculate: jest.fn() };
   const progressionMock = {
     awardXp: jest.fn(),
@@ -90,9 +92,75 @@ describe('HangmanService', () => {
         { provide: RewardEngineService, useValue: rewardEngineMock },
         { provide: ProgressionService, useValue: progressionMock },
         { provide: AliService, useValue: aliMock },
+        { provide: ArcadeVersusService, useValue: versusMock },
       ],
     }).compile();
     service = moduleRef.get(HangmanService);
+  });
+
+  describe('start (head-to-head)', () => {
+    it('creates the session on the match\'s shared words and ties it to the match', async () => {
+      versusMock.resolveStart.mockResolvedValueOnce({
+        existing: null,
+        wordIds: ['w1', 'w2'],
+        matchId: 'm1',
+      });
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({
+        ...baseSession(),
+        versusMatchId: 'm1',
+      });
+
+      await service.start('u1', 'm1');
+
+      expect(versusMock.resolveStart).toHaveBeenCalledWith(
+        'u1',
+        'm1',
+        'HANGMAN',
+        expect.any(Function),
+      );
+      expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          userId: 'u1',
+          game: 'HANGMAN',
+          wordsTotal: 2,
+          wordIds: ['w1', 'w2'],
+          versusMatchId: 'm1',
+        }),
+      });
+      // Never touches the solo resume lookup.
+      expect(prismaMock.arcadeGameSession.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('resumes the player\'s half of the match after a relaunch', async () => {
+      const existing = { ...baseSession(), versusMatchId: 'm1' };
+      versusMock.resolveStart.mockResolvedValueOnce({
+        existing,
+        wordIds: existing.wordIds,
+        matchId: 'm1',
+      });
+
+      await service.start('u1', 'm1');
+
+      expect(prismaMock.arcadeGameSession.create).not.toHaveBeenCalled();
+    });
+
+    it('the first player\'s word pick uses this game\'s own picker', async () => {
+      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w9' } }]);
+      versusMock.resolveStart.mockImplementationOnce(
+        async (_u: string, _m: string, _g: string, pick: () => Promise<string[]>) => ({
+          existing: null,
+          wordIds: await pick(),
+          matchId: 'm1',
+        }),
+      );
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
+
+      await service.start('u1', 'm1');
+
+      expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({ wordIds: ['w9'] }),
+      });
+    });
   });
 
   describe('start', () => {

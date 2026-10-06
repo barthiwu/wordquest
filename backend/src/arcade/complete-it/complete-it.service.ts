@@ -10,6 +10,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ProgressionService } from '../../progression/progression.service';
 import { isUniqueConstraintError } from '../../common/prisma-errors';
 import { ArcadeChallengeService } from '../challenge.service';
+import { ArcadeVersusService } from '../versus/versus.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
@@ -134,6 +135,7 @@ export class CompleteItService {
     private readonly rewardEngine: RewardEngineService,
     private readonly progression: ProgressionService,
     private readonly ali: AliService,
+    private readonly versus: ArcadeVersusService,
   ) {}
 
   /**
@@ -145,9 +147,10 @@ export class CompleteItService {
    * buildChallengeView never has to handle the "couldn't blank it"
    * case mid-session, and players never land on an unwinnable fragment.
    */
-  async start(userId: string): Promise<CompleteItChallengeView> {
+  async start(userId: string, versusMatchId?: string): Promise<CompleteItChallengeView> {
+    if (versusMatchId) return this.startVersus(userId, versusMatchId);
     const existing = await this.prisma.arcadeGameSession.findFirst({
-      where: { userId, game: 'COMPLETE_IT', status: 'ACTIVE' },
+      where: { userId, game: 'COMPLETE_IT', status: 'ACTIVE', versusMatchId: null },
     });
 
     const variant = await resolveEnglishVariant(this.prisma, userId);
@@ -195,6 +198,48 @@ export class CompleteItService {
     });
 
     return this.buildChallengeView(session, variant);
+  }
+
+  /**
+   * Opens this player's half of a head-to-head match: the same session as a
+   * solo play, but on the match's shared word list (picked by whichever
+   * player starts first) and tied to the match. A relaunch resumes it.
+   */
+  private async startVersus(userId: string, versusMatchId: string) {
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const resolved = await this.versus.resolveStart(userId, versusMatchId, 'COMPLETE_IT', async () =>
+      (
+        await this.challenges.pickChallenges(
+          userId,
+          COMPLETE_IT_CONFIG.WORDS_PER_SESSION,
+          [],
+          COMPLETE_IT_CONFIG.MIN_WORD_LENGTH,
+          COMPLETE_IT_CONFIG.MAX_WORD_LENGTH,
+          (c) => isCompleteItSentenceUsable(c.word.exampleSentence, c.word.word),
+        )
+      ).map((c) => c.word.id),
+    );
+    if (resolved.existing) return this.buildChallengeView(resolved.existing, variant);
+
+    try {
+      const session = await this.prisma.arcadeGameSession.create({
+        data: {
+          userId,
+          game: 'COMPLETE_IT',
+          wordsTotal: resolved.wordIds.length,
+          wordIds: resolved.wordIds,
+          versusMatchId,
+        },
+      });
+      return this.buildChallengeView(session, variant);
+    } catch (err) {
+      // A double-tap raced us: the other request already created it.
+      if (!isUniqueConstraintError(err)) throw err;
+      const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
+        where: { versusMatchId_userId: { versusMatchId, userId } },
+      });
+      return this.buildChallengeView(existing, variant);
+    }
   }
 
   /**

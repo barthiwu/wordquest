@@ -30,6 +30,11 @@ const CATEGORY_BY_TYPE: Record<NotificationType, PreferenceCategory> = {
   // Same category as STREAK_AT_RISK -- also a "go play" nudge, just scoped
   // to the whole month's catch-up window instead of today's quest.
   MONTH_END_CATCH_UP: 'dailyQuestsEnabled',
+  // Arcade head-to-head challenges / results and the daily play-limit
+  // notices are all "competition" pushes.
+  ARCADE_CHALLENGE: 'competitionEnabled',
+  ARCADE_RESULT: 'competitionEnabled',
+  ARCADE_PLAY_LIMIT: 'competitionEnabled',
 };
 
 const DEFAULT_PREFERENCE = {
