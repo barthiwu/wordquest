@@ -24,13 +24,19 @@ export interface PushMessage {
 export class ExpoPushProvider {
   private readonly logger = new Logger(ExpoPushProvider.name);
 
-  async send(messages: PushMessage[]): Promise<void> {
-    if (messages.length === 0) return;
+  /**
+   * Returns the tokens Expo says are dead (`DeviceNotRegistered`: app
+   * uninstalled / token revoked) so the caller can delete them instead of
+   * pushing to them forever.
+   */
+  async send(messages: PushMessage[]): Promise<string[]> {
+    const deadTokens: string[] = [];
+    if (messages.length === 0) return deadTokens;
 
     for (let i = 0; i < messages.length; i += EXPO_BATCH_SIZE) {
       const batch = messages.slice(i, i + EXPO_BATCH_SIZE);
       try {
-        await fetch(EXPO_PUSH_API, {
+        const response = await fetch(EXPO_PUSH_API, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -40,10 +46,20 @@ export class ExpoPushProvider {
             batch.map((m) => ({ to: m.to, title: m.title, body: m.body, data: m.data ?? {} })),
           ),
         });
+        // Tickets come back in the same order as the messages sent.
+        const json = (await response.json().catch(() => null)) as {
+          data?: Array<{ status?: string; details?: { error?: string } }>;
+        } | null;
+        json?.data?.forEach((ticket, index) => {
+          if (ticket?.status === 'error' && ticket.details?.error === 'DeviceNotRegistered') {
+            deadTokens.push(batch[index].to);
+          }
+        });
       } catch (err) {
         // Best-effort — see doc comment. Logged, not rethrown.
         this.logger.warn(`Expo push delivery failed for a batch of ${batch.length}: ${err}`);
       }
     }
+    return deadTokens;
   }
 }

@@ -229,9 +229,12 @@ export class NotificationService {
       // never the notification row itself (Correction & Completion Spec
       // §6: "push deep linking").
       const pushData = deepLink ? { ...data, deepLink } : data;
-      await this.push.send(
+      const deadTokens = await this.push.send(
         tokens.map((t: { token: string }) => ({ to: t.token, title, body, data: pushData })),
       );
+      if (deadTokens?.length) {
+        await this.prisma.pushToken.deleteMany({ where: { token: { in: deadTokens } } });
+      }
       await this.prisma.notification.update({
         where: { id: notificationId },
         data: { sentAt: new Date() },

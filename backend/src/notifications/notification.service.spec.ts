@@ -28,7 +28,7 @@ describe('NotificationService', () => {
   };
 
   const pushMock = {
-    send: jest.fn().mockResolvedValue(undefined),
+    send: jest.fn().mockResolvedValue([]),
   };
 
   beforeEach(async () => {
@@ -133,6 +133,25 @@ describe('NotificationService', () => {
       expect(prismaMock.notification.update).toHaveBeenCalledWith({
         where: { id: 'n1' },
         data: { sentAt: expect.any(Date) },
+      });
+    });
+
+    it('deletes push tokens that Expo reports as no longer registered', async () => {
+      prismaMock.notification.create.mockResolvedValueOnce({ id: 'n1' });
+      prismaMock.user.findUnique.mockResolvedValueOnce({ timezone: 'UTC' });
+      prismaMock.notificationPreference.findUnique.mockResolvedValueOnce({
+        progressEnabled: true,
+        quietHoursStartHour: null,
+        quietHoursEndHour: null,
+      });
+      prismaMock.pushToken.findMany.mockResolvedValueOnce([{ token: 'live' }, { token: 'dead' }]);
+      pushMock.send.mockResolvedValueOnce(['dead']);
+
+      await service.notify('u1', 'LEVEL_UP', 'Level up!', 'You reached level 5.');
+      await flush();
+
+      expect(prismaMock.pushToken.deleteMany).toHaveBeenCalledWith({
+        where: { token: { in: ['dead'] } },
       });
     });
 

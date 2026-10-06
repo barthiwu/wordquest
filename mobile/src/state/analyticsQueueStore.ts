@@ -24,6 +24,8 @@ interface AnalyticsQueueState {
   hydrate: () => Promise<void>;
   enqueue: (event: AnalyticsEventPayload) => void;
   removeByClientEventIds: (clientEventIds: string[]) => void;
+  /** Drops everything still queued. Called on sign-out so one player's events are never sent under the next player's account. */
+  clear: () => void;
 }
 
 function persist(events: AnalyticsEventPayload[]): void {
@@ -65,6 +67,11 @@ export const useAnalyticsQueueStore = create<AnalyticsQueueState>((set, get) => 
     const bounded = next.length > MAX_QUEUE_SIZE ? next.slice(next.length - MAX_QUEUE_SIZE) : next;
     set({ events: bounded });
     persist(bounded);
+  },
+
+  clear: () => {
+    set({ events: [] });
+    persist([]);
   },
 
   removeByClientEventIds: (clientEventIds) => {

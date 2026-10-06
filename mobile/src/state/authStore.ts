@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { AuthResult, AuthUser } from '@/services/auth';
 import { useTokenStore } from './tokenStore';
+import { useAnalyticsQueueStore } from './analyticsQueueStore';
 
 interface AuthState {
   user: AuthUser | null;
@@ -99,6 +100,8 @@ export const useAuthStore = create<AuthState>((set) => {
 
     clearSession: async () => {
       await useTokenStore.getState().clearTokens();
+      // Anything still queued belongs to the player who just left.
+      useAnalyticsQueueStore.getState().clear();
       set({ user: null });
     },
 
