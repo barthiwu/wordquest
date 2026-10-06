@@ -11,8 +11,9 @@
 // environment -- point it at Railway's production database, NOT the
 // local dev one in .env, or this resets the wrong account):
 //
-//   DATABASE_URL="<railway public connection string>" \
-//     npx ts-node scripts/reset-user-password.ts --email you@example.com --password "NewPassword123!"
+//   DATABASE_URL="<railway public connection string>" NEW_PASSWORD="<new password>" \
+//     npx ts-node scripts/reset-user-password.ts --email you@example.com
+//   (or --username theirname; the lookup ignores upper/lower case)
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 
@@ -25,13 +26,26 @@ function readArg(flag: string): string | undefined {
   return idx === -1 ? undefined : process.argv[idx + 1];
 }
 
+/** Host and database name only: never the credentials. */
+function describeDatabase(): string {
+  try {
+    const u = new URL(process.env.DATABASE_URL ?? '');
+    return `${u.hostname}:${u.port || '5432'}${u.pathname}`;
+  } catch {
+    return '(DATABASE_URL missing or unreadable)';
+  }
+}
+
 async function main() {
   const email = readArg('--email');
-  const password = readArg('--password');
+  const username = readArg('--username');
+  // Prefer the NEW_PASSWORD environment variable: it keeps the password out
+  // of the shell history and the process list.
+  const password = process.env.NEW_PASSWORD ?? readArg('--password');
 
-  if (!email || !password) {
+  if ((!email && !username) || !password) {
     console.error(
-      'Usage: ts-node scripts/reset-user-password.ts --email <email> --password <newPassword>',
+      'Usage: NEW_PASSWORD="<new password>" ts-node scripts/reset-user-password.ts (--email <email> | --username <username>)',
     );
     process.exit(1);
   }
@@ -42,33 +56,80 @@ async function main() {
     process.exit(1);
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: email.toLowerCase().trim() },
-    select: {
-      id: true,
-      email: true,
-      status: true,
-      emailVerifiedAt: true,
-      failedLoginAttempts: true,
-      lockedUntil: true,
-      createdAt: true,
-    },
-  });
+  console.log(`Database: ${describeDatabase()}`);
+  if (/localhost|127\.0\.0\.1|host\.docker\.internal/.test(describeDatabase())) {
+    console.error(
+      'This is a LOCAL database, not Railway. Set DATABASE_URL to the Railway public connection string and run again. Nothing changed.',
+    );
+    process.exit(1);
+  }
+
+  const select = {
+    id: true,
+    email: true,
+    username: true,
+    status: true,
+    emailVerifiedAt: true,
+    failedLoginAttempts: true,
+    lockedUntil: true,
+    createdAt: true,
+    deletedAt: true,
+  } as const;
+
+  // Case-insensitive on purpose: older rows may not have been lower-cased.
+  const user = email
+    ? await prisma.user.findFirst({
+        where: { email: { equals: email.trim(), mode: 'insensitive' } },
+        select,
+      })
+    : await prisma.user.findFirst({
+        where: { username: { equals: (username as string).trim(), mode: 'insensitive' } },
+        select,
+      });
 
   if (!user) {
-    console.error(`No account found for ${email}. Nothing changed.`);
+    const needle = (email ?? username ?? '').split('@')[0].replace(/[0-9]+$/, '');
+    const near = needle
+      ? await prisma.user.findMany({
+          where: {
+            OR: [
+              { email: { contains: needle, mode: 'insensitive' } },
+              { username: { contains: needle, mode: 'insensitive' } },
+            ],
+          },
+          select: { email: true, username: true, status: true, createdAt: true },
+          take: 10,
+        })
+      : [];
+    console.error(`No account found for ${email ?? username}. Nothing changed.`);
+    if (near.length > 0) {
+      console.error('Closest matches (check the spelling, or whether she signed up with another email):');
+      for (const n of near) console.error(' ', n);
+    } else {
+      console.error('No similar emails or usernames either, so this is probably the wrong database.');
+    }
+    const total = await prisma.user.count();
+    console.error(`(${total} accounts in this database.)`);
     process.exit(1);
   }
 
   console.log('Found account:', {
     id: user.id,
     email: user.email,
+    username: user.username,
     status: user.status,
+    deletedAt: user.deletedAt,
     emailVerified: !!user.emailVerifiedAt,
     failedLoginAttempts: user.failedLoginAttempts,
     lockedUntil: user.lockedUntil,
     createdAt: user.createdAt,
   });
+  if (user.status === 'DELETED') {
+    console.error(
+      'This account was deleted (soft delete). Use the in-app "Recover account" first, or tell me and I will add a restore option. Nothing changed.',
+    );
+    process.exit(1);
+  }
 
   const passwordHash = await bcrypt.hash(password, PASSWORD_SALT_ROUNDS);
   await prisma.user.update({
