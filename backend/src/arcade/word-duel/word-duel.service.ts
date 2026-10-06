@@ -9,6 +9,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ProgressionService } from '../../progression/progression.service';
 import { isUniqueConstraintError } from '../../common/prisma-errors';
 import { ArcadeChallengeService } from '../challenge.service';
+import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
@@ -117,6 +118,8 @@ export interface WordDuelResultView {
 }
 
 export interface WordDuelStateView {
+  /** Present only on the response that started a new duel for this player. */
+  playLimit?: ArcadePlayNotice;
   matchId: string;
   status: 'WAITING' | 'ACTIVE' | 'COMPLETED' | 'ABANDONED';
   /** ISO timestamp — server-authoritative match deadline. null while
@@ -213,6 +216,7 @@ export class WordDuelService {
     private readonly friends: FriendsService,
     private readonly ali: AliService,
     private readonly analytics: AnalyticsService,
+    private readonly playLimit: ArcadePlayLimitService,
   ) {}
 
   /**
@@ -247,6 +251,8 @@ export class WordDuelService {
       });
       // Falls through to matchmaking below with a clean slate.
     }
+
+    await this.playLimit.assertCanPlay(userId, 'WORD_DUEL');
 
     // Try to claim a waiting opponent's match — a few bounded attempts
     // so losing one race (someone else claimed the same candidate first)
@@ -307,7 +313,17 @@ export class WordDuelService {
           { screen: 'WordDuel' },
         );
       }
-      return this.buildStateView(playerState.id);
+      // The match is real now: it counts as a play for both players, and is
+      // never refused (the waiting player was checked when they queued).
+      const [playLimit] = await Promise.all([
+        this.playLimit.consumePlay(userId, 'WORD_DUEL', { force: true }).catch(() => undefined),
+        waitingPlayer
+          ? this.playLimit
+              .consumePlay(waitingPlayer.userId, 'WORD_DUEL', { force: true })
+              .catch(() => undefined)
+          : undefined,
+      ]);
+      return { ...(await this.buildStateView(playerState.id)), playLimit };
     }
 
     // No opponent available right now — become player 1 of a fresh match.

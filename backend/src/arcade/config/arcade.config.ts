@@ -287,3 +287,33 @@ export const ARCADE_VERSUS_CONFIG = {
   // Sweep cadence is in the service (@Cron); history kept for the lists.
   RECENT_RESULTS_SHOWN: 10,
 } as const;
+
+// ── Daily play limits ──────────────────────────────────────────────────
+// Free plan: at most this many plays of EACH Arcade game per player-local
+// day (2026-10 decision, Barth: it nudges players onto the other games and
+// toward WordQuest+, which is unlimited). A play is a session / match that
+// actually started; the day rolls over at the player's local midnight.
+export const ARCADE_DAILY_PLAY_LIMIT = 10;
+
+/** Share of the daily limit at which the player gets a notice, in percent. */
+export const ARCADE_PLAY_LIMIT_NOTICE_PERCENTS = [50, 70, 90, 100] as const;
+export type ArcadePlayLimitNoticePercent = (typeof ARCADE_PLAY_LIMIT_NOTICE_PERCENTS)[number];
+
+/**
+ * The play counts that trigger each notice, e.g. limit 10 -> 5, 7, 9, 10.
+ * Rounded up so a small limit never notices early, and de-duplicated so a
+ * tiny limit (say 3) still sends each distinct count once, the highest
+ * percent winning.
+ */
+export function playLimitNoticeCounts(
+  limit: number,
+): { count: number; percent: ArcadePlayLimitNoticePercent }[] {
+  const byCount = new Map<number, ArcadePlayLimitNoticePercent>();
+  for (const percent of ARCADE_PLAY_LIMIT_NOTICE_PERCENTS) {
+    const count = Math.min(limit, Math.max(1, Math.ceil((limit * percent) / 100)));
+    byCount.set(count, percent);
+  }
+  return [...byCount.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([count, percent]) => ({ count, percent }));
+}

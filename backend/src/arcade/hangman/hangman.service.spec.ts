@@ -12,6 +12,7 @@ import { RewardEngineService } from '../reward-engine.service';
 import { ProgressionService } from '../../progression/progression.service';
 import { AliService } from '../../ali/ali.service';
 import { ArcadeVersusService } from '../versus/versus.service';
+import { ArcadePlayLimitService } from '../limits/play-limit.service';
 
 describe('HangmanService', () => {
   let service: HangmanService;
@@ -66,6 +67,18 @@ describe('HangmanService', () => {
   };
   const aliMock = { react: jest.fn(), listReactionsSince: jest.fn() };
 
+  const playLimitMock = {
+    assertCanPlay: jest.fn().mockResolvedValue(undefined),
+    isLocked: jest.fn().mockResolvedValue(false),
+    consumePlay: jest.fn().mockResolvedValue({
+      game: 'X',
+      used: 1,
+      limit: 10,
+      remaining: 9,
+      percent: null,
+    }),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     prismaMock.arcadeGameSession.updateMany.mockResolvedValue({ count: 1 });
@@ -88,6 +101,7 @@ describe('HangmanService', () => {
       providers: [
         HangmanService,
         { provide: PrismaService, useValue: prismaMock },
+        { provide: ArcadePlayLimitService, useValue: playLimitMock },
         { provide: ArcadeChallengeService, useValue: challengesMock },
         { provide: RewardEngineService, useValue: rewardEngineMock },
         { provide: ProgressionService, useValue: progressionMock },
@@ -96,6 +110,50 @@ describe('HangmanService', () => {
       ],
     }).compile();
     service = moduleRef.get(HangmanService);
+  });
+
+  describe('start (daily play cap)', () => {
+    it('takes one play before a new solo session and reports the notice', async () => {
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
+      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w1' } }]);
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
+      playLimitMock.consumePlay.mockResolvedValueOnce({
+        game: 'HANGMAN', used: 5, limit: 10, remaining: 5, percent: 50,
+      });
+
+      const view = await service.start('u1');
+
+      expect(playLimitMock.assertCanPlay).toHaveBeenCalledWith('u1', 'HANGMAN');
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'HANGMAN');
+      expect(view.playLimit).toEqual(expect.objectContaining({ used: 5, percent: 50 }));
+    });
+
+    it('refuses a new solo play at the cap and creates nothing', async () => {
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(null);
+      playLimitMock.assertCanPlay.mockRejectedValueOnce(new Error('ARCADE_PLAY_LIMIT'));
+
+      await expect(service.start('u1')).rejects.toThrow('ARCADE_PLAY_LIMIT');
+      expect(prismaMock.arcadeGameSession.create).not.toHaveBeenCalled();
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+    });
+
+    it('does not charge a resumed session', async () => {
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(baseSession());
+
+      await service.start('u1');
+
+      expect(playLimitMock.assertCanPlay).not.toHaveBeenCalled();
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+    });
+
+    it('counts a head-to-head start without refusing it mid-match', async () => {
+      versusMock.resolveStart.mockResolvedValueOnce({ existing: null, wordIds: ['w1'], matchId: 'm1' });
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({ ...baseSession(), versusMatchId: 'm1' });
+
+      await service.start('u1', 'm1');
+
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'HANGMAN', { force: true });
+    });
   });
 
   describe('start (head-to-head)', () => {

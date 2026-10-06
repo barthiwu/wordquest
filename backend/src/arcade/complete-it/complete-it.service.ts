@@ -11,6 +11,7 @@ import { ProgressionService } from '../../progression/progression.service';
 import { isUniqueConstraintError } from '../../common/prisma-errors';
 import { ArcadeChallengeService } from '../challenge.service';
 import { ArcadeVersusService } from '../versus/versus.service';
+import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
@@ -32,6 +33,9 @@ import { quickAliExpression, type AliExpressionCue } from '../../ali/ali-express
  * word's own example sentence with the target word blanked out, never
  * the target word itself (spec §5/§8). */
 export interface CompleteItChallengeView {
+  /** Present only on the response that started a new play: the player's
+   * standing against the daily cap (and the 50/70/90/100 percent notice, if crossed). */
+  playLimit?: ArcadePlayNotice;
   sessionId: string;
   wordIndex: number;
   wordsTotal: number;
@@ -136,6 +140,7 @@ export class CompleteItService {
     private readonly progression: ProgressionService,
     private readonly ali: AliService,
     private readonly versus: ArcadeVersusService,
+    private readonly playLimit: ArcadePlayLimitService,
   ) {}
 
   /**
@@ -176,6 +181,8 @@ export class CompleteItService {
     // size pick, the old approach, is what let sessions quietly ship
     // far fewer words than WORDS_PER_SESSION whenever the pick happened
     // to land on a lot of weak sentences.
+    await this.playLimit.assertCanPlay(userId, 'COMPLETE_IT');
+
     const blankable = await this.challenges.pickChallenges(
       userId,
       COMPLETE_IT_CONFIG.WORDS_PER_SESSION,
@@ -188,6 +195,8 @@ export class CompleteItService {
       throw new BadRequestException('No words are available for Complete It right now.');
     }
 
+    // Taken before the session exists, so a refused (raced) play never leaves a free session behind.
+    const playLimit = await this.playLimit.consumePlay(userId, 'COMPLETE_IT');
     const session = await this.prisma.arcadeGameSession.create({
       data: {
         userId,
@@ -197,7 +206,7 @@ export class CompleteItService {
       },
     });
 
-    return this.buildChallengeView(session, variant);
+    return { ...(await this.buildChallengeView(session, variant)), playLimit };
   }
 
   /**
@@ -231,7 +240,10 @@ export class CompleteItService {
           versusMatchId,
         },
       });
-      return this.buildChallengeView(session, variant);
+      // The entry checks (queue / invite / accept) already gated this player;
+      // once a match exists the play is always honoured, never refused mid-match.
+      const playLimit = await this.playLimit.consumePlay(userId, 'COMPLETE_IT', { force: true });
+      return { ...(await this.buildChallengeView(session, variant)), playLimit };
     } catch (err) {
       // A double-tap raced us: the other request already created it.
       if (!isUniqueConstraintError(err)) throw err;

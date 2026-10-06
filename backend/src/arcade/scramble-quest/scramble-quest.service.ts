@@ -11,6 +11,7 @@ import { ProgressionService } from '../../progression/progression.service';
 import { isUniqueConstraintError } from '../../common/prisma-errors';
 import { ArcadeChallengeService } from '../challenge.service';
 import { ArcadeVersusService } from '../versus/versus.service';
+import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
@@ -30,6 +31,9 @@ import { quickAliExpression, type AliExpressionCue } from '../../ali/ali-express
 /** Client-safe view of the player's current ScrambleQuest word — the
  * scrambled letters, never the target word (spec §5/§8). */
 export interface ScrambleQuestChallengeView {
+  /** Present only on the response that started a new play: the player's
+   * standing against the daily cap (and the 50/70/90/100 percent notice, if crossed). */
+  playLimit?: ArcadePlayNotice;
   sessionId: string;
   wordIndex: number;
   wordsTotal: number;
@@ -144,6 +148,7 @@ export class ScrambleQuestService {
     private readonly progression: ProgressionService,
     private readonly ali: AliService,
     private readonly versus: ArcadeVersusService,
+    private readonly playLimit: ArcadePlayLimitService,
   ) {}
 
   /**
@@ -171,6 +176,8 @@ export class ScrambleQuestService {
       });
     }
 
+    await this.playLimit.assertCanPlay(userId, 'SCRAMBLE_QUEST');
+
     const picked = await this.challenges.pickChallenges(
       userId,
       SCRAMBLE_QUEST_CONFIG.WORDS_PER_SESSION,
@@ -182,6 +189,8 @@ export class ScrambleQuestService {
       throw new BadRequestException('No words are available for ScrambleQuest right now.');
     }
 
+    // Taken before the session exists, so a refused (raced) play never leaves a free session behind.
+    const playLimit = await this.playLimit.consumePlay(userId, 'SCRAMBLE_QUEST');
     const session = await this.prisma.arcadeGameSession.create({
       data: {
         userId,
@@ -191,7 +200,7 @@ export class ScrambleQuestService {
       },
     });
 
-    return this.buildChallengeView(session, variant);
+    return { ...(await this.buildChallengeView(session, variant)), playLimit };
   }
 
   /**
@@ -224,7 +233,10 @@ export class ScrambleQuestService {
           versusMatchId,
         },
       });
-      return this.buildChallengeView(session, variant);
+      // The entry checks (queue / invite / accept) already gated this player;
+      // once a match exists the play is always honoured, never refused mid-match.
+      const playLimit = await this.playLimit.consumePlay(userId, 'SCRAMBLE_QUEST', { force: true });
+      return { ...(await this.buildChallengeView(session, variant)), playLimit };
     } catch (err) {
       // A double-tap raced us: the other request already created it.
       if (!isUniqueConstraintError(err)) throw err;

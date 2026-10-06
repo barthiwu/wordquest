@@ -12,6 +12,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { FriendsService, FriendPublicView } from '../../friends/friends.service';
 import { NotificationService } from '../../notifications/notification.service';
 import { ProgressionService } from '../../progression/progression.service';
+import { ArcadePlayLimitService } from '../limits/play-limit.service';
 import { ARCADE_VERSUS_CONFIG, ARCADE_VERSUS_GAMES } from '../config/arcade.config';
 import { decideResult, isReadyToSettle, VersusSide } from './versus.util';
 
@@ -92,7 +93,28 @@ export class ArcadeVersusService {
     private readonly friends: FriendsService,
     private readonly notifications: NotificationService,
     private readonly progression: ProgressionService,
+    private readonly playLimit: ArcadePlayLimitService,
   ) {}
+
+  /**
+   * A player with no plays left cannot start a new search, but may still
+   * resume one (or a match) they already have open -- that play was counted
+   * when it started.
+   */
+  private async assertMayEnterQueue(userId: string, game: VersusGame): Promise<void> {
+    if (!(await this.playLimit.isLocked(userId, game))) return;
+    const open = await this.prisma.arcadeVersusMatch.findFirst({
+      where: {
+        game,
+        kind: 'RANDOM',
+        status: { in: ['SEARCHING', 'ACTIVE'] },
+        expiresAt: { gt: new Date() },
+        OR: [{ hostId: userId }, { guestId: userId }],
+      },
+      select: { id: true },
+    });
+    if (!open) await this.playLimit.assertCanPlay(userId, game);
+  }
 
   // ── Random queue ──────────────────────────────────────────────────────
 
@@ -105,6 +127,7 @@ export class ArcadeVersusService {
    */
   async queue(userId: string, game: VersusGame): Promise<VersusMatchView> {
     this.assertGame(game);
+    await this.assertMayEnterQueue(userId, game);
     const matchId = await this.prisma.$transaction(async (tx) => {
       // Serialized per game: of two players queueing at the same instant,
       // the second always finds the first's row and pairs with it.
@@ -202,6 +225,7 @@ export class ArcadeVersusService {
   async invite(userId: string, friendId: string, game: VersusGame): Promise<VersusMatchView> {
     this.assertGame(game);
     if (friendId === userId) throw new BadRequestException('You cannot challenge yourself.');
+    await this.playLimit.assertCanPlay(userId, game);
 
     const friendship = await this.prisma.friendship.findFirst({
       where: {
@@ -285,6 +309,8 @@ export class ArcadeVersusService {
     if (await this.friends.areBlocked(userId, match.hostId)) {
       throw new ForbiddenException('This challenge is no longer open.');
     }
+    // Declining is always allowed; accepting needs a play left today.
+    if (accept) await this.playLimit.assertCanPlay(userId, match.game);
     const windowMs = ARCADE_VERSUS_CONFIG.FRIEND_PLAY_WINDOW_HOURS * 3_600_000;
     const claimed = await this.prisma.arcadeVersusMatch.updateMany({
       where: { id: matchId, status: 'INVITED' },

@@ -11,6 +11,7 @@ import { ProgressionService } from '../../progression/progression.service';
 import { isUniqueConstraintError } from '../../common/prisma-errors';
 import { ArcadeChallengeService } from '../challenge.service';
 import { ArcadeVersusService } from '../versus/versus.service';
+import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
 import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, HANGMAN_CONFIG } from '../config/arcade.config';
@@ -31,6 +32,9 @@ import { quickAliExpression, type AliExpressionCue } from '../../ali/ali-express
  * word itself: `pattern` has '_' for every letter still hidden.
  */
 export interface HangmanChallengeView {
+  /** Present only on the response that started a new play: the player's
+   * standing against the daily cap (and the 50/70/90/100 percent notice, if crossed). */
+  playLimit?: ArcadePlayNotice;
   sessionId: string;
   wordIndex: number;
   wordsTotal: number;
@@ -117,6 +121,7 @@ export class HangmanService {
     private readonly progression: ProgressionService,
     private readonly ali: AliService,
     private readonly versus: ArcadeVersusService,
+    private readonly playLimit: ArcadePlayLimitService,
   ) {}
 
   /** Starts a new session, or resumes the one already in progress (an app
@@ -129,6 +134,8 @@ export class HangmanService {
     const variant = await resolveEnglishVariant(this.prisma, userId);
     if (existing) return this.buildChallengeView(existing, variant);
 
+    await this.playLimit.assertCanPlay(userId, 'HANGMAN');
+
     const picked = await this.challenges.pickChallenges(
       userId,
       HANGMAN_CONFIG.WORDS_PER_SESSION,
@@ -140,6 +147,8 @@ export class HangmanService {
       throw new BadRequestException('No words are available for Hangman right now.');
     }
 
+    // Taken before the session exists, so a refused (raced) play never leaves a free session behind.
+    const playLimit = await this.playLimit.consumePlay(userId, 'HANGMAN');
     const session = await this.prisma.arcadeGameSession.create({
       data: {
         userId,
@@ -148,7 +157,7 @@ export class HangmanService {
         wordIds: picked.map((c) => c.word.id),
       },
     });
-    return this.buildChallengeView(session, variant);
+    return { ...(await this.buildChallengeView(session, variant)), playLimit };
   }
 
   /**
@@ -181,7 +190,10 @@ export class HangmanService {
           versusMatchId,
         },
       });
-      return this.buildChallengeView(session, variant);
+      // The entry checks (queue / invite / accept) already gated this player;
+      // once a match exists the play is always honoured, never refused mid-match.
+      const playLimit = await this.playLimit.consumePlay(userId, 'HANGMAN', { force: true });
+      return { ...(await this.buildChallengeView(session, variant)), playLimit };
     } catch (err) {
       // A double-tap raced us: the other request already created it.
       if (!isUniqueConstraintError(err)) throw err;

@@ -3,6 +3,7 @@ import { ArcadeGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user.decorator';
+import { ArcadePlayLimitService, type ArcadeAllowanceView } from './limits/play-limit.service';
 
 /**
  * GET /api/v1/arcade/last-played — read-only "what did this player most
@@ -32,7 +33,16 @@ import { CurrentUserId } from '../auth/decorators/current-user.decorator';
 @Controller('arcade')
 @UseGuards(JwtAuthGuard)
 export class ArcadeStatusController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly playLimit: ArcadePlayLimitService,
+  ) {}
+
+  /** GET /arcade/plays: today's plays used / left per game, and when they reset. */
+  @Get('plays')
+  plays(@CurrentUserId() userId: string): Promise<ArcadeAllowanceView> {
+    return this.playLimit.getAllowance(userId);
+  }
 
   @Get('last-played')
   async lastPlayed(

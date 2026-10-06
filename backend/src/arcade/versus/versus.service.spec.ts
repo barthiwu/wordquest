@@ -5,6 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { FriendsService } from '../../friends/friends.service';
 import { NotificationService } from '../../notifications/notification.service';
 import { ProgressionService } from '../../progression/progression.service';
+import { ArcadePlayLimitService } from '../limits/play-limit.service';
 
 describe('ArcadeVersusService', () => {
   let service: ArcadeVersusService;
@@ -65,6 +66,18 @@ describe('ArcadeVersusService', () => {
     answers: a,
   });
 
+  const playLimitMock = {
+    assertCanPlay: jest.fn().mockResolvedValue(undefined),
+    isLocked: jest.fn().mockResolvedValue(false),
+    consumePlay: jest.fn().mockResolvedValue({
+      game: 'X',
+      used: 1,
+      limit: 10,
+      remaining: 9,
+      percent: null,
+    }),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     prismaMock.$executeRaw.mockResolvedValue(1);
@@ -83,6 +96,7 @@ describe('ArcadeVersusService', () => {
       providers: [
         ArcadeVersusService,
         { provide: PrismaService, useValue: prismaMock },
+        { provide: ArcadePlayLimitService, useValue: playLimitMock },
         { provide: FriendsService, useValue: friendsMock },
         { provide: NotificationService, useValue: notificationsMock },
         { provide: ProgressionService, useValue: progressionMock },
@@ -296,6 +310,79 @@ describe('ArcadeVersusService', () => {
       prismaMock.arcadeVersusMatch.findUnique.mockResolvedValueOnce(invited());
       prismaMock.arcadeVersusMatch.updateMany.mockResolvedValueOnce({ count: 0 });
       await expect(service.respond('guest', 'm1', false)).rejects.toBeInstanceOf(ConflictException);
+    });
+  });
+
+  describe('daily play cap', () => {
+    const limitError = () => new ForbiddenException({ error: 'ARCADE_PLAY_LIMIT' });
+
+    it('a locked player cannot start a new random search', async () => {
+      playLimitMock.isLocked.mockResolvedValueOnce(true);
+      prismaMock.arcadeVersusMatch.findFirst.mockResolvedValueOnce(null);
+      playLimitMock.assertCanPlay.mockRejectedValueOnce(limitError());
+
+      await expect(service.queue('u1', 'HANGMAN')).rejects.toBeInstanceOf(ForbiddenException);
+      expect(prismaMock.arcadeVersusMatch.create).not.toHaveBeenCalled();
+    });
+
+    it('a locked player can still resume a search or match they already have open', async () => {
+      playLimitMock.isLocked.mockResolvedValueOnce(true);
+      prismaMock.arcadeVersusMatch.findFirst.mockResolvedValueOnce({ id: 'open' });
+      const mine = matchRow({ status: 'SEARCHING', hostId: 'u1', guestId: null });
+      prismaMock.arcadeVersusMatch.findMany.mockResolvedValue([mine]);
+      prismaMock.arcadeVersusMatch.findUnique.mockResolvedValue(mine);
+      prismaMock.arcadeVersusMatch.findUniqueOrThrow.mockResolvedValue(mine);
+
+      await service.queue('u1', 'HANGMAN');
+
+      expect(playLimitMock.assertCanPlay).not.toHaveBeenCalled();
+    });
+
+    it('an unlocked player queues without any extra lookup', async () => {
+      prismaMock.arcadeVersusMatch.findMany.mockResolvedValue([]);
+      prismaMock.arcadeVersusMatch.create.mockResolvedValueOnce({ id: 'm1' });
+      const mine = matchRow({ status: 'SEARCHING', hostId: 'u1', guestId: null });
+      prismaMock.arcadeVersusMatch.findUnique.mockResolvedValue(mine);
+      prismaMock.arcadeVersusMatch.findUniqueOrThrow.mockResolvedValue(mine);
+
+      await service.queue('u1', 'HANGMAN');
+
+      expect(prismaMock.arcadeVersusMatch.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('a locked player cannot send a friend challenge', async () => {
+      playLimitMock.assertCanPlay.mockRejectedValueOnce(limitError());
+      await expect(service.invite('u1', 'u2', 'HANGMAN')).rejects.toBeInstanceOf(
+        ForbiddenException,
+      );
+      expect(prismaMock.arcadeVersusMatch.create).not.toHaveBeenCalled();
+    });
+
+    it('a locked player cannot accept a challenge, but can always decline one', async () => {
+      const invited = () =>
+        matchRow({
+          kind: 'FRIEND',
+          status: 'INVITED',
+          hostId: 'host',
+          guestId: 'guest',
+          wordsPickedAt: null,
+          wordIds: [],
+        });
+      prismaMock.arcadeVersusMatch.findUnique.mockResolvedValueOnce(invited());
+      playLimitMock.assertCanPlay.mockRejectedValueOnce(limitError());
+      await expect(service.respond('guest', 'm1', true)).rejects.toBeInstanceOf(ForbiddenException);
+      expect(prismaMock.arcadeVersusMatch.updateMany).not.toHaveBeenCalled();
+
+      prismaMock.arcadeVersusMatch.findUnique.mockResolvedValueOnce(invited());
+      prismaMock.arcadeVersusMatch.updateMany.mockResolvedValueOnce({ count: 1 });
+      prismaMock.arcadeVersusMatch.findUniqueOrThrow.mockResolvedValue(
+        matchRow({ kind: 'FRIEND', status: 'DECLINED' }),
+      );
+      prismaMock.arcadeVersusMatch.findUnique.mockResolvedValue(
+        matchRow({ kind: 'FRIEND', status: 'DECLINED' }),
+      );
+      await service.respond('guest', 'm1', false);
+      expect(playLimitMock.assertCanPlay).toHaveBeenCalledTimes(1);
     });
   });
 

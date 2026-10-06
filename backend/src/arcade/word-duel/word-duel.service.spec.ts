@@ -9,6 +9,7 @@ import { FriendsService } from '../../friends/friends.service';
 import { AliService } from '../../ali/ali.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { WORD_DUEL_CONFIG, WORD_DUEL_TIEBREAK_DESCRIPTION } from '../config/arcade.config';
+import { ArcadePlayLimitService } from '../limits/play-limit.service';
 
 /**
  * Word Duel's two-player, multiply-queried shape (buildStateView and
@@ -325,6 +326,18 @@ describe('WordDuelService', () => {
   };
   const analyticsMock = { track: jest.fn() };
 
+  const playLimitMock = {
+    assertCanPlay: jest.fn().mockResolvedValue(undefined),
+    isLocked: jest.fn().mockResolvedValue(false),
+    consumePlay: jest.fn().mockResolvedValue({
+      game: 'X',
+      used: 1,
+      limit: 10,
+      remaining: 9,
+      percent: null,
+    }),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     store = makeStore();
@@ -367,6 +380,7 @@ describe('WordDuelService', () => {
       providers: [
         WordDuelService,
         { provide: PrismaService, useValue: prismaMock },
+        { provide: ArcadePlayLimitService, useValue: playLimitMock },
         { provide: ArcadeChallengeService, useValue: challengesMock },
         { provide: RewardEngineService, useValue: rewardEngineMock },
         { provide: ProgressionService, useValue: progressionMock },
@@ -400,6 +414,63 @@ describe('WordDuelService', () => {
       expect(view.wordsTotal).toBe(2);
       expect(view.opponent).toBeNull();
       expect(view.current).toBeNull(); // no clock runs until a second player arrives
+    });
+
+    it('refuses to start a new duel once the daily cap is reached', async () => {
+      playLimitMock.assertCanPlay.mockRejectedValueOnce(new Error('ARCADE_PLAY_LIMIT'));
+
+      await expect(service.joinQueue('u1')).rejects.toThrow('ARCADE_PLAY_LIMIT');
+      expect(playLimitMock.assertCanPlay).toHaveBeenCalledWith('u1', 'WORD_DUEL');
+      expect(challengesMock.pickChallenges).not.toHaveBeenCalled();
+      expect(prismaMock.wordDuelMatch.create).not.toHaveBeenCalled();
+    });
+
+    it('waiting alone takes no play; the play is counted when an opponent arrives', async () => {
+      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w1' } }]);
+      await service.joinQueue('u1');
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+    });
+
+    it('counts the play for BOTH players when the match goes active, never refusing either', async () => {
+      store.matches.set('m1', {
+        id: 'm1',
+        status: 'WAITING',
+        wordIds: ['w1', 'w2'],
+        startedAt: null,
+        endsAt: null,
+        completedAt: null,
+        winnerId: null,
+        tieBreakReason: null,
+        createdAt: new Date(),
+      });
+      store.playerStates.set('ps1', {
+        id: 'ps1',
+        matchId: 'm1',
+        userId: 'u1',
+        totalXp: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        correctCount: 0,
+        currentIndex: 0,
+        currentWordStartedAt: new Date(),
+        currentWordCluesRevealed: 0,
+        joinedAt: new Date(),
+        disconnectedAt: null,
+        reconnectedAt: null,
+      });
+      playLimitMock.consumePlay.mockResolvedValueOnce({
+        game: 'WORD_DUEL',
+        used: 7,
+        limit: 10,
+        remaining: 3,
+        percent: 70,
+      });
+
+      const view = await service.joinQueue('u2');
+
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u2', 'WORD_DUEL', { force: true });
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'WORD_DUEL', { force: true });
+      expect(view.playLimit).toEqual(expect.objectContaining({ used: 7, percent: 70 }));
     });
 
     it('throws BadRequestException when no words are available for a fresh match', async () => {

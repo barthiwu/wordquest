@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { VocabularyModule } from '../vocabulary/vocabulary.module';
 import { RewardEngineService } from './reward-engine.service';
 import { ArcadeChallengeService } from './challenge.service';
+import { NotificationModule } from '../notifications/notification.module';
+import { ArcadePlayLimitService } from './limits/play-limit.service';
 import { ArcadeStatusController } from './arcade-status.controller';
 
 /**
@@ -16,9 +18,9 @@ import { ArcadeStatusController } from './arcade-status.controller';
  * PrismaModule is @Global().
  */
 @Module({
-  imports: [VocabularyModule],
+  imports: [VocabularyModule, NotificationModule],
   controllers: [ArcadeStatusController],
-  providers: [RewardEngineService, ArcadeChallengeService],
-  exports: [RewardEngineService, ArcadeChallengeService],
+  providers: [RewardEngineService, ArcadeChallengeService, ArcadePlayLimitService],
+  exports: [RewardEngineService, ArcadeChallengeService, ArcadePlayLimitService],
 })
 export class ArcadeModule {}

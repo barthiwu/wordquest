@@ -12,6 +12,7 @@ import { FriendsService } from '../../friends/friends.service';
 import { NotificationService } from '../../notifications/notification.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { ArcadeChallengeService } from '../challenge.service';
+import { ArcadePlayLimitService } from '../limits/play-limit.service';
 
 describe('WordDuelInviteService', () => {
   let service: WordDuelInviteService;
@@ -35,6 +36,18 @@ describe('WordDuelInviteService', () => {
   const fresh = () => new Date(Date.now() - 10_000);
   const old = () => new Date(Date.now() - 10 * 60_000);
 
+  const playLimitMock = {
+    assertCanPlay: jest.fn().mockResolvedValue(undefined),
+    isLocked: jest.fn().mockResolvedValue(false),
+    consumePlay: jest.fn().mockResolvedValue({
+      game: 'X',
+      used: 1,
+      limit: 10,
+      remaining: 9,
+      percent: null,
+    }),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     prismaMock.friendship.findFirst.mockResolvedValue({ id: 'f' });
@@ -53,6 +66,7 @@ describe('WordDuelInviteService', () => {
       providers: [
         WordDuelInviteService,
         { provide: PrismaService, useValue: prismaMock },
+        { provide: ArcadePlayLimitService, useValue: playLimitMock },
         { provide: ArcadeChallengeService, useValue: challengesMock },
         { provide: FriendsService, useValue: friendsMock },
         { provide: NotificationService, useValue: notificationsMock },
@@ -70,6 +84,12 @@ describe('WordDuelInviteService', () => {
       await expect(service.invite('u1', 'u2')).rejects.toBeInstanceOf(ForbiddenException);
       friendsMock.areBlocked.mockResolvedValueOnce(true);
       await expect(service.invite('u1', 'u2')).rejects.toBeInstanceOf(ForbiddenException);
+    });
+
+    it('a player at the daily cap cannot send a duel challenge', async () => {
+      playLimitMock.assertCanPlay.mockRejectedValueOnce(new Error('ARCADE_PLAY_LIMIT'));
+      await expect(service.invite('u1', 'u2')).rejects.toThrow('ARCADE_PLAY_LIMIT');
+      expect(prismaMock.wordDuelMatch.create).not.toHaveBeenCalled();
     });
 
     it('creates a private WAITING match for the friend and notifies them', async () => {
@@ -156,6 +176,23 @@ describe('WordDuelInviteService', () => {
         data: { matchId: 'm1', userId: 'u2' },
       });
       expect(analyticsMock.track).toHaveBeenCalledTimes(2);
+    });
+
+    it('a player at the daily cap cannot accept, and nothing is claimed', async () => {
+      prismaMock.wordDuelMatch.findUnique.mockResolvedValueOnce(waiting());
+      playLimitMock.assertCanPlay.mockRejectedValueOnce(new Error('ARCADE_PLAY_LIMIT'));
+
+      await expect(service.accept('u2', 'm1')).rejects.toThrow('ARCADE_PLAY_LIMIT');
+      expect(prismaMock.wordDuelMatch.updateMany).not.toHaveBeenCalled();
+    });
+
+    it('accepting counts the play for both the host and the friend', async () => {
+      prismaMock.wordDuelMatch.findUnique.mockResolvedValueOnce(waiting());
+
+      await service.accept('u2', 'm1');
+
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u2', 'WORD_DUEL', { force: true });
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'WORD_DUEL', { force: true });
     });
 
     it('an expired or already-taken challenge is closed', async () => {

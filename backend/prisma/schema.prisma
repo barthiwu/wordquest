@@ -75,6 +75,11 @@ model User {
   // derivation falls back to UTC until it's set (see common/timezone.ts).
   timezone String?
 
+  // WordQuest+ (V2 subscription): until this moment the player has no daily
+  // Arcade play limit. Null = free plan. There is no purchase flow yet; the
+  // column is the single switch the future billing code (or support) flips.
+  plusUntil DateTime?
+
   // Onboarding (Identity phase, build order §47 item 9)
   nativeLanguage        String? // BCP-47-ish tag, e.g. "en"
   targetLanguage        String? // language the player is learning, e.g. "fr"
@@ -162,6 +167,7 @@ model User {
   feedback                 Feedback[]
   arcadeGameSessions       ArcadeGameSession[]
   wordDuelMessages         WordDuelMessage[]         @relation("WordDuelMessageSender")
+  arcadePlayCounts         ArcadePlayCount[]
   arcadeVersusHosted       ArcadeVersusMatch[]       @relation("ArcadeVersusHost")
   arcadeVersusJoined       ArcadeVersusMatch[]       @relation("ArcadeVersusGuest")
   wordDuelPlayerStates     WordDuelPlayerState[]
@@ -1790,6 +1796,24 @@ model ArcadeAnswer {
   @@unique([sessionId, wordIndex])
   @@index([sessionId])
   @@map("arcade_answers")
+}
+
+// How many plays of one Arcade game a player has started on one of THEIR
+// local calendar days (2026-10: max 10 plays per game per day on the free
+// plan; WordQuest+ is unlimited). A "play" is a session or match that
+// actually started -- resuming one, or an unanswered search, never counts.
+model ArcadePlayCount {
+  id        String     @id @default(uuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game      ArcadeGame
+  // "YYYY-MM-DD" in the player's timezone (common/timezone.ts).
+  localDate String
+  count     Int        @default(0)
+
+  @@unique([userId, game, localDate])
+  @@index([localDate])
+  @@map("arcade_play_counts")
 }
 
 enum ArcadeVersusKind {

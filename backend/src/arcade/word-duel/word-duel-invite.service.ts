@@ -10,6 +10,7 @@ import { FriendsService, type FriendPublicView } from '../../friends/friends.ser
 import { NotificationService } from '../../notifications/notification.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { ArcadeChallengeService } from '../challenge.service';
+import { ArcadePlayLimitService } from '../limits/play-limit.service';
 import { WORD_DUEL_CONFIG } from '../config/arcade.config';
 import { isCompleteItSentenceUsable } from '../complete-it/complete-it.util';
 import { WordDuelService, type WordDuelStateView } from './word-duel.service';
@@ -42,11 +43,13 @@ export class WordDuelInviteService {
     private readonly notifications: NotificationService,
     private readonly analytics: AnalyticsService,
     private readonly wordDuel: WordDuelService,
+    private readonly playLimit: ArcadePlayLimitService,
   ) {}
 
   async invite(userId: string, friendId: string): Promise<WordDuelStateView> {
     if (friendId === userId) throw new BadRequestException('You cannot challenge yourself.');
     await this.assertCanChallenge(userId, friendId);
+    await this.playLimit.assertCanPlay(userId, 'WORD_DUEL');
 
     const mine = await this.prisma.wordDuelPlayerState.findFirst({
       where: { userId, match: { status: { in: ['WAITING', 'ACTIVE'] } } },
@@ -131,6 +134,7 @@ export class WordDuelInviteService {
     if (match.status !== 'WAITING' || this.isExpired(match)) {
       throw new ConflictException('This challenge is no longer open.');
     }
+    await this.playLimit.assertCanPlay(userId, 'WORD_DUEL');
     const hostId = match.players[0]?.userId;
     if (!hostId || (await this.friends.areBlocked(userId, hostId))) {
       throw new ForbiddenException('This challenge is no longer open.');
@@ -162,7 +166,11 @@ export class WordDuelInviteService {
     for (const id of [userId, hostId]) {
       this.analytics.track(id, 'DUEL_STARTED', { matchId }, { screen: 'WordDuel' });
     }
-    return this.wordDuel.getState(userId, matchId);
+    const [playLimit] = await Promise.all([
+      this.playLimit.consumePlay(userId, 'WORD_DUEL', { force: true }).catch(() => undefined),
+      this.playLimit.consumePlay(hostId, 'WORD_DUEL', { force: true }).catch(() => undefined),
+    ]);
+    return { ...(await this.wordDuel.getState(userId, matchId)), playLimit };
   }
 
   async decline(userId: string, matchId: string): Promise<{ declined: boolean }> {
