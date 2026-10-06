@@ -11,16 +11,36 @@ import { PracticeService } from './practice.service';
  * service that's out of this change's scope otherwise.
  */
 describe('PracticeService', () => {
-  const wordRow = { id: 'w1', word: 'resilient', definition: 'x', partOfSpeech: 'adjective', isActive: true };
+  const wordRow = {
+    id: 'w1',
+    word: 'resilient',
+    normalizedWord: 'resilient',
+    wordUS: null,
+    normalizedWordUS: null,
+    exampleSentence: 'She is resilient.',
+    exampleSentenceUS: null,
+    baseDifficulty: 3,
+    definition: 'x',
+    partOfSpeech: 'adjective',
+    isActive: true,
+  };
 
   const prismaMock = {
     word: { findUnique: jest.fn().mockResolvedValue(wordRow) },
-    user: { findUnique: jest.fn().mockResolvedValue({ nativeLanguage: null }) },
+    user: {
+      findUnique: jest.fn().mockResolvedValue({ nativeLanguage: null, englishVariant: null }),
+    },
+    mastery: { findUnique: jest.fn().mockResolvedValue({ id: 'm1' }) },
+    questAttempt: { findFirst: jest.fn().mockResolvedValue(null) },
   };
   const masteryMock = {
-    recordSkillAreaPractice: jest
-      .fn()
-      .mockResolvedValue({ attemptScore: 80, bestScore: 80, level: 'RECALLING', justMastered: false }),
+    recordAnswer: jest.fn().mockResolvedValue({ level: 'RECALLING', justMastered: false }),
+    recordSkillAreaPractice: jest.fn().mockResolvedValue({
+      attemptScore: 80,
+      bestScore: 80,
+      level: 'RECALLING',
+      justMastered: false,
+    }),
   };
   const sentenceEvaluationMock = { evaluate: jest.fn() };
   const paragraphEvaluationMock = { evaluate: jest.fn() };
@@ -39,7 +59,9 @@ describe('PracticeService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     prismaMock.word.findUnique.mockResolvedValue(wordRow);
-    prismaMock.user.findUnique.mockResolvedValue({ nativeLanguage: null });
+    prismaMock.user.findUnique.mockResolvedValue({ nativeLanguage: null, englishVariant: null });
+    prismaMock.mastery.findUnique.mockResolvedValue({ id: 'm1' });
+    prismaMock.questAttempt.findFirst.mockResolvedValue(null);
     masteryMock.recordSkillAreaPractice.mockResolvedValue({
       attemptScore: 80,
       bestScore: 80,
@@ -65,7 +87,10 @@ describe('PracticeService', () => {
     });
 
     it("passes the player's nativeLanguage through to the evaluator", async () => {
-      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'zh' });
+      prismaMock.user.findUnique.mockResolvedValueOnce({
+        nativeLanguage: 'zh',
+        englishVariant: null,
+      });
 
       await service.submitSentence('u1', 'w1', 'She is resilient.');
 
@@ -79,7 +104,10 @@ describe('PracticeService', () => {
     });
 
     it('passes undefined-safe null when the player has no nativeLanguage set', async () => {
-      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: null });
+      prismaMock.user.findUnique.mockResolvedValueOnce({
+        nativeLanguage: null,
+        englishVariant: null,
+      });
 
       await service.submitSentence('u1', 'w1', 'She is resilient.');
 
@@ -97,7 +125,10 @@ describe('PracticeService', () => {
     const thirtyWordParagraph = Array.from({ length: 30 }, (_, i) => `word${i}`).join(' ');
 
     it("passes the player's nativeLanguage through to the evaluator", async () => {
-      prismaMock.user.findUnique.mockResolvedValueOnce({ nativeLanguage: 'pt' });
+      prismaMock.user.findUnique.mockResolvedValueOnce({
+        nativeLanguage: 'pt',
+        englishVariant: null,
+      });
 
       await service.submitParagraph('u1', 'w1', thirtyWordParagraph);
 
@@ -108,6 +139,43 @@ describe('PracticeService', () => {
         thirtyWordParagraph,
         'pt',
       );
+    });
+  });
+
+  describe('met-word gate and spelling variant', () => {
+    it('refuses a word the player has never met (no Mastery row, no quest attempt)', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce(null);
+      await expect(service.getOverview('u1', 'w1')).rejects.toBeInstanceOf(NotFoundException);
+      prismaMock.mastery.findUnique.mockResolvedValueOnce(null);
+      await expect(service.submitGuess('u1', 'w1', 'resilient')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(masteryMock.recordAnswer).not.toHaveBeenCalled();
+    });
+
+    it('allows a word presented in a quest attempt even without a Mastery row yet', async () => {
+      prismaMock.mastery.findUnique.mockResolvedValueOnce(null);
+      prismaMock.questAttempt.findFirst.mockResolvedValueOnce({ id: 'qa1' });
+      await service.submitGuess('u1', 'w1', 'resilient');
+      expect(masteryMock.recordAnswer).toHaveBeenCalledWith('u1', 'w1', true);
+    });
+
+    it('grades the guess against the US spelling for a US player', async () => {
+      const usWord = {
+        ...wordRow,
+        word: 'colour',
+        normalizedWord: 'colour',
+        wordUS: 'color',
+        normalizedWordUS: 'color',
+      };
+      prismaMock.word.findUnique.mockResolvedValueOnce(usWord);
+      prismaMock.user.findUnique.mockResolvedValueOnce({
+        nativeLanguage: null,
+        englishVariant: 'US',
+      });
+      const result = await service.submitGuess('u1', 'w1', 'Color');
+      expect(result.isCorrect).toBe(true);
+      expect(result.correctAnswer).toBe('color');
     });
   });
 });

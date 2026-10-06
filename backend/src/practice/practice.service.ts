@@ -4,6 +4,7 @@ import { MasteryService, type MasteryLevel } from '../mastery/mastery.service';
 import { SentenceEvaluationService } from '../sentence/sentence-evaluation.service';
 import { ParagraphEvaluationService } from '../paragraph/paragraph-evaluation.service';
 import { generateOmissionChallenge } from '../vocabulary/omission-engine';
+import { renderWord } from '../vocabulary/english-variant';
 
 export interface PracticeWordOverview {
   wordId: string;
@@ -73,24 +74,57 @@ export class PracticeService {
     private readonly paragraphEvaluation: ParagraphEvaluationService,
   ) {}
 
-  async getOverview(userId: string, wordId: string): Promise<PracticeWordOverview> {
-    const word = await this.prisma.word.findUnique({ where: { id: wordId } });
-    if (!word || !word.isActive) throw new NotFoundException('Word not found');
+  /**
+   * Loads the word for a practice call and enforces two rules:
+   *  - the word must be active, and the player must already have met it
+   *    (a Mastery row, or a quest attempt that presented it). Without this
+   *    any active wordId could be "practised" to MASTERED, which inflates
+   *    the Passport count and the CEFR unlock gate without ever having
+   *    seen the word in a quest.
+   *  - spelling follows the player's own US/UK variant, exactly like the
+   *    quests do, so a US player is never marked wrong for "color".
+   * Unmet words answer 404 (same as a missing word) so the endpoint can't
+   * be used to probe the vocabulary.
+   */
+  private async loadPracticeWord(userId: string, wordId: string) {
+    const [word, player, mastery, attempt] = await Promise.all([
+      this.prisma.word.findUnique({ where: { id: wordId } }),
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { nativeLanguage: true, englishVariant: true },
+      }),
+      this.prisma.mastery.findUnique({
+        where: { userId_wordId: { userId, wordId } },
+        select: { id: true },
+      }),
+      this.prisma.questAttempt.findFirst({
+        where: { userId, wordIds: { has: wordId } },
+        select: { id: true },
+      }),
+    ]);
+    if (!word || !word.isActive || (!mastery && !attempt)) {
+      throw new NotFoundException('Word not found');
+    }
+    const rendered = renderWord(word, player?.englishVariant ?? null);
+    return { word, rendered, nativeLanguage: player?.nativeLanguage ?? null };
+  }
 
-    // A practice-only word (never presented via a real quest) has no
-    // Mastery row yet -- getDetail already returns the all-zero NEW
-    // shape for that case, so this reads the same either way.
+  async getOverview(userId: string, wordId: string): Promise<PracticeWordOverview> {
+    const { word, rendered } = await this.loadPracticeWord(userId, wordId);
+
+    // A word met only through a quest attempt may not have a Mastery row
+    // yet -- getDetail returns the all-zero NEW shape for that case.
     const detail = await this.mastery.getDetail(userId, wordId);
 
     return {
       wordId: word.id,
-      word: word.word,
+      word: rendered.text,
       definition: word.definition,
       partOfSpeech: word.partOfSpeech,
       pronunciation: word.pronunciation,
       phoneticRepresentation: word.phoneticRepresentation,
       synonyms: word.synonyms,
-      exampleSentence: word.exampleSentence,
+      exampleSentence: rendered.sentence,
       currentLevel: detail.currentLevel,
       guessScore: detail.guessScore,
       sentenceScore: detail.sentenceScore,
@@ -99,12 +133,11 @@ export class PracticeService {
   }
 
   async getGuessChallenge(userId: string, wordId: string): Promise<PracticeGuessChallenge> {
-    const word = await this.prisma.word.findUnique({ where: { id: wordId } });
-    if (!word || !word.isActive) throw new NotFoundException('Word not found');
+    const { word, rendered } = await this.loadPracticeWord(userId, wordId);
 
     const masteryLevel = await this.mastery.getLevel(userId, wordId);
     const challenge = generateOmissionChallenge({
-      word: word.word,
+      word: rendered.text,
       baseDifficulty: word.baseDifficulty,
       masteryLevel,
     });
@@ -112,11 +145,14 @@ export class PracticeService {
     return { displayPattern: challenge.displayPattern, missingIndexes: challenge.missingIndexes };
   }
 
-  async submitGuess(userId: string, wordId: string, rawAnswer: string): Promise<PracticeGuessResult> {
-    const word = await this.prisma.word.findUnique({ where: { id: wordId } });
-    if (!word || !word.isActive) throw new NotFoundException('Word not found');
+  async submitGuess(
+    userId: string,
+    wordId: string,
+    rawAnswer: string,
+  ): Promise<PracticeGuessResult> {
+    const { rendered } = await this.loadPracticeWord(userId, wordId);
 
-    const isCorrect = this.normalize(rawAnswer) === word.normalizedWord;
+    const isCorrect = this.normalize(rawAnswer) === rendered.normalizedText;
 
     // Practice still runs the same recordAnswer path a live Guess does
     // (streak/level ladder, guessScore EMA, MASTERED re-check) -- the
@@ -124,7 +160,7 @@ export class PracticeService {
     // own anyway (QuestsService does that separately around it).
     const { level, justMastered } = await this.mastery.recordAnswer(userId, wordId, isCorrect);
 
-    return { isCorrect, correctAnswer: word.word, masteryLevel: level, justMastered };
+    return { isCorrect, correctAnswer: rendered.text, masteryLevel: level, justMastered };
   }
 
   async submitSentence(
@@ -132,26 +168,23 @@ export class PracticeService {
     wordId: string,
     sentence: string,
   ): Promise<PracticeWritingResult> {
-    const [word, player] = await Promise.all([
-      this.prisma.word.findUnique({ where: { id: wordId } }),
-      this.prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
-    ]);
-    if (!word || !word.isActive) throw new NotFoundException('Word not found');
+    const { word, rendered, nativeLanguage } = await this.loadPracticeWord(userId, wordId);
 
     const evaluation = await this.sentenceEvaluation.evaluate(
-      word.word,
+      rendered.text,
       word.definition,
       word.partOfSpeech,
       sentence,
-      player?.nativeLanguage,
+      nativeLanguage,
     );
 
-    const { attemptScore, bestScore, level, justMastered } = await this.mastery.recordSkillAreaPractice(
-      userId,
-      wordId,
-      'sentence',
-      evaluation.scores as unknown as Record<string, number>,
-    );
+    const { attemptScore, bestScore, level, justMastered } =
+      await this.mastery.recordSkillAreaPractice(
+        userId,
+        wordId,
+        'sentence',
+        evaluation.scores as unknown as Record<string, number>,
+      );
 
     return {
       scores: evaluation.scores as unknown as Record<string, number>,
@@ -175,26 +208,23 @@ export class PracticeService {
       throw new BadRequestException(`Paragraph must be 30-100 words (got ${wordCount}).`);
     }
 
-    const [word, player] = await Promise.all([
-      this.prisma.word.findUnique({ where: { id: wordId } }),
-      this.prisma.user.findUnique({ where: { id: userId }, select: { nativeLanguage: true } }),
-    ]);
-    if (!word || !word.isActive) throw new NotFoundException('Word not found');
+    const { word, rendered, nativeLanguage } = await this.loadPracticeWord(userId, wordId);
 
     const evaluation = await this.paragraphEvaluation.evaluate(
-      word.word,
+      rendered.text,
       word.definition,
       word.partOfSpeech,
       paragraph,
-      player?.nativeLanguage,
+      nativeLanguage,
     );
 
-    const { attemptScore, bestScore, level, justMastered } = await this.mastery.recordSkillAreaPractice(
-      userId,
-      wordId,
-      'paragraph',
-      evaluation.scores as unknown as Record<string, number>,
-    );
+    const { attemptScore, bestScore, level, justMastered } =
+      await this.mastery.recordSkillAreaPractice(
+        userId,
+        wordId,
+        'paragraph',
+        evaluation.scores as unknown as Record<string, number>,
+      );
 
     return {
       scores: evaluation.scores as unknown as Record<string, number>,
