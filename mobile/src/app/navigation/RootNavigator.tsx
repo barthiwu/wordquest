@@ -220,17 +220,17 @@ export function RootNavigator() {
     >
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Splash">
         <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Registration" component={RegistrationScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-        <Stack.Screen name="RecoverAccount" component={RecoverAccountScreen} />
-        <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        <Stack.Screen name="Biodata" component={BiodataScreen} />
-        <Stack.Screen name="OnboardingGoal" component={OnboardingGoalScreen} />
-        <Stack.Screen name="ClanSelection" component={ClanSelectionScreen} />
-        <Stack.Screen name="AppIntro" component={AppIntroScreen} />
+        <Stack.Screen name="Welcome" component={framed(WelcomeScreen, 560)} />
+        <Stack.Screen name="Registration" component={framed(RegistrationScreen, 520)} />
+        <Stack.Screen name="Login" component={framed(LoginScreen, 520)} />
+        <Stack.Screen name="ForgotPassword" component={framed(ForgotPasswordScreen, 520)} />
+        <Stack.Screen name="RecoverAccount" component={framed(RecoverAccountScreen, 520)} />
+        <Stack.Screen name="VerifyEmail" component={framed(VerifyEmailScreen, 520)} />
+        <Stack.Screen name="ResetPassword" component={framed(ResetPasswordScreen, 520)} />
+        <Stack.Screen name="Biodata" component={framed(BiodataScreen, 560)} />
+        <Stack.Screen name="OnboardingGoal" component={framed(OnboardingGoalScreen, 640)} />
+        <Stack.Screen name="ClanSelection" component={framed(ClanSelectionScreen, 760)} />
+        <Stack.Screen name="AppIntro" component={framed(AppIntroScreen, 760)} />
         <Stack.Screen name="Main" component={MainTabNavigator} />
         <Stack.Screen name="DailyQuest" component={framed(DailyQuestScreen)} />
         <Stack.Screen name="QuestComplete" component={framed(QuestCompleteScreen)} />

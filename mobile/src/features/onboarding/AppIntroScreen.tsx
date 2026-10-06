@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import {
-  Dimensions,
+  useWindowDimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -48,7 +48,11 @@ const SLIDE_KEYS = ['quests', 'arcade', 'progress'] as const;
 export function AppIntroScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
-  const { width } = Dimensions.get('window');
+  // The slides page horizontally, so their width must be the width of the
+  // column they actually sit in (a centered max-width column on tablet and
+  // desktop), never the window's: measured, with the window as the first guess.
+  const windowWidth = useWindowDimensions().width;
+  const [width, setWidth] = useState(windowWidth);
   const styles = useMemo(
     () => createStyles(colors, insets.top, insets.bottom, width),
     [colors, insets.top, insets.bottom, width],
@@ -57,6 +61,13 @@ export function AppIntroScreen({ navigation }: Props) {
   const scrollRef = useRef<ScrollView>(null);
   const [index, setIndex] = useState(0);
   const lastSlide = index === SLIDE_KEYS.length - 1;
+
+  // Keep the current slide in view when the column is resized (rotation,
+  // window drag on web).
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ x: width * index, animated: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on a width change.
+  }, [width]);
 
   // Last stop in the onboarding chain (see the screen doc comment) --
   // reaching Main from here is ONBOARDING_COMPLETED, the funnel's
@@ -92,7 +103,13 @@ export function AppIntroScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onLayout={(e) => {
+        const w = Math.round(e.nativeEvent.layout.width);
+        if (w > 0 && w !== width) setWidth(w);
+      }}
+    >
       <Pressable
         style={styles.skip}
         onPress={finish}
