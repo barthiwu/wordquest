@@ -8313,3 +8313,698 @@ ID,Word,Definition,Part of Speech,Example Sentence,Synonym 1,Synonym 2,CEFR Leve
 19007,Zonula,A small band or girdle-like area.,Noun,The thin zonula around the lens looked like a tiny belt.,zonule,,B1,45,General,Common,,,zone
 19008,Zonule,"A small zone shaped like a belt, such as the fibres that hold the lens of the eye.",Noun,Tiny fibres called zonules hold the lens of the eye in place.,zonula,,B1,45,General,Common,,,zone
 19009,Zoster,Eruptions along a nerve path often accompanied by severe neuralgia.,Noun,The old man had a painful rash of zoster along one side of his chest.,herpes zoster,shingles,B1,45,Personal Development,Common,,,herpes
+19010,Abbey,"A building where monks or nuns live, or a church that was once part of one.",Noun,We visited an old abbey on a hill above the village.,monastery,priory,B2,58,Society & Culture,Common,,,monk;church;cloister
+19011,Absorb,"To take in a liquid, heat or light so that it becomes part of something.",Verb,A sponge can absorb a lot of water.,soak up,take in,B2,58,Science & Technology,Common,,,sponge;soak;take in
+19012,Accept,To agree to take something that is offered.,Verb,She was happy to accept the invitation to the party.,receive,take,A2,28,Communication,Very Common,,,agree;receive;welcome
+19013,Acre,"A unit of land area, about the size of a football field.",Noun,The farm covers about forty acres of rich soil.,plot,lot,B1,45,General,Common,,,farm;field;land
+19014,Adhere,To stick firmly to a surface or to follow a rule closely.,Verb,The tape will not adhere to a wet surface.,stick,cling,B2,58,General,Common,,,stick;cling;follow
+19015,Advice,An opinion about what someone should do.,Noun,My teacher gave me good advice about learning English.,guidance,counsel,A2,28,Communication,Very Common,,,tip;help;suggest
+19016,Afford,To have enough money to pay for something.,Verb,We cannot afford a new car this year.,manage,spare,B1,45,Business,Common,,,pay;cost;money
+19017,Aisle,A passage between rows of seats or shelves.,Noun,She walked down the aisle of the supermarket looking for rice.,passage,gangway,B2,58,General,Common,,,row;seat;church
+19018,Alpaca,"A South American animal kept for its soft, thick wool.",Noun,The alpaca stood quietly on the mountain slope.,llama,camelid,B2,58,Nature,Common,,,wool;Andes;mountain
+19019,Ample,More than enough in amount or size.,Adjective,There is ample room in the car for all our bags.,plenty,abundant,B2,58,General,Common,,,enough;plenty;spacious
+19020,Angle,"The space between two lines that meet, measured in degrees.",Noun,The ramp rises at a steep angle.,corner,slant,B1,45,Academic,Common,,,corner;degree;slope
+19021,Angler,A person who catches fish with a rod and line.,Noun,The angler waited patiently beside the river.,fisherman,fisher,B2,58,Travel & Places,Common,,,fishing;rod;river
+19022,Annual,Happening once every year.,Adjective,The school holds an annual sports day in March.,yearly,once a year,B1,45,General,Common,,,year;yearly;event
+19023,Anthem,"A special song of a country, school or group, sung on important occasions.",Noun,Everyone stood up to sing the national anthem.,hymn,song,B2,58,Society & Culture,Common,,,song;country;sing
+19024,Antler,"One of the two hard, branched horns on the head of a male deer.",Noun,The stag lowered its antler and charged.,horn,tine,B2,58,Nature,Common,,,deer;horn;stag
+19025,Apple,"A round fruit with red, green or yellow skin and crisp white flesh.",Noun,He bit into a crisp red apple.,fruit,pippin,A1,15,General,Very Common,,,fruit;tree;juice
+19026,Apron,A garment worn over the front of clothes to keep them clean.,Noun,She tied on her apron before she started cooking.,pinafore,overall,B1,45,General,Common,,,kitchen;cook;clothes
+19027,Arcade,"A covered walkway with shops, or a place with video games.",Noun,We spent the afternoon at the arcade playing games.,gallery,passage,B2,58,Society & Culture,Common,,,games;shops;passage
+19028,Arch,"A curved structure over an opening, such as a doorway or bridge.",Noun,We walked under the stone arch into the old town.,vault,curve,B1,45,Arts & Creativity,Common,,,bridge;curve;gateway
+19029,Arm,The part of the body between the shoulder and the hand.,Noun,He carried the box under one arm.,limb,member,A1,15,Health & Wellness,Very Common,,,hand;elbow;shoulder
+19030,Array,A neat and impressive collection of things.,Noun,The market had a colourful array of fruit and vegetables.,display,range,B2,58,General,Common,,,display;range;collection
+19031,Atom,"The smallest unit of a chemical element, made of even smaller particles.",Noun,A water molecule is made of two hydrogen atoms and one oxygen atom.,particle,speck,B1,45,Science & Technology,Common,,,molecule;element;nucleus
+19032,Attach,To fasten or join one thing to another.,Verb,Please attach a photo to the form.,fasten,join,B1,45,Communication,Common,,,fasten;join;add
+19033,Avenue,"A wide street, often with trees on both sides.",Noun,We walked along the avenue in the evening.,boulevard,road,B2,58,Travel & Places,Common,,,street;road;trees
+19034,Awe,A feeling of great respect mixed with wonder.,Noun,The children looked up at the huge waterfall in awe.,wonder,amazement,B2,58,Emotion,Common,,,wonder;respect;marvel
+19035,Bacon,Salted or smoked meat from the back or sides of a pig.,Noun,The smell of frying bacon filled the kitchen.,ham,rasher,A2,28,General,Common,,,breakfast;pork;fry
+19036,Badge,A small piece of metal or cloth worn to show membership or rank.,Noun,The scout proudly pinned the badge to his shirt.,emblem,crest,B1,45,Society & Culture,Common,,,pin;emblem;uniform
+19037,Bag,A soft container with handles used for carrying things.,Noun,She packed her books in a bag and left for school.,sack,satchel,A1,15,General,Very Common,,,carry;pocket;luggage
+19038,Baker,"A person who makes and sells bread, cakes and pastry.",Noun,The baker gets up at four o'clock to prepare the bread.,breadmaker,pastry cook,A2,28,Business,Common,,,bread;oven;shop
+19039,Balm,A soothing cream or oil that you rub on skin to ease pain.,Noun,She rubbed a little balm on her dry lips.,ointment,salve,B2,58,Health & Wellness,Common,,,cream;soothe;oil
+19040,Bamboo,"A tall tropical plant with hollow, woody stems that is used for building.",Noun,The hut was built of strong bamboo.,cane,reed,B2,58,Nature,Common,,,grass;stem;panda
+19041,Barber,A person whose job is to cut men's hair.,Noun,He went to the barber for a haircut.,hairdresser,stylist,B1,45,Business,Common,,,hair;shave;shop
+19042,Bark,The tough outer covering of a tree trunk.,Noun,The deer scraped the bark off the young tree.,rind,covering,B1,45,Nature,Common,,,tree;trunk;wood
+19043,Barn,A large farm building used for storing hay or sheltering animals.,Noun,The cows spend the winter nights in the barn.,shed,stable,B1,45,Nature,Common,,,farm;hay;cattle
+19044,Basic,Forming the simplest and most important part of something.,Adjective,"Food, water and shelter are basic human needs.",simple,essential,A2,28,General,Very Common,,,simple;essential;plain
+19045,Basin,"A wide, shallow bowl used for holding water or for washing.",Noun,She filled the basin with warm water to wash her face.,bowl,sink,B2,58,General,Common,,,bowl;wash;water
+19046,Batch,A group of things made or dealt with together at one time.,Noun,The baker took a fresh batch of rolls out of the oven.,lot,set,B2,58,General,Common,,,group;bake;set
+19047,Beach,An area of sand or small stones beside the sea.,Noun,The children built a sandcastle on the beach.,shore,coast,A1,15,Travel & Places,Very Common,,,sand;sea;holiday
+19048,Bead,"A small round piece of glass, wood or plastic with a hole for a string.",Noun,She threaded a blue bead onto the bracelet.,ball,droplet,B1,45,Arts & Creativity,Common,,,necklace;string;jewel
+19049,Beauty,A quality that gives pleasure to the eyes or mind.,Noun,We admired the beauty of the sunset.,loveliness,charm,A2,28,Arts & Creativity,Very Common,,,pretty;lovely;art
+19050,Bed,A piece of furniture that you sleep on.,Noun,The children jumped into bed and fell asleep.,bunk,cot,A1,15,General,Very Common,,,sleep;pillow;blanket
+19051,Bee,A flying insect that makes honey and gathers nectar from flowers.,Noun,A bee landed on the yellow flower and began to feed.,honeybee,bumblebee,A2,28,Nature,Common,,,hive;honey;wasp
+19052,Beetle,An insect with hard wing cases that cover its back.,Noun,A beetle crawled across the leaf.,bug,insect,B1,45,Nature,Common,,,insect;wing;crawl
+19053,Belief,A strong feeling that something is true or real.,Noun,It is my belief that honesty is important.,opinion,faith,B1,45,Personal Development,Common,,,faith;trust;idea
+19054,Bell,A hollow metal object that makes a ringing sound when struck.,Noun,The school bell rings at nine o'clock.,chime,gong,A2,28,General,Common,,,ring;chime;toll
+19055,Belong,To be owned by or to be a member of something.,Verb,Does this umbrella belong to you?,fit,be owned,A2,28,Society & Culture,Common,,,own;member;fit
+19056,Belt,A strip of leather or cloth worn around the waist.,Noun,He pulled his belt a notch tighter.,strap,band,A2,28,General,Common,,,waist;buckle;trousers
+19057,Bench,"A long seat for two or more people, often made of wood.",Noun,We sat on a bench in the park and ate our lunch.,seat,pew,A2,28,General,Common,,,park;seat;wood
+19058,Berry,"A small, round, juicy fruit with no stone, such as a strawberry.",Noun,She picked a ripe berry from the bush and ate it.,fruit,drupe,A2,28,Nature,Common,,,fruit;bush;jam
+19059,Birth,The moment when a baby comes out of its mother's body.,Noun,The birth of the baby brought great joy to the family.,delivery,beginning,A2,28,Health & Wellness,Very Common,,,baby;born;mother
+19060,Bishop,A senior Christian leader who is in charge of many churches.,Noun,The bishop spoke to the crowd outside the cathedral.,prelate,clergyman,B2,58,Society & Culture,Common,,,church;cathedral;priest
+19061,Bitter,"Having a sharp, unpleasant taste.",Adjective,The medicine had a bitter taste.,sour,sharp,B1,45,General,Common,,,taste;sharp;sour
+19062,Blast,"A sudden strong rush of air, or a loud explosion.",Noun,A blast of cold wind hit us as we opened the door.,gust,explosion,B2,58,General,Common,,,wind;explosion;noise
+19063,Bleach,A strong chemical used to whiten cloth or clean surfaces.,Noun,Do not mix bleach with other cleaning products.,whitener,disinfectant,B2,58,General,Common,,,clean;chemical;white
+19064,Blend,To mix two or more things together so they become one.,Verb,Blend the eggs and sugar until the mixture is smooth.,mix,combine,B2,58,General,Common,,,mix;stir;merge
+19065,Bless,To ask for the favour and protection of God for someone.,Verb,The priest raised his hand to bless the crowd.,consecrate,sanctify,B2,58,Society & Culture,Common,,,prayer;holy;grace
+19066,Blind,Unable to see.,Adjective,The blind man used a white stick to find his way.,sightless,unseeing,B1,45,Health & Wellness,Common,,,sight;eyes;guide
+19067,Block,"A solid piece of material with flat sides, such as wood or stone.",Noun,The child built a tower from wooden blocks.,chunk,brick,A2,28,General,Common,,,solid;wood;brick
+19068,Blood,The red liquid that flows around the body.,Noun,The nurse took a sample of blood from my arm.,plasma,gore,A2,28,Health & Wellness,Very Common,,,heart;vein;red
+19069,Blouse,A light shirt that women and girls wear.,Noun,She wore a white blouse with her black skirt.,shirt,top,B1,45,General,Common,,,shirt;clothes;sleeve
+19070,Board,"A long, thin, flat piece of wood.",Noun,He nailed a board across the broken window.,plank,panel,A2,28,General,Common,,,wood;plank;table
+19071,Booth,"A small enclosed space for a single person, such as for voting or phoning.",Noun,She stepped into the booth to cast her vote.,stall,kiosk,B2,58,General,Common,,,stall;kiosk;cubicle
+19072,Borrow,To take something with the promise of giving it back later.,Verb,Can I borrow your pen for a minute?,take on loan,take,A2,28,General,Very Common,,,lend;return;library
+19073,Bottle,A container with a narrow neck used for holding liquids.,Noun,He filled the bottle with fresh water.,flask,jar,A1,15,General,Very Common,,,water;glass;cap
+19074,Bowler,A player who throws the ball in cricket.,Noun,The bowler ran up and sent down a fast ball.,pitcher,thrower,B2,58,Society & Culture,Common,,,cricket;ball;game
+19075,Brake,A device used to slow down or stop a vehicle.,Noun,He pressed the brake and the car stopped at the lights.,stopper,control,B1,45,Travel & Places,Common,,,car;stop;pedal
+19076,Brave,Willing to face danger or pain without showing fear.,Adjective,The brave boy jumped into the river to save the dog.,bold,fearless,A2,28,Personal Development,Very Common,,,courage;hero;fear
+19077,Breath,The air that you take into your lungs and let out again.,Noun,He took a deep breath before jumping into the pool.,inhale,gasp,B1,45,Health & Wellness,Common,,,lungs;air;breathe
+19078,Brick,A small block of baked clay used for building walls.,Noun,The house was built of red brick.,block,tile,A2,28,General,Common,,,wall;clay;build
+19079,Bride,A woman on or just before her wedding day.,Noun,The bride smiled as she walked down the aisle.,newlywed,fiancee,B1,45,Society & Culture,Common,,,wedding;groom;marry
+19080,Bridle,The straps that go around a horse's head so that a rider can control it.,Noun,She slipped the bridle over the horse's ears.,harness,rein,B2,58,Society & Culture,Common,,,horse;reins;saddle
+19081,Bright,Giving out or reflecting a lot of light.,Adjective,The bright sun made me squint.,brilliant,shining,A2,28,General,Very Common,,,light;shiny;sunny
+19082,Broad,Wide from one side to the other.,Adjective,He had broad shoulders and a friendly smile.,wide,expansive,B1,45,General,Common,,,wide;large;open
+19083,Bronze,A brown metal made by mixing copper and tin.,Noun,The statue in the square is made of bronze.,alloy,metal,B2,58,Arts & Creativity,Common,,,medal;metal;statue
+19084,Broom,A brush with a long handle used for sweeping floors.,Noun,She swept the dust into a pile with a broom.,brush,besom,B1,45,General,Common,,,sweep;floor;witch
+19085,Bubble,A thin ball of liquid filled with air.,Noun,The child blew a bubble from soapy water.,blister,globule,B1,45,General,Common,,,soap;air;float
+19086,Buckle,A metal fastener on a belt or strap.,Noun,He tightened the buckle on his belt.,clasp,fastener,B2,58,General,Common,,,belt;strap;clasp
+19087,Bud,A small swelling on a plant that grows into a leaf or flower.,Noun,Each bud on the rose bush will open in the spring.,sprout,shoot,B1,45,Nature,Common,,,blossom;petal;stem
+19088,Budget,A plan for how much money you will earn and spend.,Noun,We made a budget to save money for the holiday.,plan,allowance,B1,45,Business,Common,,,money;save;spend
+19089,Bulb,The round glass part of a lamp that gives off light.,Noun,The bulb flickered and then went out.,lamp,globe,B1,45,Science & Technology,Common,,,lamp;light;glass
+19090,Butter,A soft yellow food made from milk or cream and spread on bread.,Noun,She spread butter on a slice of warm bread.,spread,margarine,A1,15,General,Very Common,,,bread;cream;toast
+19091,Button,"A small, round object that fastens clothes or is pressed to operate a machine.",Noun,He sewed a button back onto his shirt.,fastener,switch,A2,28,General,Very Common,,,shirt;press;sew
+19092,Cab,A car that you pay to take you to a place of your choice.,Noun,We took a cab to the airport because the train was late.,taxi,hackney,B1,45,Travel & Places,Common,,,driver;fare;ride
+19093,Cabin,"A small wooden house in the countryside, or a room on a ship or plane.",Noun,We spent the weekend in a cosy log cabin.,hut,lodge,B1,45,Travel & Places,Common,,,hut;forest;ship
+19094,Cactus,A prickly desert plant that stores water in its thick stem.,Noun,"The cactus grew in the hot, dry sand.",succulent,plant,B1,45,Nature,Common,,,desert;spine;plant
+19095,Calf,"A young cow, or the back part of the leg below the knee.",Noun,The calf stayed close to its mother in the field.,young cow,heifer,B1,45,Nature,Common,,,cow;cattle;farm
+19096,Camel,A large desert animal with one or two humps on its back.,Noun,A camel can go for days without water.,dromedary,beast of burden,A2,28,Nature,Common,,,desert;hump;caravan
+19097,Camper,A person who spends a holiday living in a tent.,Noun,The camper put up his tent beside the lake.,tent dweller,outdoorsman,B2,58,Travel & Places,Common,,,tent;outdoors;campfire
+19098,Cane,"A long, thin stick used for walking or to support a plant.",Noun,The old man walked slowly with a wooden cane.,stick,staff,B2,58,General,Common,,,stick;walking;sugar
+19099,Canoe,"A light, narrow boat that you move with a paddle.",Noun,They paddled the canoe down the quiet river.,kayak,dugout,B1,45,Travel & Places,Common,,,paddle;river;boat
+19100,Canopy,"A cover that hangs above something, or the top layer of branches in a forest.",Noun,Monkeys leaped through the forest canopy.,awning,cover,B2,58,Nature,Common,,,forest;shelter;branches
+19101,Cap,"A soft, flat hat, often with a stiff curved part at the front.",Noun,He wore a blue cap to keep the sun out of his eyes.,hat,beret,A2,28,General,Common,,,visor;hood;lid
+19102,Carrot,"A long, orange root vegetable.",Noun,The rabbit nibbled a carrot.,vegetable,root,A1,15,General,Very Common,,,vegetable;orange;rabbit
+19103,Carve,"To cut a shape out of wood or stone, or to cut cooked meat into slices.",Verb,He used a sharp knife to carve a small bird from the wood.,sculpt,cut,B1,45,Arts & Creativity,Common,,,sculpt;chisel;wood
+19104,Cave,A large natural hollow in the side of a hill or under the ground.,Noun,Bats were sleeping on the roof of the cave.,cavern,grotto,A2,28,Nature,Common,,,cavern;rock;tunnel
+19105,Cavern,"A large, deep cave.",Noun,Their voices echoed in the dark cavern.,cave,grotto,B2,58,Nature,Common,,,cave;cliff;underground
+19106,Cell,The smallest living unit of a plant or animal body.,Noun,Every living cell contains a tiny control centre called a nucleus.,unit,chamber,B1,45,Science & Technology,Common,,,biology;tissue;nucleus
+19107,Cement,A grey powder that is mixed with water to make concrete.,Noun,The workers mixed cement to build the wall.,mortar,concrete,B1,45,Science & Technology,Common,,,concrete;build;mix
+19108,Census,An official count of the people who live in a country.,Noun,The census showed that the town's population had doubled.,survey,count,B2,58,Society & Culture,Common,,,population;count;survey
+19109,Centre,The middle point or part of something.,Noun,The fountain stands in the centre of the square.,middle,core,A2,28,General,Very Common,,,middle;heart;core
+19110,Chair,"A seat with a back, made for one person.",Noun,He pulled out a chair and sat at the table.,seat,stool,A1,15,General,Very Common,,,table;sit;furniture
+19111,Chalk,A soft white stone used for writing on a blackboard.,Noun,The teacher wrote the date on the board with chalk.,crayon,limestone,B1,45,Academic,Common,,,board;write;school
+19112,Chapel,A small church or a room used for Christian prayer.,Noun,They got married in a quiet little chapel.,church,shrine,B2,58,Society & Culture,Common,,,church;prayer;altar
+19113,Charge,The amount of money asked for goods or a service.,Noun,There is no charge for children under five.,fee,cost,B1,45,Business,Common,,,fee;cost;pay
+19114,Chart,"A sheet of information shown as a table, graph or diagram.",Noun,The nurse studied the chart at the end of the bed.,graph,table,B1,45,Academic,Common,,,graph;map;data
+19115,Cheek,The soft part on each side of the face below the eye.,Noun,She kissed her grandmother on the cheek.,face,jowl,B1,45,Health & Wellness,Common,,,face;skin;kiss
+19116,Cheer,To shout loudly to show support or happiness.,Verb,The crowd began to cheer when the team scored.,applaud,hail,B1,45,Emotion,Common,,,shout;applaud;crowd
+19117,Cheese,"A food made from milk, often yellow or white.",Noun,She put a slice of cheese in the sandwich.,cheddar,curd,A1,15,General,Very Common,,,milk;slice;sandwich
+19118,Chef,"A professional cook, especially the head cook of a restaurant.",Noun,The chef tasted the sauce before sending it out.,cook,caterer,A2,28,General,Common,,,kitchen;restaurant;recipe
+19119,Cherry,"A small, round fruit that is red or black and has a stone.",Noun,He picked a ripe cherry from the tree.,fruit,drupe,A2,28,Nature,Common,,,fruit;tree;red
+19120,Cherub,An angel shown as a plump baby with wings.,Noun,A little cherub was painted on the ceiling.,angel,putto,B2,58,Arts & Creativity,Common,,,angel;baby;wings
+19121,Chief,The person with the highest rank in a group or tribe.,Noun,The village chief welcomed the visitors with a speech.,leader,head,B1,45,Society & Culture,Common,,,leader;boss;tribe
+19122,Chilly,Rather cold.,Adjective,"It was a chilly morning, so we wore coats.",cold,cool,A2,28,Nature,Common,,,cold;cool;wind
+19123,Chisel,A tool with a sharp edge used for cutting wood or stone.,Noun,The sculptor used a chisel to shape the stone.,gouge,blade,B2,58,Arts & Creativity,Common,,,tool;stone;carve
+19124,Choir,"A group of people who sing together, especially in church.",Noun,The school choir sang at the carol service.,chorus,singers,B1,45,Arts & Creativity,Common,,,sing;church;voice
+19125,Chord,Three or more musical notes played together.,Noun,She struck a chord on the guitar and began to sing.,harmony,notes,B2,58,Arts & Creativity,Common,,,music;note;guitar
+19126,Chorus,"A group of singers, or the part of a song that is repeated.",Noun,Everyone joined in the chorus of the song.,choir,refrain,B1,45,Arts & Creativity,Common,,,song;singers;refrain
+19127,Circle,A perfectly round shape.,Noun,The children sat in a circle on the floor.,ring,round,A2,28,General,Very Common,,,ring;round;shape
+19128,Circus,"A show with clowns, acrobats and trained animals, usually in a big tent.",Noun,We saw a juggler and a clown at the circus.,show,carnival,B1,45,Arts & Creativity,Common,,,clown;tent;acrobat
+19129,Civic,Relating to a town or city and the people who live in it.,Adjective,Voting is an important civic duty.,municipal,public,B2,58,Society & Culture,Common,,,citizen;city;duty
+19130,Clam,A shellfish with two hard shells that lives in sand or mud.,Noun,We dug for clams on the beach at low tide.,shellfish,mollusc,B2,58,Nature,Common,,,shell;sand;seafood
+19131,Claw,"A sharp, curved nail on the foot of an animal or bird.",Noun,The cat sank its claw into the sofa.,talon,nail,B1,45,Nature,Common,,,paw;talon;cat
+19132,Clay,"Soft, sticky earth that becomes hard when baked, used to make pots.",Noun,The children made small bowls out of clay.,earth,mud,B1,45,Arts & Creativity,Common,,,pottery;mud;kiln
+19133,Clerk,A person who keeps records or deals with papers in an office or shop.,Noun,The clerk stamped my form and handed it back.,assistant,secretary,B1,45,Business,Common,,,office;records;desk
+19134,Client,A person who pays someone for a service.,Noun,The lawyer met a new client this morning.,customer,patron,B2,58,Business,Common,,,customer;service;buyer
+19135,Clinic,A place where people go for medical advice or treatment.,Noun,She took her baby to the clinic for a check-up.,surgery,health centre,B1,45,Health & Wellness,Common,,,doctor;nurse;patient
+19136,Cloak,A loose outer garment without sleeves that hangs from the shoulders.,Noun,The traveller wrapped his cloak tightly around him.,cape,mantle,B2,58,General,Common,,,cape;coat;hood
+19137,Clock,A device that shows what time it is.,Noun,The clock on the wall said half past two.,timepiece,timer,A1,15,General,Very Common,,,time;hour;watch
+19138,Cloud,A white or grey mass of tiny water drops floating in the sky.,Noun,A dark cloud drifted across the sun.,vapour,mist,A1,15,Nature,Very Common,,,rain;sky;storm
+19139,Coal,A hard black rock that is burned to make heat or power.,Noun,The old train burned coal to make steam.,fuel,carbon,B1,45,Science & Technology,Common,,,mine;fuel;fire
+19140,Cobra,A poisonous snake that spreads the skin of its neck when it is angry.,Noun,The snake charmer played music to the cobra.,snake,serpent,B2,58,Nature,Common,,,snake;venom;hood
+19141,Cobweb,A net of thin threads made by a spider.,Noun,A cobweb hung in the corner of the room.,web,gossamer,B2,58,Nature,Common,,,spider;dust;thread
+19142,Cocoon,A silky case that a young insect spins around itself.,Noun,The caterpillar spun a cocoon on a branch.,casing,chrysalis,B2,58,Nature,Common,,,butterfly;silk;caterpillar
+19143,Cog,A wheel with teeth around its edge that fits into another wheel to make a machine move.,Noun,One broken cog stopped the whole clock from working.,gear,sprocket,B2,58,Science & Technology,Common,,,wheel;machine;gear
+19144,Coin,"A flat, round piece of metal used as money.",Noun,He dropped a coin into the fountain and made a wish.,piece,token,A2,28,Business,Common,,,money;cash;penny
+19145,Collie,"A type of dog with long hair, often used for guarding sheep.",Noun,The collie rounded up the sheep.,sheepdog,dog,B2,58,Nature,Common,,,dog;sheep;herd
+19146,Column,"A tall, upright post that supports a building.",Noun,A stone column stood at each corner of the temple.,pillar,post,B2,58,Arts & Creativity,Common,,,pillar;stone;building
+19147,Comb,A flat tool with teeth that you pull through your hair to make it tidy.,Noun,She ran a comb through her wet hair.,brush,rake,A2,28,General,Common,,,hair;brush;tidy
+19148,Comedy,"A funny play, film or television programme.",Noun,We laughed all evening at the comedy.,humour,farce,B1,45,Arts & Creativity,Common,,,funny;laugh;film
+19149,Condor,A very large vulture that lives in the mountains of South America.,Noun,A condor soared above the Andes.,vulture,raptor,B2,58,Nature,Common,,,bird;Andes;vulture
+19150,Cone,A shape that is round at the bottom and comes to a point at the top.,Noun,He ate his ice cream from a crisp cone.,pyramid,funnel,B1,45,General,Common,,,shape;pine;ice cream
+19151,Cooker,A kitchen appliance used for baking and frying.,Noun,She put the pot on the cooker.,stove,range,A2,28,General,Common,,,kitchen;oven;pot
+19152,Coral,"A hard, colourful substance made from tiny sea animals.",Noun,Bright fish darted among the coral.,polyp,reef,B2,58,Nature,Common,,,reef;ocean;fish
+19153,Cord,A thick string made of twisted threads.,Noun,He tied the box with a strong cord.,string,rope,B2,58,General,Common,,,rope;string;tie
+19154,Cork,"A light, soft material from tree bark, used to seal bottles.",Noun,He pulled the cork out of the bottle.,stopper,plug,B2,58,General,Common,,,bottle;stopper;seal
+19155,Corner,The place where two lines or walls meet.,Noun,A lamp stood in the corner of the room.,angle,bend,A2,28,General,Very Common,,,angle;edge;room
+19156,County,A region within a country that has its own local government.,Noun,He lives in a small county in the east.,region,shire,B2,58,Society & Culture,Common,,,region;district;government
+19157,Crab,"A sea animal with a hard shell, ten legs and two large claws.",Noun,A small crab scuttled sideways across the sand.,crustacean,shellfish,A2,28,Nature,Common,,,shell;beach;claw
+19158,Cradle,A small bed for a baby that can rock from side to side.,Noun,She rocked the baby gently in the cradle.,crib,bassinet,B2,58,General,Common,,,baby;rock;crib
+19159,Crane,"A large machine for lifting heavy things, or a tall bird with long legs.",Noun,A giant crane lifted the steel beam into place.,hoist,derrick,B1,45,Science & Technology,Common,,,lift;building;bird
+19160,Crawl,To move slowly on your hands and knees.,Verb,The baby began to crawl across the carpet.,creep,inch,B1,45,General,Common,,,creep;baby;slow
+19161,Crazy,Very strange or foolish.,Adjective,It was a crazy idea to swim in the freezing sea.,mad,silly,A2,28,Emotion,Common,,,silly;wild;mad
+19162,Crest,"The top of a hill or wave, or a tuft of feathers on a bird's head.",Noun,We reached the crest of the hill at sunrise.,summit,peak,B2,58,Nature,Common,,,peak;hill;wave
+19163,Crew,"A group of people who work together, especially on a ship or aircraft.",Noun,The crew worked all night to repair the boat.,team,staff,B1,45,Travel & Places,Common,,,ship;team;sailors
+19164,Crisis,"A time of great danger, trouble or difficulty.",Noun,The country faced a food crisis after the drought.,emergency,disaster,B2,58,Society & Culture,Common,,,trouble;danger;emergency
+19165,Crisps,Very thin slices of fried potato eaten as a snack.,Noun,He ate a bag of crisps after school.,chips,snack,B1,45,General,Common,,,potato;snack;packet
+19166,Critic,"A person who gives opinions on books, films or art.",Noun,The film critic gave the movie four stars.,reviewer,judge,B2,58,Arts & Creativity,Common,,,review;opinion;judge
+19167,Cross,To go from one side of something to the other.,Verb,Look both ways before you cross the road.,traverse,span,A2,28,Travel & Places,Very Common,,,road;bridge;pass
+19168,Crouch,To bend your knees and lower your body close to the ground.,Verb,The cat will crouch low before it jumps.,squat,stoop,B2,58,General,Common,,,bend;squat;hide
+19169,Crowd,A large number of people gathered together in one place.,Noun,A huge crowd waited outside the stadium.,throng,mob,A2,28,Society & Culture,Common,,,people;gather;stadium
+19170,Crown,A circle of gold and jewels worn on the head by a king or queen.,Noun,The queen wore a golden crown at the ceremony.,tiara,coronet,A2,28,Society & Culture,Common,,,king;queen;jewel
+19171,Crumb,"A tiny piece that falls from bread, cake or biscuits.",Noun,She brushed the crumbs off the table.,morsel,fragment,B1,45,General,Common,,,bread;cake;bit
+19172,Curfew,A rule that people must stay indoors after a certain time.,Noun,The town had a curfew from nine o'clock at night.,restriction,limit,B2,58,Society & Culture,Common,,,night;rule;time
+19173,Cygnet,A young swan.,Noun,A cygnet followed its mother across the lake.,young swan,baby swan,B2,58,Nature,Common,,,swan;lake;young
+19174,Daily,Done or happening every day.,Adjective,The newspaper arrives with the daily post.,everyday,regular,A2,28,General,Very Common,,,day;every;routine
+19175,Daisy,A small wild flower with a yellow centre and white petals.,Noun,A single daisy grew in the middle of the lawn.,flower,bloom,B1,45,Nature,Common,,,flower;lawn;petal
+19176,Dance,To move your body to music in a pattern of steps.,Verb,They love to dance at weddings.,jig,sway,A1,15,Arts & Creativity,Very Common,,,music;rhythm;party
+19177,Danger,The possibility that something bad may happen.,Noun,The sign warned of danger ahead.,peril,risk,A2,28,General,Very Common,,,risk;safe;warning
+19178,Decent,Of a good standard or fairly good.,Adjective,He earns a decent salary at the bank.,fair,respectable,B1,45,General,Common,,,fair;good;proper
+19179,Deck,The flat floor on a ship or the raised platform of a house.,Noun,We stood on the deck and watched the island come closer.,floor,platform,B1,45,Travel & Places,Common,,,ship;floor;sailor
+19180,Demand,To ask for something firmly.,Verb,The workers demand better pay.,insist,require,B1,45,Communication,Common,,,ask;insist;require
+19181,Dent,A hollow mark made in a surface by a blow or by pressure.,Noun,The hailstones left a dent in the car roof.,dimple,hollow,B2,58,General,Common,,,bump;mark;damage
+19182,Depend,To rely on someone or something.,Verb,You can depend on me to help.,rely,count,B1,45,General,Common,,,rely;trust;need
+19183,Desert,"A large, dry region with little rain and few plants.",Noun,Camels carry people across the desert.,wasteland,sands,A2,28,Nature,Very Common,,,sand;dry;camel
+19184,Desire,A strong wish to have or do something.,Noun,He had a strong desire to travel the world.,wish,longing,B1,45,Emotion,Common,,,want;wish;hope
+19185,Device,A small machine or tool made for a particular purpose.,Noun,This device measures the temperature of the air.,gadget,tool,B1,45,Science & Technology,Common,,,gadget;machine;tool
+19186,Dew,Tiny drops of water that form on cool surfaces outdoors during the night.,Noun,The grass was wet with dew when we woke up.,moisture,droplets,B2,58,Nature,Common,,,morning;grass;mist
+19187,Dial,The round face of a clock or an instrument that shows a measurement.,Noun,She turned the dial until she found her favourite station.,face,disc,B2,58,Science & Technology,Common,,,clock;radio;knob
+19188,Diesel,"A heavy fuel used in the engines of lorries, trains and some cars.",Noun,The bus runs on diesel.,fuel,oil,B2,58,Science & Technology,Common,,,engine;fuel;lorry
+19189,Diet,The food and drink that a person or animal usually consumes.,Noun,A healthy diet includes plenty of fruit and vegetables.,food,nutrition,B1,45,Health & Wellness,Very Common,,,food;health;weight
+19190,Dime,A United States coin worth ten cents.,Noun,He found a dime under the sofa cushion.,coin,ten cents,B2,58,Business,Common,,,coin;cent;money
+19191,Diner,"A person eating a meal in a restaurant, or a small cheap restaurant.",Noun,The waiter greeted each diner with a smile.,customer,guest,B2,58,Society & Culture,Common,,,restaurant;meal;table
+19192,Dinner,"The main meal of the day, usually eaten in the evening.",Noun,We had rice and chicken for dinner.,supper,feast,A1,15,General,Very Common,,,meal;evening;table
+19193,Dip,To put something briefly into a liquid and take it out again.,Verb,Dip the bread into the soup before you eat it.,plunge,immerse,B1,45,General,Common,,,dunk;soak;splash
+19194,Ditch,"A long, narrow channel dug in the ground to carry water.",Noun,The car slid off the road and into a ditch.,trench,channel,B2,58,Nature,Common,,,trench;drain;road
+19195,Dollar,The main unit of money in the United States and some other countries.,Noun,The book cost ten dollars.,buck,note,A2,28,Business,Common,,,money;cent;price
+19196,Dome,A rounded roof shaped like half of a ball.,Noun,The golden dome of the mosque shone in the sun.,cupola,vault,B2,58,Arts & Creativity,Common,,,roof;mosque;arch
+19197,Donate,To give money or goods to a person or group that needs them.,Verb,She chose to donate her old clothes to charity.,give,contribute,B2,58,Society & Culture,Common,,,give;charity;gift
+19198,Donkey,"An animal like a small horse with long ears, used for carrying loads.",Noun,The donkey carried the baskets up the hill.,ass,burro,A2,28,Nature,Common,,,ears;farm;load
+19199,Dough,A thick mixture of flour and water that is baked into bread.,Noun,She kneaded the dough on a floured table.,paste,batter,B1,45,General,Common,,,bread;flour;bake
+19200,Dove,"A small, gentle bird often used as a sign of peace.",Noun,A white dove flew up from the garden wall.,pigeon,bird,B1,45,Nature,Common,,,peace;pigeon;bird
+19201,Drawer,A sliding box in a piece of furniture for keeping things.,Noun,He kept his socks in the top drawer.,compartment,tray,A2,28,General,Common,,,desk;furniture;slide
+19202,Drill,A tool used for making holes in hard materials.,Noun,He used a power drill to make holes in the wall.,borer,bit,B2,58,Science & Technology,Common,,,hole;tool;wood
+19203,Drink,To take liquid into the mouth and swallow it.,Verb,You should drink plenty of water on hot days.,sip,gulp,A1,15,General,Very Common,,,water;thirst;cup
+19204,Driver,A person who drives a vehicle.,Noun,The bus driver waved as we got on.,chauffeur,motorist,A2,28,Travel & Places,Very Common,,,car;bus;road
+19205,Ear,The part of the head used for hearing.,Noun,She whispered the secret in her friend's ear.,lug,hearing organ,A1,15,Health & Wellness,Very Common,,,hear;sound;head
+19206,Earth,"The planet we live on, or the soil in which plants grow.",Noun,The astronaut looked back at the Earth from space.,world,globe,A2,28,Nature,Very Common,,,planet;soil;ground
+19207,Eel,"A long, thin fish with a body like a snake.",Noun,The eel slid through the weeds and disappeared.,elver,moray,B1,45,Nature,Common,,,fish;river;slippery
+19208,Egg,"An oval object laid by a bird, from which a baby bird hatches.",Noun,She boiled an egg for breakfast.,ovum,spawn,A1,15,General,Very Common,,,chicken;breakfast;shell
+19209,Elm,A tall tree with rough bark and leaves that have toothed edges.,Noun,An old elm shades the village square.,tree,hardwood,B2,58,Nature,Common,,,oak;bark;leaf
+19210,Enemy,A person or group that is against you and wants to harm you.,Noun,The soldiers camped near the enemy.,foe,opponent,B1,45,Society & Culture,Common,,,foe;war;rival
+19211,Engine,A machine that turns fuel into movement.,Noun,The car's engine started with a roar.,motor,machine,B1,45,Science & Technology,Common,,,motor;car;power
+19212,Essay,A short piece of writing on a particular subject.,Noun,She wrote an essay about the history of Lagos.,composition,article,B1,45,Academic,Common,,,write;school;topic
+19213,Estate,A large area of land in the countryside with a big house on it.,Noun,They own a large estate near the river.,property,land,B2,58,Business,Common,,,land;property;house
+19214,Eve,The day or evening before an important day or event.,Noun,We always cook a big meal on New Year's eve.,evening,day before,B2,58,Society & Culture,Common,,,evening;holiday;festival
+19215,Excuse,A reason given to explain a mistake or avoid doing something.,Noun,He gave a feeble excuse for being late.,pretext,reason,B1,45,Communication,Common,,,reason;explain;sorry
+19216,Expert,A person with a lot of knowledge or skill in a subject.,Noun,She is an expert on African history.,specialist,master,B1,45,Academic,Common,,,skill;knowledge;skilled
+19217,Factor,One of several things that influence a result.,Noun,Cost was an important factor in our decision.,element,cause,B2,58,Academic,Common,,,cause;element;reason
+19218,Falcon,A fast bird of prey with pointed wings.,Noun,The falcon dived toward its prey.,hawk,raptor,B2,58,Nature,Common,,,bird;hunt;fast
+19219,Fan,A machine or object that moves the air to make you feel cooler.,Noun,She turned on the fan because the room was hot.,ventilator,blower,A2,28,General,Common,,,breeze;cool;summer
+19220,Fee,The money you pay for a service or to join something.,Noun,The school charges a small fee for the trip.,charge,payment,B1,45,Business,Common,,,cost;price;payment
+19221,Female,Belonging to the sex that can produce babies or eggs.,Adjective,The female bird sat on the eggs.,feminine,woman,A2,28,General,Common,,,woman;girl;mother
+19222,Fern,"A green plant with feathery leaves that grows in damp, shady places.",Noun,Ferns grew thickly along the bank of the stream.,bracken,plant,B2,58,Nature,Common,,,forest;shade;leaf
+19223,Field,An area of open land used for growing crops or playing sports.,Noun,Cows were grazing in the green field.,meadow,pasture,A2,28,Nature,Very Common,,,farm;grass;crop
+19224,Filter,A device that lets liquid or air pass through but stops solid particles.,Noun,The filter keeps dirt out of the water.,strainer,sieve,B2,58,Science & Technology,Common,,,water;clean;sieve
+19225,Finger,"One of the long, thin parts at the end of the hand.",Noun,She wore a gold ring on her finger.,digit,thumb,A1,15,Health & Wellness,Very Common,,,hand;thumb;ring
+19226,Fir,"An evergreen tree with flat needles and cones, often used as a Christmas tree.",Noun,We decorated a small fir for the holidays.,conifer,evergreen,B2,58,Nature,Common,,,pine;needle;cone
+19227,Flag,A piece of cloth with a pattern that stands for a country or group.,Noun,The flag flew above the town hall.,banner,standard,A2,28,Society & Culture,Common,,,country;pole;banner
+19228,Flash,"A sudden, short burst of bright light.",Noun,A flash of lightning lit up the sky.,flare,spark,B1,45,General,Common,,,light;bright;lightning
+19229,Fleece,"The thick woolly coat of a sheep, or a soft warm jacket.",Noun,He wore a blue fleece on the hike.,wool,coat,B2,58,General,Common,,,sheep;wool;warm
+19230,Flight,A journey made by an aircraft.,Noun,Our flight to Abuja took one hour.,air travel,trip,A2,28,Travel & Places,Very Common,,,plane;airport;journey
+19231,Float,To rest on the surface of a liquid without sinking.,Verb,The leaves float down the stream.,drift,bob,B1,45,General,Common,,,water;boat;drift
+19232,Flock,A group of birds or sheep that live or move together.,Noun,A flock of birds flew over the lake.,herd,group,B2,58,Nature,Common,,,bird;sheep;group
+19233,Floral,Decorated with flowers or relating to flowers.,Adjective,She wore a floral dress to the wedding.,flowery,patterned,B2,58,Arts & Creativity,Common,,,flower;pattern;dress
+19234,Flour,"A fine powder made from ground grain, used to make bread.",Noun,Mix the flour with water to make dough.,meal,grain,A2,28,General,Common,,,bread;bake;wheat
+19235,Flower,The colourful part of a plant that produces seeds.,Noun,She picked a flower from the garden.,bloom,blossom,A1,15,Nature,Very Common,,,petal;garden;bloom
+19236,Fog,A thick cloud of tiny water drops near the ground that makes it hard to see.,Noun,"Thick fog covered the road, so we drove slowly.",mist,haze,A2,28,Nature,Common,,,cloud;damp;gloom
+19237,Force,Strength or power that makes something move or change.,Noun,The force of the wind pushed us back.,power,strength,B1,45,Science & Technology,Common,,,power;push;energy
+19238,Ford,A shallow place in a river where you can cross on foot or in a vehicle.,Noun,The path crosses the stream at a shallow ford.,crossing,shallows,B2,58,Travel & Places,Common,,,river;crossing;shallow
+19239,Forge,A workshop where metal is heated and shaped.,Noun,The blacksmith hammered iron at the forge.,smithy,foundry,B2,58,Society & Culture,Common,,,iron;smith;fire
+19240,Fox,A wild animal like a small dog with red-brown fur and a bushy tail.,Noun,A fox crept along the edge of the field at dusk.,vixen,reynard,A2,28,Nature,Common,,,cunning;den;wolf
+19241,Frame,"A solid border around a picture, window or door.",Noun,She hung the photograph in a wooden frame.,border,casing,B1,45,General,Common,,,picture;window;border
+19242,Fresco,A painting made on a freshly plastered wall.,Noun,The church wall was covered with a faded fresco.,mural,painting,B2,58,Arts & Creativity,Common,,,wall;paint;mural
+19243,Fresh,"Newly made, picked or arrived, and not old or tinned.",Adjective,We bought fresh fish at the harbour this morning.,new,crisp,A2,28,General,Very Common,,,new;clean;raw
+19244,Friend,A person you know well and like.,Noun,My best friend lives next door.,pal,mate,A1,15,Society & Culture,Very Common,,,buddy;kind;trust
+19245,Frozen,Turned into ice or very cold.,Adjective,The pond was frozen solid in January.,icy,chilled,A2,28,Nature,Common,,,ice;cold;freeze
+19246,Fruit,The sweet part of a plant that contains seeds and can be eaten.,Noun,She ate a bowl of fruit for breakfast.,produce,harvest,A1,15,General,Very Common,,,apple;sweet;juicy
+19247,Fry,To cook food in hot oil or fat in a pan.,Verb,Fry the onions until they turn golden brown.,sizzle,saute,A2,28,General,Common,,,pan;oil;cook
+19248,Fuel,Material such as petrol or coal that is burned to give heat or power.,Noun,The truck stopped to take on fuel.,petrol,power,B1,45,Science & Technology,Common,,,petrol;energy;engine
+19249,Fungus,A living thing such as a mushroom or mould that feeds on plants.,Noun,A white fungus grew on the old log.,mould,mushroom,B2,58,Nature,Common,,,mushroom;mould;spores
+19250,Galaxy,A huge group of stars and planets held together by gravity.,Noun,Our galaxy is called the Milky Way.,star system,cosmos,B2,58,Science & Technology,Common,,,stars;space;universe
+19251,Gale,A very strong wind.,Noun,A gale blew down several trees in the night.,storm,tempest,B2,58,Nature,Common,,,storm;wind;weather
+19252,Gallop,"To run at full speed, as a horse does.",Verb,The horse began to gallop across the field.,race,bolt,B2,58,General,Common,,,horse;run;speed
+19253,Garage,A building where a car is kept or repaired.,Noun,He parked the car in the garage.,workshop,shed,A2,28,Travel & Places,Common,,,car;repair;park
+19254,Garden,A piece of land near a house where flowers and vegetables grow.,Noun,We grow tomatoes and beans in our garden.,yard,plot,A1,15,Nature,Very Common,,,flowers;grass;plant
+19255,Geyser,A hot spring that shoots a jet of steam and water into the air.,Noun,The geyser erupted every hour.,spring,jet,B2,58,Nature,Common,,,steam;hot;spring
+19256,Giant,An imaginary person of enormous size and strength.,Noun,The giant in the story was taller than the trees.,colossus,titan,B1,45,Arts & Creativity,Common,,,huge;fairy tale;tall
+19257,Gift,Something you give to another person without asking for payment.,Noun,She wrapped the gift in bright paper.,present,donation,A2,28,Society & Culture,Very Common,,,present;birthday;wrap
+19258,Giggle,"To laugh in a silly, nervous way.",Verb,The children began to giggle at the funny joke.,titter,snicker,B1,45,Emotion,Common,,,laugh;silly;chuckle
+19259,Ginger,A hot-tasting root used to flavour food and drinks.,Noun,She added fresh ginger to the soup.,spice,root,B1,45,General,Common,,,spice;root;tea
+19260,Glass,"A hard, clear material used to make windows and bottles.",Noun,The vase was made of thick glass.,crystal,pane,A1,15,General,Very Common,,,window;clear;fragile
+19261,Globe,A ball-shaped model of the Earth with a map of its surface.,Noun,He spun the globe and pointed to Nigeria.,sphere,world,B1,45,Travel & Places,Common,,,map;world;sphere
+19262,Goblet,"A large cup with a stem and no handle, used for wine.",Noun,He raised the silver goblet and drank.,chalice,cup,B2,58,General,Common,,,cup;glass;drink
+19263,Gown,"A long, formal dress or a loose robe worn for a special purpose.",Noun,She wore a silk gown to the ball.,dress,robe,B2,58,General,Common,,,dress;robe;ball
+19264,Grain,"The small, hard seed of a plant such as wheat, rice or corn.",Noun,The farmer stored the grain in a large barn.,seed,cereal,B1,45,Nature,Common,,,wheat;rice;harvest
+19265,Grant,To agree to give something someone has asked for.,Verb,The judge agreed to grant her request.,give,allow,B2,58,Business,Common,,,permit;award;give
+19266,Grape,"A small, round, juicy fruit that grows in bunches and is used to make wine.",Noun,He popped a sweet green grape into his mouth.,fruit,berry,A2,28,Nature,Common,,,vine;wine;bunch
+19267,Grass,A common green plant with thin leaves that covers fields and lawns.,Noun,The children sat on the grass in the park.,turf,lawn,A1,15,Nature,Very Common,,,lawn;field;green
+19268,Grave,A place in the ground where a dead person is buried.,Noun,Flowers were laid on the grave.,tomb,burial,B1,45,Society & Culture,Common,,,bury;tomb;cemetery
+19269,Graze,To eat grass in a field.,Verb,Sheep graze on the hillside all summer.,browse,feed,B2,58,Nature,Common,,,cattle;grass;pasture
+19270,Greed,"A strong wish to have more money, food or power than you need.",Noun,His greed made him take more than his share.,avarice,hunger,B2,58,Emotion,Common,,,want;selfish;wealth
+19271,Grid,A pattern of straight lines that cross each other to form squares.,Noun,The map was covered with a grid of numbered squares.,network,lattice,B2,58,Science & Technology,Common,,,squares;lines;map
+19272,Grocer,A person who sells food and other items for the home.,Noun,The grocer weighed the rice and put it in a bag.,shopkeeper,seller,B2,58,Business,Common,,,shop;food;market
+19273,Grove,A small group of trees growing close together.,Noun,We picnicked in a grove of olive trees.,copse,orchard,B2,58,Nature,Common,,,trees;orchard;wood
+19274,Guard,A person whose job is to protect a place or people.,Noun,A security guard stood at the gate.,sentry,watchman,B1,45,Society & Culture,Common,,,protect;gate;watch
+19275,Guilty,Having done something wrong or feeling bad about it.,Adjective,He felt guilty about breaking the window.,ashamed,to blame,B1,45,Emotion,Common,,,shame;blame;wrong
+19276,Guitar,A musical instrument with strings that you play with your fingers.,Noun,She plays the guitar in a band.,instrument,strings,A2,28,Arts & Creativity,Common,,,music;strings;band
+19277,Gulf,A large area of sea that is almost surrounded by land.,Noun,Ships crossed the gulf before dawn.,bay,bight,B2,58,Travel & Places,Common,,,bay;sea;coast
+19278,Hail,Small balls of ice that fall from the sky like rain.,Noun,Hail rattled against the window during the storm.,sleet,ice,B2,58,Nature,Common,,,storm;ice;rain
+19279,Happy,Feeling pleasure and joy.,Adjective,She was happy to see her old friends again.,glad,cheerful,A1,15,Emotion,Very Common,,,joy;smile;glad
+19280,Harp,A tall musical instrument with strings that you pluck with your fingers.,Noun,She played a soft tune on the harp.,lyre,instrument,B2,58,Arts & Creativity,Common,,,strings;music;pluck
+19281,Hawk,A large bird that hunts small animals and has sharp claws.,Noun,A hawk circled slowly above the field.,falcon,raptor,B1,45,Nature,Common,,,bird;prey;talon
+19282,Hay,Grass that has been cut and dried to feed farm animals.,Noun,The farmer stacked the hay in the barn for winter.,fodder,forage,B1,45,Nature,Common,,,farm;straw;barn
+19283,Helm,The wheel or handle used to steer a boat.,Noun,The captain stood at the helm and watched the waves.,wheel,tiller,B2,58,Travel & Places,Common,,,ship;steer;captain
+19284,Helmet,A hard hat that protects the head.,Noun,Always wear a helmet when you ride a bike.,hard hat,headgear,A2,28,General,Common,,,head;safe;bike
+19285,Hem,The folded and sewn edge of a piece of cloth.,Noun,She sewed up the loose hem of her skirt.,border,edge,B2,58,Arts & Creativity,Common,,,sew;cloth;skirt
+19286,Herd,A large group of animals of one kind that live and feed together.,Noun,A herd of elephants crossed the river.,flock,pack,B1,45,Nature,Common,,,cattle;flock;animals
+19287,Hero,A person admired for courage or fine qualities.,Noun,The firefighter was hailed as a hero after saving the child.,champion,star,A2,28,Society & Culture,Very Common,,,brave;courage;legend
+19288,Hip,The part of the body on each side where the leg joins the trunk.,Noun,He placed his hands on his hips and stared at the mess.,pelvis,joint,B1,45,Health & Wellness,Common,,,leg;waist;bone
+19289,Hive,A structure in which bees live and make honey.,Noun,The bees returned to the hive at sunset.,beehive,colony,B2,58,Nature,Common,,,bee;honey;swarm
+19290,Hollow,Having an empty space inside.,Adjective,The squirrel lives in a hollow tree.,empty,vacant,B1,45,General,Common,,,empty;tree;hole
+19291,Honey,"A sweet, sticky food made by bees.",Noun,He spread honey on his warm toast.,nectar,syrup,A2,28,General,Common,,,bee;sweet;hive
+19292,Hop,To jump on one foot or to move in small jumps.,Verb,The little bird began to hop across the lawn.,jump,skip,A2,28,General,Common,,,jump;leap;bounce
+19293,Hornet,A large insect that gives a painful sting.,Noun,A hornet buzzed around the picnic.,wasp,insect,B2,58,Nature,Common,,,sting;wasp;buzz
+19294,Hotel,A building where travellers pay to stay overnight.,Noun,We booked a room in a hotel near the beach.,inn,lodging,A1,15,Travel & Places,Very Common,,,room;guest;travel
+19295,House,A building where people live.,Noun,They moved into a new house last month.,home,dwelling,A1,15,General,Very Common,,,home;garden;roof
+19296,Hub,The central or most active place of an area or activity.,Noun,The city is a busy hub for trade and travel.,centre,core,B2,58,Travel & Places,Common,,,centre;airport;network
+19297,Hull,The main body of a ship or boat.,Noun,Water poured in through a hole in the hull.,body,shell,B2,58,Travel & Places,Common,,,ship;boat;keel
+19298,Humble,Not proud and not thinking you are better than others.,Adjective,He came from a humble family and never forgot it.,modest,meek,B2,58,Personal Development,Common,,,modest;simple;polite
+19299,Humid,Having a lot of moisture in the air.,Adjective,The weather in Lagos is hot and humid.,damp,muggy,B2,58,Nature,Common,,,damp;moist;sticky
+19300,Hurdle,A barrier that runners jump over in a race.,Noun,She cleared the last hurdle and won the race.,barrier,obstacle,B2,58,General,Common,,,race;jump;obstacle
+19301,Icon,A small picture on a screen that stands for a program or a command.,Noun,Click the icon to open the app.,symbol,image,B1,45,Science & Technology,Common,,,screen;symbol;picture
+19302,Impact,The strong effect of one thing on another.,Noun,The new law will have a big impact on schools.,effect,influence,B2,58,General,Common,,,effect;force;result
+19303,Income,The money a person earns or receives regularly.,Noun,The family has a low monthly income.,earnings,salary,B1,45,Business,Common,,,salary;earn;money
+19304,Indoor,Done or used inside a building.,Adjective,We play indoor games when it rains.,inside,interior,B1,45,General,Common,,,inside;room;house
+19305,Inhale,To breathe air into your lungs.,Verb,Inhale slowly through your nose and count to four.,breathe in,gasp,B2,58,Health & Wellness,Common,,,breath;lungs;air
+19306,Ink,"Coloured liquid used for writing, drawing or printing.",Noun,The ink spilled and stained the table blue.,dye,pigment,A2,28,General,Common,,,pen;paper;print
+19307,Insect,"A small creature with six legs, such as an ant or a bee.",Noun,A tiny insect landed on my hand.,bug,beetle,A2,28,Nature,Very Common,,,bug;six legs;wing
+19308,Invite,To ask someone to come to an event.,Verb,We will invite all our friends to the party.,ask,request,A2,28,Society & Culture,Very Common,,,party;ask;guest
+19309,Ion,An atom that has gained or lost electrons and so carries an electric charge.,Noun,Salt breaks into ions when it dissolves in water.,particle,charge,B2,58,Science & Technology,Common,,,atom;charge;electron
+19310,Island,A piece of land completely surrounded by water.,Noun,We took a boat to a small island.,isle,islet,A1,15,Travel & Places,Very Common,,,sea;beach;coast
+19311,Isle,"A small island, often used in poetry or in place names.",Noun,They sailed to a quiet isle in the bay.,island,islet,B2,58,Travel & Places,Common,,,island;sea;coast
+19312,Jacket,A short coat.,Noun,He put on a warm jacket before going out.,coat,blazer,A2,28,General,Very Common,,,coat;zip;warm
+19313,Jam,A sweet spread made by boiling fruit with sugar.,Noun,She spread strawberry jam on her toast.,preserve,conserve,A2,28,General,Common,,,toast;fruit;spread
+19314,Jar,"A glass container with a wide mouth and a lid, used for food.",Noun,She put the honey back in the jar and closed the lid.,pot,container,A2,28,General,Common,,,lid;glass;bottle
+19315,Jaw,The bones of the face that hold the teeth and open and close the mouth.,Noun,His jaw ached after the long dentist visit.,mandible,jawbone,B1,45,Health & Wellness,Common,,,chin;teeth;chew
+19316,Jersey,"A knitted garment for the upper body, or the shirt worn by a sports team.",Noun,The player wore a green jersey with number seven on it.,jumper,top,B2,58,General,Common,,,shirt;team;sport
+19317,Jockey,A person who rides horses in races.,Noun,The jockey guided the horse past the finishing post.,rider,horseman,B2,58,Society & Culture,Common,,,horse;race;ride
+19318,Jog,"To run at a slow, steady pace, usually for exercise.",Verb,I like to jog around the park every morning.,trot,run,A2,28,Health & Wellness,Common,,,run;exercise;fitness
+19319,Joyful,Full of happiness.,Adjective,The joyful crowd danced in the streets.,happy,delighted,B1,45,Emotion,Common,,,happy;glad;celebrate
+19320,Juice,The liquid that comes out of fruit or vegetables.,Noun,She drank a glass of orange juice.,nectar,drink,A1,15,General,Very Common,,,fruit;squeeze;drink
+19321,Jungle,"A thick forest in a hot, wet part of the world.",Noun,Monkeys swung through the jungle trees.,rainforest,wilds,A2,28,Nature,Common,,,forest;tropical;wild
+19322,Junior,Lower in rank or younger than others.,Adjective,He is a junior member of the team.,younger,lesser,B1,45,Society & Culture,Common,,,young;rank;student
+19323,Jury,A group of citizens who decide the verdict in a court case.,Noun,The jury took two days to reach its verdict.,panel,judges,B2,58,Society & Culture,Common,,,court;trial;verdict
+19324,Kayak,"A small, narrow boat that you paddle while sitting inside it.",Noun,We paddled our kayak along the quiet coast.,canoe,boat,B2,58,Travel & Places,Common,,,paddle;river;boat
+19325,Kelp,"A large brown seaweed that grows in cool, shallow seas.",Noun,Otters float in thick beds of kelp.,seaweed,wrack,B2,58,Nature,Common,,,seaweed;ocean;algae
+19326,Key,A small piece of metal used to open or lock a door.,Noun,He turned the key and the door swung open.,opener,latchkey,A1,15,General,Very Common,,,lock;door;unlock
+19327,Kidney,One of two organs in the body that clean the blood.,Noun,The kidney removes waste from the blood.,organ,renal organ,B2,58,Health & Wellness,Common,,,organ;blood;body
+19328,Kit,A set of tools or equipment needed for a particular purpose.,Noun,Pack the first-aid kit before the hike.,gear,equipment,B1,45,General,Common,,,tools;set;gear
+19329,Kite,A light toy that flies in the wind at the end of a long string.,Noun,We flew a red kite on the beach.,toy,glider,A2,28,General,Common,,,wind;string;fly
+19330,Knife,A tool with a sharp blade for cutting.,Noun,Use a sharp knife to slice the bread.,blade,cutter,A1,15,General,Very Common,,,fork;spoon;cut
+19331,Knight,"In the past, a soldier on a horse who served a king.",Noun,The knight rode into battle.,warrior,cavalier,B1,45,Society & Culture,Common,,,armour;horse;king
+19332,Knit,To make clothes by looping wool together with long needles.,Verb,My grandmother can knit a warm sweater in a week.,loop,weave,B1,45,Arts & Creativity,Common,,,wool;needle;sweater
+19333,Knot,A fastening made by tying a rope or string around itself.,Noun,He tied a firm knot in the rope.,tie,loop,B1,45,General,Common,,,rope;tie;string
+19334,Label,A piece of paper or cloth attached to something to give information.,Noun,Read the label on the bottle before you take the medicine.,tag,sticker,B1,45,General,Common,,,tag;sticker;name
+19335,Ladder,A pair of long poles with rungs used for climbing.,Noun,He climbed the ladder to reach the roof.,steps,stepladder,A2,28,General,Common,,,climb;rungs;roof
+19336,Lamb,"A young sheep, or the meat from a young sheep.",Noun,The lamb followed its mother across the hillside.,young sheep,kid,B1,45,Nature,Common,,,sheep;wool;farm
+19337,Lamp,"A device that gives light, usually powered by electricity or oil.",Noun,She switched on the lamp beside her bed.,light,lantern,A2,28,General,Common,,,bulb;light;shade
+19338,Lane,"A narrow road, especially in the countryside.",Noun,We cycled along a quiet country lane.,alley,track,B1,45,Travel & Places,Common,,,road;path;village
+19339,Lap,The flat area formed on your thighs when you sit down.,Noun,The cat curled up in her lap and fell asleep.,knees,thighs,B1,45,General,Common,,,seat;knees;sit
+19340,Launch,"To send a rocket or boat into the air or water, or to start something new.",Verb,The company will launch a new phone in May.,start,release,B1,45,Science & Technology,Common,,,rocket;start;begin
+19341,Laurel,"A bush with shiny leaves, used in ancient times to make a victory crown.",Noun,The champion wore a crown of laurel.,bay,tree,B2,58,Nature,Common,,,crown;victory;leaf
+19342,Lawn,"An area of short, cut grass in a garden or park.",Noun,The children played football on the lawn.,grass,green,B1,45,Nature,Common,,,garden;grass;mow
+19343,Lax,Not strict or careful enough about rules or standards.,Adjective,Lax security let the thief walk straight in.,careless,slack,B2,58,Personal Development,Common,,,careless;loose;relaxed
+19344,Layout,The way in which things are arranged on a page or in a space.,Noun,I like the layout of the new classroom.,plan,design,B2,58,General,Common,,,design;plan;arrangement
+19345,Leader,A person who is in charge of a group or country.,Noun,The team leader gave clear instructions.,chief,head,A2,28,Society & Culture,Very Common,,,chief;head;group
+19346,Leg,One of the limbs that a person or animal uses to stand and walk.,Noun,She broke her leg while skiing.,limb,shank,A1,15,Health & Wellness,Very Common,,,knee;foot;walk
+19347,Legal,Allowed by the law.,Adjective,It is legal to cross the road at the green light.,lawful,permitted,B1,45,Society & Culture,Common,,,law;allowed;court
+19348,Lemon,A sour yellow citrus fruit.,Noun,She squeezed a lemon into her tea.,citrus,fruit,A2,28,General,Common,,,sour;juice;yellow
+19349,Length,The measurement of how long something is.,Noun,The length of the table is two metres.,extent,distance,A2,28,General,Very Common,,,long;measure;metres
+19350,Lentil,"A small, flat seed that is cooked and eaten as food.",Noun,She made a soup from red lentils.,pulse,legume,B2,58,General,Common,,,soup;bean;seed
+19351,Lesson,A period of time in which a teacher teaches something.,Noun,Our maths lesson starts at nine o'clock.,class,period,A1,15,Academic,Very Common,,,class;teacher;learn
+19352,Lever,A bar that moves around a fixed point to lift or move something.,Noun,He pulled the lever and the gate opened.,handle,crowbar,B2,58,Science & Technology,Common,,,handle;lift;machine
+19353,Lichen,A flat grey or green plant that grows on rocks and trees.,Noun,Orange lichen grew on the old stone wall.,growth,moss,B2,58,Nature,Common,,,rock;moss;fungus
+19354,Lily,"A tall garden plant with large, trumpet-shaped flowers.",Noun,A white lily stood in a vase on the table.,flower,bloom,B2,58,Nature,Common,,,flower;pond;petal
+19355,Limb,"An arm or leg of a person, or a large branch of a tree.",Noun,The wounded bird could barely move its limb.,branch,arm,B2,58,Health & Wellness,Common,,,arm;leg;branch
+19356,Linen,"Cloth made from the fibres of the flax plant, or household items like sheets.",Noun,The table was covered with a white linen cloth.,cloth,fabric,B2,58,General,Common,,,cloth;sheets;flax
+19357,Lint,Tiny soft fibres that gather on cloth or in a pocket.,Noun,He picked a bit of lint from his sweater.,fluff,fuzz,B2,58,General,Common,,,fluff;cloth;pocket
+19358,Lip,One of the two soft edges that form the opening of the mouth.,Noun,She bit her lip while she waited for the result.,mouth,edge,A1,15,Health & Wellness,Very Common,,,mouth;smile;teeth
+19359,Lizard,A small reptile with four legs and a long tail.,Noun,A lizard darted across the warm rock.,reptile,gecko,A2,28,Nature,Common,,,reptile;tail;sun
+19360,Llama,A South American animal with long legs and a woolly coat.,Noun,The llama carried supplies across the Andes.,alpaca,camelid,B2,58,Nature,Common,,,Andes;wool;mountain
+19361,Lob,To throw or hit something in a high curve through the air.,Verb,He tried to lob the ball over the goalkeeper.,toss,fling,B2,58,General,Common,,,throw;toss;arc
+19362,Locust,A large insect that travels in huge groups and eats crops.,Noun,A swarm of locusts destroyed the maize.,grasshopper,insect,B2,58,Nature,Common,,,swarm;crop;insect
+19363,Lodge,"A small house, often in the country, used for holidays or hunting.",Noun,We stayed at a mountain lodge by the lake.,cabin,chalet,B2,58,Travel & Places,Common,,,cabin;hut;stay
+19364,Loft,A room or space just under the roof of a house.,Noun,We keep the old suitcases in the loft.,attic,garret,B2,58,General,Common,,,attic;roof;storage
+19365,Log,A thick piece of wood cut from a fallen or felled tree.,Noun,We sat on a log by the fire and talked.,timber,trunk,A2,28,Nature,Common,,,wood;fire;tree
+19366,Logic,A sensible way of thinking that follows clear rules.,Noun,There is no logic in leaving the umbrella at home on a rainy day.,reason,sense,B2,58,Academic,Common,,,reason;sense;think
+19367,Loom,A machine used for weaving thread into cloth.,Noun,She sat at the loom and wove a bright blanket.,frame,machine,B2,58,Arts & Creativity,Common,,,weave;cloth;thread
+19368,Lorry,A large vehicle used for carrying goods by road.,Noun,A lorry loaded with timber blocked the road.,truck,haulier,B1,45,Travel & Places,Common,,,truck;road;cargo
+19369,Lotion,A thick liquid that you put on your skin.,Noun,She put some lotion on her dry hands.,cream,balm,B2,58,Health & Wellness,Common,,,skin;cream;soothe
+19370,Luxury,Great comfort and expensive surroundings.,Noun,They stayed in luxury at a five-star hotel.,splendour,comfort,B2,58,General,Common,,,rich;expensive;comfort
+19371,Magnet,A piece of metal that attracts iron or steel.,Noun,The magnet picked up the pins.,attractor,lodestone,B1,45,Science & Technology,Common,,,iron;pull;metal
+19372,Magpie,A black and white bird that likes to collect shiny things.,Noun,A magpie picked up the shiny coin.,bird,crow,B2,58,Nature,Common,,,bird;shiny;collect
+19373,Mallet,A tool like a hammer with a large wooden head.,Noun,He tapped the stake into the ground with a mallet.,hammer,club,B2,58,General,Common,,,hammer;wood;tap
+19374,Mane,The long hair on the neck of a horse or lion.,Noun,The wind blew through the horse's thick mane.,hair,ruff,B2,58,Nature,Common,,,horse;lion;hair
+19375,Map,"A drawing that shows the position of places, roads and other features.",Noun,We studied the map to find the quickest route.,chart,plan,A1,15,Travel & Places,Very Common,,,route;atlas;compass
+19376,Maple,A tree with broad leaves that gives sweet syrup and bright autumn colours.,Noun,The maple leaves turn red in the autumn.,tree,hardwood,B2,58,Nature,Common,,,syrup;leaf;tree
+19377,Marble,"A hard stone used for statues and buildings, or a small glass ball.",Noun,The floor of the hall was made of white marble.,stone,glass ball,B2,58,Arts & Creativity,Common,,,stone;statue;floor
+19378,Mascot,"A person, animal or thing that is thought to bring luck to a team.",Noun,The team's mascot is a lion.,charm,symbol,B2,58,Society & Culture,Common,,,team;luck;symbol
+19379,Mask,A covering worn over the face to hide or protect it.,Noun,The doctor wore a mask over her nose and mouth.,disguise,veil,A2,28,General,Common,,,face;costume;protect
+19380,Mast,A tall pole on a ship that holds up the sails.,Noun,A sailor climbed the mast to look for land.,pole,spar,B2,58,Travel & Places,Common,,,ship;sail;pole
+19381,Mat,A flat piece of material put on the floor or a table to protect it or wipe shoes.,Noun,Please wipe your shoes on the mat before you come in.,rug,carpet,A2,28,General,Common,,,rug;floor;carpet
+19382,Media,"The main ways of sharing news and information, such as television and the internet.",Noun,The media reported on the storm all day.,press,news,B1,45,Communication,Very Common,,,news;press;television
+19383,Medium,Of middle size or amount.,Adjective,Do you have this shirt in a medium size?,average,middle,A2,28,General,Common,,,average;size;middle
+19384,Melon,"A large, round fruit with sweet, juicy flesh and a thick skin.",Noun,We shared a slice of cold melon on the beach.,fruit,cantaloupe,B1,45,Nature,Common,,,fruit;juicy;sweet
+19385,Memory,"The ability to remember things, or something that you remember.",Noun,She has a good memory for faces.,recall,recollection,A2,28,Personal Development,Very Common,,,remember;mind;recall
+19386,Mental,Relating to the mind or to thinking.,Adjective,Chess is a good form of mental exercise.,intellectual,cerebral,B2,58,Health & Wellness,Common,,,mind;thought;brain
+19387,Mesh,A net made of connected threads or wires with spaces between them.,Noun,A wire mesh covered the window to keep insects out.,net,web,B2,58,General,Common,,,net;wire;screen
+19388,Method,A particular way of doing something.,Noun,This is the best method for learning new words.,technique,approach,B1,45,Academic,Common,,,way;system;plan
+19389,Mirage,Something that looks real in the desert heat but is not actually there.,Noun,The travellers saw a mirage of a lake in the sand.,illusion,vision,B2,58,Nature,Common,,,desert;illusion;heat
+19390,Mirror,A glass surface that shows your reflection.,Noun,She looked in the mirror and fixed her hair.,looking glass,reflector,A1,15,General,Very Common,,,reflect;glass;face
+19391,Mitten,A warm glove with one part for the thumb and another for the fingers.,Noun,He pulled on a woolly mitten against the cold.,glove,handwear,B2,58,General,Common,,,glove;wool;winter
+19392,Mobile,Able to move or be moved easily.,Adjective,A mobile library visits our village every week.,portable,movable,B1,45,Science & Technology,Common,,,move;phone;portable
+19393,Modest,"Not large or showy, or not talking proudly about yourself.",Adjective,She was modest about her success.,humble,unassuming,B2,58,Personal Development,Common,,,humble;small;quiet
+19394,Molten,Made liquid by great heat.,Adjective,Molten lava poured down the side of the volcano.,melted,liquefied,B2,58,Science & Technology,Common,,,lava;melted;hot
+19395,Monkey,"A small, clever animal with a long tail that lives in trees.",Noun,The monkey swung from branch to branch.,ape,primate,A1,15,Nature,Very Common,,,tree;banana;tail
+19396,Moor,A wide area of open hilly land covered with rough grass.,Noun,We walked across the wild moor in the mist.,heath,fell,B2,58,Nature,Common,,,heath;hill;wild
+19397,Mosque,A building where Muslims go to pray.,Noun,He went to the mosque on Friday.,temple,place of prayer,B1,45,Society & Culture,Common,,,prayer;Islam;minaret
+19398,Moss,A soft green plant that grows in thick patches on damp ground.,Noun,Soft green moss covered the old stone wall.,lichen,growth,B1,45,Nature,Common,,,green;damp;forest
+19399,Moth,An insect like a butterfly that usually flies at night.,Noun,A moth fluttered around the lamp.,insect,flyer,B1,45,Nature,Common,,,butterfly;night;wing
+19400,Motor,A machine that makes things move by turning energy into motion.,Noun,The boat's motor stopped in the middle of the river.,engine,machine,B1,45,Science & Technology,Common,,,engine;power;machine
+19401,Mouse,"A small furry animal with a long tail, or a small device to control a computer.",Noun,A mouse ran across the kitchen floor.,rodent,cursor,A1,15,Nature,Very Common,,,cheese;computer;rat
+19402,Mule,An animal that is the young of a male donkey and a female horse.,Noun,The mule carried the heavy packs up the mountain.,hybrid,pack animal,B2,58,Nature,Common,,,donkey;horse;stubborn
+19403,Museum,A building where important objects of art or history are displayed.,Noun,We visited the museum to see the ancient pots.,gallery,exhibition,A2,28,Travel & Places,Very Common,,,history;art;exhibit
+19404,Music,Sounds arranged in a pleasing way by singing or playing instruments.,Noun,We listened to music all the way home.,melody,tune,A1,15,Arts & Creativity,Very Common,,,song;rhythm;sound
+19405,Musk,"A strong, sweet smell used to make perfume.",Noun,The soap had a faint smell of musk.,scent,fragrance,B2,58,General,Common,,,scent;perfume;smell
+19406,Myth,An ancient story about gods or heroes that explains the world.,Noun,The myth tells how the world was made.,legend,fable,B1,45,Society & Culture,Common,,,legend;story;ancient
+19407,Nail,"A thin piece of metal with a point, hammered into wood to hold things.",Noun,He hammered a nail into the wall to hang the picture.,tack,spike,A2,28,General,Common,,,hammer;wood;metal
+19408,Narrow,Small in width.,Adjective,The road was too narrow for two cars.,thin,slim,A2,28,General,Common,,,thin;tight;road
+19409,Nature,"The plants, animals and landscapes of the natural world.",Noun,We enjoy a walk in nature on Sundays.,wildlife,environment,A2,28,Nature,Very Common,,,plants;animals;wild
+19410,Nectar,The sweet liquid made by flowers that bees collect.,Noun,Bees collect nectar from the flowers.,syrup,juice,B2,58,Nature,Common,,,flower;honey;bee
+19411,Nest,A home that a bird builds out of twigs and feathers to lay its eggs in.,Noun,A small nest sat high in the tree.,lair,den,A2,28,Nature,Common,,,bird;egg;twig
+19412,Nettle,A wild plant covered in tiny hairs that sting your skin.,Noun,He brushed against a nettle and his arm began to itch.,plant,weed,B2,58,Nature,Common,,,sting;weed;plant
+19413,Nod,To move your head up and down to show yes or to give a greeting.,Verb,She gave a nod to show that she understood.,bow,dip,B1,45,Communication,Common,,,agree;gesture;head
+19414,Node,A point where lines or paths meet or branch.,Noun,Each computer is a node in the network.,junction,hub,B2,58,Science & Technology,Common,,,network;point;joint
+19415,Noise,A loud or unpleasant sound.,Noun,The noise from the building site gave me a headache.,din,racket,A2,28,General,Very Common,,,sound;loud;din
+19416,Noodle,"A long, thin strip of pasta, often eaten in soup.",Noun,She ate a bowl of noodle soup.,pasta,vermicelli,A2,28,General,Common,,,soup;pasta;bowl
+19417,Norm,A usual or accepted way of behaving or doing something.,Noun,Working from home has become the norm for many people.,standard,rule,B2,58,Society & Culture,Common,,,standard;custom;habit
+19418,North,The direction to your left when you face the rising sun.,Noun,The compass needle pointed north.,northward,northern part,A2,28,Travel & Places,Common,,,south;compass;direction
+19419,Notch,A small V-shaped cut in the edge of something.,Noun,He cut a notch in the stick to mark the days.,nick,groove,B2,58,General,Common,,,cut;groove;mark
+19420,Notice,To see or become aware of something.,Verb,Did you notice the new sign at the school gate?,spot,observe,A2,28,General,Very Common,,,see;spot;aware
+19421,Novel,A long written story about imaginary people and events.,Noun,I read a gripping novel on the train.,book,fiction,B1,45,Arts & Creativity,Common,,,book;story;author
+19422,Nugget,A small lump of a precious metal such as gold.,Noun,The miner found a nugget of gold in the river.,lump,chunk,B2,58,General,Common,,,gold;lump;precious
+19423,Nurse,A person trained to look after sick or injured people.,Noun,The nurse checked the patient's temperature.,carer,sister,A2,28,Health & Wellness,Common,,,doctor;hospital;patient
+19424,Nut,A hard-shelled seed that grows on trees and can be eaten.,Noun,The squirrel hid a nut under the old oak.,kernel,seed,A2,28,Nature,Common,,,squirrel;shell;snack
+19425,Nylon,"A strong, light, man-made material used for clothes and ropes.",Noun,The tent was made of waterproof nylon.,fabric,polymer,B2,58,Science & Technology,Common,,,fabric;rope;synthetic
+19426,Oak,A large tree with strong wood that produces acorns.,Noun,The children built a treehouse in the old oak.,tree,hardwood,B1,45,Nature,Common,,,acorn;forest;timber
+19427,Oar,A long pole with a flat end used to row a boat.,Noun,He dipped the oar into the water and pulled hard.,paddle,scull,B2,58,Travel & Places,Common,,,boat;row;river
+19428,Oasis,A fertile spot in the desert where water is found.,Noun,The travellers rested at the oasis.,refuge,haven,B2,58,Nature,Common,,,desert;water;palm
+19429,Oat,A cereal grain used to make porridge and animal food.,Noun,A bowl of warm oat porridge is a good winter breakfast.,grain,cereal,B2,58,General,Common,,,porridge;grain;farm
+19430,Ocean,One of the five very large areas of salt water that cover the Earth.,Noun,The ship sailed across the Atlantic Ocean.,sea,deep,A1,15,Nature,Very Common,,,sea;wave;deep
+19431,Ode,"A poem, often addressed to a person or thing, that expresses strong feeling.",Noun,He wrote an ode to the sea.,poem,verse,B2,58,Arts & Creativity,Common,,,poem;verse;praise
+19432,Olive,A small green or black fruit from which oil is made.,Noun,She added an olive to her salad.,fruit,drupe,B1,45,Nature,Common,,,oil;tree;Mediterranean
+19433,Onion,A round vegetable with a strong smell that can make you cry.,Noun,Chop the onion and fry it in a little oil.,bulb,shallot,A1,15,General,Very Common,,,cook;vegetable;tears
+19434,Opera,A play in which the words are sung to the music of an orchestra.,Noun,We went to the opera to hear her sing.,musical,show,B2,58,Arts & Creativity,Common,,,sing;theatre;stage
+19435,Option,One of the choices that you can make.,Noun,You have the option of paying in cash or by card.,choice,alternative,B1,45,General,Very Common,,,choice;pick;decide
+19436,Orange,"A round citrus fruit with a thick, bright skin and sweet, juicy segments.",Noun,She peeled an orange and shared the pieces.,citrus,fruit,A1,15,General,Very Common,,,fruit;juice;colour
+19437,Ore,A rock that contains metal which can be taken out and used.,Noun,Iron ore is dug from deep mines.,mineral,rock,B2,58,Science & Technology,Common,,,mine;metal;iron
+19438,Organ,"A part of the body that does a particular job, such as the heart.",Noun,The heart is the organ that pumps blood.,body part,structure,B2,58,Health & Wellness,Common,,,heart;lung;body
+19439,Orphan,A child whose parents have died.,Noun,The orphan was raised by his aunt.,waif,foundling,B2,58,Society & Culture,Common,,,parents;child;care
+19440,Otter,A water animal with brown fur that eats fish and swims very well.,Noun,An otter slid down the muddy bank into the river.,river animal,mustelid,B2,58,Nature,Common,,,river;fish;fur
+19441,Outfit,A set of clothes worn together.,Noun,She chose a smart outfit for the interview.,costume,clothes,B1,45,General,Common,,,clothes;wear;style
+19442,Oven,A closed space with a door in which you bake or roast food.,Noun,She took the hot bread out of the oven.,stove,cooker,A2,28,General,Common,,,bake;kitchen;roast
+19443,Oxide,A chemical made when oxygen joins with another substance.,Noun,Iron forms a red oxide when it rusts.,compound,rust,B2,58,Science & Technology,Common,,,oxygen;rust;chemical
+19444,Oyster,A shellfish with a rough shell that sometimes contains a pearl.,Noun,The chef opened the oyster with a knife.,shellfish,mollusc,B2,58,Nature,Common,,,pearl;shell;seafood
+19445,Paddle,A short pole with a flat blade used to move a small boat.,Noun,He pulled the paddle through the water.,oar,blade,B2,58,Travel & Places,Common,,,canoe;river;boat
+19446,Pagoda,"A temple with several levels and a curved roof, found in Asia.",Noun,A golden pagoda stood on top of the hill.,temple,shrine,B2,58,Travel & Places,Common,,,temple;Asia;tower
+19447,Panel,A flat piece of wood or metal forming part of a door or wall.,Noun,He fixed the broken panel in the door.,board,sheet,B2,58,General,Common,,,door;board;group
+19448,Paper,"A thin material used for writing, printing or wrapping.",Noun,She wrote the address on a piece of paper.,sheet,page,A1,15,General,Very Common,,,write;print;book
+19449,Parade,"A public march of people, often with music and decorations.",Noun,The children waved flags as the parade went by.,procession,march,B1,45,Society & Culture,Common,,,march;music;festival
+19450,Parent,A mother or father.,Noun,Each parent attended the school meeting.,guardian,mother,A1,15,Society & Culture,Very Common,,,family;child;mother
+19451,Parish,A small area with its own church and priest.,Noun,The village is part of a large parish.,district,community,B2,58,Society & Culture,Common,,,church;community;priest
+19452,Parrot,A colourful tropical bird that can copy human speech.,Noun,The parrot said hello when we came in.,macaw,bird,A2,28,Nature,Common,,,bird;talk;feather
+19453,Pasta,An Italian food made from flour and water in shapes like tubes or ribbons.,Noun,We had pasta with tomato sauce for dinner.,spaghetti,noodles,A2,28,General,Common,,,noodle;sauce;Italy
+19454,Patrol,A group sent to guard or watch an area.,Noun,The police patrol walked through the market.,guard,watch,B2,58,Society & Culture,Common,,,guard;watch;police
+19455,Paw,The foot of an animal such as a cat or dog.,Noun,The puppy put its muddy paw on my clean shirt.,foot,pad,B1,45,Nature,Common,,,claw;cat;dog
+19456,Pea,"A small, round, green seed that grows in a pod and is eaten as a vegetable.",Noun,He pushed a single pea around his plate.,legume,pulse,A2,28,General,Common,,,pod;vegetable;green
+19457,Peace,"A time without war or a calm, quiet state.",Noun,The two countries have lived in peace for years.,calm,harmony,A2,28,Society & Culture,Very Common,,,calm;quiet;war
+19458,Pear,A sweet fruit that is round at the bottom and narrower at the top.,Noun,"He bit into a ripe, juicy pear.",fruit,perry,A2,28,General,Common,,,fruit;juicy;orchard
+19459,Pearl,"A small, round, shiny white stone that grows inside an oyster.",Noun,She wore a necklace of pearls.,gem,jewel,B1,45,Arts & Creativity,Common,,,oyster;jewel;necklace
+19460,Pebble,"A small, smooth stone found on a beach or in a river.",Noun,She skimmed a pebble across the lake.,stone,rock,B1,45,Nature,Common,,,stone;beach;stream
+19461,Peel,To remove the skin from fruit or vegetables.,Verb,Peel the orange before you eat it.,skin,pare,A2,28,General,Common,,,skin;rind;fruit
+19462,Pen,A tool for writing or drawing with ink.,Noun,She signed her name with a blue pen.,biro,ballpoint,A1,15,General,Very Common,,,ink;write;paper
+19463,Pencil,A tool for writing or drawing with a thin stick of lead in a wooden case.,Noun,Write your name in pencil first.,crayon,marker,A1,15,General,Very Common,,,write;draw;eraser
+19464,Penny,A small coin of low value used in Britain.,Noun,He found a penny on the pavement.,coin,cent,B1,45,Business,Common,,,coin;cent;copper
+19465,People,"Men, women and children.",Noun,Hundreds of people gathered in the square.,persons,folk,A1,15,Society & Culture,Very Common,,,crowd;human;society
+19466,Perch,"A place where a bird rests, or a freshwater fish.",Noun,The parrot sat on its perch and watched us.,roost,rest,B2,58,Nature,Common,,,bird;rest;branch
+19467,Pet,An animal kept at home for company and enjoyment.,Noun,Our family pet is a small grey rabbit.,companion,favourite,A1,15,General,Very Common,,,dog;cat;care
+19468,Phrase,A small group of words that act together as one idea.,Noun,"""Once upon a time"" is a famous phrase.",expression,saying,B1,45,Communication,Common,,,words;sentence;expression
+19469,Pickle,A vegetable preserved in vinegar or salty water.,Noun,He added a pickle to his sandwich.,relish,chutney,B2,58,General,Common,,,vinegar;jar;sandwich
+19470,Pie,"A baked dish with a pastry crust and a filling of fruit, meat or vegetables.",Noun,Grandma baked an apple pie for dessert.,tart,pastry,A2,28,General,Common,,,pastry;oven;dessert
+19471,Piece,"A part that has been cut, broken or separated from a whole.",Noun,Could I have a piece of that cake?,part,bit,A2,28,General,Very Common,,,part;slice;bit
+19472,Pierce,To make a small hole in something with a sharp object.,Verb,She had her ears pierced when she was ten.,stab,puncture,B2,58,General,Common,,,hole;sharp;stab
+19473,Pigeon,A grey bird that is common in towns and cities.,Noun,A pigeon landed on the window sill.,dove,bird,A2,28,Nature,Common,,,bird;city;wings
+19474,Pillar,"A tall, strong post that holds up a roof or building.",Noun,A stone pillar stood in the middle of the hall.,column,post,B2,58,Arts & Creativity,Common,,,column;stone;support
+19475,Pillow,A soft cushion that you rest your head on in bed.,Noun,She put a fresh pillow on the bed.,cushion,bolster,A2,28,General,Common,,,bed;head;soft
+19476,Pin,"A short, thin piece of metal with a sharp point, used to hold things together.",Noun,She used a pin to hold the hem in place.,tack,needle,A2,28,General,Common,,,needle;sewing;fasten
+19477,Pinch,To squeeze a small bit of skin or flesh between finger and thumb.,Verb,The crab will pinch your finger if you touch it.,nip,squeeze,B2,58,General,Common,,,squeeze;nip;sting
+19478,Pitch,A marked field where a game such as football is played.,Noun,The players ran onto the pitch.,field,ground,B2,58,General,Common,,,field;football;sport
+19479,Plaque,"A flat piece of metal or stone with writing on it, put on a wall.",Noun,A plaque on the wall remembers the famous poet.,plate,tablet,B2,58,Society & Culture,Common,,,wall;memorial;sign
+19480,Pledge,A serious promise to do something.,Noun,She made a pledge to help the poor.,promise,vow,B2,58,Personal Development,Common,,,promise;vow;oath
+19481,Plume,"A long, soft feather or a cloud of smoke rising in the air.",Noun,A plume of smoke rose from the chimney.,feather,column,B2,58,Nature,Common,,,smoke;feather;cloud
+19482,Pocket,A small bag sewn into a piece of clothing.,Noun,He put the key in his pocket.,pouch,compartment,A2,28,General,Very Common,,,coat;trousers;key
+19483,Polar,Relating to the North or South Pole.,Adjective,Polar bears live in the Arctic.,arctic,frozen,B2,58,Nature,Common,,,Arctic;ice;pole
+19484,Polite,Having good manners and showing respect for others.,Adjective,It is polite to say thank you.,courteous,civil,A2,28,Personal Development,Very Common,,,manners;respect;kind
+19485,Pollen,A fine powder produced by flowers that makes new seeds grow.,Noun,Bees carry pollen from flower to flower.,dust,spores,B2,58,Nature,Common,,,flower;bee;seed
+19486,Poncho,A loose coat made of one piece of cloth with a hole for the head.,Noun,She wore a woollen poncho in the rain.,cape,cloak,B2,58,General,Common,,,cloak;wool;rain
+19487,Pony,A small breed of horse.,Noun,The children took turns riding the pony.,horse,foal,B1,45,Nature,Common,,,horse;ride;stable
+19488,Porch,A covered area at the entrance to a house.,Noun,We sat on the porch and watched the rain.,veranda,entrance,B2,58,General,Common,,,door;veranda;house
+19489,Portal,"An impressive door or entrance, or a website that gives access to many services.",Noun,She logged into the student portal to see her grades.,gateway,entrance,B2,58,Science & Technology,Common,,,door;website;gateway
+19490,Porter,A person whose job is to carry bags at a hotel or station.,Noun,The porter carried our bags to the room.,carrier,bearer,B2,58,Travel & Places,Common,,,bags;hotel;carry
+19491,Postal,Relating to the sending of letters and parcels.,Adjective,Write the postal address on the envelope.,mail,delivery,B1,45,General,Common,,,post;letter;delivery
+19492,Pot,A deep round container used for cooking food or growing plants.,Noun,Stir the soup in the pot every few minutes.,pan,vessel,A2,28,General,Common,,,pan;kitchen;lid
+19493,Pouch,"A small bag, or the pocket of skin in which a kangaroo carries its baby.",Noun,The baby kangaroo peeked out of its mother's pouch.,bag,purse,B2,58,Nature,Common,,,bag;pocket;kangaroo
+19494,Pounce,To jump quickly onto something in order to catch it.,Verb,The cat crouched and waited to pounce on the mouse.,spring,leap,B2,58,Nature,Common,,,jump;catch;cat
+19495,Pretty,Nice to look at in a charming way.,Adjective,She wore a pretty yellow dress to the party.,lovely,attractive,A2,28,General,Very Common,,,lovely;nice;charming
+19496,Priest,A person who leads religious services and ceremonies.,Noun,The priest welcomed everyone to the church.,clergyman,pastor,B1,45,Society & Culture,Common,,,church;prayer;cathedral
+19497,Prince,The son of a king or queen.,Noun,The prince waved to the cheering crowd.,royal,noble,A2,28,Society & Culture,Common,,,king;queen;palace
+19498,Proper,Right or suitable for a particular situation.,Adjective,Use the proper tool to fix the engine.,correct,suitable,B1,45,General,Common,,,right;correct;fit
+19499,Prune,To cut off parts of a tree or bush so that it grows better.,Verb,She will prune the roses in early spring.,trim,cut back,B2,58,Nature,Common,,,garden;trim;branch
+19500,Puffin,"A small black and white sea bird with a bright, colourful beak.",Noun,The puffin carried fish in its beak.,seabird,auk,B2,58,Nature,Common,,,bird;beak;cliff
+19501,Puppy,A young dog.,Noun,The puppy chased its tail across the floor.,pup,whelp,A2,28,Nature,Very Common,,,dog;young;pet
+19502,Quaint,Attractively old-fashioned or unusual.,Adjective,We stayed in a quaint cottage by the sea.,charming,old-fashioned,B2,58,General,Common,,,charming;old;cottage
+19503,Quay,A platform built beside the water where ships load and unload.,Noun,Fishermen unloaded the catch on the quay.,dock,wharf,B2,58,Travel & Places,Common,,,harbour;dock;ship
+19504,Queen,"A woman who rules a country, or the wife of a king.",Noun,The queen waved to the cheering crowd.,monarch,sovereign,A2,28,Society & Culture,Very Common,,,king;crown;royal
+19505,Quiz,A short test or game in which people answer questions.,Noun,Our class had a quiz on geography this morning.,test,contest,A2,28,Academic,Common,,,question;test;answer
+19506,Quota,A fixed share or number of something that is allowed.,Noun,Each farmer has a quota of milk to sell.,ration,limit,B2,58,Business,Common,,,limit;share;allowance
+19507,Racing,The sport or activity of competing in speed.,Noun,He loves watching motor racing on Sundays.,speed contest,competition,B1,45,General,Common,,,speed;track;sport
+19508,Radish,"A small, round root vegetable with a red skin and a sharp taste.",Noun,She sliced a radish into the salad.,root,vegetable,B2,58,General,Common,,,salad;root;red
+19509,Raft,A flat floating platform made of logs or other materials tied together.,Noun,They built a raft and floated down the river.,float,platform,B2,58,Travel & Places,Common,,,river;float;paddle
+19510,Rat,"A rodent like a large mouse with a long, thin tail.",Noun,A rat darted across the alley and under a fence.,rodent,vermin,A2,28,Nature,Common,,,mouse;tail;pest
+19511,Ravine,"A deep, narrow valley with steep sides.",Noun,A stream ran through the ravine.,gorge,gully,B2,58,Nature,Common,,,valley;cliff;stream
+19512,Record,A written or printed account of facts or events.,Noun,The nurse kept a record of the patient's temperature.,document,log,B1,45,Academic,Very Common,,,file;history;note
+19513,Reef,A ridge of rock or coral just below the surface of the sea.,Noun,The ship struck a reef and began to sink.,shoal,sandbar,B2,58,Nature,Common,,,coral;ocean;fish
+19514,Reel,"A round object on which thread, film or fishing line is wound.",Noun,She wound the thread back onto the reel.,spool,bobbin,B2,58,General,Common,,,film;thread;fishing
+19515,Reform,A change made to improve a system or law.,Noun,The government announced a reform of the school system.,improvement,change,B2,58,Society & Culture,Common,,,change;improve;law
+19516,Remove,To take something away from the place where it is.,Verb,Please remove your shoes at the door.,take off,delete,B1,45,General,Common,,,take;delete;clear
+19517,Retail,The selling of goods to the public in shops.,Noun,She works in retail at a large shopping centre.,sales,trade,B2,58,Business,Common,,,shop;sell;goods
+19518,Retire,To stop working because of age.,Verb,My father will retire next year.,stop work,withdraw,B1,45,Business,Common,,,age;job;pension
+19519,Rib,One of the curved bones that protect the chest.,Noun,"He fell and bruised a rib, which made breathing painful.",costal bone,bone,B1,45,Health & Wellness,Common,,,chest;bone;lung
+19520,Rider,"A person who rides a horse, bicycle or motorbike.",Noun,The rider led the horse around the ring.,jockey,cyclist,B1,45,General,Common,,,horse;bike;ride
+19521,Ridge,"A long, narrow top of a hill or mountain.",Noun,We walked along the ridge to enjoy the view.,crest,spine,B2,58,Nature,Common,,,hill;crest;mountain
+19522,Rifle,A long gun that is held against the shoulder when firing.,Noun,The hunter carried a rifle over his shoulder.,gun,firearm,B2,58,Society & Culture,Common,,,gun;hunter;weapon
+19523,Rift,"A deep crack or split in the ground, or a break in a relationship.",Noun,A deep rift opened between the two friends.,split,crack,B2,58,Society & Culture,Common,,,split;gap;quarrel
+19524,Rig,"A large piece of equipment used for a special job, such as drilling for oil.",Noun,Workers live on the oil rig for weeks at a time.,platform,derrick,B2,58,Science & Technology,Common,,,oil;drill;platform
+19525,Rim,"The outer edge of something round, such as a cup or a wheel.",Noun,A chip on the rim of the cup cut his lip.,edge,brim,B2,58,General,Common,,,edge;brim;wheel
+19526,River,A large natural stream of water flowing to the sea.,Noun,We swam in the river on hot days.,stream,waterway,A1,15,Nature,Very Common,,,water;bank;flow
+19527,Rob,To take money or goods from someone by force or threat.,Verb,Two men tried to rob the bank early in the morning.,steal,hold up,B1,45,Society & Culture,Common,,,thief;steal;crime
+19528,Robe,"A long, loose piece of clothing worn after a bath or on formal occasions.",Noun,He put on a robe and made some coffee.,gown,cloak,B2,58,General,Common,,,gown;bath;clothing
+19529,Rod,"A long, thin stick or bar made of wood, metal or plastic.",Noun,He stood by the river with his fishing rod.,pole,stick,B1,45,General,Common,,,pole;fishing;metal
+19530,Rope,"A thick, strong cord made of twisted fibres.",Noun,They tied the boat to the dock with a rope.,cable,line,A2,28,General,Common,,,knot;tie;climb
+19531,Rot,"To slowly break down and go bad, as food or wood does.",Verb,The apples will rot if you leave them in the sun.,decay,spoil,B1,45,Nature,Common,,,decay;mould;spoil
+19532,Rudder,A flat piece at the back of a boat used for steering.,Noun,He turned the rudder to steer the boat left.,helm,tiller,B2,58,Travel & Places,Common,,,ship;steer;boat
+19533,Rugged,"Rough and rocky, or strong and tough.",Adjective,The coast was wild and rugged.,rough,craggy,B2,58,Nature,Common,,,rough;rocky;wild
+19534,Rustic,Simple and plain in a way that reminds you of the countryside.,Adjective,They had dinner in a rustic farmhouse.,rural,country,B2,58,Society & Culture,Common,,,country;simple;rough
+19535,Rut,A deep track made in soft ground by the wheels of vehicles.,Noun,The truck got stuck in a muddy rut.,groove,furrow,B2,58,Nature,Common,,,track;mud;road
+19536,Sacred,Holy and deserving great respect.,Adjective,Mountains are sacred places in many religions.,holy,divine,B2,58,Society & Culture,Common,,,holy;religion;worship
+19537,Saddle,A leather seat for a rider on a horse or bicycle.,Noun,He put the saddle on the horse's back.,seat,tack,B2,58,General,Common,,,horse;ride;leather
+19538,Sage,"A grey-green herb used to flavour food, or a wise person.",Noun,A little sage gives the stuffing a rich flavour.,herb,scholar,B2,58,General,Common,,,herb;wise;cooking
+19539,Salad,A cold dish of raw vegetables such as lettuce and tomato.,Noun,She ate a fresh salad for lunch.,greens,mixture,A2,28,General,Common,,,vegetable;lettuce;dressing
+19540,Salmon,A large silver fish that swims up rivers to lay its eggs.,Noun,We ate grilled salmon for dinner.,fish,trout,B1,45,Nature,Common,,,fish;river;pink
+19541,Salt,A white substance used to flavour and preserve food.,Noun,Add a pinch of salt to the soup.,seasoning,sodium,A1,15,General,Very Common,,,pepper;sea;taste
+19542,Sample,A small amount of something that shows what the rest is like.,Noun,The shop gave out a free sample of cheese.,specimen,taste,B1,45,General,Common,,,taste;test;example
+19543,Sandal,"A light, open shoe that is held on the foot with straps.",Noun,She wore a leather sandal on the beach.,slipper,flip-flop,B1,45,General,Common,,,shoe;foot;summer
+19544,Sap,The sweet liquid that carries food through a plant or tree.,Noun,Sap oozed from the cut in the maple tree.,juice,fluid,B2,58,Nature,Common,,,tree;maple;resin
+19545,Sauce,A thick liquid served with food to add flavour.,Noun,He poured tomato sauce over the pasta.,gravy,dressing,A2,28,General,Common,,,pasta;flavour;pour
+19546,Scarf,A long piece of cloth worn around the neck or head.,Noun,She wrapped a warm scarf around her neck.,shawl,muffler,A2,28,General,Common,,,neck;wool;winter
+19547,School,A place where children go to learn.,Noun,The children walk to school together.,academy,college,A1,15,Academic,Very Common,,,class;teacher;learn
+19548,Sea,The large body of salt water that covers much of the Earth.,Noun,We watched the sun sink slowly into the sea.,ocean,deep,A1,15,Nature,Very Common,,,wave;beach;ship
+19549,Season,"One of the four parts of the year: spring, summer, autumn and winter.",Noun,Summer is my favourite season of the year.,period,time of year,A1,15,Nature,Very Common,,,summer;winter;year
+19550,Secret,Something that is kept hidden from other people.,Noun,He told me a secret and asked me not to tell.,mystery,confidence,A2,28,Communication,Very Common,,,hidden;private;mystery
+19551,Sector,One part of a country's trade or work.,Noun,The farming sector employs many people.,area,branch,B2,58,Business,Common,,,area;branch;industry
+19552,Senior,"Older, or higher in rank than other people.",Adjective,She is a senior manager at the bank.,elder,higher,B1,45,Society & Culture,Common,,,older;rank;manager
+19553,Series,A number of things that come one after another.,Noun,We watched a new series on television.,sequence,run,B1,45,General,Common,,,chain;sequence;show
+19554,Shadow,A dark shape made when something blocks the light.,Noun,The tree cast a long shadow across the lawn.,shade,silhouette,A2,28,Nature,Very Common,,,dark;shade;light
+19555,Shark,"A large sea fish with sharp teeth, some of which attack people.",Noun,A shark circled the boat.,predator,fish,A2,28,Nature,Common,,,ocean;fin;teeth
+19556,Sharp,Having a fine edge or point that can cut.,Adjective,"Be careful, the knife is very sharp.",keen,pointed,A2,28,General,Very Common,,,knife;point;cut
+19557,Shears,"A large tool like scissors, used for cutting hedges or sheep's wool.",Noun,He trimmed the hedge with a pair of shears.,clippers,scissors,B2,58,General,Common,,,garden;cut;hedge
+19558,Sheep,A farm animal kept for its wool and meat.,Noun,The shepherd counted his sheep every evening.,ewe,ram,A1,15,Nature,Very Common,,,wool;lamb;farm
+19559,Sheet,"A large piece of cloth that covers a bed, or a flat thin piece of paper.",Noun,She changed the sheet on the bed.,layer,covering,A2,28,General,Common,,,bed;paper;cloth
+19560,Shelf,A flat board fixed to a wall to hold things.,Noun,He put the book back on the shelf.,ledge,rack,A2,28,General,Common,,,book;wall;rack
+19561,Shell,"The hard outer covering of an egg, nut or sea creature.",Noun,She picked up a pretty shell on the beach.,casing,husk,A2,28,Nature,Common,,,egg;beach;snail
+19562,Shield,A large piece of armour carried on the arm to protect the body.,Noun,The soldier raised his shield to block the arrow.,guard,protection,B1,45,Society & Culture,Common,,,armour;protect;sword
+19563,Shin,The front part of the leg between the knee and the ankle.,Noun,The football hit him hard on the shin.,leg,bone,B2,58,Health & Wellness,Common,,,knee;ankle;leg
+19564,Shirt,"A piece of clothing for the upper body, with sleeves and a collar.",Noun,He wore a white shirt and a blue tie.,blouse,top,A1,15,General,Very Common,,,collar;sleeve;clothes
+19565,Shore,The land along the edge of a sea or lake.,Noun,We walked along the shore at sunset.,beach,coast,B1,45,Travel & Places,Common,,,sea;coast;sand
+19566,Shovel,"A tool with a long handle and a broad blade, used for digging.",Noun,He used a shovel to dig a hole for the tree.,spade,scoop,B1,45,General,Common,,,dig;soil;garden
+19567,Shower,"A short period of light rain, or a bath in which water sprays from above.",Noun,A sudden shower caught us without umbrellas.,downpour,drizzle,A2,28,Nature,Very Common,,,rain;wash;water
+19568,Shrine,A holy place where people go to pray or remember a holy person.,Noun,Pilgrims travelled to the shrine to pray.,temple,sanctuary,B2,58,Society & Culture,Common,,,holy;pray;pilgrim
+19569,Shy,Nervous or uncomfortable around other people.,Adjective,The shy girl hid behind her mother at the party.,timid,bashful,A2,28,Emotion,Common,,,quiet;nervous;timid
+19570,Simple,Easy to understand or do.,Adjective,The instructions were simple and clear.,easy,plain,A2,28,General,Very Common,,,easy;plain;clear
+19571,Sip,"To drink something slowly, taking only a little at a time.",Verb,He took a sip of tea and then set the cup down.,taste,nip,B1,45,General,Common,,,drink;taste;cup
+19572,Sir,A polite way to speak to a man whose name you do not know.,Noun,"Excuse me, sir, you dropped your wallet.",mister,gentleman,A2,28,Communication,Common,,,polite;address;title
+19573,Skate,To glide over ice or a hard surface on boots with blades or wheels.,Verb,We love to skate on the frozen lake.,glide,slide,B1,45,General,Common,,,ice;wheel;glide
+19574,Skewer,A long thin stick used to hold pieces of meat while they cook.,Noun,He pushed chunks of chicken onto a skewer.,spit,rod,B2,58,General,Common,,,kebab;grill;meat
+19575,Ski,"One of a pair of long, narrow boards fixed to boots for gliding over snow.",Noun,He left a ski leaning against the cabin wall.,slider,runner,A2,28,Travel & Places,Common,,,snow;slope;winter
+19576,Skinny,Very thin.,Adjective,The skinny cat could barely jump.,thin,lean,B1,45,Health & Wellness,Common,,,thin;slim;lean
+19577,Skirt,A piece of clothing that hangs from the waist and covers the legs.,Noun,She wore a long red skirt to the party.,kilt,petticoat,A2,28,General,Common,,,dress;waist;clothes
+19578,Skull,The bony part of the head that protects the brain.,Noun,The doctor studied the X-ray of the skull.,cranium,head bone,B1,45,Health & Wellness,Common,,,bone;head;brain
+19579,Sky,"The space above the Earth where we see the sun, moon and clouds.",Noun,The sky turned pink as the sun set.,heavens,air,A1,15,Nature,Very Common,,,cloud;blue;star
+19580,Slab,"A thick, flat piece of stone, wood or other solid material.",Noun,A heavy stone slab covered the entrance.,block,chunk,B2,58,General,Common,,,stone;block;paving
+19581,Slate,"A smooth, grey rock that splits into thin plates, used for roofs.",Noun,The cottage roof was covered with grey slate.,rock,tile,B2,58,General,Common,,,roof;stone;school
+19582,Smooth,Having an even surface with no lumps.,Adjective,The stone was cool and smooth.,even,flat,A2,28,General,Common,,,flat;even;soft
+19583,Snail,"A small, slow animal with a soft body and a spiral shell.",Noun,A snail left a silver trail on the path.,mollusc,slug,A2,28,Nature,Common,,,shell;slow;garden
+19584,Soap,A substance you use with water to wash your body or clothes.,Noun,Wash your hands with soap and water.,cleanser,lather,A2,28,General,Common,,,wash;bath;foam
+19585,Sock,A soft piece of clothing worn on the foot inside a shoe.,Noun,She could not find the other sock in the laundry.,stocking,hose,A2,28,General,Common,,,foot;shoe;pair
+19586,Socket,"A hole or opening into which something fits, such as a plug.",Noun,He put the plug into the socket and switched it on.,outlet,hollow,B2,58,Science & Technology,Common,,,plug;electric;hole
+19587,Soften,To become or make something softer.,Verb,Heat the butter to soften it.,ease,melt,B2,58,General,Common,,,soft;melt;ease
+19588,Solar,Relating to the sun or powered by the sun.,Adjective,Solar panels on the roof provide hot water.,sun-powered,sun-driven,B1,45,Science & Technology,Common,,,sun;energy;panel
+19589,Sorrow,A feeling of deep sadness.,Noun,She felt great sorrow when her friend moved away.,grief,sadness,B2,58,Emotion,Common,,,sad;grief;tears
+19590,Sow,To plant seeds by scattering them over or into the ground.,Verb,Farmers sow wheat in the autumn.,plant,seed,B2,58,Nature,Common,,,seed;plant;harvest
+19591,Span,The distance from one end of something to the other.,Noun,The bridge has a span of more than two hundred metres.,stretch,length,B2,58,General,Common,,,bridge;length;reach
+19592,Spice,A strong-tasting plant substance used to flavour food.,Noun,Cinnamon is a sweet spice that is used in cakes.,seasoning,flavouring,B1,45,General,Common,,,pepper;flavour;curry
+19593,Spider,A small creature with eight legs that spins webs to catch insects.,Noun,A spider crept across the wall.,arachnid,tarantula,A2,28,Nature,Very Common,,,web;eight legs;insect
+19594,Spike,"A thin, sharp point of metal or wood.",Noun,A spike on the fence tore his sleeve.,point,barb,B2,58,General,Common,,,point;sharp;nail
+19595,Spiral,A shape that winds around a central point in circles.,Noun,A snail shell is a spiral.,coil,curl,B2,58,General,Common,,,coil;curve;snail
+19596,Spirit,"The part of a person that is not the body, often thought of as the soul.",Noun,The team showed great spirit in the final.,soul,essence,B1,45,Personal Development,Common,,,soul;mind;ghost
+19597,Sponge,"A soft material that can soak up liquid, used for washing.",Noun,She wiped the table with a damp sponge.,swab,cloth,B1,45,General,Common,,,wash;soak;cleaning
+19598,Spoon,"A tool with a small bowl at the end, used for eating or stirring.",Noun,He stirred his tea with a spoon.,ladle,scoop,A1,15,General,Very Common,,,fork;knife;bowl
+19599,Sprain,To hurt a joint by suddenly twisting it.,Verb,He managed to sprain his ankle in the match.,twist,wrench,B2,58,Health & Wellness,Common,,,ankle;twist;injury
+19600,Spray,A fine mist of liquid blown through the air.,Noun,The waves threw a cool spray over the deck.,mist,drizzle,B2,58,General,Common,,,mist;water;spritz
+19601,Spruce,A type of evergreen tree with needles and hanging cones.,Noun,They decorated a spruce for the holiday.,fir,pine,B2,58,Nature,Common,,,fir;pine;cone
+19602,Squad,A small group of people who work or play together.,Noun,The football squad trained twice a day.,team,unit,B2,58,General,Common,,,team;group;police
+19603,Squeak,"A short, high-pitched sound.",Noun,The door opened with a loud squeak.,squeal,peep,B2,58,General,Common,,,sound;mouse;door
+19604,Stack,A neat pile of things placed one on top of another.,Noun,There was a stack of books on his desk.,pile,heap,B1,45,General,Common,,,pile;heap;books
+19605,Staff,"The people who work in a company, school or hospital.",Noun,The staff at the hotel were friendly and helpful.,workers,personnel,B1,45,Business,Common,,,workers;team;school
+19606,Stare,To look at something for a long time without moving your eyes.,Verb,He could only stare at the strange object in amazement.,gaze,glare,B1,45,Communication,Common,,,gaze;look;eyes
+19607,Statue,A figure of a person or animal made from stone or metal.,Noun,A bronze statue of the king stands in the square.,sculpture,figure,B1,45,Arts & Creativity,Common,,,stone;sculpt;museum
+19608,Steak,"A thick slice of meat or fish, usually cooked on a grill.",Noun,He ordered a steak with chips.,fillet,cut,B1,45,General,Common,,,beef;grill;meat
+19609,Steam,The hot gas that rises from boiling water.,Noun,Steam rose from the hot bowl of rice.,vapour,mist,B1,45,Science & Technology,Common,,,hot;boil;mist
+19610,Steel,"A strong metal made from iron, used for buildings and machines.",Noun,The bridge is built of steel.,alloy,iron,B1,45,Science & Technology,Common,,,iron;metal;strong
+19611,Stick,A thin piece of wood that has fallen from a tree.,Noun,The dog fetched the stick from the river.,twig,branch,A2,28,General,Very Common,,,wood;branch;twig
+19612,Stitch,A single loop of thread made when sewing.,Noun,She sewed the torn sleeve with tiny stitches.,loop,seam,B1,45,Arts & Creativity,Common,,,sew;thread;needle
+19613,Stock,A supply of goods that a shop has for sale.,Noun,The shop has a large stock of rice.,supply,store,B2,58,Business,Common,,,goods;shop;supply
+19614,Stool,A seat with no back or arms.,Noun,He sat on a wooden stool to milk the cow.,seat,perch,B2,58,General,Common,,,seat;bar;wooden
+19615,Stormy,"Having strong wind, heavy rain and thunder.",Adjective,It was a dark and stormy night.,wild,rough,B1,45,Nature,Common,,,storm;rain;wind
+19616,Straw,"The dried stalks of cereal crops, or a thin tube for drinking.",Noun,The farmer spread clean straw in the barn.,stalk,thatch,B1,45,General,Common,,,hay;drink;farm
+19617,Street,A road in a town with houses or shops along it.,Noun,We live on a quiet street.,road,avenue,A1,15,Travel & Places,Very Common,,,road;town;houses
+19618,Strong,Having great power or force.,Adjective,He was strong enough to lift the heavy box.,powerful,mighty,A1,15,General,Very Common,,,power;muscle;tough
+19619,Studio,"A room where an artist, photographer or musician works.",Noun,The artist works in a bright studio.,workshop,atelier,B1,45,Arts & Creativity,Common,,,art;paint;music
+19620,Sudden,Happening quickly and without warning.,Adjective,A sudden noise made us jump.,abrupt,swift,B1,45,General,Common,,,quick;surprise;abrupt
+19621,Sun,The star that gives light and heat to the Earth.,Noun,The sun rose over the hills at six o'clock.,star,daylight,A1,15,Nature,Very Common,,,light;heat;star
+19622,Supply,An amount of something that is available for use.,Noun,The village has a good supply of clean water.,stock,store,B1,45,Business,Common,,,store;provide;stock
+19623,Swan,"A large white bird with a long, graceful neck that swims on lakes.",Noun,A swan glided across the still water.,bird,waterfowl,B2,58,Nature,Common,,,lake;bird;graceful
+19624,Symbol,A sign or picture that stands for something else.,Noun,The dove is a symbol of peace.,sign,emblem,B1,45,Academic,Common,,,sign;mark;meaning
+19625,System,A set of parts or rules that work together.,Noun,The school has a new system for keeping records.,method,network,B1,45,Science & Technology,Very Common,,,network;method;order
+19626,Tablet,"A small hard piece of medicine, or a flat computer with a touch screen.",Noun,Take one tablet with water twice a day.,pill,capsule,B1,45,Health & Wellness,Common,,,medicine;pill;screen
+19627,Tack,"A small, sharp nail with a broad flat head.",Noun,He used a tack to hold the notice on the board.,pin,nail,B2,58,General,Common,,,nail;pin;board
+19628,Tackle,To deal with a problem or take the ball from another player.,Verb,We must tackle the problem of litter in our town.,handle,address,B2,58,General,Common,,,problem;deal;football
+19629,Tangle,A twisted mass of threads or hair that is hard to separate.,Noun,She spent an hour untying the tangle of wool.,knot,twist,B2,58,General,Common,,,knot;thread;hair
+19630,Tape,A narrow strip of sticky material used to hold things together.,Noun,She wrapped the parcel and sealed it with tape.,ribbon,band,A2,28,General,Common,,,sticky;parcel;ribbon
+19631,Tassel,"A bunch of threads tied at one end, used as a decoration.",Noun,A red tassel hung from the curtain.,fringe,tuft,B2,58,Arts & Creativity,Common,,,decoration;fringe;cord
+19632,Tattoo,A picture or pattern drawn permanently on the skin.,Noun,He had a small anchor tattoo on his arm.,body art,mark,B2,58,Arts & Creativity,Common,,,skin;ink;design
+19633,Tea,A hot drink made by pouring boiling water onto dried leaves.,Noun,She made a pot of tea and put out some biscuits.,brew,cuppa,A1,15,General,Very Common,,,cup;leaf;kettle
+19634,Teapot,A container with a spout and handle used for making and pouring tea.,Noun,She poured tea from the teapot.,kettle,urn,A2,28,General,Common,,,tea;cup;pour
+19635,Temple,A building used for the worship of a god.,Noun,Visitors removed their shoes before entering the temple.,shrine,sanctuary,A2,28,Society & Culture,Common,,,worship;prayer;god
+19636,Thatch,Straw or reeds used to cover the roofs of houses.,Noun,The cottage had a roof made of thatch.,straw,reed,B2,58,General,Common,,,roof;straw;cottage
+19637,Theory,An idea that explains how or why something happens.,Noun,The scientist had a theory about why the plants had died.,idea,hypothesis,B1,45,Academic,Common,,,idea;science;explain
+19638,Throne,A special chair used by a king or queen.,Noun,The king sat on his golden throne.,seat of power,chair,B1,45,Society & Culture,Common,,,king;queen;royal
+19639,Ticket,A piece of paper that shows you have paid to enter a place or travel.,Noun,I bought a train ticket to Lagos.,pass,voucher,A2,28,Travel & Places,Very Common,,,train;travel;pay
+19640,Tickle,To touch someone lightly so that they laugh.,Verb,"Don't tickle me, my feet are sensitive!",stroke,tease,B1,45,General,Common,,,laugh;touch;feather
+19641,Tide,The regular rise and fall of the sea level each day.,Noun,The tide came in and covered the sand.,current,flow,B1,45,Nature,Common,,,ocean;wave;moon
+19642,Tiger,A large wild cat with orange fur and black stripes.,Noun,The tiger crept through the long grass.,big cat,predator,A2,28,Nature,Common,,,stripe;jungle;cat
+19643,Tile,"A thin, flat square used to cover roofs, floors or walls.",Noun,He laid a blue tile on the bathroom wall.,slate,slab,B1,45,General,Common,,,floor;roof;wall
+19644,Timer,A device that measures time and gives a signal when it ends.,Noun,She set the timer for ten minutes.,clock,stopwatch,B1,45,General,Common,,,clock;alarm;cooking
+19645,Tip,A small piece of useful advice or a small extra payment for good service.,Noun,My teacher gave me a useful tip for learning new words.,hint,pointer,A2,28,Communication,Common,,,advice;hint;suggestion
+19646,Tissue,"A soft paper handkerchief, or a mass of cells that forms body parts.",Noun,She wiped her nose with a tissue.,handkerchief,fabric,B2,58,Health & Wellness,Common,,,paper;nose;cells
+19647,Toast,Bread that has been heated until it is brown and crisp.,Noun,He had toast with butter for breakfast.,bread,breakfast,A2,28,General,Common,,,bread;butter;breakfast
+19648,Toe,One of the five small parts at the end of each foot.,Noun,She stubbed her toe on the edge of the bed.,digit,phalanx,A2,28,Health & Wellness,Common,,,foot;nail;ankle
+19649,Toll,Money paid to use a road or bridge.,Noun,We paid the toll at the gate on the motorway.,fee,charge,B2,58,Travel & Places,Common,,,road;fee;bridge
+19650,Tomato,"A soft, round red fruit eaten as a vegetable.",Noun,He sliced a tomato for the salad.,fruit,vegetable,A1,15,General,Very Common,,,salad;red;sauce
+19651,Tooth,One of the hard white parts in the mouth used for biting.,Noun,The dentist pulled out a loose tooth.,fang,molar,A1,15,Health & Wellness,Very Common,,,dentist;mouth;bite
+19652,Top,The highest point or surface of something.,Noun,We reached the top of the hill just before sunrise.,peak,summit,A1,15,General,Very Common,,,summit;peak;highest
+19653,Torch,A small electric light that you hold in your hand.,Noun,He shone a torch into the dark cellar.,flashlight,lamp,B1,45,General,Common,,,light;dark;battery
+19654,Toucan,"A tropical bird with a huge, colourful beak.",Noun,The toucan ate fruit high in the trees.,bird,tropical bird,B2,58,Nature,Common,,,beak;rainforest;colour
+19655,Towel,A piece of thick cloth used to dry the body after washing.,Noun,She wrapped a towel around her wet hair.,cloth,drier,A2,28,General,Common,,,bath;dry;cloth
+19656,Tower,"A tall, narrow building or part of a building.",Noun,The church tower could be seen from miles away.,spire,turret,A2,28,Travel & Places,Common,,,castle;church;high
+19657,Trail,A path through the countryside or a track left behind.,Noun,We followed the trail through the forest.,path,track,B1,45,Travel & Places,Common,,,path;hike;track
+19658,Trait,A particular quality or part of someone's character.,Noun,Kindness is her best trait.,feature,quality,B2,58,Personal Development,Common,,,quality;feature;character
+19659,Tray,A flat piece of wood or plastic with raised edges for carrying food or drink.,Noun,The waiter carried a tray of drinks.,platter,salver,A2,28,General,Common,,,plate;cup;carry
+19660,Trek,A long and difficult journey made on foot.,Noun,We began a three-day trek through the mountains.,hike,trudge,B2,58,Travel & Places,Common,,,hike;mountain;journey
+19661,Trench,"A long, narrow ditch dug in the ground.",Noun,Workers dug a trench for the water pipes.,ditch,channel,B2,58,General,Common,,,ditch;dig;pipe
+19662,Tribal,Relating to a group of people with the same customs and leader.,Adjective,The tribal dance lasted all night.,ethnic,clan,B2,58,Society & Culture,Common,,,tribe;custom;culture
+19663,Tripod,A stand with three legs used for holding a camera.,Noun,She set up the camera on a tripod.,stand,support,B2,58,Science & Technology,Common,,,camera;stand;legs
+19664,Trophy,A cup or prize given to the winner of a competition.,Noun,The captain lifted the trophy above his head.,cup,prize,B1,45,Society & Culture,Common,,,prize;win;cup
+19665,Trowel,A small hand tool for digging in the garden.,Noun,She used a trowel to plant the flowers.,spade,scoop,B2,58,General,Common,,,garden;dig;plant
+19666,Tumble,To fall suddenly and awkwardly.,Verb,The boy will tumble off his bike if he is not careful.,fall,topple,B2,58,General,Common,,,fall;roll;trip
+19667,Tundra,A cold treeless region where the ground is frozen for most of the year.,Noun,Reindeer roam the Arctic tundra.,Arctic plain,frozen plain,B2,58,Nature,Common,,,Arctic;ice;cold
+19668,Tunnel,A long underground passage built through a hill or under a river.,Noun,The train went through a long tunnel.,passage,burrow,A2,28,Travel & Places,Common,,,underground;train;dig
+19669,Turban,A long cloth wound around the head as a head covering.,Noun,He wore a bright blue turban.,headdress,wrap,B2,58,General,Common,,,head;cloth;wrap
+19670,Uncle,"The brother of your mother or father, or the husband of your aunt.",Noun,My uncle drove us to the airport.,relative,kinsman,A1,15,Society & Culture,Very Common,,,aunt;family;relative
+19671,Update,"A new version of something, or the latest news about it.",Noun,The phone needs a software update.,revision,news,B1,45,Science & Technology,Common,,,new;software;news
+19672,Urn,"A tall container with a lid, often used to hold ashes or to serve hot drinks.",Noun,A large tea urn stood on the table at the fair.,vase,jar,B2,58,General,Common,,,vase;jar;container
+19673,Valve,A device that opens and closes to control the flow of liquid or gas.,Noun,He turned the valve to stop the water.,tap,gate,B2,58,Science & Technology,Common,,,pipe;tap;flow
+19674,Vat,A large tank or barrel used for holding liquids in factories.,Noun,The workers poured dye into a huge vat.,tank,barrel,B2,58,Science & Technology,Common,,,tank;liquid;factory
+19675,Velvet,"A soft cloth with a short, thick surface on one side.",Noun,The curtains were made of purple velvet.,plush,fabric,B2,58,General,Common,,,fabric;soft;curtain
+19676,Verify,To check that something is true.,Verb,Please verify your email address before logging in.,confirm,check,B2,58,Science & Technology,Common,,,check;confirm;prove
+19677,Victim,A person who has been harmed or killed by a crime or accident.,Noun,The police helped the victim of the robbery.,casualty,sufferer,B2,58,Society & Culture,Common,,,crime;harm;help
+19678,Villa,A large house in the countryside or at the seaside.,Noun,We rented a villa on the coast for the summer.,mansion,house,B2,58,Travel & Places,Common,,,holiday;garden;pool
+19679,Violet,"A small purple flower, or a bluish-purple colour.",Noun,She picked a violet from the garden.,purple,flower,B2,58,Nature,Common,,,flower;purple;spring
+19680,Vow,A serious promise to do something or to behave in a certain way.,Noun,She made a vow to visit her grandmother every week.,pledge,oath,B2,58,Personal Development,Common,,,promise;oath;swear
+19681,Waffle,"A crisp, flat cake with a pattern of small squares, eaten with syrup.",Noun,He poured syrup over a hot waffle.,pancake,wafer,B2,58,General,Common,,,syrup;breakfast;batter
+19682,Wallow,To roll about in mud or water for pleasure.,Verb,The hippos wallow in the river mud.,roll,bask,B2,58,Nature,Common,,,mud;hippo;roll
+19683,Walnut,"A round nut with a wrinkled shell, or the wood of the tree it grows on.",Noun,She cracked a walnut and ate the kernel.,nut,kernel,B1,45,Nature,Common,,,nut;tree;shell
+19684,Warden,"A person whose job is to look after a building, park or group of people.",Noun,The park warden locked the gates at night.,keeper,guardian,B2,58,Society & Culture,Common,,,guard;park;keeper
+19685,Weasel,"A small, thin animal with a long body that hunts mice and rabbits.",Noun,A weasel slipped into the hole.,stoat,predator,B2,58,Nature,Common,,,animal;mice;burrow
+19686,Weave,To make cloth by passing threads over and under each other.,Verb,She can weave a colourful basket from palm leaves.,knit,braid,B2,58,Arts & Creativity,Common,,,cloth;thread;loom
+19687,Web,A net of fine threads that a spider spins to catch insects.,Noun,A shiny web hung between the two branches.,net,mesh,A2,28,Nature,Common,,,spider;thread;trap
+19688,Weight,How heavy something is.,Noun,The weight of the bag made my shoulders ache.,mass,heaviness,A2,28,Science & Technology,Very Common,,,heavy;scale;measure
+19689,Wheat,A cereal grain that is ground into flour to make bread.,Noun,Fields of golden wheat stretched to the horizon.,grain,cereal,A2,28,Nature,Common,,,flour;bread;farm
+19690,Wheel,"A round object that turns around its centre, used on vehicles.",Noun,The car had a flat wheel.,disc,hoop,A2,28,General,Common,,,car;turn;axle
+19691,Wicked,Very bad or evil.,Adjective,The wicked witch cast a spell on the village.,evil,cruel,B2,58,Personal Development,Common,,,evil;bad;villain
+19692,Wicker,"Thin, bendable twigs woven together to make baskets and furniture.",Noun,They sat in a wicker chair on the porch.,cane,rattan,B2,58,Arts & Creativity,Common,,,basket;weave;chair
+19693,Wig,A covering of false hair worn on the head.,Noun,The actor wore a long grey wig on stage.,toupee,hairpiece,B1,45,Arts & Creativity,Common,,,hair;theatre;costume
+19694,Window,An opening in a wall filled with glass to let in light.,Noun,She opened the window to let in some fresh air.,pane,casement,A1,15,General,Very Common,,,glass;wall;open
+19695,Wisdom,The ability to make good decisions based on experience and knowledge.,Noun,His grandmother's wisdom guided the family.,insight,sense,B2,58,Personal Development,Common,,,wise;experience;knowledge
+19696,Wok,"A large, bowl-shaped pan used in Chinese cooking.",Noun,He tossed the vegetables in a hot wok.,pan,skillet,B1,45,General,Common,,,stir-fry;kitchen;pan
+19697,Wombat,"A short, furry Australian animal that digs burrows.",Noun,A wombat dug a burrow under the fence.,marsupial,burrower,B2,58,Nature,Common,,,Australia;burrow;marsupial
+19698,Wooden,Made of wood.,Adjective,They sat on a wooden bench.,timber,woody,A2,28,General,Common,,,wood;tree;carpenter
+19699,Worker,A person who does a job to earn money.,Noun,Every worker at the factory wears a helmet.,employee,labourer,A2,28,Business,Very Common,,,job;factory;employee
+19700,Yam,A starchy root vegetable that is common in West Africa and the Caribbean.,Noun,We pounded the boiled yam and ate it with soup.,tuber,root,B2,58,General,Common,,,cassava;tuber;vegetable
+19701,Yew,A dark evergreen tree with red berries and flat needles.,Noun,An ancient yew grows in the churchyard.,evergreen,tree,B2,58,Nature,Common,,,conifer;berry;churchyard
+19702,Zebra,An African animal like a horse with black and white stripes.,Noun,A zebra galloped across the plain.,striped horse,equine,A2,28,Nature,Common,,,stripe;Africa;horse
+19703,Zenith,"The highest point of something, or the point in the sky directly above you.",Noun,The sun reached its zenith at noon.,peak,summit,B2,58,General,Common,,,peak;top;sky
+19704,Zodiac,An imaginary band in the sky divided into twelve signs.,Noun,Which sign of the zodiac are you?,astrology,star signs,B2,58,Society & Culture,Common,,,stars;sign;astrology
