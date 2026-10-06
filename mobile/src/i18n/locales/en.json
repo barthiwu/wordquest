@@ -1163,7 +1163,9 @@
       "add": "Add",
       "pending": "Pending",
       "acceptErrorTitle": "Couldn’t accept request",
-      "declineErrorTitle": "Couldn’t decline request"
+      "declineErrorTitle": "Couldn’t decline request",
+      "cancelRequest": "Cancel",
+      "cancelErrorTitle": "Couldn’t cancel request"
     }
   },
   "proto": {

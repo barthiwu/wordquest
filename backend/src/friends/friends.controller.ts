@@ -13,6 +13,7 @@ import { CurrentUserId } from '../auth/decorators/current-user.decorator';
  * POST /api/v1/friends/requests
  * POST /api/v1/friends/requests/:requestId/accept
  * POST /api/v1/friends/requests/:requestId/decline
+ * DELETE /api/v1/friends/requests/:requestId  (sender cancels a pending request)
  * DELETE /api/v1/friends/:userId
  * POST /api/v1/friends/:userId/block
  * POST /api/v1/friends/:userId/unblock
@@ -60,6 +61,11 @@ export class FriendsController {
   @Post('requests/:requestId/decline')
   decline(@CurrentUserId() userId: string, @Param('requestId') requestId: string) {
     return this.friends.declineRequest(userId, requestId);
+  }
+
+  @Delete('requests/:requestId')
+  cancel(@CurrentUserId() userId: string, @Param('requestId') requestId: string) {
+    return this.friends.cancelRequest(userId, requestId);
   }
 
   @Delete(':userId')

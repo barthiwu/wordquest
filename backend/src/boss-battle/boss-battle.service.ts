@@ -193,7 +193,7 @@ export class BossBattleService {
     };
   }
 
-  async joinBattle(userId: string): Promise<BattleChallengeView> {
+  async joinBattle(userId: string, isRetry = false): Promise<BattleChallengeView> {
     const now = new Date();
     const battle = await this.getOrCreateCurrentBattle(now);
     const status = deriveStatus(battle.scheduledStartUtc, battle.scheduledEndUtc, now);
@@ -257,7 +257,20 @@ export class BossBattleService {
       return this.buildChallengeView(existing, existing.group, deadline, variant);
     }
 
-    const { group, player } = await this.claimGroupSlot(battle.id, userId);
+    let claimed: Awaited<ReturnType<BossBattleService['claimGroupSlot']>>;
+    try {
+      claimed = await this.claimGroupSlot(battle.id, userId);
+    } catch (err) {
+      // A double-tap / two devices joining at once: the other request
+      // created this player's row first and the unique constraint turned
+      // ours away (its transaction, including the slot increment, rolled
+      // back). Resume through the normal path instead of surfacing a 500.
+      if (!isRetry && (err as { code?: string } | null)?.code === 'P2002') {
+        return this.joinBattle(userId, true);
+      }
+      throw err;
+    }
+    const { group, player } = claimed;
     this.analytics.track(userId, 'boss_battle_joined', { battleId: battle.id, groupId: group.id });
     const freshDeadline = playerDeadline(
       now,

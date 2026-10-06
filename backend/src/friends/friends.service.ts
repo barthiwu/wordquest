@@ -61,6 +61,9 @@ export interface PublicProfileView {
  * WordDuelService) matchmaking -- so the effect is always mutual even
  * though the Block row itself only records who initiated it.
  */
+/** After a decline the requester can't ask the same player again for this long. */
+const DECLINE_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+
 @Injectable()
 export class FriendsService {
   constructor(
@@ -183,7 +186,11 @@ export class FriendsService {
     const reverseExisting = await this.prisma.friendship.findUnique({
       where: { requesterId_addresseeId: { requesterId: target.id, addresseeId: requesterId } },
     });
-    if (reverseExisting) {
+    if (reverseExisting && reverseExisting.status === 'DECLINED') {
+      // You declined them earlier; now you're the one reaching out, so the
+      // old declined row has no meaning left -- clear it and carry on.
+      await this.prisma.friendship.delete({ where: { id: reverseExisting.id } });
+    } else if (reverseExisting) {
       if (reverseExisting.status === 'ACCEPTED') {
         throw new BadRequestException('You are already friends with this player.');
       }
@@ -202,6 +209,25 @@ export class FriendsService {
     if (existing) {
       if (existing.status === 'ACCEPTED') {
         throw new BadRequestException('You are already friends with this player.');
+      }
+      if (existing.status === 'DECLINED') {
+        const declinedAt = existing.respondedAt?.getTime() ?? 0;
+        if (Date.now() - declinedAt < DECLINE_COOLDOWN_MS) {
+          // Deliberately vague -- don't tell the requester they were declined.
+          throw new BadRequestException(
+            "This player isn't accepting a friend request from you right now.",
+          );
+        }
+        // Cooldown over: reopen the same row rather than creating a second one.
+        const reopened = await this.prisma.friendship.update({
+          where: { id: existing.id },
+          data: { status: 'PENDING', respondedAt: null, createdAt: new Date() },
+        });
+        return {
+          id: reopened.id,
+          user: await this.toPublicView(target),
+          createdAt: reopened.createdAt.toISOString(),
+        };
       }
       throw new BadRequestException('A friend request is already pending with this player.');
     }
@@ -231,6 +257,18 @@ export class FriendsService {
     const request = await this.loadPendingRequest(requestId);
     if (request.addresseeId !== userId) {
       throw new ForbiddenException('This request was not sent to you.');
+    }
+    await this.prisma.friendship.update({
+      where: { id: requestId },
+      data: { status: 'DECLINED', respondedAt: new Date() },
+    });
+  }
+
+  /** The sender withdrawing a request that is still pending. */
+  async cancelRequest(userId: string, requestId: string): Promise<void> {
+    const request = await this.loadPendingRequest(requestId);
+    if (request.requesterId !== userId) {
+      throw new ForbiddenException('This request was not sent by you.');
     }
     await this.prisma.friendship.delete({ where: { id: requestId } });
   }
@@ -364,6 +402,11 @@ export class FriendsService {
     });
     if (!friendship) return 'NONE';
     if (friendship.status === 'ACCEPTED') return 'FRIENDS';
+    if (friendship.status === 'DECLINED') {
+      // The decliner sees a clean slate; the declined sender still sees
+      // "request sent" (they are never told they were declined).
+      return friendship.requesterId === viewerId ? 'REQUEST_SENT' : 'NONE';
+    }
     return friendship.requesterId === viewerId ? 'REQUEST_SENT' : 'REQUEST_RECEIVED';
   }
 

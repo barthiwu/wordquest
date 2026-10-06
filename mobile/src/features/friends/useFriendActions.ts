@@ -5,6 +5,7 @@ import { confirmAction, notify } from '@/utils/dialogs';
 import {
   acceptFriendRequest,
   blockPlayer,
+  cancelFriendRequest,
   declineFriendRequest,
   sendFriendRequest,
   unblockPlayer,
@@ -131,5 +132,24 @@ export function useFriendActions() {
     }
   }
 
-  return { addFriend, confirmAndBlock, unblock, confirmAndUnfriend, accept, decline };
+  async function cancelRequest(requestId: string): Promise<boolean> {
+    if (!accessToken) return false;
+    try {
+      await cancelFriendRequest(accessToken, requestId);
+      return true;
+    } catch (err) {
+      reportError(t('friends:list.cancelErrorTitle'), err);
+      return false;
+    }
+  }
+
+  return {
+    addFriend,
+    confirmAndBlock,
+    unblock,
+    confirmAndUnfriend,
+    accept,
+    decline,
+    cancelRequest,
+  };
 }

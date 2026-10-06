@@ -95,6 +95,14 @@ export function acceptFriendRequest(accessToken: string, requestId: string): Pro
   });
 }
 
+/** The sender withdrawing a request that is still pending. */
+export function cancelFriendRequest(accessToken: string, requestId: string): Promise<void> {
+  return apiRequest<void>(`/friends/requests/${encodeURIComponent(requestId)}`, {
+    method: 'DELETE',
+    accessToken,
+  });
+}
+
 export function declineFriendRequest(accessToken: string, requestId: string): Promise<void> {
   return apiRequest<void>(`/friends/requests/${encodeURIComponent(requestId)}/decline`, {
     method: 'POST',

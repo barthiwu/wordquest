@@ -41,7 +41,7 @@ export function FriendsScreen({ navigation }: Props) {
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation(['friends', 'common']);
   const accessToken = useAuthStore((s) => s.accessToken);
-  const { addFriend, accept, decline } = useFriendActions();
+  const { addFriend, accept, decline, cancelRequest } = useFriendActions();
 
   const [friends, setFriends] = useState<FriendPublicView[] | null>(null);
   const [requests, setRequests] = useState<FriendRequestsView | null>(null);
@@ -104,6 +104,13 @@ export function FriendsScreen({ navigation }: Props) {
   const onDecline = async (requestId: string) => {
     setBusyUserId(requestId);
     const ok = await decline(requestId);
+    setBusyUserId(null);
+    if (ok) load();
+  };
+
+  const onCancel = async (requestId: string) => {
+    setBusyUserId(requestId);
+    const ok = await cancelRequest(requestId);
     setBusyUserId(null);
     if (ok) load();
   };
@@ -210,8 +217,19 @@ export function FriendsScreen({ navigation }: Props) {
               player={r.user}
               onPress={() => navigation.navigate('PublicProfile', { userId: r.user.userId })}
               trailing={
-                <View style={styles.mutedPill}>
-                  <Text style={styles.mutedPillText}>{t('friends:list.pending')}</Text>
+                <View style={styles.actionRow}>
+                  <View style={styles.mutedPill}>
+                    <Text style={styles.mutedPillText}>{t('friends:list.pending')}</Text>
+                  </View>
+                  <Pressable
+                    style={styles.declineButton}
+                    onPress={() => onCancel(r.id)}
+                    disabled={busyUserId === r.id}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('friends:list.cancelRequest')}
+                  >
+                    <Text style={styles.declineButtonText}>{t('friends:list.cancelRequest')}</Text>
+                  </Pressable>
                 </View>
               }
             />

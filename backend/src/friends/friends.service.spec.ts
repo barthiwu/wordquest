@@ -100,6 +100,33 @@ describe('FriendsService', () => {
       expect(result).toMatchObject({ id: 'f1', user: { userId: 'u2', username: 'bo' } });
     });
 
+    it('refuses a re-request inside the decline cooldown, and reopens it after', async () => {
+      const target = { id: 'u2', username: 'bo', avatarKey: null };
+      prismaMock.user.findUnique.mockResolvedValue(target);
+      prismaMock.block.findFirst.mockResolvedValue(null);
+      prismaMock.friendship.findUnique
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ id: 'f1', status: 'DECLINED', respondedAt: new Date() });
+      await expect(service.sendRequest('u1', 'bo')).rejects.toThrow(BadRequestException);
+
+      prismaMock.friendship.findUnique
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({
+          id: 'f1',
+          status: 'DECLINED',
+          respondedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+        });
+      prismaMock.friendship.update.mockResolvedValueOnce({ id: 'f1', createdAt: new Date() });
+      const result = await service.sendRequest('u1', 'bo');
+      expect(prismaMock.friendship.update).toHaveBeenCalledWith({
+        where: { id: 'f1' },
+        data: { status: 'PENDING', respondedAt: null, createdAt: expect.any(Date) },
+      });
+      expect(result).toMatchObject({ id: 'f1' });
+      prismaMock.user.findUnique.mockReset();
+      prismaMock.block.findFirst.mockReset();
+    });
+
     it('throws NotFoundException for an unknown username', async () => {
       prismaMock.user.findUnique.mockResolvedValueOnce(null);
       await expect(service.sendRequest('u1', 'ghost')).rejects.toThrow(NotFoundException);
@@ -215,14 +242,37 @@ describe('FriendsService', () => {
       await expect(service.acceptRequest('u1', 'f1')).rejects.toThrow(BadRequestException);
     });
 
-    it('deletes the row on decline', async () => {
+    it('marks the row DECLINED (kept, so the sender cannot immediately re-ask)', async () => {
       prismaMock.friendship.findUnique.mockResolvedValueOnce({
         id: 'f1',
         addresseeId: 'u1',
         status: 'PENDING',
       });
       await service.declineRequest('u1', 'f1');
+      expect(prismaMock.friendship.update).toHaveBeenCalledWith({
+        where: { id: 'f1' },
+        data: { status: 'DECLINED', respondedAt: expect.any(Date) },
+      });
+      expect(prismaMock.friendship.delete).not.toHaveBeenCalled();
+    });
+
+    it('lets the sender cancel a pending request, and nobody else', async () => {
+      prismaMock.friendship.findUnique.mockResolvedValueOnce({
+        id: 'f1',
+        requesterId: 'u1',
+        addresseeId: 'u2',
+        status: 'PENDING',
+      });
+      await service.cancelRequest('u1', 'f1');
       expect(prismaMock.friendship.delete).toHaveBeenCalledWith({ where: { id: 'f1' } });
+
+      prismaMock.friendship.findUnique.mockResolvedValueOnce({
+        id: 'f2',
+        requesterId: 'u9',
+        addresseeId: 'u1',
+        status: 'PENDING',
+      });
+      await expect(service.cancelRequest('u1', 'f2')).rejects.toThrow(ForbiddenException);
     });
   });
 

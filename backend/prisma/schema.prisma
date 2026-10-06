@@ -1902,6 +1902,9 @@ model WordDuelAnswer {
 enum FriendshipStatus {
   PENDING
   ACCEPTED
+  // The addressee declined. The row is kept (instead of deleted) so the
+  // requester can't immediately ask again -- see FriendsService.DECLINE_COOLDOWN_MS.
+  DECLINED
 }
 
 // One directed row per request. requesterId sent it; addresseeId is who
