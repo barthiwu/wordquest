@@ -56,7 +56,10 @@ export function DobPicker({
     // neighboring dates before committing.
     if (Platform.OS === 'android') setShowPicker(false);
     if (event.type === 'dismissed') return;
-    if (selectedDate) onChange(selectedDate);
+    // The OS picker speaks LOCAL time; this component's contract is UTC
+    // midnight. Re-anchor the picked calendar day, otherwise anyone east of
+    // UTC (Lagos included) gets their birthday shifted a day earlier.
+    if (selectedDate) onChange(localDayToUtcMidnight(selectedDate));
   };
 
   return (
@@ -75,11 +78,11 @@ export function DobPicker({
 
       {showPicker && (
         <DateTimePicker
-          value={value ?? defaultAnchorDate(maximumDate)}
+          value={utcMidnightToLocalDay(value ?? defaultAnchorDate(maximumDate))}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          maximumDate={maximumDate}
-          minimumDate={minimumDate}
+          maximumDate={utcMidnightToLocalDay(maximumDate)}
+          minimumDate={utcMidnightToLocalDay(minimumDate)}
           onChange={handleChange}
           style={styles.inlinePicker}
         />
@@ -107,7 +110,17 @@ function defaultAnchorDate(maximumDate: Date): Date {
 }
 
 function formatDob(date: Date): string {
-  return date.toLocaleDateString();
+  return date.toLocaleDateString(undefined, { timeZone: 'UTC' });
+}
+
+/** The calendar day the OS picker returned (local), as that same Y-M-D at UTC midnight. */
+export function localDayToUtcMidnight(local: Date): Date {
+  return new Date(Date.UTC(local.getFullYear(), local.getMonth(), local.getDate()));
+}
+
+/** A UTC-midnight date as the same Y-M-D at local midnight, which is what the OS picker displays. */
+export function utcMidnightToLocalDay(utc: Date): Date {
+  return new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
 }
 
 function createStyles(colors: ThemeColors) {

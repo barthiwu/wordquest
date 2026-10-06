@@ -80,7 +80,10 @@ export function RegistrationScreen({ navigation }: Props) {
   const dobValid = dobParts !== null && dobError === null;
 
   const canSubmit =
-    displayName.trim().length >= 2 && email.includes('@') && isAcceptablePassword(password) && dobValid;
+    displayName.trim().length >= 2 &&
+    email.includes('@') &&
+    isAcceptablePassword(password) &&
+    dobValid;
 
   const dobMaximumDate = useMemo(() => new Date(), []);
   const dobMinimumDate = useMemo(() => {
@@ -109,7 +112,8 @@ export function RegistrationScreen({ navigation }: Props) {
   const social = useSocialAuth({
     onSession: enterFromSocial,
     onChallenge: setChallengeToken,
-    dateOfBirth: dobValid && dobParts ? toIsoDate(dobParts.year, dobParts.month, dobParts.day) : undefined,
+    dateOfBirth:
+      dobValid && dobParts ? toIsoDate(dobParts.year, dobParts.month, dobParts.day) : undefined,
   });
   const onTwoFactor = async (code: string) => {
     if (!challengeToken || submitting) return;
@@ -118,9 +122,18 @@ export function RegistrationScreen({ navigation }: Props) {
     try {
       await enterFromSocial(await completeTwoFactorLogin({ challengeToken, code: code.trim() }));
     } catch (err) {
-      setTwoFactorError(
-        err instanceof ApiError && err.status === 401 ? t('twoFactor.errorIncorrect') : t('registration.errorGeneric'),
-      );
+      if (err instanceof ApiError && err.status === 401 && /expired/i.test(err.message)) {
+        // The challenge token timed out: back to the form with a clear reason
+        // instead of a "code didn't work" the player can never get past.
+        setChallengeToken(null);
+        setError(t('twoFactor.errorExpired'));
+      } else {
+        setTwoFactorError(
+          err instanceof ApiError && err.status === 401
+            ? t('twoFactor.errorIncorrect')
+            : t('registration.errorGeneric'),
+        );
+      }
     } finally {
       setSubmitting(false);
     }
@@ -175,7 +188,11 @@ export function RegistrationScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
-        <WordmarkLogo align="start" fontSize={30} style={{ alignSelf: 'flex-start', marginBottom: 12 }} />
+        <WordmarkLogo
+          align="start"
+          fontSize={30}
+          style={{ alignSelf: 'flex-start', marginBottom: 12 }}
+        />
         <Text style={styles.title}>{t('registration.title')}</Text>
         <Text style={styles.subtitle}>{t('registration.subtitle')}</Text>
       </View>
