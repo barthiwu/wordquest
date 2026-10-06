@@ -425,13 +425,7 @@ describe('WordDuelService', () => {
       expect(prismaMock.wordDuelMatch.create).not.toHaveBeenCalled();
     });
 
-    it('waiting alone takes no play; the play is counted when an opponent arrives', async () => {
-      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w1' } }]);
-      await service.joinQueue('u1');
-      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
-    });
-
-    it('counts the play for BOTH players when the match goes active, never refusing either', async () => {
+    it('takes no play at the start: neither waiting nor being matched counts, only finishing does', async () => {
       store.matches.set('m1', {
         id: 'm1',
         status: 'WAITING',
@@ -458,19 +452,11 @@ describe('WordDuelService', () => {
         disconnectedAt: null,
         reconnectedAt: null,
       });
-      playLimitMock.consumePlay.mockResolvedValueOnce({
-        game: 'WORD_DUEL',
-        used: 7,
-        limit: 10,
-        remaining: 3,
-        percent: 70,
-      });
 
-      const view = await service.joinQueue('u2');
+      await service.joinQueue('u2');
 
-      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u2', 'WORD_DUEL', { force: true });
-      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'WORD_DUEL', { force: true });
-      expect(view.playLimit).toEqual(expect.objectContaining({ used: 7, percent: 70 }));
+      expect(playLimitMock.assertCanPlay).toHaveBeenCalledWith('u2', 'WORD_DUEL');
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
     });
 
     it('throws BadRequestException when no words are available for a fresh match', async () => {
@@ -984,6 +970,35 @@ describe('WordDuelService', () => {
         'DUEL_COMPLETED',
         expect.objectContaining({ correct: 0, won: false, tie: false }),
       );
+    });
+
+    it('counts the duel for each player who played it to the end, when the match completes', async () => {
+      seedActiveMatch({ wordIds: ['w1'], endsAt: new Date(Date.now() + 60_000) });
+      store.playerStates.get('ps2')!.currentIndex = 1;
+      rewardEngineMock.calculate.mockReturnValue({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+
+      await service.submitAnswer('u1', 'm1', 'train');
+
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'WORD_DUEL', { force: true });
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u2', 'WORD_DUEL', { force: true });
+    });
+
+    it('does not count the duel for a player who dropped off before the last word', async () => {
+      seedActiveMatch({ wordIds: ['w1', 'w2'], endsAt: new Date(Date.now() - 1_000) });
+      store.playerStates.get('ps1')!.currentIndex = 2; // finished everything
+      store.playerStates.get('ps2')!.currentIndex = 1; // left midway; the clock ended it
+
+      await expect(service.submitAnswer('u1', 'm1', 'train')).rejects.toBeDefined();
+
+      expect(store.matches.get('m1')?.status).toBe('COMPLETED');
+      expect(playLimitMock.consumePlay).toHaveBeenCalledTimes(1);
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'WORD_DUEL', { force: true });
     });
 
     it('reads back a STREAK_MILESTONE and any deferred reactions once the match completes (task #99 follow-up)', async () => {

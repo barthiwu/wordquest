@@ -241,6 +241,8 @@ export function CompleteItScreen({ navigation, route }: Props) {
     if (feedback.sessionComplete || !feedback.nextChallenge) {
       completedRef.current = true;
       trackEvent('ARCADE_SESSION_COMPLETED', { game: 'COMPLETE_IT' });
+      // A head-to-head play counts toward the daily cap only once finished.
+      useArcadePlaysStore.getState().applyNotice(feedback.playLimit);
       setPhase('complete');
       return;
     }

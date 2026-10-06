@@ -50,6 +50,8 @@ export interface ScrambleQuestAnswerResult {
   currentStreak: number;
   longestStreak: number;
   sessionComplete: boolean;
+  /** Only on the final answer of a head-to-head play: that play now counts toward today's cap. */
+  playLimit?: ArcadePlayNotice;
   totalXpAwarded: number;
   correctCount: number;
   wordsTotal: number;

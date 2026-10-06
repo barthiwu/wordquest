@@ -159,13 +159,14 @@ describe('ScrambleQuestService', () => {
       expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
     });
 
-    it('counts a head-to-head start without refusing it mid-match', async () => {
+    it('a head-to-head start takes no play yet (it counts when the match is finished)', async () => {
       versusMock.resolveStart.mockResolvedValueOnce({ existing: null, wordIds: ['w1'], matchId: 'm1' });
       prismaMock.arcadeGameSession.create.mockResolvedValueOnce({ ...baseSession(), versusMatchId: 'm1' });
 
       await service.start('u1', 'm1');
 
-      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'SCRAMBLE_QUEST', { force: true });
+      expect(playLimitMock.assertCanPlay).toHaveBeenCalledWith('u1', 'SCRAMBLE_QUEST');
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
     });
   });
 
@@ -453,6 +454,35 @@ describe('ScrambleQuestService', () => {
           data: expect.objectContaining({ status: 'COMPLETED' }),
         }),
       );
+      // A solo play was already counted when it started.
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+    });
+
+    it('counts a head-to-head play once the last word is answered (not before)', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        versusMatchId: 'm1',
+        currentIndex: 2, // last of 3 words (0-based)
+      });
+      rewardEngineMock.calculate.mockReturnValueOnce({
+        baseXp: 30,
+        speedModifier: 1,
+        hintModifier: 1,
+        streakModifier: 1,
+        finalXp: 30,
+      });
+
+      const result = await service.submitAnswer('u1', 's1', 'train');
+
+      expect(result.sessionComplete).toBe(true);
+      expect(result.nextChallenge).toBeNull();
+      expect(progressionMock.recordDailyActivity).toHaveBeenCalledWith('u1', prismaMock, []);
+      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ status: 'COMPLETED' }),
+        }),
+      );
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'SCRAMBLE_QUEST', { force: true });
     });
 
     it('resolves a STREAK_MILESTONE reaction live on the last word (task #99 follow-up: anchored to the streak container)', async () => {

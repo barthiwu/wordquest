@@ -179,6 +179,8 @@ export function HangmanScreen({ navigation, route }: Props) {
     if (completion.sessionComplete || !completion.nextChallenge) {
       completedRef.current = true;
       trackEvent('ARCADE_SESSION_COMPLETED', { game: 'HANGMAN' });
+      // A head-to-head play counts toward the daily cap only once finished.
+      useArcadePlaysStore.getState().applyNotice(completion.playLimit);
       setPhase('complete');
       return;
     }

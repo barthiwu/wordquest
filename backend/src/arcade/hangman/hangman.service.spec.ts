@@ -146,13 +146,14 @@ describe('HangmanService', () => {
       expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
     });
 
-    it('counts a head-to-head start without refusing it mid-match', async () => {
+    it('a head-to-head start takes no play yet (it counts when the match is finished)', async () => {
       versusMock.resolveStart.mockResolvedValueOnce({ existing: null, wordIds: ['w1'], matchId: 'm1' });
       prismaMock.arcadeGameSession.create.mockResolvedValueOnce({ ...baseSession(), versusMatchId: 'm1' });
 
       await service.start('u1', 'm1');
 
-      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'HANGMAN', { force: true });
+      expect(playLimitMock.assertCanPlay).toHaveBeenCalledWith('u1', 'HANGMAN');
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
     });
   });
 
@@ -420,6 +421,31 @@ describe('HangmanService', () => {
         where: { id: 's1', currentIndex: 1, currentWordGuessCount: 2 },
         data: expect.objectContaining({ status: 'COMPLETED' }),
       });
+      // A solo play was already counted when it started.
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+    });
+
+    it('counts a head-to-head play once the last word is answered (not before)', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        versusMatchId: 'm1',
+        currentIndex: 1,
+        currentWordGuesses: ['c', 'a'],
+        currentWordGuessCount: 2,
+      });
+      prismaMock.arcadeAnswer.count.mockResolvedValueOnce(2);
+
+      const result = await service.guessLetter('u1', 's1', 't');
+
+      expect(result.completion?.sessionComplete).toBe(true);
+      expect(result.completion?.nextChallenge).toBeNull();
+      expect(result.completion?.correctCount).toBe(2);
+      expect(progressionMock.recordDailyActivity).toHaveBeenCalled();
+      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith({
+        where: { id: 's1', currentIndex: 1, currentWordGuessCount: 2 },
+        data: expect.objectContaining({ status: 'COMPLETED' }),
+      });
+      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'HANGMAN', { force: true });
     });
 
     it('does not double-award when the claim loses a race', async () => {

@@ -9,7 +9,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ProgressionService } from '../../progression/progression.service';
 import { isUniqueConstraintError } from '../../common/prisma-errors';
 import { ArcadeChallengeService } from '../challenge.service';
-import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
+import { ArcadePlayLimitService } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
 import { normalizeAnswer } from '../answer-normalization';
@@ -118,8 +118,6 @@ export interface WordDuelResultView {
 }
 
 export interface WordDuelStateView {
-  /** Present only on the response that started a new duel for this player. */
-  playLimit?: ArcadePlayNotice;
   matchId: string;
   status: 'WAITING' | 'ACTIVE' | 'COMPLETED' | 'ABANDONED';
   /** ISO timestamp — server-authoritative match deadline. null while
@@ -313,17 +311,7 @@ export class WordDuelService {
           { screen: 'WordDuel' },
         );
       }
-      // The match is real now: it counts as a play for both players, and is
-      // never refused (the waiting player was checked when they queued).
-      const [playLimit] = await Promise.all([
-        this.playLimit.consumePlay(userId, 'WORD_DUEL', { force: true }).catch(() => undefined),
-        waitingPlayer
-          ? this.playLimit
-              .consumePlay(waitingPlayer.userId, 'WORD_DUEL', { force: true })
-              .catch(() => undefined)
-          : undefined,
-      ]);
-      return { ...(await this.buildStateView(playerState.id)), playLimit };
+      return this.buildStateView(playerState.id);
     }
 
     // No opponent available right now — become player 1 of a fresh match.
@@ -770,6 +758,17 @@ export class WordDuelService {
     if (a && b && ARCADE_COUNTS_TOWARD_DAILY_STREAK) {
       await this.progression.recordDailyActivity(a.userId);
       await this.progression.recordDailyActivity(b.userId);
+    }
+
+    // Daily play cap: a duel counts for a player only when they played it to
+    // the end (answered every word). Someone who dropped off midway, or was
+    // cut off by the clock, does not use up one of the day's plays.
+    for (const p of match.players) {
+      if (p.currentIndex >= match.wordIds.length) {
+        await this.playLimit
+          .consumePlay(p.userId, 'WORD_DUEL', { force: true })
+          .catch(() => undefined);
+      }
     }
 
     // DUEL_COMPLETED (spec §12) — fired once per participant, from the

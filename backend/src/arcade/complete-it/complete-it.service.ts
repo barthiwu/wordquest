@@ -72,6 +72,8 @@ export interface CompleteItAnswerResult {
   currentStreak: number;
   longestStreak: number;
   sessionComplete: boolean;
+  /** Set on the last word of a head-to-head play: that play now counts toward the daily cap. */
+  playLimit?: ArcadePlayNotice;
   totalXpAwarded: number;
   correctCount: number;
   wordsTotal: number;
@@ -230,6 +232,10 @@ export class CompleteItService {
     );
     if (resolved.existing) return this.buildChallengeView(resolved.existing, variant);
 
+    // A head-to-head play is counted when it is finished (see submitAnswer),
+    // so starting only checks that today's plays are not already used up.
+    await this.playLimit.assertCanPlay(userId, 'COMPLETE_IT');
+
     try {
       const session = await this.prisma.arcadeGameSession.create({
         data: {
@@ -240,10 +246,7 @@ export class CompleteItService {
           versusMatchId,
         },
       });
-      // The entry checks (queue / invite / accept) already gated this player;
-      // once a match exists the play is always honoured, never refused mid-match.
-      const playLimit = await this.playLimit.consumePlay(userId, 'COMPLETE_IT', { force: true });
-      return { ...(await this.buildChallengeView(session, variant)), playLimit };
+      return this.buildChallengeView(session, variant);
     } catch (err) {
       // A double-tap raced us: the other request already created it.
       if (!isUniqueConstraintError(err)) throw err;
@@ -457,6 +460,16 @@ export class CompleteItService {
       }
     }
 
+    // A head-to-head play counts only once the player has played it to the
+    // end: dropping out midway never uses up one of the day's plays. The
+    // match is already committed, so this is recorded, never refused.
+    let playLimit: ArcadePlayNotice | undefined;
+    if (isLastWord && session.versusMatchId) {
+      playLimit = await this.playLimit
+        .consumePlay(userId, 'COMPLETE_IT', { force: true })
+        .catch(() => undefined);
+    }
+
     return {
       isCorrect,
       timedOut,
@@ -465,6 +478,7 @@ export class CompleteItService {
       currentStreak: streakAfter,
       longestStreak: newLongestStreak,
       sessionComplete: isLastWord,
+      playLimit,
       totalXpAwarded: session.totalXpAwarded + reward.finalXp,
       correctCount,
       wordsTotal: session.wordsTotal,

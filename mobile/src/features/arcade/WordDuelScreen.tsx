@@ -193,17 +193,19 @@ export function WordDuelScreen({ navigation, route }: Props) {
   const applyState = useCallback(
     (view: WordDuelStateView) => {
       if (view.chat) mergeChat(view.chat);
-      // Only the response that started this duel carries it; polls never do.
-      useArcadePlaysStore.getState().applyNotice(view.playLimit);
       setState(view);
       if (view.status === 'WAITING') setPhase('waiting');
       else if (view.status === 'ACTIVE') setPhase('active');
       else if (view.status === 'COMPLETED') {
-        if (completeAtRef.current === null) completeAtRef.current = Date.now();
+        if (completeAtRef.current === null) {
+          completeAtRef.current = Date.now();
+          // A duel counts toward the daily cap only once it finishes; pick up the new count.
+          if (accessToken) void useArcadePlaysStore.getState().refresh(accessToken);
+        }
         setPhase('complete');
       } else setPhase('no-opponent'); // ABANDONED — this player's own stale queue entry
     },
-    [mergeChat],
+    [accessToken, mergeChat],
   );
 
   const join = useCallback(async () => {

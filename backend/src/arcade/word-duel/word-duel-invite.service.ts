@@ -166,11 +166,7 @@ export class WordDuelInviteService {
     for (const id of [userId, hostId]) {
       this.analytics.track(id, 'DUEL_STARTED', { matchId }, { screen: 'WordDuel' });
     }
-    const [playLimit] = await Promise.all([
-      this.playLimit.consumePlay(userId, 'WORD_DUEL', { force: true }).catch(() => undefined),
-      this.playLimit.consumePlay(hostId, 'WORD_DUEL', { force: true }).catch(() => undefined),
-    ]);
-    return { ...(await this.wordDuel.getState(userId, matchId)), playLimit };
+    return this.wordDuel.getState(userId, matchId);
   }
 
   async decline(userId: string, matchId: string): Promise<{ declined: boolean }> {

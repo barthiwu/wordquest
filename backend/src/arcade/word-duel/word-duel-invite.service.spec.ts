@@ -186,13 +186,12 @@ describe('WordDuelInviteService', () => {
       expect(prismaMock.wordDuelMatch.updateMany).not.toHaveBeenCalled();
     });
 
-    it('accepting counts the play for both the host and the friend', async () => {
+    it('accepting takes no play yet: a duel counts only when it is played to the end', async () => {
       prismaMock.wordDuelMatch.findUnique.mockResolvedValueOnce(waiting());
 
       await service.accept('u2', 'm1');
 
-      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u2', 'WORD_DUEL', { force: true });
-      expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'WORD_DUEL', { force: true });
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
     });
 
     it('an expired or already-taken challenge is closed', async () => {

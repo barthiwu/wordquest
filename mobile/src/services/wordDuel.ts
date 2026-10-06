@@ -1,5 +1,4 @@
 import { apiRequest } from './apiClient';
-import type { ArcadePlayNotice } from './arcadePlays';
 import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
 
 /** Opponent's live score only — never their current word or answers
@@ -66,8 +65,6 @@ export interface WordDuelResultView {
 }
 
 export interface WordDuelStateView {
-  /** Only on the response that started a new play: today's standing, and the 50/70/90/100 percent milestone it crossed. */
-  playLimit?: ArcadePlayNotice;
   matchId: string;
   status: 'WAITING' | 'ACTIVE' | 'COMPLETED' | 'ABANDONED';
   /** ISO timestamp — server-authoritative match deadline. null while WAITING. */

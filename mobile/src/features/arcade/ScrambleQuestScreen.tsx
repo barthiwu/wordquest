@@ -269,6 +269,8 @@ export function ScrambleQuestScreen({ navigation, route }: Props) {
     if (feedback.sessionComplete || !feedback.nextChallenge) {
       completedRef.current = true;
       trackEvent('ARCADE_SESSION_COMPLETED', { game: 'SCRAMBLE_QUEST' });
+      // A head-to-head play counts toward the daily cap only once finished.
+      useArcadePlaysStore.getState().applyNotice(feedback.playLimit);
       setPhase('complete');
       return;
     }
