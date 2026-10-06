@@ -27,6 +27,8 @@ export interface ProtoPlayViewProps {
   onSelectQuest: (key: string) => void;
   onPlay: (game: 'SCRAMBLE_QUEST' | 'WORD_DUEL' | 'COMPLETE_IT' | 'HANGMAN' | 'BOSS_BATTLE') => void;
   bossBadge?: string | null;
+  /** "7 left today" / "Locked today" for an Arcade tile; null when unlimited. */
+  playsBadge?: (game: 'SCRAMBLE_QUEST' | 'WORD_DUEL' | 'COMPLETE_IT' | 'HANGMAN') => { text: string; locked: boolean } | null;
   bossSubtext?: string | null;
 }
 
@@ -130,6 +132,11 @@ export function ProtoPlayView(p: ProtoPlayViewProps) {
               <View style={styles.tileText}>
                 <Text style={[styles.tileTitle, { color: colors.ink }]}>{g.title}</Text>
                 <Text style={{ color: colors.inkMuted, fontSize: 13 }} numberOfLines={2}>{g.sub}</Text>
+                {p.playsBadge?.(g.id) ? (
+                  <Text style={{ color: p.playsBadge(g.id)?.locked ? colors.danger : colors.inkMuted, fontSize: 12, fontWeight: '700' }}>
+                    {p.playsBadge(g.id)?.text}
+                  </Text>
+                ) : null}
                 <View style={[styles.playPill, { backgroundColor: `${colors.arcane}26`, borderColor: `${colors.arcane}66` }]}>
                   <Text style={{ color: colors.arcaneSoft, fontWeight: '800', fontSize: 13 }}>{t('arcade:play')}</Text>
                   <Ionicons name="play" size={12} color={colors.arcaneSoft} />

@@ -93,7 +93,7 @@ export function PlayScreen({ navigation }: Props) {
     trackEvent('ARCADE_OPENED');
   }, []);
 
-  const { launch, sheet } = useArcadeLauncher();
+  const { launch, badge, sheet } = useArcadeLauncher();
 
   const selectGame = (
     game: string,
@@ -269,6 +269,7 @@ export function PlayScreen({ navigation }: Props) {
         cta={t('arcade:play')}
         enabled
         onPress={() => selectGame('SCRAMBLE_QUEST', 'ScrambleQuest')}
+        badge={badge('ScrambleQuest')?.text}
         icon={<ScrambleQuestIcon colors={colors} />}
         styles={styles}
         grid={wide}
@@ -279,6 +280,7 @@ export function PlayScreen({ navigation }: Props) {
         cta={t('arcade:play')}
         enabled
         onPress={() => selectGame('WORD_DUEL', 'WordDuel')}
+        badge={badge('WordDuel')?.text}
         icon={<WordDuelIcon colors={colors} />}
         styles={styles}
         grid={wide}
@@ -289,6 +291,7 @@ export function PlayScreen({ navigation }: Props) {
         cta={t('arcade:play')}
         enabled
         onPress={() => selectGame('COMPLETE_IT', 'CompleteIt')}
+        badge={badge('CompleteIt')?.text}
         icon={<CompleteItIcon colors={colors} />}
         styles={styles}
         grid={wide}
@@ -299,6 +302,7 @@ export function PlayScreen({ navigation }: Props) {
         cta={t('arcade:play')}
         enabled
         onPress={() => selectGame('HANGMAN', 'Hangman')}
+        badge={badge('Hangman')?.text}
         icon={<HangmanIcon colors={colors} />}
         styles={styles}
         grid={wide}
@@ -358,6 +362,17 @@ export function PlayScreen({ navigation }: Props) {
         }
         bossBadge={battleCountdown?.compact}
         bossSubtext={battleCountdown?.subtitle}
+        playsBadge={(game) =>
+          game === 'SCRAMBLE_QUEST'
+            ? badge('ScrambleQuest')
+            : game === 'WORD_DUEL'
+              ? badge('WordDuel')
+              : game === 'COMPLETE_IT'
+                ? badge('CompleteIt')
+                : game === 'HANGMAN'
+                  ? badge('Hangman')
+                  : null
+        }
       />
       {sheet}
       </>

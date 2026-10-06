@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { AuthResult, AuthUser } from '@/services/auth';
 import { useTokenStore } from './tokenStore';
 import { useAnalyticsQueueStore } from './analyticsQueueStore';
+import { useArcadePlaysStore } from './arcadePlaysStore';
 
 interface AuthState {
   user: AuthUser | null;
@@ -102,6 +103,7 @@ export const useAuthStore = create<AuthState>((set) => {
       await useTokenStore.getState().clearTokens();
       // Anything still queued belongs to the player who just left.
       useAnalyticsQueueStore.getState().clear();
+      useArcadePlaysStore.getState().reset();
       set({ user: null });
     },
 

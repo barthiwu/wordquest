@@ -34,6 +34,9 @@ import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
 import { trackEvent } from '@/services/analyticsClient';
 import { ApiError } from '@/services/apiClient';
+import { isPlayLimitError } from '@/services/arcadePlays';
+import { useArcadePlaysStore } from '@/state/arcadePlaysStore';
+import { ArcadeLimitReached } from '@/components/ArcadeLimitReached';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -94,6 +97,8 @@ export function CompleteItScreen({ navigation, route }: Props) {
   const accessToken = useAuthStore((s) => s.accessToken);
 
   const [phase, setPhase] = useState<Phase>('loading');
+  // Set when the server refuses the start because today's plays are used up.
+  const [limitHit, setLimitHit] = useState(false);
   const [challenge, setChallenge] = useState<CompleteItChallenge | null>(null);
   const [answer, setAnswer] = useState('');
   const answerRef = useRef('');
@@ -126,13 +131,18 @@ export function CompleteItScreen({ navigation, route }: Props) {
     setPhase('loading');
     try {
       const view = await startCompleteIt(accessToken, versusMatchId);
+      useArcadePlaysStore.getState().applyNotice(view.playLimit);
       trackEvent('ARCADE_SESSION_STARTED', { game: 'COMPLETE_IT' });
       setChallenge(view);
       setAnswer('');
       autoSubmittedRef.current = false;
       lastVibratedSecondRef.current = null;
       setPhase('active');
-    } catch {
+    } catch (err) {
+      if (isPlayLimitError(err)) {
+        useArcadePlaysStore.getState().markLocked('COMPLETE_IT');
+        setLimitHit(true);
+      }
       setPhase('error');
     }
   }, [accessToken, versusMatchId]);
@@ -247,6 +257,10 @@ export function CompleteItScreen({ navigation, route }: Props) {
         <ActivityIndicator color={colors.arcaneSoft} />
       </View>
     );
+  }
+
+  if (phase === 'error' && limitHit) {
+    return <ArcadeLimitReached game="COMPLETE_IT" onBack={() => navigation.goBack()} />;
   }
 
   if (phase === 'error') {

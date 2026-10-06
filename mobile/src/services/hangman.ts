@@ -1,10 +1,13 @@
 import { apiRequest } from './apiClient';
+import type { ArcadePlayNotice } from './arcadePlays';
 import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
 
 /** Client-safe view of the current Hangman word (backend
  * HangmanChallengeView) -- the pattern has '_' for every hidden letter,
  * never the word itself. */
 export interface HangmanChallenge {
+  /** Only on the response that started a new play: today's standing, and the 50/70/90/100 percent milestone it crossed. */
+  playLimit?: ArcadePlayNotice;
   sessionId: string;
   wordIndex: number;
   wordsTotal: number;

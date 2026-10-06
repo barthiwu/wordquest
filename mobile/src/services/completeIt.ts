@@ -1,4 +1,5 @@
 import { apiRequest } from './apiClient';
+import type { ArcadePlayNotice } from './arcadePlays';
 import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
 
 /** Client-safe view of the current word — the word's own example
@@ -9,6 +10,8 @@ import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
  * rather than ScrambleQuest's flat 3-hint cap; see backend
  * CompleteItService.maxHintsFor). */
 export interface CompleteItChallenge {
+  /** Only on the response that started a new play: today's standing, and the 50/70/90/100 percent milestone it crossed. */
+  playLimit?: ArcadePlayNotice;
   sessionId: string;
   wordIndex: number;
   wordsTotal: number;

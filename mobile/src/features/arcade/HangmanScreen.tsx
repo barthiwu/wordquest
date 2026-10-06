@@ -23,6 +23,9 @@ import {
   type HangmanWordCompletion,
 } from '@/services/hangman';
 import { ApiError } from '@/services/apiClient';
+import { isPlayLimitError } from '@/services/arcadePlays';
+import { useArcadePlaysStore } from '@/state/arcadePlaysStore';
+import { ArcadeLimitReached } from '@/components/ArcadeLimitReached';
 import { trackEvent } from '@/services/analyticsClient';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
@@ -59,6 +62,8 @@ export function HangmanScreen({ navigation, route }: Props) {
   const accessToken = useAuthStore((s) => s.accessToken);
 
   const [phase, setPhase] = useState<Phase>('loading');
+  // Set when the server refuses the start because today's plays are used up.
+  const [limitHit, setLimitHit] = useState(false);
   const [challenge, setChallenge] = useState<HangmanChallenge | null>(null);
   const [completion, setCompletion] = useState<HangmanWordCompletion | null>(null);
   const [showMeaning, setShowMeaning] = useState(false);
@@ -84,6 +89,7 @@ export function HangmanScreen({ navigation, route }: Props) {
     setPhase('loading');
     try {
       const view = await startHangman(accessToken, versusMatchId);
+      useArcadePlaysStore.getState().applyNotice(view.playLimit);
       trackEvent('ARCADE_SESSION_STARTED', { game: 'HANGMAN' });
       completedRef.current = false;
       setChallenge(view);
@@ -92,7 +98,11 @@ export function HangmanScreen({ navigation, route }: Props) {
       setShowSynonyms(false);
       setInlineError(null);
       setPhase('active');
-    } catch {
+    } catch (err) {
+      if (isPlayLimitError(err)) {
+        useArcadePlaysStore.getState().markLocked('HANGMAN');
+        setLimitHit(true);
+      }
       setPhase('error');
     }
   }, [accessToken, versusMatchId]);
@@ -201,6 +211,10 @@ export function HangmanScreen({ navigation, route }: Props) {
         <ActivityIndicator color={colors.arcaneSoft} />
       </View>
     );
+  }
+
+  if (phase === 'error' && limitHit) {
+    return <ArcadeLimitReached game="HANGMAN" onBack={() => navigation.goBack()} />;
   }
 
   if (phase === 'error') {

@@ -5,6 +5,7 @@ import { AppProviders } from '@/app/providers/AppProviders';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { RootNavigator } from '@/app/navigation/RootNavigator';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
+import { ArcadePlayNoticeToast } from '@/components/ArcadePlayNoticeToast';
 import { useThemeStore } from '@/state/themeStore';
 import { subscribeToNotificationTaps } from '@/utils/pushNotifications';
 
@@ -30,6 +31,7 @@ export default function App() {
         <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
         <RootNavigator />
         <ThemeToggleButton />
+        <ArcadePlayNoticeToast />
       </AppProviders>
     </ErrorBoundary>
   );

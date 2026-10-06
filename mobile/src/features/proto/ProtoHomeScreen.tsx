@@ -59,7 +59,7 @@ export function ProtoHomeScreen({ navigation }: Props) {
   const { t } = useTranslation(['home', 'arcade', 'proto']);
   const displayName = useAuthStore((s) => s.user?.displayName);
   const data = useHomeData();
-  const { launch, sheet } = useArcadeLauncher();
+  const { launch, badge, sheet } = useArcadeLauncher();
   const { progression, journey, todaySummary, wordMastery } = data;
   const wide = !bp.isMobile;
 
@@ -191,6 +191,14 @@ export function ProtoHomeScreen({ navigation }: Props) {
                 {g.sub}
               </Text>
             ) : null}
+            {badge(g.route) ? (
+              <Text
+                style={[styles.tileSub, { color: badge(g.route)?.locked ? colors.danger : colors.inkMuted, fontWeight: '700' }]}
+                numberOfLines={1}
+              >
+                {badge(g.route)?.text}
+              </Text>
+            ) : null}
           </Pressable>
         ))}
       </View>
@@ -202,7 +210,7 @@ export function ProtoHomeScreen({ navigation }: Props) {
     <Panel style={styles.flex1}>
       <SectionHeader title={t('proto:compete')} />
       <View style={styles.tileRow}>
-        <Pressable style={[styles.tile, { borderColor: colors.border, backgroundColor: colors.surfaceRaised }]} onPress={() => navigation.navigate('WordDuel')} accessibilityRole="button" accessibilityLabel={t('arcade:wordDuelTitle')}>
+        <Pressable style={[styles.tile, { borderColor: colors.border, backgroundColor: colors.surfaceRaised }]} onPress={() => launch('WordDuel')} accessibilityRole="button" accessibilityLabel={t('arcade:wordDuelTitle')}>
           <ArcadeArt kind="duel" width={wide ? 150 : 110} height={70} style={styles.tileArt} />
           <Text style={[styles.tileTitle, { color: colors.ink }]}>{t('arcade:wordDuelTitle')}</Text>
           <Text style={[styles.tileSub, { color: colors.inkMuted }]}>{t('proto:findRival')}</Text>

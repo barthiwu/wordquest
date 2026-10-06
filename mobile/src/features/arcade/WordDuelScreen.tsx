@@ -22,6 +22,9 @@ import {
   type WordDuelStateView,
 } from '@/services/wordDuel';
 import { ApiError } from '@/services/apiClient';
+import { isPlayLimitError } from '@/services/arcadePlays';
+import { useArcadePlaysStore } from '@/state/arcadePlaysStore';
+import { ArcadeLimitReached } from '@/components/ArcadeLimitReached';
 import { trackEvent } from '@/services/analyticsClient';
 import { useAuthStore } from '@/state/authStore';
 import type { AliExpressionCue } from '@/services/aliExpression';
@@ -127,6 +130,8 @@ export function WordDuelScreen({ navigation, route }: Props) {
   const userUsername = useAuthStore((s) => s.user?.username ?? null);
 
   const [phase, setPhase] = useState<Phase>('loading');
+  // Set when the server refuses the start because today's plays are used up.
+  const [limitHit, setLimitHit] = useState(false);
   const [state, setState] = useState<WordDuelStateView | null>(null);
   const [invite, setInvite] = useState<WordDuelInviteView | null>(null);
   const [inviteBusy, setInviteBusy] = useState(false);
@@ -188,6 +193,8 @@ export function WordDuelScreen({ navigation, route }: Props) {
   const applyState = useCallback(
     (view: WordDuelStateView) => {
       if (view.chat) mergeChat(view.chat);
+      // Only the response that started this duel carries it; polls never do.
+      useArcadePlaysStore.getState().applyNotice(view.playLimit);
       setState(view);
       if (view.status === 'WAITING') setPhase('waiting');
       else if (view.status === 'ACTIVE') setPhase('active');
@@ -228,7 +235,11 @@ export function WordDuelScreen({ navigation, route }: Props) {
         ? await inviteWordDuelFriend(accessToken, challengeFriendId)
         : await joinWordDuelQueue(accessToken);
       applyState(view);
-    } catch {
+    } catch (err) {
+      if (isPlayLimitError(err)) {
+        useArcadePlaysStore.getState().markLocked('WORD_DUEL');
+        setLimitHit(true);
+      }
       setPhase('error');
     }
   }, [accessToken, applyState, challengeFriendId, inviteMatchId]);
@@ -447,6 +458,10 @@ export function WordDuelScreen({ navigation, route }: Props) {
     );
   }
 
+  if (phase === 'error' && limitHit) {
+    return <ArcadeLimitReached game="WORD_DUEL" onBack={() => navigation.goBack()} />;
+  }
+
   if (phase === 'error') {
     return (
       <View style={styles.centered}>
@@ -468,7 +483,13 @@ export function WordDuelScreen({ navigation, route }: Props) {
           await declineWordDuelInvite(accessToken, inviteMatchId);
           navigation.goBack();
         }
-      } catch {
+      } catch (err) {
+        if (isPlayLimitError(err)) {
+          useArcadePlaysStore.getState().markLocked('WORD_DUEL');
+          setLimitHit(true);
+          setPhase('error');
+          return;
+        }
         // Expired or taken in the meantime.
         setPhase('invite-closed');
       } finally {

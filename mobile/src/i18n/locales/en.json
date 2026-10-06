@@ -949,6 +949,20 @@
     "hangmanTitle": "Hangman",
     "hangmanSubtitle": "Find the word before the man is hanged",
     "backToPlay": "Back to Play",
+    "plays": {
+      "left_one": "{{count}} play left today",
+      "left_other": "{{count}} plays left today",
+      "locked": "Locked today",
+      "lockedTitle": "{{game}} is locked for today",
+      "lockedBody": "You have used all of today's {{game}} plays. It unlocks again tomorrow, so try another Arcade game in the meantime.",
+      "plusHint": "Unlimited plays are coming with WordQuest+.",
+      "gotIt": "Got it",
+      "backToArcade": "Back to Arcade",
+      "notice50": "Halfway there: {{used}} of {{limit}} {{game}} plays used today.",
+      "noticeMid_one": "{{percent}}% of today's {{game}} plays used. {{count}} left.",
+      "noticeMid_other": "{{percent}}% of today's {{game}} plays used. {{count}} left.",
+      "notice100": "That was your last {{game}} play today. It unlocks again tomorrow."
+    },
     "versus": {
       "modeTitle": "How do you want to play {{game}}?",
       "single": "Single player",

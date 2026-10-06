@@ -77,7 +77,7 @@ export function NewHomeScreen({ navigation }: Props) {
   const displayName = useAuthStore((s) => s.user?.displayName);
   const avatarUrl = useAuthStore((s) => s.user?.avatarUrl);
   const data = useHomeData();
-  const { launch, sheet } = useArcadeLauncher();
+  const { launch, badge, sheet } = useArcadeLauncher();
   const { progression, journey, todaySummary, wordMastery } = data;
 
   const wide = !bp.isMobile;
@@ -149,6 +149,13 @@ export function NewHomeScreen({ navigation }: Props) {
                 {t(subKey)}
               </Text>
             </View>
+            {badge(route) ? (
+              <View style={[styles.playsPill, badge(route)?.locked && styles.playsPillLocked]}>
+                <Text style={[styles.playsPillText, badge(route)?.locked && styles.playsPillTextLocked]}>
+                  {badge(route)?.text}
+                </Text>
+              </View>
+            ) : null}
           </Pressable>
         ))}
       </View>
@@ -463,6 +470,15 @@ function createStyles(colors: ThemeColors, topInset: number) {
     },
     arcadeCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 72 },
     arcadeText: { flex: 1, gap: 2 },
+    playsPill: {
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: radius.pill,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+    },
+    playsPillLocked: { backgroundColor: colors.danger },
+    playsPillText: { color: colors.inkMuted, fontSize: 11, fontWeight: '700' },
+    playsPillTextLocked: { color: colors.ink },
     cardTitle: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '700' },
     cardSub: { color: colors.inkMuted, fontSize: typography.scale.sm },
   });
