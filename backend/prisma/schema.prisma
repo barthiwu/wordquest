@@ -1877,6 +1877,11 @@ model WordDuelMatch {
   endsAt      DateTime? // set when status -> ACTIVE; server-authoritative match end
   completedAt DateTime?
 
+  // Set for a friend challenge: only this player can join the match, and the
+  // random queue never offers it to anyone else (2026-10 request: challenge
+  // a friend to any Arcade game).
+  invitedUserId String?
+
   winnerId       String?
   // Populated only when both players' final XP is equal — records which
   // rule actually decided it (spec §6's required tiebreaker), so a
@@ -1890,6 +1895,7 @@ model WordDuelMatch {
   createdAt DateTime @default(now())
 
   @@index([status])
+  @@index([invitedUserId, status])
   @@map("word_duel_matches")
 }
 

@@ -235,7 +235,10 @@ export class WordDuelService {
       if (match.status === 'ACTIVE') {
         return this.buildStateView(existing.id);
       }
-      if (!this.isStaleWaitingMatch(match.createdAt)) {
+      // A pending friend challenge of this player's own is dropped when
+      // they ask for a random match instead (they would otherwise sit on
+      // the invite's waiting screen).
+      if (!match.invitedUserId && !this.isStaleWaitingMatch(match)) {
         return this.buildStateView(existing.id);
       }
       await this.prisma.wordDuelMatch.updateMany({
@@ -259,6 +262,7 @@ export class WordDuelService {
         where: {
           status: 'WAITING',
           createdAt: { gte: cutoff },
+          invitedUserId: null, // friend challenges are never offered to the queue
           players: { none: { userId } },
           ...(excludedMatchIds.length > 0 ? { id: { notIn: excludedMatchIds } } : {}),
         },
@@ -562,9 +566,11 @@ export class WordDuelService {
     return { left: closed.count > 0 };
   }
 
-  private isStaleWaitingMatch(createdAt: Date): boolean {
-    const cutoffMs = Date.now() - WORD_DUEL_CONFIG.MATCHMAKING_TIMEOUT_SECONDS * 1000;
-    return createdAt.getTime() < cutoffMs;
+  private isStaleWaitingMatch(match: { createdAt: Date; invitedUserId: string | null }): boolean {
+    const seconds = match.invitedUserId
+      ? WORD_DUEL_CONFIG.INVITE_TIMEOUT_SECONDS
+      : WORD_DUEL_CONFIG.MATCHMAKING_TIMEOUT_SECONDS;
+    return match.createdAt.getTime() < Date.now() - seconds * 1000;
   }
 
   private async loadActivePlayerState(
@@ -819,7 +825,7 @@ export class WordDuelService {
 
     if (
       playerState.match.status === 'WAITING' &&
-      this.isStaleWaitingMatch(playerState.match.createdAt)
+      this.isStaleWaitingMatch(playerState.match)
     ) {
       await this.prisma.wordDuelMatch.updateMany({
         where: { id: playerState.matchId, status: 'WAITING' },

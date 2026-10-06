@@ -28,6 +28,8 @@ import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { ProtoGameHeader } from '@/features/proto/ProtoGameHeader';
+import { VersusBar } from '@/components/VersusBar';
+import { VersusResultCard } from '@/components/VersusResultCard';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
 import { trackEvent } from '@/services/analyticsClient';
@@ -82,7 +84,8 @@ function mergeRevealedAnswer(
  * right as this screen's clock hits zero is judged by the server's
  * clock, not this one's.
  */
-export function CompleteItScreen({ navigation }: Props) {
+export function CompleteItScreen({ navigation, route }: Props) {
+  const versusMatchId = route.params?.versusMatchId;
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -122,7 +125,7 @@ export function CompleteItScreen({ navigation }: Props) {
     if (!accessToken) return;
     setPhase('loading');
     try {
-      const view = await startCompleteIt(accessToken);
+      const view = await startCompleteIt(accessToken, versusMatchId);
       trackEvent('ARCADE_SESSION_STARTED', { game: 'COMPLETE_IT' });
       setChallenge(view);
       setAnswer('');
@@ -132,7 +135,7 @@ export function CompleteItScreen({ navigation }: Props) {
     } catch {
       setPhase('error');
     }
-  }, [accessToken]);
+  }, [accessToken, versusMatchId]);
 
   useEffect(() => {
     load();
@@ -277,11 +280,16 @@ export function CompleteItScreen({ navigation }: Props) {
               text: t('scrambleQuest:sessionLongestStreak', { streak: feedback.longestStreak }),
             },
           ]}
-          primaryLabel={t('scrambleQuest:playAgain')}
-          onPrimary={load}
+          primaryLabel={
+            versusMatchId ? t('arcade:versus.result.rematch') : t('scrambleQuest:playAgain')
+          }
+          onPrimary={
+            versusMatchId ? () => navigation.replace('ArcadeVersus', { game: 'COMPLETE_IT' }) : load
+          }
           secondaryLabel={t('arcade:backToPlay')}
           onSecondary={() => navigation.goBack()}
         />
+        {versusMatchId ? <VersusResultCard matchId={versusMatchId} /> : null}
         <AliDeferredRecap
           reactions={feedback.deferredAliReactions ?? []}
           colors={colors}
@@ -306,6 +314,7 @@ export function CompleteItScreen({ navigation }: Props) {
       <ScrollView contentContainerStyle={styles.container}>
         <BackButton onPress={() => navigation.goBack()} />
         <ProtoGameHeader line={tp('gameComplete')} />
+        {versusMatchId ? <VersusBar matchId={versusMatchId} /> : null}
 
         <View style={styles.headerRow}>
           <Text style={styles.progressLabel}>

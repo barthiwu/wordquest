@@ -160,6 +160,10 @@ export const WORD_DUEL_CONFIG = {
   // value ("5 min" written here next to a 30-second number); fixed to
   // describe what the code actually does.
   MATCHMAKING_TIMEOUT_SECONDS: 30,
+  // A friend challenge waits longer than the random queue: the friend has
+  // to see the notification and open the app. The host stays on the
+  // waiting screen for this long.
+  INVITE_TIMEOUT_SECONDS: 120,
   WRONG_ANSWER_LOCKOUT_MS: 0, // 2026-09 decision: streak reset only, no extra lockout
   // Word bank size for one match (mirrors SCRAMBLE_QUEST_CONFIG/
   // COMPLETE_IT_CONFIG's WORDS_PER_SESSION) -- generous relative to

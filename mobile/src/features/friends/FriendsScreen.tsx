@@ -25,6 +25,13 @@ import {
   type FriendRequestsView,
 } from '@/services/friends';
 import { useFriendActions } from './useFriendActions';
+import { ChallengeGameSheet } from '@/components/ChallengeGameSheet';
+import {
+  listMyVersus,
+  type ChallengeGame,
+  type VersusMatch,
+  type VersusMine,
+} from '@/services/arcadeVersus';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -35,17 +42,20 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Friends'>;
  * inbox and the player's current friends list (2026-09, Barth). Reached
  * from a "Friends" row on the Profile/Passport screen.
  */
-export function FriendsScreen({ navigation }: Props) {
+export function FriendsScreen({ navigation, route }: Props) {
+  const challengeGame = route.params?.challengeGame;
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
-  const { t } = useTranslation(['friends', 'common']);
+  const { t } = useTranslation(['friends', 'common', 'arcade']);
   const accessToken = useAuthStore((s) => s.accessToken);
   const { addFriend, accept, decline, cancelRequest } = useFriendActions();
 
   const [friends, setFriends] = useState<FriendPublicView[] | null>(null);
   const [requests, setRequests] = useState<FriendRequestsView | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [challenges, setChallenges] = useState<VersusMine | null>(null);
+  const [challengeTarget, setChallengeTarget] = useState<FriendPublicView | null>(null);
 
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
@@ -62,6 +72,10 @@ export function FriendsScreen({ navigation }: Props) {
         setRequests(requestsView);
       })
       .catch(() => setError(t('friends:list.genericError')));
+    // Head-to-head challenges are secondary: a failure here never hides the list.
+    listMyVersus(accessToken)
+      .then(setChallenges)
+      .catch(() => setChallenges(null));
   }, [accessToken, t]);
 
   useFocusEffect(load);
@@ -115,10 +129,73 @@ export function FriendsScreen({ navigation }: Props) {
     if (ok) load();
   };
 
+  const startChallenge = (friend: FriendPublicView, game: ChallengeGame) => {
+    setChallengeTarget(null);
+    if (game === 'WORD_DUEL') {
+      navigation.navigate('WordDuel', {
+        challengeFriendId: friend.userId,
+        challengeFriendName: friend.username,
+      });
+    } else {
+      navigation.navigate('ArcadeVersus', { game, friendId: friend.userId });
+    }
+  };
+
+  const onChallenge = (friend: FriendPublicView) => {
+    if (challengeGame) startChallenge(friend, challengeGame);
+    else setChallengeTarget(friend);
+  };
+
+  const gameLabel = (game: string) =>
+    t(
+      game === 'SCRAMBLE_QUEST'
+        ? 'arcade:scrambleQuestTitle'
+        : game === 'COMPLETE_IT'
+          ? 'arcade:completeItTitle'
+          : game === 'HANGMAN'
+            ? 'arcade:hangmanTitle'
+            : 'arcade:wordDuelTitle',
+    );
+
+  const openMatch = (m: VersusMatch) => navigation.navigate('ArcadeVersus', { matchId: m.id });
+
+  const matchRows = (
+    list: VersusMatch[],
+    label: (m: VersusMatch) => string,
+    cta: (m: VersusMatch) => string,
+  ): React.ReactNode =>
+    list.map((m) => (
+      <PlayerRow
+        key={m.id}
+        colors={colors}
+        styles={styles}
+        player={m.opponent ?? { userId: m.id, username: '?', avatarUrl: null }}
+        onPress={() => openMatch(m)}
+        trailing={
+          <View style={styles.matchTrail}>
+            <Text style={styles.matchLabel} numberOfLines={1}>
+              {label(m)}
+            </Text>
+            <View style={styles.addButton}>
+              <Text style={styles.addButtonText}>{cta(m)}</Text>
+            </View>
+          </View>
+        }
+      />
+    ));
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <BackButton onPress={() => navigation.goBack()} />
       <Text style={styles.title}>{t('friends:list.title')}</Text>
+
+      {challengeGame && (
+        <View style={styles.challengeBanner} accessibilityRole="alert">
+          <Text style={styles.challengeBannerText}>
+            {t('friends:challenge.pickFriend', { game: gameLabel(challengeGame) })}
+          </Text>
+        </View>
+      )}
 
       <View style={styles.searchRow}>
         <TextInput
@@ -170,6 +247,49 @@ export function FriendsScreen({ navigation }: Props) {
       )}
 
       {error && <Text style={styles.error}>{error}</Text>}
+
+      {challenges && challenges.incoming.length > 0 && (
+        <Section title={t('friends:challenge.incomingTitle')} styles={styles}>
+          {matchRows(
+            challenges.incoming,
+            (m) => gameLabel(m.game),
+            () => t('friends:challenge.respond'),
+          )}
+        </Section>
+      )}
+
+      {challenges && challenges.active.length > 0 && (
+        <Section title={t('friends:challenge.activeTitle')} styles={styles}>
+          {matchRows(
+            challenges.active,
+            (m) => gameLabel(m.game),
+            (m) => (m.me.finished ? t('friends:challenge.waiting') : t('friends:challenge.play')),
+          )}
+        </Section>
+      )}
+
+      {challenges && challenges.outgoing.length > 0 && (
+        <Section title={t('friends:challenge.sentTitle')} styles={styles}>
+          {matchRows(
+            challenges.outgoing,
+            (m) => gameLabel(m.game),
+            () => t('friends:challenge.open'),
+          )}
+        </Section>
+      )}
+
+      {challenges && challenges.recent.length > 0 && (
+        <Section title={t('friends:challenge.recentTitle')} styles={styles}>
+          {matchRows(
+            challenges.recent,
+            (m) =>
+              m.result
+                ? `${gameLabel(m.game)} · ${t(`friends:challenge.outcome.${m.result.outcome}`)}`
+                : gameLabel(m.game),
+            () => t('friends:challenge.open'),
+          )}
+        </Section>
+      )}
 
       {requests && requests.incoming.length > 0 && (
         <Section title={t('friends:list.incomingRequestsTitle')} styles={styles}>
@@ -250,10 +370,26 @@ export function FriendsScreen({ navigation }: Props) {
               styles={styles}
               player={f}
               onPress={() => navigation.navigate('PublicProfile', { userId: f.userId })}
+              trailing={
+                <Pressable
+                  style={styles.challengeButton}
+                  onPress={() => onChallenge(f)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('friends:challenge.button', { name: f.username })}
+                >
+                  <Text style={styles.challengeButtonText}>{t('friends:challenge.cta')}</Text>
+                </Pressable>
+              }
             />
           ))
         )}
       </Section>
+
+      <ChallengeGameSheet
+        friendName={challengeTarget?.username ?? null}
+        onClose={() => setChallengeTarget(null)}
+        onPick={(game) => challengeTarget && startChallenge(challengeTarget, game)}
+      />
     </ScrollView>
   );
 }
@@ -378,6 +514,33 @@ function createStyles(colors: ThemeColors, topInset: number) {
       borderColor: colors.border,
     },
     declineButtonText: { color: colors.inkMuted, fontSize: typography.scale.sm, fontWeight: '700' },
+    challengeBanner: {
+      backgroundColor: colors.surfaceRaised,
+      borderWidth: 1,
+      borderColor: colors.arcaneSoft,
+      borderRadius: radius.md,
+      padding: spacing.md,
+    },
+    challengeBannerText: {
+      color: colors.ink,
+      fontSize: typography.scale.sm,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
+    challengeButton: {
+      borderRadius: radius.pill,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderWidth: 1.5,
+      borderColor: colors.arcaneSoft,
+    },
+    challengeButtonText: {
+      color: colors.arcaneSoft,
+      fontSize: typography.scale.sm,
+      fontWeight: '700',
+    },
+    matchTrail: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexShrink: 1 },
+    matchLabel: { color: colors.inkMuted, fontSize: typography.scale.xs, flexShrink: 1 },
     mutedPill: {
       backgroundColor: colors.surfaceRaised,
       borderRadius: radius.pill,

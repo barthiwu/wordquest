@@ -8,6 +8,7 @@ import { radius, spacing, typography, type ThemeColors } from '@/constants/theme
 import { useThemeColors } from '@/state/themeStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { useIsPrototype } from '@/state/uiVersionStore';
+import { useArcadeLauncher } from '@/features/arcade/useArcadeLauncher';
 import { ProtoPlayView } from '@/features/proto/ProtoPlayView';
 import { ResponsiveContainer } from '@/components/layout/ResponsiveContainer';
 import {
@@ -92,12 +93,14 @@ export function PlayScreen({ navigation }: Props) {
     trackEvent('ARCADE_OPENED');
   }, []);
 
+  const { launch, sheet } = useArcadeLauncher();
+
   const selectGame = (
     game: string,
     screen: 'ScrambleQuest' | 'WordDuel' | 'CompleteIt' | 'Hangman' | 'BossBattle',
   ) => {
     trackEvent('ARCADE_GAME_SELECTED', { game });
-    navigation.navigate(screen);
+    launch(screen);
   };
 
   const load = useCallback(() => {
@@ -330,6 +333,7 @@ export function PlayScreen({ navigation }: Props) {
       unlockTime: `${String(q.windowStartHour ?? 0).padStart(2, '0')}:00`,
     });
     return (
+      <>
       <ProtoPlayView
         selected={selected ? toProto(selected) : null}
         others={otherQuests.map(toProto)}
@@ -355,6 +359,8 @@ export function PlayScreen({ navigation }: Props) {
         bossBadge={battleCountdown?.compact}
         bossSubtext={battleCountdown?.subtitle}
       />
+      {sheet}
+      </>
     );
   }
 
@@ -399,6 +405,7 @@ export function PlayScreen({ navigation }: Props) {
       <Text style={styles.deviceTime}>
         {t('quests:localTime', { period: timeOfDayPeriod(now), clock: formatLocalClock(now) })}
       </Text>
+      {sheet}
       </ResponsiveContainer>
     </ScrollView>
   );

@@ -26,6 +26,8 @@ import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
 import { ProtoGameHeader } from '@/features/proto/ProtoGameHeader';
+import { VersusBar } from '@/components/VersusBar';
+import { VersusResultCard } from '@/components/VersusResultCard';
 import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
@@ -78,7 +80,8 @@ function mergeRevealedAnswer(
  * §11), so a submission that lands right as this screen's clock hits
  * zero is judged by the server's clock, not this one's.
  */
-export function ScrambleQuestScreen({ navigation }: Props) {
+export function ScrambleQuestScreen({ navigation, route }: Props) {
+  const versusMatchId = route.params?.versusMatchId;
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -125,7 +128,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     if (!accessToken) return;
     setPhase('loading');
     try {
-      const view = await startScrambleQuest(accessToken);
+      const view = await startScrambleQuest(accessToken, versusMatchId);
       trackEvent('ARCADE_SESSION_STARTED', { game: 'SCRAMBLE_QUEST' });
       setChallenge(view);
       setDisplayedLetters(view.scrambledLetters);
@@ -137,7 +140,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
     } catch {
       setPhase('error');
     }
-  }, [accessToken]);
+  }, [accessToken, versusMatchId]);
 
   useEffect(() => {
     load();
@@ -302,11 +305,16 @@ export function ScrambleQuestScreen({ navigation }: Props) {
             { icon: 'flash', text: t('sessionXpEarned', { xp: feedback.totalXpAwarded }) },
             { icon: 'flame', text: t('sessionLongestStreak', { streak: feedback.longestStreak }) },
           ]}
-          primaryLabel={t('playAgain')}
-          onPrimary={load}
+          primaryLabel={versusMatchId ? t('arcade:versus.result.rematch') : t('playAgain')}
+          onPrimary={
+            versusMatchId
+              ? () => navigation.replace('ArcadeVersus', { game: 'SCRAMBLE_QUEST' })
+              : load
+          }
           secondaryLabel={t('arcade:backToPlay')}
           onSecondary={() => navigation.goBack()}
         />
+        {versusMatchId ? <VersusResultCard matchId={versusMatchId} /> : null}
         <AliDeferredRecap
           reactions={feedback.deferredAliReactions ?? []}
           colors={colors}
@@ -331,6 +339,7 @@ export function ScrambleQuestScreen({ navigation }: Props) {
       <ScrollView contentContainerStyle={styles.container}>
         <BackButton onPress={() => navigation.goBack()} />
         <ProtoGameHeader line={tp('gameScramble')} />
+        {versusMatchId ? <VersusBar matchId={versusMatchId} /> : null}
 
         <View style={styles.headerRow}>
           <Text style={styles.progressLabel}>

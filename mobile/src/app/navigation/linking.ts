@@ -109,6 +109,9 @@ export const linking: LinkingOptions<RootStackParamList> = {
       Notifications: 'notifications',
       CalibrationResult: 'calibration-result',
       CatchUpCalendar: 'catch-up',
+      // Arcade head-to-head: a challenge / result notification opens the match.
+      ArcadeVersus: 'arcade/versus/:matchId',
+      WordDuel: 'arcade/word-duel/:inviteMatchId?',
       Main: {
         screens: {
           Home: 'home',

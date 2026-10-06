@@ -1,3 +1,4 @@
+import { useArcadeLauncher } from '@/features/arcade/useArcadeLauncher';
 import { useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -58,6 +59,7 @@ export function ProtoHomeScreen({ navigation }: Props) {
   const { t } = useTranslation(['home', 'arcade', 'proto']);
   const displayName = useAuthStore((s) => s.user?.displayName);
   const data = useHomeData();
+  const { launch, sheet } = useArcadeLauncher();
   const { progression, journey, todaySummary, wordMastery } = data;
   const wide = !bp.isMobile;
 
@@ -176,7 +178,7 @@ export function ProtoHomeScreen({ navigation }: Props) {
           <Pressable
             key={g.route}
             style={[styles.tile, { borderColor: colors.border, backgroundColor: colors.surfaceRaised }]}
-            onPress={() => navigation.navigate(g.route)}
+            onPress={() => launch(g.route)}
             accessibilityRole="button"
             accessibilityLabel={g.title}
           >
@@ -274,6 +276,7 @@ export function ProtoHomeScreen({ navigation }: Props) {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      {sheet}
       <AliScene
         variant="forest"
         height={heroHeight}

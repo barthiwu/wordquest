@@ -7,13 +7,18 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
+  acceptWordDuelInvite,
+  declineWordDuelInvite,
+  getWordDuelInvite,
   getWordDuelState,
+  inviteWordDuelFriend,
   joinWordDuelQueue,
   leaveWordDuelQueue,
   revealWordDuelClue,
   sendWordDuelMessage,
   submitWordDuelAnswer,
   type WordDuelChatMessage,
+  type WordDuelInviteView,
   type WordDuelStateView,
 } from '@/services/wordDuel';
 import { ApiError } from '@/services/apiClient';
@@ -39,7 +44,16 @@ import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WordDuel'>;
 
-type Phase = 'loading' | 'waiting' | 'active' | 'no-opponent' | 'complete' | 'error';
+type Phase =
+  | 'loading'
+  | 'waiting'
+  | 'active'
+  | 'no-opponent'
+  | 'complete'
+  | 'error'
+  // Opened from a friend's challenge: deciding, or the challenge is gone.
+  | 'invite'
+  | 'invite-closed';
 
 /** How often to poll the live match state (spec §6/§11's deliberately
  * chosen REST + client-polling transport, not a WebSocket gateway —
@@ -100,7 +114,8 @@ interface Feedback {
  * This screen's countdown/opponent progress are refreshed by polling,
  * not a WebSocket push — see POLL_INTERVAL_MS above.
  */
-export function WordDuelScreen({ navigation }: Props) {
+export function WordDuelScreen({ navigation, route }: Props) {
+  const { challengeFriendId, challengeFriendName, inviteMatchId } = route.params ?? {};
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -113,6 +128,8 @@ export function WordDuelScreen({ navigation }: Props) {
 
   const [phase, setPhase] = useState<Phase>('loading');
   const [state, setState] = useState<WordDuelStateView | null>(null);
+  const [invite, setInvite] = useState<WordDuelInviteView | null>(null);
+  const [inviteBusy, setInviteBusy] = useState(false);
   const [answer, setAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [revealingClue, setRevealingClue] = useState(false);
@@ -196,12 +213,25 @@ export function WordDuelScreen({ navigation }: Props) {
     chatIdsRef.current = new Set();
     completeAtRef.current = null;
     try {
-      const view = await joinWordDuelQueue(accessToken);
+      if (inviteMatchId) {
+        // Opened from a friend's challenge: show it before joining.
+        const inv = await getWordDuelInvite(accessToken, inviteMatchId);
+        setInvite(inv);
+        if (inv.status === 'ACCEPTED') {
+          applyState(await getWordDuelState(accessToken, inviteMatchId));
+        } else {
+          setPhase(inv.status === 'OPEN' ? 'invite' : 'invite-closed');
+        }
+        return;
+      }
+      const view = challengeFriendId
+        ? await inviteWordDuelFriend(accessToken, challengeFriendId)
+        : await joinWordDuelQueue(accessToken);
       applyState(view);
     } catch {
       setPhase('error');
     }
-  }, [accessToken, applyState]);
+  }, [accessToken, applyState, challengeFriendId, inviteMatchId]);
 
   useEffect(() => {
     join();
@@ -426,12 +456,71 @@ export function WordDuelScreen({ navigation }: Props) {
     );
   }
 
+  if (phase === 'invite' || phase === 'invite-closed') {
+    const from = invite?.from?.username ?? '';
+    const decide = async (accept: boolean) => {
+      if (!accessToken || !inviteMatchId) return;
+      setInviteBusy(true);
+      try {
+        if (accept) {
+          applyState(await acceptWordDuelInvite(accessToken, inviteMatchId));
+        } else {
+          await declineWordDuelInvite(accessToken, inviteMatchId);
+          navigation.goBack();
+        }
+      } catch {
+        // Expired or taken in the meantime.
+        setPhase('invite-closed');
+      } finally {
+        setInviteBusy(false);
+      }
+    };
+    return (
+      <View style={styles.centered}>
+        <BackButton onPress={() => navigation.goBack()} />
+        {phase === 'invite' ? (
+          <>
+            <Text style={styles.title}>{t('invite.title', { name: from })}</Text>
+            <Text style={styles.subtitle}>{t('invite.body')}</Text>
+            <Pressable
+              style={[styles.button, inviteBusy && styles.buttonDisabled]}
+              disabled={inviteBusy}
+              onPress={() => void decide(true)}
+              accessibilityRole="button"
+              accessibilityLabel={t('invite.accept')}
+            >
+              <Text style={styles.buttonText}>{t('invite.accept')}</Text>
+            </Pressable>
+            <Pressable
+              style={styles.secondaryButton}
+              disabled={inviteBusy}
+              onPress={() => void decide(false)}
+              accessibilityRole="button"
+              accessibilityLabel={t('invite.decline')}
+            >
+              <Text style={styles.secondaryButtonText}>{t('invite.decline')}</Text>
+            </Pressable>
+          </>
+        ) : (
+          <>
+            <Text style={styles.title}>{t('invite.closedTitle')}</Text>
+            <Text style={styles.subtitle}>{t('invite.closedBody')}</Text>
+          </>
+        )}
+      </View>
+    );
+  }
+
   if (phase === 'waiting') {
+    const waitingTitle = challengeFriendId
+      ? t('invite.waitingTitle', { name: challengeFriendName ?? '' })
+      : t('waitingTitle');
+    const waitingSubtitle = challengeFriendId ? t('invite.waitingSubtitle') : t('waitingSubtitle');
     if (proto) {
       return (
         <ProtoDuelSearch
-          title={t('waitingTitle')}
-          subtitle={t('waitingSubtitle')}
+          title={waitingTitle}
+          subtitle={waitingSubtitle}
           wordTipLabel={t('wordTipLabel')}
           cancelLabel={t('cancelSearch')}
           onCancel={onCancelSearch}
@@ -441,8 +530,8 @@ export function WordDuelScreen({ navigation }: Props) {
     return (
       <DuelPrepJourney
         colors={colors}
-        title={t('waitingTitle')}
-        subtitle={t('waitingSubtitle')}
+        title={waitingTitle}
+        subtitle={waitingSubtitle}
         wordTipLabel={t('wordTipLabel')}
         cancelLabel={t('cancelSearch')}
         onCancel={onCancelSearch}

@@ -7,10 +7,19 @@ import { AnalyticsModule } from '../../analytics/analytics.module';
 import { WordDuelService } from './word-duel.service';
 import { WordDuelController } from './word-duel.controller';
 import { WordDuelChatService } from './word-duel-chat.service';
+import { WordDuelInviteService } from './word-duel-invite.service';
+import { NotificationModule } from '../../notifications/notification.module';
 
 @Module({
-  imports: [ArcadeModule, ProgressionModule, FriendsModule, AliModule, AnalyticsModule],
+  imports: [
+    ArcadeModule,
+    ProgressionModule,
+    FriendsModule,
+    AliModule,
+    AnalyticsModule,
+    NotificationModule,
+  ],
   controllers: [WordDuelController],
-  providers: [WordDuelService, WordDuelChatService],
+  providers: [WordDuelService, WordDuelChatService, WordDuelInviteService],
 })
 export class WordDuelModule {}

@@ -188,3 +188,53 @@ export function leaveWordDuelQueue(accessToken: string, matchId: string): Promis
     accessToken,
   });
 }
+
+/** What a challenged friend sees before deciding (backend WordDuelInviteView). */
+export interface WordDuelInviteView {
+  matchId: string;
+  /** OPEN = can be accepted; ACCEPTED = already joined; CLOSED = expired,
+   * declined, cancelled or taken. */
+  status: 'OPEN' | 'ACCEPTED' | 'CLOSED';
+  from: { userId: string; username: string; avatarUrl: string | null } | null;
+  expiresAt: string;
+}
+
+/** Challenges a friend to a live Word Duel. Returns the WAITING match the
+ * host sits on while the friend decides (same shape as joinWordDuelQueue). */
+export function inviteWordDuelFriend(
+  accessToken: string,
+  friendId: string,
+): Promise<WordDuelStateView> {
+  return apiRequest<WordDuelStateView>('/arcade/word-duel/invite', {
+    method: 'POST',
+    body: { friendId },
+    accessToken,
+  });
+}
+
+export function getWordDuelInvite(
+  accessToken: string,
+  matchId: string,
+): Promise<WordDuelInviteView> {
+  return apiRequest<WordDuelInviteView>(`/arcade/word-duel/${matchId}/invite`, { accessToken });
+}
+
+export function acceptWordDuelInvite(
+  accessToken: string,
+  matchId: string,
+): Promise<WordDuelStateView> {
+  return apiRequest<WordDuelStateView>(`/arcade/word-duel/${matchId}/accept`, {
+    method: 'POST',
+    accessToken,
+  });
+}
+
+export function declineWordDuelInvite(
+  accessToken: string,
+  matchId: string,
+): Promise<{ declined: boolean }> {
+  return apiRequest<{ declined: boolean }>(`/arcade/word-duel/${matchId}/decline`, {
+    method: 'POST',
+    accessToken,
+  });
+}

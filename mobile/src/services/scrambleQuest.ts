@@ -63,10 +63,14 @@ export interface ScrambleQuestAnswerResult {
 }
 
 /** Starts a new session, or resumes one already in progress. */
-export function startScrambleQuest(accessToken: string): Promise<ScrambleQuestChallenge> {
+export function startScrambleQuest(
+  accessToken: string,
+  versusMatchId?: string,
+): Promise<ScrambleQuestChallenge> {
   return apiRequest<ScrambleQuestChallenge>('/arcade/scramble-quest/start', {
     method: 'POST',
     accessToken,
+    ...(versusMatchId ? { body: { versusMatchId } } : {}),
   });
 }
 

@@ -948,7 +948,67 @@
     "completeItSubtitle": "Fill in the missing word",
     "hangmanTitle": "Hangman",
     "hangmanSubtitle": "Find the word before the man is hanged",
-    "backToPlay": "Back to Play"
+    "backToPlay": "Back to Play",
+    "versus": {
+      "modeTitle": "How do you want to play {{game}}?",
+      "single": "Single player",
+      "singleSub": "Play on your own, at your own pace.",
+      "multi": "Multiplayer",
+      "multiSub": "Go head to head with another player.",
+      "random": "Random opponent",
+      "randomSub": "We'll find someone to play right now.",
+      "friend": "Challenge a friend",
+      "friendSub": "Pick someone from your friends list.",
+      "back": "Back",
+      "bar": {
+        "vs": "Playing against {{name}}",
+        "you": "You",
+        "them": "Them",
+        "done": "Finished"
+      },
+      "lobby": {
+        "error": "Could not set up the match. Please try again.",
+        "tryAgain": "Try again",
+        "searchingTitle": "Finding an opponent...",
+        "searchingBody": "Looking for someone to play {{game}} with you.",
+        "cancelSearch": "Cancel search",
+        "foundTitle": "Opponent found",
+        "foundBody": "You are playing {{name}} at {{game}}. Same words for both of you, best score wins.",
+        "playNow": "Play now",
+        "theyStarted": "{{name}} has already started.",
+        "incomingTitle": "{{name}} challenged you",
+        "incomingBody": "{{game}}, head to head. Same words for both of you, best score wins.",
+        "accept": "Accept",
+        "decline": "Decline",
+        "waitingFriend": "Waiting for {{name}}",
+        "waitingFriendBody": "They have 24 hours to accept. We'll let you know.",
+        "cancelChallenge": "Cancel challenge",
+        "declinedTitle": "Challenge declined",
+        "declinedBody": "{{name}} didn't take this one up.",
+        "cancelledTitle": "Match cancelled",
+        "cancelledBody": "This match was cancelled.",
+        "noOpponentTitle": "No one is around right now",
+        "noOpponentBody": "Search again, or play solo while you wait.",
+        "expiredTitle": "This challenge expired",
+        "expiredBody": "Nobody finished in time.",
+        "searchAgain": "Search again",
+        "playSolo": "Play solo instead"
+      },
+      "result": {
+        "waiting": "Waiting for {{name}} to finish...",
+        "waitingFriend": "Waiting for {{name}} to play their half. We'll tell you when it's done.",
+        "win": "You won!",
+        "loss": "{{name}} won this one.",
+        "draw": "It finished level.",
+        "noContest": "No result - nobody played.",
+        "theyLeft": "{{name}} left before finishing.",
+        "youLeft": "You didn't finish in time.",
+        "vs": "vs",
+        "scoreRule": "Most correct answers wins. A tie goes to the faster player.",
+        "bonus": "+{{xp}} XP win bonus",
+        "rematch": "Find a new opponent"
+      }
+    }
   },
   "scrambleQuest": {
     "genericError": "Could not reach ScrambleQuest right now.",
@@ -1087,6 +1147,16 @@
       "firstLast": "First & Last",
       "example": "Example",
       "letters": "Reveal Letters"
+    },
+    "invite": {
+      "title": "{{name}} challenged you to a Word Duel",
+      "body": "A live head-to-head. Five minutes, same words, most XP wins.",
+      "accept": "Accept",
+      "decline": "Decline",
+      "closedTitle": "This challenge is over",
+      "closedBody": "It expired, was cancelled or someone else got there first.",
+      "waitingTitle": "Waiting for {{name}}",
+      "waitingSubtitle": "They have two minutes to accept. We've sent them a notification."
     }
   },
   "feedback": {
@@ -1213,6 +1283,27 @@
       "declineErrorTitle": "Couldn’t decline request",
       "cancelRequest": "Cancel",
       "cancelErrorTitle": "Couldn’t cancel request"
+    },
+    "challenge": {
+      "cta": "Challenge",
+      "button": "Challenge {{name}}",
+      "sheetTitle": "Challenge {{name}} to...",
+      "duelNote": "Live head-to-head. They have two minutes to accept.",
+      "pickFriend": "Pick a friend to challenge to {{game}}.",
+      "incomingTitle": "Challenges for you",
+      "activeTitle": "Matches in progress",
+      "sentTitle": "Challenges you sent",
+      "recentTitle": "Recent matches",
+      "respond": "Respond",
+      "play": "Play",
+      "waiting": "Waiting",
+      "open": "Open",
+      "outcome": {
+        "WIN": "You won",
+        "LOSS": "You lost",
+        "DRAW": "Draw",
+        "NO_CONTEST": "No result"
+      }
     }
   },
   "proto": {

@@ -32,6 +32,8 @@ import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { HangmanFigure } from '@/components/HangmanFigure';
 import { ProtoGameHeader } from '@/features/proto/ProtoGameHeader';
+import { VersusBar } from '@/components/VersusBar';
+import { VersusResultCard } from '@/components/VersusResultCard';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Hangman'>;
 
@@ -47,7 +49,8 @@ const KEY_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
  * this screen), so all this screen does is send a letter and draw what
  * comes back.
  */
-export function HangmanScreen({ navigation }: Props) {
+export function HangmanScreen({ navigation, route }: Props) {
+  const versusMatchId = route.params?.versusMatchId;
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -80,7 +83,7 @@ export function HangmanScreen({ navigation }: Props) {
     if (!accessToken) return;
     setPhase('loading');
     try {
-      const view = await startHangman(accessToken);
+      const view = await startHangman(accessToken, versusMatchId);
       trackEvent('ARCADE_SESSION_STARTED', { game: 'HANGMAN' });
       completedRef.current = false;
       setChallenge(view);
@@ -92,7 +95,7 @@ export function HangmanScreen({ navigation }: Props) {
     } catch {
       setPhase('error');
     }
-  }, [accessToken]);
+  }, [accessToken, versusMatchId]);
 
   useEffect(() => {
     void load();
@@ -236,11 +239,14 @@ export function HangmanScreen({ navigation }: Props) {
               text: t('sessionLongestStreak', { streak: completion.longestStreak }),
             },
           ]}
-          primaryLabel={t('playAgain')}
-          onPrimary={() => void load()}
+          primaryLabel={versusMatchId ? t('arcade:versus.result.rematch') : t('playAgain')}
+          onPrimary={
+            versusMatchId ? () => navigation.replace('ArcadeVersus', { game: 'HANGMAN' }) : load
+          }
           secondaryLabel={t('arcade:backToPlay')}
           onSecondary={() => navigation.goBack()}
         />
+        {versusMatchId ? <VersusResultCard matchId={versusMatchId} /> : null}
         <AliDeferredRecap
           reactions={completion.deferredAliReactions ?? []}
           colors={colors}
@@ -275,6 +281,7 @@ export function HangmanScreen({ navigation }: Props) {
         <View style={styles.column}>
           <BackButton onPress={() => navigation.goBack()} />
           <ProtoGameHeader line={tp('gameHangman')} />
+          {versusMatchId ? <VersusBar matchId={versusMatchId} /> : null}
 
           <View style={styles.headerRow}>
             <Text style={styles.progressLabel}>

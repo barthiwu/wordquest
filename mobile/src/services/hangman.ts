@@ -60,8 +60,15 @@ export interface HangmanHintResult {
 }
 
 /** Starts a new session, or resumes one already in progress. */
-export function startHangman(accessToken: string): Promise<HangmanChallenge> {
-  return apiRequest<HangmanChallenge>('/arcade/hangman/start', { method: 'POST', accessToken });
+export function startHangman(
+  accessToken: string,
+  versusMatchId?: string,
+): Promise<HangmanChallenge> {
+  return apiRequest<HangmanChallenge>('/arcade/hangman/start', {
+    method: 'POST',
+    accessToken,
+    ...(versusMatchId ? { body: { versusMatchId } } : {}),
+  });
 }
 
 export function guessHangmanLetter(

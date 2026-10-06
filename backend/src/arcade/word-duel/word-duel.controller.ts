@@ -2,6 +2,8 @@ import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/co
 import { Throttle } from '@nestjs/throttler';
 import { WordDuelService } from './word-duel.service';
 import { WordDuelChatService } from './word-duel-chat.service';
+import { WordDuelInviteService } from './word-duel-invite.service';
+import { InviteDuelFriendDto } from './dto/invite-duel-friend.dto';
 import { SendDuelMessageDto } from './dto/send-duel-message.dto';
 import { SubmitWordDuelAnswerDto } from './dto/submit-word-duel-answer.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -10,6 +12,10 @@ import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
 
 /**
  * POST /api/v1/arcade/word-duel/join
+ * POST /api/v1/arcade/word-duel/invite             { friendId }   challenge a friend
+ * GET  /api/v1/arcade/word-duel/:matchId/invite    the challenged friend's view
+ * POST /api/v1/arcade/word-duel/:matchId/accept
+ * POST /api/v1/arcade/word-duel/:matchId/decline
  * GET  /api/v1/arcade/word-duel/:matchId
  * POST /api/v1/arcade/word-duel/:matchId/answer
  * POST /api/v1/arcade/word-duel/:matchId/clue
@@ -35,12 +41,37 @@ export class WordDuelController {
   constructor(
     private readonly wordDuel: WordDuelService,
     private readonly chat: WordDuelChatService,
+    private readonly invites: WordDuelInviteService,
   ) {}
 
   @Post('join')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   joinQueue(@CurrentUserId() userId: string) {
     return this.wordDuel.joinQueue(userId);
+  }
+
+  @Post('invite')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  invite(@CurrentUserId() userId: string, @Body() dto: InviteDuelFriendDto) {
+    return this.invites.invite(userId, dto.friendId);
+  }
+
+  @Get(':matchId/invite')
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
+  getInvite(@CurrentUserId() userId: string, @Param('matchId') matchId: string) {
+    return this.invites.getInvite(userId, matchId);
+  }
+
+  @Post(':matchId/accept')
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  acceptInvite(@CurrentUserId() userId: string, @Param('matchId') matchId: string) {
+    return this.invites.accept(userId, matchId);
+  }
+
+  @Post(':matchId/decline')
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  declineInvite(@CurrentUserId() userId: string, @Param('matchId') matchId: string) {
+    return this.invites.decline(userId, matchId);
   }
 
   /**

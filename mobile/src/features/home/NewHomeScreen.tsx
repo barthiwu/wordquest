@@ -41,6 +41,7 @@ import {
 import type { MainTabParamList } from '@/app/navigation/MainTabNavigator';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 import { useHomeData } from './useHomeData';
+import { useArcadeLauncher } from '@/features/arcade/useArcadeLauncher';
 import { WordmarkLogo } from '@/components/WordmarkLogo';
 
 type Props = CompositeScreenProps<
@@ -76,6 +77,7 @@ export function NewHomeScreen({ navigation }: Props) {
   const displayName = useAuthStore((s) => s.user?.displayName);
   const avatarUrl = useAuthStore((s) => s.user?.avatarUrl);
   const data = useHomeData();
+  const { launch, sheet } = useArcadeLauncher();
   const { progression, journey, todaySummary, wordMastery } = data;
 
   const wide = !bp.isMobile;
@@ -136,7 +138,7 @@ export function NewHomeScreen({ navigation }: Props) {
           <Pressable
             key={route}
             style={[styles.card, styles.arcadeCard, wide && styles.cell]}
-            onPress={() => navigation.navigate(route)}
+            onPress={() => launch(route)}
             accessibilityRole="button"
             accessibilityLabel={t(titleKey)}
           >
@@ -223,6 +225,7 @@ export function NewHomeScreen({ navigation }: Props) {
       showsVerticalScrollIndicator={false}
     >
       <ResponsiveContainer style={styles.page}>
+        {sheet}
         {/* 0. Brand mark */}
         {!wide && <WordmarkLogo variant="inline" fontSize={18} style={styles.brandMark} />}
 

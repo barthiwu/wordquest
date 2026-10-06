@@ -56,10 +56,14 @@ export interface CompleteItAnswerResult {
 }
 
 /** Starts a new session, or resumes one already in progress. */
-export function startCompleteIt(accessToken: string): Promise<CompleteItChallenge> {
+export function startCompleteIt(
+  accessToken: string,
+  versusMatchId?: string,
+): Promise<CompleteItChallenge> {
   return apiRequest<CompleteItChallenge>('/arcade/complete-it/start', {
     method: 'POST',
     accessToken,
+    ...(versusMatchId ? { body: { versusMatchId } } : {}),
   });
 }
 
