@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View, type DimensionValue } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 
 export interface RevealedLetter {
@@ -77,10 +77,8 @@ export function LetterBoxInput({
   const activeEditableIndex = Math.min(value.length, Math.max(editablePositions.length - 1, 0));
   const activeIndex = editablePositions[activeEditableIndex];
 
-  // RN's DimensionValue only accepts a `${number}%` template-literal type
-  // for percentage strings, not a plain runtime-computed `string` -- this
-  // value genuinely is always a percentage, so the cast is safe.
-  const boxBasis = `${100 / Math.max(length, 1)}%` as DimensionValue;
+  // Long words get smaller letters so they stay legible inside the shrunken boxes.
+  const letterSize = length >= 11 ? 14 : length >= 9 ? 16 : length >= 7 ? 18 : typography.scale.lg;
 
   return (
     <Pressable
@@ -108,7 +106,7 @@ export function LetterBoxInput({
         {letters.map((letter, i) => {
           const isRevealed = revealedMap.has(i);
           return (
-            <View key={i} style={[styles.boxOuter, { flexBasis: boxBasis }]}>
+            <View key={i} style={styles.boxOuter}>
               <View
                 style={[
                   styles.box,
@@ -129,7 +127,7 @@ export function LetterBoxInput({
                     : null,
                 ]}
               >
-                <Text style={[styles.letter, { color: isRevealed ? colors.glyph : colors.ink }]}>
+                <Text style={[styles.letter, { fontSize: letterSize, color: isRevealed ? colors.glyph : colors.ink }]}>
                   {letter}
                 </Text>
               </View>
@@ -146,11 +144,12 @@ const styles = StyleSheet.create({
   hiddenInput: { position: 'absolute', opacity: 0, height: 1, width: 1 },
   boxRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    rowGap: spacing.xs,
+    // One line, always: boxes shrink to fit instead of wrapping a stray box
+    // onto a second row on narrow phones.
+    flexWrap: 'nowrap',
     justifyContent: 'center',
   },
-  boxOuter: { paddingHorizontal: spacing.xs / 2, maxWidth: 52, minWidth: 30 },
+  boxOuter: { flex: 1, paddingHorizontal: spacing.xs / 2, maxWidth: 52, minWidth: 0 },
   box: {
     aspectRatio: 1,
     borderRadius: radius.md,

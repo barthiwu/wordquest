@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Svg, { Circle, Line, Polygon, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Line, Polygon, Text as SvgText, TSpan } from 'react-native-svg';
 import { typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 
@@ -18,6 +18,9 @@ interface Props {
 }
 
 const GRID_RINGS = [0.25, 0.5, 0.75, 1];
+/** Horizontal room on each side for the axis labels (they used to be clipped
+ * at the SVG edge, e.g. "Sentence construction" and "Recall"). */
+const LABEL_MARGIN = 48;
 
 /**
  * A true polygon radar chart, built on react-native-svg rather than a
@@ -34,13 +37,15 @@ export function RadarChart({ data, size = 260 }: Props) {
   if (n < 3) return null;
 
   const center = size / 2;
+  const cx = center + LABEL_MARGIN;
+  const svgWidth = size + LABEL_MARGIN * 2;
   const maxRadius = center - 40; // leave room for axis labels
 
   const angleFor = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
   const pointAt = (i: number, fraction: number) => {
     const angle = angleFor(i);
     return {
-      x: center + Math.cos(angle) * maxRadius * fraction,
+      x: cx + Math.cos(angle) * maxRadius * fraction,
       y: center + Math.sin(angle) * maxRadius * fraction,
     };
   };
@@ -50,7 +55,7 @@ export function RadarChart({ data, size = 260 }: Props) {
 
   return (
     <View style={styles.wrapper}>
-      <Svg width={size} height={size}>
+      <Svg width="100%" height={size} viewBox={`0 0 ${svgWidth} ${size}`} style={{ maxWidth: svgWidth }}>
         {GRID_RINGS.map((ring) => (
           <Polygon
             key={ring}
@@ -71,7 +76,7 @@ export function RadarChart({ data, size = 260 }: Props) {
           return (
             <Line
               key={i}
-              x1={center}
+              x1={cx}
               y1={center}
               x2={outer.x}
               y2={outer.y}
@@ -98,18 +103,26 @@ export function RadarChart({ data, size = 260 }: Props) {
           const angle = angleFor(i);
           const anchor =
             Math.cos(angle) > 0.3 ? 'start' : Math.cos(angle) < -0.3 ? 'end' : 'middle';
+          // Two-word labels ("Sentence construction") break onto two lines so
+          // they stay inside the chart's side margins.
+          const words = d.label.split(' ');
+          const lines = words.length > 1 && d.label.length > 9 ? [words[0], words.slice(1).join(' ')] : [d.label];
           return (
             <SvgText
               key={d.key}
               x={labelPoint.x}
-              y={labelPoint.y}
+              y={labelPoint.y - (lines.length - 1) * 7}
               fill={d.measured ? colors.ink : colors.inkMuted}
               fontSize={typography.scale.xs}
               fontWeight="700"
               textAnchor={anchor}
               alignmentBaseline="middle"
             >
-              {d.label}
+              {lines.map((line, li) => (
+                <TSpan key={li} x={labelPoint.x} dy={li === 0 ? 0 : 14}>
+                  {line}
+                </TSpan>
+              ))}
             </SvgText>
           );
         })}
@@ -120,6 +133,6 @@ export function RadarChart({ data, size = 260 }: Props) {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-    wrapper: { alignItems: 'center', justifyContent: 'center' },
+    wrapper: { alignItems: 'center', justifyContent: 'center', width: '100%' },
   });
 }

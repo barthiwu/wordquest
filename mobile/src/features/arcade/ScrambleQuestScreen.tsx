@@ -7,6 +7,7 @@ import {
   Text,
   Vibration,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -83,11 +84,25 @@ function mergeRevealedAnswer(
  * §11), so a submission that lands right as this screen's clock hits
  * zero is judged by the server's clock, not this one's.
  */
+/**
+ * Largest font size at which the whole scrambled word (letters separated by
+ * spaces) fits on ONE line at the current window width. At the default 28pt a
+ * 9+ letter word wrapped onto a second line on phones, leaving a lone letter
+ * underneath. Capped at the default size and floored so it stays legible.
+ */
+export function scrambledFontSize(letterCount: number, windowWidth: number): number {
+  const chars = Math.max(letterCount * 2 - 1, 1);
+  const available = Math.min(windowWidth, 960) - 112; // screen + card padding, shuffle button
+  const perChar = available / chars - 4; // minus the 4pt letter spacing
+  return Math.round(Math.max(14, Math.min(typography.scale.xl, perChar / 0.64)));
+}
+
 export function ScrambleQuestScreen({ navigation, route }: Props) {
   const versusMatchId = route.params?.versusMatchId;
   // Set when this play is part of a Group Play round.
   const groupId = route.params?.groupId;
   const colors = useThemeColors();
+  const { width: windowWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation(['scrambleQuest', 'arcade']);
@@ -396,7 +411,12 @@ export function ScrambleQuestScreen({ navigation, route }: Props) {
             style={styles.puzzleCardAccentBar}
           />
           <View style={styles.scrambledRow}>
-            <Text style={styles.scrambledLetters}>
+            <Text
+              style={[
+                styles.scrambledLetters,
+                { fontSize: scrambledFontSize(displayedLetters.length, windowWidth) },
+              ]}
+            >
               {displayedLetters.toUpperCase().split('').join(' ')}
             </Text>
             <Pressable
@@ -610,6 +630,8 @@ function createStyles(colors: ThemeColors, topInset: number) {
       gap: spacing.sm,
     },
     scrambledLetters: {
+      flexShrink: 1,
+      textAlign: 'center',
       color: colors.ink,
       fontSize: typography.scale.xl,
       fontWeight: '700',

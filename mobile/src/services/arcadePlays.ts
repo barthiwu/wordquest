@@ -69,7 +69,7 @@ export function playsBadge(
   allowance: ArcadeAllowance | null,
   game: ArcadeGameKind,
 ): PlaysBadge | null {
-  if (!allowance || allowance.unlimited) return null;
+  if (!allowance || allowance.unlimited || !Array.isArray(allowance.games)) return null;
   const row = allowance.games.find((g) => g.game === game);
   if (!row || row.limit === null) return null;
   if (row.locked) return { kind: 'locked' };

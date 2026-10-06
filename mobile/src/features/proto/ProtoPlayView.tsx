@@ -40,8 +40,11 @@ export interface ProtoPlayViewProps {
 export function ProtoPlayView(p: ProtoPlayViewProps) {
   const { t } = useTranslation(['play', 'quests', 'arcade', 'home', 'common', 'proto']);
   const colors = useThemeColors();
-  const { isMobile } = useBreakpoint();
+  const { isMobile, isDesktop } = useBreakpoint();
   const wide = !isMobile;
+  // Four games: two across on tablet, four across on desktop, so the fourth
+  // never wraps onto a row of its own.
+  const tileWide = { flexBasis: isDesktop ? '23%' : '47%', minWidth: 0 } as const;
 
   const games = [
     { id: 'SCRAMBLE_QUEST' as const, kind: 'scramble' as const, title: t('arcade:scrambleQuestTitle'), sub: t('arcade:scrambleQuestSubtitle') },
@@ -126,9 +129,9 @@ export function ProtoPlayView(p: ProtoPlayViewProps) {
               onPress={() => p.onPlay(g.id)}
               accessibilityRole="button"
               accessibilityLabel={`${g.title}. ${t('arcade:play')}`}
-              style={({ pressed }) => [styles.tile, { borderColor: colors.border, backgroundColor: colors.surface }, !wide && styles.tileMobile, pressed && { opacity: 0.85 }]}
+              style={({ pressed }) => [styles.tile, { borderColor: colors.border, backgroundColor: colors.surface }, !wide && styles.tileMobile, wide && tileWide, pressed && { opacity: 0.85 }]}
             >
-              <ArcadeArt kind={g.kind} width={wide ? 260 : 120} height={wide ? 130 : 96} style={[styles.tileArt, !wide && { borderRadius: 12 }]} />
+              <ArcadeArt kind={g.kind} width={wide ? 260 : 120} height={wide ? 130 : 96} style={[styles.tileArt, wide ? { width: '100%' } : { borderRadius: 12 }]} />
               <View style={styles.tileText}>
                 <Text style={[styles.tileTitle, { color: colors.ink }]}>{g.title}</Text>
                 <Text style={{ color: colors.inkMuted, fontSize: 13 }} numberOfLines={2}>{g.sub}</Text>
