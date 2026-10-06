@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -20,6 +19,7 @@ import { getTwoFactorStatus, logout } from '@/services/auth';
 import { ProtoSettingsView, type ProtoSettingsGroup } from '@/features/proto/ProtoSettingsView';
 import { useAuthStore } from '@/state/authStore';
 import { BackButton } from '@/components/BackButton';
+import { AvatarImage } from '@/components/AvatarImage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 import { unsyncPushToken } from '@/utils/pushNotifications';
@@ -158,6 +158,7 @@ export function SettingsScreen({ navigation }: Props) {
           name: user?.displayName ?? t('profileSection'),
           username: user?.username,
           avatarUrl: user?.avatarUrl,
+          onAvatarError: () => void useAuthStore.getState().refreshAvatar(),
           label: t('profileSection'),
           onPress: () => navigation.navigate('ProfileSettings'),
         }}
@@ -180,7 +181,18 @@ export function SettingsScreen({ navigation }: Props) {
         accessibilityLabel={t('profileSection')}
       >
         {user?.avatarUrl ? (
-          <Image source={{ uri: user.avatarUrl }} style={styles.profileCardAvatarImage} />
+          <AvatarImage
+            uri={user.avatarUrl}
+            style={styles.profileCardAvatarImage}
+            onFail={() => void useAuthStore.getState().refreshAvatar()}
+            fallback={
+              <View style={styles.profileCardAvatarPlaceholder}>
+                <Text style={styles.profileCardAvatarInitial}>
+                  {user?.displayName?.trim().charAt(0).toUpperCase() || '?'}
+                </Text>
+              </View>
+            }
+          />
         ) : (
           <View style={styles.profileCardAvatarPlaceholder}>
             <Text style={styles.profileCardAvatarInitial}>

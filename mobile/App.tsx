@@ -6,6 +6,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { RootNavigator } from '@/app/navigation/RootNavigator';
 import { ArcadePlayNoticeToast } from '@/components/ArcadePlayNoticeToast';
 import { useThemeStore } from '@/state/themeStore';
+import { useAvatarUrlRefresh } from '@/hooks/useAvatarUrlRefresh';
 import { subscribeToNotificationTaps } from '@/utils/pushNotifications';
 
 export default function App() {
@@ -23,6 +24,9 @@ export default function App() {
   useEffect(() => {
     hydrateTheme();
   }, [hydrateTheme]);
+
+  // Own profile picture is a signed link that expires hourly.
+  useAvatarUrlRefresh();
 
   return (
     <ErrorBoundary>

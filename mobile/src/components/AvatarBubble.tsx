@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { AvatarImage } from './AvatarImage';
 import type { ThemeColors } from '@/constants/theme';
 
 interface Props {
@@ -11,6 +12,8 @@ interface Props {
   username: string;
   /** Diameter in px. Default 36 matches HomeScreen's header avatar. */
   size?: number;
+  /** Called when the picture fails to load (e.g. an expired signed link). */
+  onLoadError?: () => void;
 }
 
 /**
@@ -20,16 +23,19 @@ interface Props {
  * Public Profile screen all need the exact same rendering, 2026-09).
  * Purely presentational — wrap it in a Pressable for tap behavior.
  */
-export function AvatarBubble({ colors, avatarUrl, username, size = 36 }: Props) {
+export function AvatarBubble({ colors, avatarUrl, username, size = 36, onLoadError }: Props) {
   const styles = useMemo(() => createStyles(colors, size), [colors, size]);
   const initial = (username.trim()[0] ?? '?').toUpperCase();
 
-  return avatarUrl ? (
-    <Image source={{ uri: avatarUrl }} style={styles.bubble} />
-  ) : (
+  const initialBubble = (
     <View style={styles.bubble}>
       <Text style={styles.initial}>{initial}</Text>
     </View>
+  );
+  return avatarUrl ? (
+    <AvatarImage uri={avatarUrl} style={styles.bubble} fallback={initialBubble} onFail={onLoadError} />
+  ) : (
+    initialBubble
   );
 }
 

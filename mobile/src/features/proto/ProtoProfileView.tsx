@@ -77,7 +77,7 @@ export function ProtoProfileView({ passport, navigate }: ProtoProfileViewProps) 
       <View>
         <SceneBackdrop variant={sceneForStage(passport.journeyStageName)} height={wide ? 230 : 190} fadeTo={wide ? undefined : colors.background} />
         <View style={styles.header} pointerEvents="box-none">
-          <ProtoMobileHeader />
+          <ProtoMobileHeader hideAvatar />
         </View>
       </View>
 

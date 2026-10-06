@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
-  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -27,6 +26,7 @@ import {
   type AvatarContentType,
 } from '@/services/users';
 import { useAuthStore } from '@/state/authStore';
+import { AvatarImage } from '@/components/AvatarImage';
 import { BackButton } from '@/components/BackButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
@@ -268,7 +268,18 @@ export function ProfileSettingsScreen({ navigation }: Props) {
           accessibilityLabel={t('passport:changeProfilePicture')}
         >
           {user?.avatarUrl ? (
-            <Image source={{ uri: user.avatarUrl }} style={styles.avatarImage} />
+            <AvatarImage
+              uri={user.avatarUrl}
+              style={styles.avatarImage}
+              onFail={() => void useAuthStore.getState().refreshAvatar()}
+              fallback={
+                <View style={styles.avatarPlaceholder}>
+                  <Text style={styles.avatarInitial}>
+                    {user?.displayName?.trim().charAt(0).toUpperCase() || '?'}
+                  </Text>
+                </View>
+              }
+            />
           ) : (
             <View style={styles.avatarPlaceholder}>
               <Text style={styles.avatarInitial}>

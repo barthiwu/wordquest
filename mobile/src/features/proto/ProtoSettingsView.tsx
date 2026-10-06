@@ -1,4 +1,5 @@
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { AvatarImage } from '@/components/AvatarImage';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/state/themeStore';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -27,7 +28,7 @@ export interface ProtoSettingsGroup {
 
 export interface ProtoSettingsViewProps {
   title: string;
-  profile: { name: string; username?: string | null; avatarUrl?: string | null; label: string; onPress: () => void };
+  profile: { name: string; username?: string | null; avatarUrl?: string | null; onAvatarError?: () => void; label: string; onPress: () => void };
   groups: ProtoSettingsGroup[];
   logout: { label: string; busy: boolean; onPress: () => void };
   onBack: () => void;
@@ -53,7 +54,12 @@ export function ProtoSettingsView({ title, profile, groups, logout, onBack }: Pr
         <GlassCard style={styles.profile}>
           <View style={[styles.avatar, { borderColor: colors.arcane, backgroundColor: colors.surface }]}>
             {profile.avatarUrl ? (
-              <Image source={{ uri: profile.avatarUrl }} style={styles.avatarImg} />
+              <AvatarImage
+                uri={profile.avatarUrl}
+                style={styles.avatarImg}
+                fallback={<Text style={{ color: colors.ink, fontSize: 22, fontWeight: '900' }}>{initial}</Text>}
+                onFail={profile.onAvatarError}
+              />
             ) : (
               <Text style={{ color: colors.ink, fontSize: 22, fontWeight: '900' }}>{initial}</Text>
             )}

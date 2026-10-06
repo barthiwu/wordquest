@@ -14,6 +14,13 @@ interface AuthState {
   clearSession: () => Promise<void>;
   /** Merges a partial profile update (e.g. from Settings' Profile section) into the in-memory user, so a saved displayName/username shows up immediately without a re-login. */
   updateUser: (patch: Partial<AuthUser>) => void;
+  /**
+   * Re-fetches the player's avatar URL. It is a signed link that expires after
+   * an hour, so a session left open longer would otherwise show a blank circle
+   * everywhere the player's own picture appears. Quiet on failure and
+   * throttled, so a picture that is genuinely broken can't cause a request loop.
+   */
+  refreshAvatar: (opts?: { force?: boolean }) => Promise<void>;
 }
 
 /**
@@ -31,7 +38,10 @@ interface AuthState {
  * backend on demand (BUILD_HANDOFF §40: frontend owns presentation/local
  * prefs, backend owns progression truth).
  */
-export const useAuthStore = create<AuthState>((set) => {
+const AVATAR_REFRESH_MIN_GAP_MS = 20_000;
+
+export const useAuthStore = create<AuthState>((set, get) => {
+  let lastAvatarRefresh = 0;
   useTokenStore.subscribe((tokenState) => {
     set({
       accessToken: tokenState.accessToken,
@@ -109,6 +119,21 @@ export const useAuthStore = create<AuthState>((set) => {
 
     updateUser: (patch: Partial<AuthUser>) => {
       set((state) => (state.user ? { user: { ...state.user, ...patch } } : state));
+    },
+
+    refreshAvatar: async (opts) => {
+      const { accessToken, user } = get();
+      if (!accessToken || !user) return;
+      const now = Date.now();
+      if (!opts?.force && now - lastAvatarRefresh < AVATAR_REFRESH_MIN_GAP_MS) return;
+      lastAvatarRefresh = now;
+      try {
+        const { getMe } = await import('@/services/users');
+        const me = await getMe(accessToken);
+        get().updateUser({ avatarUrl: me.avatarUrl });
+      } catch {
+        // Keep whatever is showing; the next trigger tries again.
+      }
     },
   };
 });

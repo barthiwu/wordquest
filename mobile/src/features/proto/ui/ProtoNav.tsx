@@ -41,7 +41,7 @@ function useTabItems({ state, descriptors, navigation }: BottomTabBarProps) {
   });
 }
 
-function TopActions({ navigation }: { navigation: { navigate: (...a: any[]) => void } }) {
+function TopActions({ navigation, hideAvatar }: { navigation: { navigate: (...a: any[]) => void }; hideAvatar?: boolean }) {
   const colors = useThemeColors();
   const user = useAuthStore((s) => s.user);
   return (
@@ -55,22 +55,31 @@ function TopActions({ navigation }: { navigation: { navigate: (...a: any[]) => v
       >
         <Ionicons name="notifications-outline" size={22} color={colors.ink} />
       </Pressable>
-      <Pressable
-        onPress={() => navigation.navigate('Main', { screen: 'Profile' })}
-        accessibilityRole="button"
-        accessibilityLabel="Profile"
-        hitSlop={8}
-        style={[styles.avatarRing, { borderColor: colors.arcane }]}
-      >
-        <AvatarBubble colors={colors} avatarUrl={user?.avatarUrl} username={user?.displayName ?? '?'} size={34} />
-      </Pressable>
+      {/* Hidden on the Profile tab itself, which already shows the picture large. */}
+      {hideAvatar ? null : (
+        <Pressable
+          onPress={() => navigation.navigate('Main', { screen: 'Profile' })}
+          accessibilityRole="button"
+          accessibilityLabel="Profile"
+          hitSlop={8}
+          style={[styles.avatarRing, { borderColor: colors.arcane }]}
+        >
+          <AvatarBubble
+            colors={colors}
+            avatarUrl={user?.avatarUrl}
+            username={user?.displayName ?? '?'}
+            size={34}
+            onLoadError={() => void useAuthStore.getState().refreshAvatar()}
+          />
+        </Pressable>
+      )}
     </View>
   );
 }
 
 /** Mobile top row (wordmark · bell · avatar). Returns nothing on wider
  * layouts, where the nav chrome carries these. */
-export function ProtoMobileHeader() {
+export function ProtoMobileHeader({ hideAvatar }: { hideAvatar?: boolean } = {}) {
   const { isMobile } = useBreakpoint();
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
@@ -78,7 +87,7 @@ export function ProtoMobileHeader() {
   return (
     <View style={[styles.mobileHeader, { paddingTop: insets.top + 8 }]}>
       <Wordmark size={17} />
-      <TopActions navigation={navigation} />
+      <TopActions navigation={navigation} hideAvatar={hideAvatar} />
     </View>
   );
 }
@@ -145,7 +154,7 @@ function TopBar(props: BottomTabBarProps) {
           </Pressable>
         ))}
       </View>
-      <TopActions navigation={props.navigation.getParent() ?? props.navigation} />
+      <TopActions navigation={props.navigation.getParent() ?? props.navigation} hideAvatar={props.state.routes[props.state.index]?.name === 'Profile'} />
     </View>
   );
 }
@@ -184,7 +193,7 @@ function Sidebar(props: BottomTabBarProps) {
         ))}
       </View>
       <View style={[styles.sideHeader, { left: PROTO_SIDEBAR_WIDTH, height: PROTO_TOPBAR_HEIGHT + insets.top, paddingTop: insets.top }]}>
-        <TopActions navigation={props.navigation.getParent() ?? props.navigation} />
+        <TopActions navigation={props.navigation.getParent() ?? props.navigation} hideAvatar={props.state.routes[props.state.index]?.name === 'Profile'} />
       </View>
     </>
   );

@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import {
   ActivityIndicator,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -17,6 +16,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { useAuthStore } from '@/state/authStore';
+import { AvatarImage } from '@/components/AvatarImage';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { timeOfDayGreeting } from '@/utils/timeOfDay';
 import { journeyVisualFor } from '@/constants/journeyVisuals';
@@ -242,7 +242,16 @@ export function NewHomeScreen({ navigation }: Props) {
         {/* 1. Identity + utilities */}
         <View style={styles.identityRow}>
           {avatarUrl ? (
-            <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+            <AvatarImage
+              uri={avatarUrl}
+              style={styles.avatar}
+              onFail={() => void useAuthStore.getState().refreshAvatar()}
+              fallback={
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>{initial}</Text>
+                </View>
+              }
+            />
           ) : (
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>{initial}</Text>
