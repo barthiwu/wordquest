@@ -30,18 +30,26 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-function questIcon(q: TodayQuestWindowSummary): keyof typeof Ionicons.glyphMap {
+/**
+ * Which part of the day a quest window belongs to. Matches the seeded
+ * windows (Morning 0-11, Noon 12-15, Evening 16-23): the old cut-offs
+ * (11 / 17) put the 16:00 Evening window under "Afternoon", so the Daily
+ * Goals row read Morning, Afternoon, Afternoon.
+ */
+export function questPeriod(q: Pick<TodayQuestWindowSummary, 'windowStartHour'>): 'morning' | 'afternoon' | 'evening' {
   const h = q.windowStartHour ?? 0;
-  if (h < 11) return 'sunny';
-  if (h < 17) return 'partly-sunny';
-  return 'moon';
+  if (h < 12) return 'morning';
+  if (h < 16) return 'afternoon';
+  return 'evening';
 }
 
-function windowLabel(q: TodayQuestWindowSummary, fallback: string): string {
-  const h = q.windowStartHour ?? 0;
-  if (h < 11) return 'Morning';
-  if (h < 17) return 'Afternoon';
-  return q.title ? 'Evening' : fallback;
+function questIcon(q: TodayQuestWindowSummary): keyof typeof Ionicons.glyphMap {
+  const period = questPeriod(q);
+  return period === 'morning' ? 'sunny' : period === 'afternoon' ? 'partly-sunny' : 'moon';
+}
+
+function windowLabel(q: TodayQuestWindowSummary, t: (key: string) => string): string {
+  return t(`proto:goal_${questPeriod(q)}`);
 }
 
 /**
@@ -134,7 +142,7 @@ export function ProtoHomeScreen({ navigation }: Props) {
               <Ionicons name={questIcon(q)} size={24} color={q.completed ? colors.success : colors.warning} />
             </View>
             <Text style={[styles.goalLabel, { color: colors.ink }]}>
-              {windowLabel(q, q.title)} {q.completed ? <Text style={{ color: colors.success }}>✓</Text> : null}
+              {windowLabel(q, t)} {q.completed ? <Text style={{ color: colors.success }}>✓</Text> : null}
             </Text>
           </View>
         ))}
