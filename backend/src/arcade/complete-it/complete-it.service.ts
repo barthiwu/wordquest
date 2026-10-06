@@ -11,6 +11,7 @@ import { ProgressionService } from '../../progression/progression.service';
 import { isUniqueConstraintError } from '../../common/prisma-errors';
 import { ArcadeChallengeService } from '../challenge.service';
 import { ArcadeVersusService } from '../versus/versus.service';
+import { ArcadeGroupService } from '../group/group.service';
 import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
@@ -143,6 +144,7 @@ export class CompleteItService {
     private readonly ali: AliService,
     private readonly versus: ArcadeVersusService,
     private readonly playLimit: ArcadePlayLimitService,
+    private readonly group: ArcadeGroupService,
   ) {}
 
   /**
@@ -154,10 +156,15 @@ export class CompleteItService {
    * buildChallengeView never has to handle the "couldn't blank it"
    * case mid-session, and players never land on an unwinnable fragment.
    */
-  async start(userId: string, versusMatchId?: string): Promise<CompleteItChallengeView> {
+  async start(
+    userId: string,
+    versusMatchId?: string,
+    groupId?: string,
+  ): Promise<CompleteItChallengeView> {
     if (versusMatchId) return this.startVersus(userId, versusMatchId);
+    if (groupId) return this.startGroup(userId, groupId);
     const existing = await this.prisma.arcadeGameSession.findFirst({
-      where: { userId, game: 'COMPLETE_IT', status: 'ACTIVE', versusMatchId: null },
+      where: { userId, game: 'COMPLETE_IT', status: 'ACTIVE', versusMatchId: null, groupId: null },
     });
 
     const variant = await resolveEnglishVariant(this.prisma, userId);
@@ -252,6 +259,49 @@ export class CompleteItService {
       if (!isUniqueConstraintError(err)) throw err;
       const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { versusMatchId_userId: { versusMatchId, userId } },
+      });
+      return this.buildChallengeView(existing, variant);
+    }
+  }
+
+  /**
+   * Opens this member's play in a Group Play round: the same session as a
+   * solo play, but on the group's shared word list (picked by whichever
+   * member starts first) and tied to the group. A relaunch resumes it.
+   * Group plays are not counted against the daily limit.
+   */
+  private async startGroup(userId: string, groupId: string) {
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const resolved = await this.group.resolveStart(userId, groupId, 'COMPLETE_IT', async () =>
+      (
+        await this.challenges.pickChallenges(
+          userId,
+          COMPLETE_IT_CONFIG.WORDS_PER_SESSION,
+          [],
+          COMPLETE_IT_CONFIG.MIN_WORD_LENGTH,
+          COMPLETE_IT_CONFIG.MAX_WORD_LENGTH,
+          (c) => isCompleteItSentenceUsable(c.word.exampleSentence, c.word.word),
+        )
+      ).map((c) => c.word.id),
+    );
+    if (resolved.existing) return this.buildChallengeView(resolved.existing, variant);
+
+    try {
+      const session = await this.prisma.arcadeGameSession.create({
+        data: {
+          userId,
+          game: 'COMPLETE_IT',
+          wordsTotal: resolved.wordIds.length,
+          wordIds: resolved.wordIds,
+          groupId,
+        },
+      });
+      return this.buildChallengeView(session, variant);
+    } catch (err) {
+      // A double-tap raced us: the other request already created it.
+      if (!isUniqueConstraintError(err)) throw err;
+      const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
+        where: { groupId_userId: { groupId, userId } },
       });
       return this.buildChallengeView(existing, variant);
     }

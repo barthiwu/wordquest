@@ -28,7 +28,7 @@ export class CompleteItController {
   @Post('start')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   start(@CurrentUserId() userId: string, @Body() dto: StartArcadeGameDto) {
-    return this.completeIt.start(userId, dto?.versusMatchId);
+    return this.completeIt.start(userId, dto?.versusMatchId, dto?.groupId);
   }
 
   @Post(':sessionId/hint')

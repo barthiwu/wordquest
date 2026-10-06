@@ -12,6 +12,7 @@ import { RewardEngineService } from '../reward-engine.service';
 import { ProgressionService } from '../../progression/progression.service';
 import { AliService } from '../../ali/ali.service';
 import { ArcadeVersusService } from '../versus/versus.service';
+import { ArcadeGroupService } from '../group/group.service';
 import { ArcadePlayLimitService } from '../limits/play-limit.service';
 
 describe('HangmanService', () => {
@@ -60,6 +61,7 @@ describe('HangmanService', () => {
   };
   const challengesMock = { pickChallenges: jest.fn() };
   const versusMock = { resolveStart: jest.fn() };
+  const groupMock = { resolveStart: jest.fn() };
   const rewardEngineMock = { calculate: jest.fn() };
   const progressionMock = {
     awardXp: jest.fn(),
@@ -107,6 +109,7 @@ describe('HangmanService', () => {
         { provide: ProgressionService, useValue: progressionMock },
         { provide: AliService, useValue: aliMock },
         { provide: ArcadeVersusService, useValue: versusMock },
+        { provide: ArcadeGroupService, useValue: groupMock },
       ],
     }).compile();
     service = moduleRef.get(HangmanService);
@@ -154,6 +157,65 @@ describe('HangmanService', () => {
 
       expect(playLimitMock.assertCanPlay).toHaveBeenCalledWith('u1', 'HANGMAN');
       expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('start (group play)', () => {
+    it("creates the session on the group's shared words and ties it to the group", async () => {
+      groupMock.resolveStart.mockResolvedValueOnce({ existing: null, wordIds: ['w1', 'w2'], groupId: 'g1' });
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({ ...baseSession(), groupId: 'g1' });
+
+      await service.start('u1', undefined, 'g1');
+
+      expect(groupMock.resolveStart).toHaveBeenCalledWith('u1', 'g1', 'HANGMAN', expect.any(Function));
+      expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          userId: 'u1',
+          game: 'HANGMAN',
+          wordsTotal: 2,
+          wordIds: ['w1', 'w2'],
+          groupId: 'g1',
+        }),
+      });
+      // Never touches the solo resume lookup.
+      expect(prismaMock.arcadeGameSession.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('is not counted against the daily limit, so a locked-out player can still join their class', async () => {
+      groupMock.resolveStart.mockResolvedValueOnce({ existing: null, wordIds: ['w1'], groupId: 'g1' });
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({ ...baseSession(), groupId: 'g1' });
+
+      await service.start('u1', undefined, 'g1');
+
+      expect(playLimitMock.assertCanPlay).not.toHaveBeenCalled();
+      expect(playLimitMock.consumePlay).not.toHaveBeenCalled();
+    });
+
+    it("resumes the member's play after a relaunch", async () => {
+      const existing = { ...baseSession(), groupId: 'g1' };
+      groupMock.resolveStart.mockResolvedValueOnce({ existing, wordIds: existing.wordIds, groupId: 'g1' });
+
+      await service.start('u1', undefined, 'g1');
+
+      expect(prismaMock.arcadeGameSession.create).not.toHaveBeenCalled();
+    });
+
+    it("the first member's word pick uses this game's own picker", async () => {
+      challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w9' } }]);
+      groupMock.resolveStart.mockImplementationOnce(
+        async (_u: string, _g: string, _game: string, pick: () => Promise<string[]>) => ({
+          existing: null,
+          wordIds: await pick(),
+          groupId: 'g1',
+        }),
+      );
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce(baseSession());
+
+      await service.start('u1', undefined, 'g1');
+
+      expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({ wordIds: ['w9'] }),
+      });
     });
   });
 

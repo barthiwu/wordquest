@@ -18,6 +18,7 @@ import { ScrambleQuestModule } from './arcade/scramble-quest/scramble-quest.modu
 import { CompleteItModule } from './arcade/complete-it/complete-it.module';
 import { HangmanModule } from './arcade/hangman/hangman.module';
 import { ArcadeVersusModule } from './arcade/versus/versus.module';
+import { ArcadeGroupModule } from './arcade/group/group.module';
 import { WordDuelModule } from './arcade/word-duel/word-duel.module';
 import { MasteryModule } from './mastery/mastery.module';
 import { ProgressionModule } from './progression/progression.module';
@@ -73,6 +74,7 @@ import { FeedbackModule } from './feedback/feedback.module';
     CompleteItModule,
     HangmanModule,
     ArcadeVersusModule,
+    ArcadeGroupModule,
     WordDuelModule,
     MasteryModule,
     ProgressionModule,

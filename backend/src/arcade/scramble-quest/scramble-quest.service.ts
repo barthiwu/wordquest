@@ -11,6 +11,7 @@ import { ProgressionService } from '../../progression/progression.service';
 import { isUniqueConstraintError } from '../../common/prisma-errors';
 import { ArcadeChallengeService } from '../challenge.service';
 import { ArcadeVersusService } from '../versus/versus.service';
+import { ArcadeGroupService } from '../group/group.service';
 import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
@@ -151,6 +152,7 @@ export class ScrambleQuestService {
     private readonly ali: AliService,
     private readonly versus: ArcadeVersusService,
     private readonly playLimit: ArcadePlayLimitService,
+    private readonly group: ArcadeGroupService,
   ) {}
 
   /**
@@ -159,10 +161,15 @@ export class ScrambleQuestService {
    * timer hasn't already run out. A resumable-but-expired session is
    * abandoned first, never left ACTIVE forever with no way to progress.
    */
-  async start(userId: string, versusMatchId?: string): Promise<ScrambleQuestChallengeView> {
+  async start(
+    userId: string,
+    versusMatchId?: string,
+    groupId?: string,
+  ): Promise<ScrambleQuestChallengeView> {
     if (versusMatchId) return this.startVersus(userId, versusMatchId);
+    if (groupId) return this.startGroup(userId, groupId);
     const existing = await this.prisma.arcadeGameSession.findFirst({
-      where: { userId, game: 'SCRAMBLE_QUEST', status: 'ACTIVE', versusMatchId: null },
+      where: { userId, game: 'SCRAMBLE_QUEST', status: 'ACTIVE', versusMatchId: null, groupId: null },
     });
     const variant = await resolveEnglishVariant(this.prisma, userId);
 
@@ -245,6 +252,48 @@ export class ScrambleQuestService {
       if (!isUniqueConstraintError(err)) throw err;
       const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { versusMatchId_userId: { versusMatchId, userId } },
+      });
+      return this.buildChallengeView(existing, variant);
+    }
+  }
+
+  /**
+   * Opens this member's play in a Group Play round: the same session as a
+   * solo play, but on the group's shared word list (picked by whichever
+   * member starts first) and tied to the group. A relaunch resumes it.
+   * Group plays are not counted against the daily limit.
+   */
+  private async startGroup(userId: string, groupId: string) {
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const resolved = await this.group.resolveStart(userId, groupId, 'SCRAMBLE_QUEST', async () =>
+      (
+        await this.challenges.pickChallenges(
+          userId,
+          SCRAMBLE_QUEST_CONFIG.WORDS_PER_SESSION,
+          [],
+          SCRAMBLE_QUEST_CONFIG.MIN_WORD_LENGTH,
+          SCRAMBLE_QUEST_CONFIG.MAX_WORD_LENGTH,
+        )
+      ).map((c) => c.word.id),
+    );
+    if (resolved.existing) return this.buildChallengeView(resolved.existing, variant);
+
+    try {
+      const session = await this.prisma.arcadeGameSession.create({
+        data: {
+          userId,
+          game: 'SCRAMBLE_QUEST',
+          wordsTotal: resolved.wordIds.length,
+          wordIds: resolved.wordIds,
+          groupId,
+        },
+      });
+      return this.buildChallengeView(session, variant);
+    } catch (err) {
+      // A double-tap raced us: the other request already created it.
+      if (!isUniqueConstraintError(err)) throw err;
+      const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
+        where: { groupId_userId: { groupId, userId } },
       });
       return this.buildChallengeView(existing, variant);
     }

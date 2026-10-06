@@ -288,6 +288,31 @@ export const ARCADE_VERSUS_CONFIG = {
   RECENT_RESULTS_SHOWN: 10,
 } as const;
 
+// ── Group Play ─────────────────────────────────────────────────────────
+// One host (a teacher, say) creates a private group, shares its link, and up
+// to MAX_MEMBERS people play the same words in one timed round (2026-10
+// request). Link-only: there is no public listing. Group plays are NOT
+// counted against the daily play limit, so a student who has used up their
+// own plays can still join their class.
+export const ARCADE_GROUP_GAMES = ['SCRAMBLE_QUEST', 'COMPLETE_IT', 'HANGMAN'] as const;
+
+export const ARCADE_GROUP_CONFIG = {
+  MAX_MEMBERS: 50,
+  // An unused group (nobody started a round) lapses after this long.
+  LOBBY_TTL_HOURS: 48,
+  // How long a round runs once the host starts it (the host picks within the range).
+  DEFAULT_WINDOW_MINUTES: 60,
+  MIN_WINDOW_MINUTES: 10,
+  MAX_WINDOW_MINUTES: 240,
+  // Open (lobby / active) groups one host can have at once.
+  MAX_OPEN_GROUPS_PER_HOST: 10,
+  TITLE_MAX_LENGTH: 60,
+  // Length of the secret in the invite link (about 49 bits at 31 symbols).
+  CODE_LENGTH: 10,
+  // Ended groups stay readable (teachers look back at results) this long.
+  ENDED_RETENTION_DAYS: 180,
+} as const;
+
 // ── Daily play limits ──────────────────────────────────────────────────
 // Free plan: at most this many plays of EACH Arcade game per player-local
 // day (2026-10 decision, Barth: it nudges players onto the other games and

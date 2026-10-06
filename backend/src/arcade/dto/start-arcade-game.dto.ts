@@ -7,4 +7,10 @@ export class StartArcadeGameDto {
   @IsString()
   @IsUUID()
   versusMatchId?: string;
+
+  /** Set when the player is opening their play in a Group Play round. */
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  groupId?: string;
 }

@@ -23,7 +23,7 @@ export class HangmanController {
   @Post('start')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   start(@CurrentUserId() userId: string, @Body() dto: StartArcadeGameDto) {
-    return this.hangman.start(userId, dto?.versusMatchId);
+    return this.hangman.start(userId, dto?.versusMatchId, dto?.groupId);
   }
 
   @Post(':sessionId/guess')

@@ -170,6 +170,8 @@ model User {
   arcadePlayCounts         ArcadePlayCount[]
   arcadeVersusHosted       ArcadeVersusMatch[]       @relation("ArcadeVersusHost")
   arcadeVersusJoined       ArcadeVersusMatch[]       @relation("ArcadeVersusGuest")
+  arcadeGroupsHosted       ArcadeGroup[]             @relation("ArcadeGroupHost")
+  arcadeGroupMemberships   ArcadeGroupMember[]
   wordDuelPlayerStates     WordDuelPlayerState[]
   // Friends (2026-09, Barth) -- see the Friendship/Block models near the
   // end of this file for the full design notes.
@@ -1748,12 +1750,19 @@ model ArcadeGameSession {
   versusMatchId String?
   versusMatch   ArcadeVersusMatch? @relation(fields: [versusMatchId], references: [id], onDelete: SetNull)
 
+  // Set when this session is one member's play inside a Group Play round
+  // (ArcadeGroup). Same one-session-per-member rule as versus matches.
+  groupId String?
+  group   ArcadeGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+
   startedAt DateTime  @default(now())
   endedAt   DateTime?
 
   answers ArcadeAnswer[]
 
   @@unique([versusMatchId, userId])
+  @@unique([groupId, userId])
+  @@index([groupId])
   @@index([userId, game])
   @@index([status])
   @@index([versusMatchId])
@@ -1874,6 +1883,69 @@ model ArcadeVersusMatch {
   @@index([guestId, status])
   @@index([expiresAt])
   @@map("arcade_versus_matches")
+}
+
+enum ArcadeGroupStatus {
+  LOBBY // created, people are joining via the link; the host has not started
+  ACTIVE // the host started the round: everyone plays the same words
+  ENDED // the host ended it, or the play window / lobby expired
+}
+
+// Group Play (2026-10 request): up to 50 players play the same ScrambleQuest /
+// Complete It / Hangman words in one timed round, set up by one host (a
+// teacher, say) who shares a private link. The group only adds membership, a
+// shared word list and a results table on top of the games' ordinary
+// sessions -- each member's session, timer, hints and XP are exactly the solo
+// ones (see ArcadeGameSession.groupId). Private by design: it can be found
+// only through its unguessable `code`; there is no public listing.
+model ArcadeGroup {
+  id     String            @id @default(uuid())
+  // The secret in the invite link. Random, unambiguous characters.
+  code   String            @unique
+  game   ArcadeGame
+  status ArcadeGroupStatus @default(LOBBY)
+
+  hostId String
+  host   User   @relation("ArcadeGroupHost", fields: [hostId], references: [id], onDelete: Cascade)
+
+  title           String?
+  maxMembers      Int     @default(50)
+  // false = members see only their own result (assessment mode); the host
+  // always sees everyone.
+  showLeaderboard Boolean @default(true)
+  // How long the round runs once started.
+  windowMinutes   Int     @default(60)
+
+  // Chosen once, by whichever member starts first (compare-and-swap on
+  // wordsPickedAt), then read by everyone else.
+  wordIds       String[]
+  wordsPickedAt DateTime?
+
+  createdAt   DateTime  @default(now())
+  activatedAt DateTime?
+  // While in the lobby: when the unused group lapses. Once ACTIVE: the end of the round.
+  expiresAt   DateTime
+  endedAt     DateTime?
+
+  members  ArcadeGroupMember[]
+  sessions ArcadeGameSession[]
+
+  @@index([hostId, status])
+  @@index([status, expiresAt])
+  @@map("arcade_groups")
+}
+
+model ArcadeGroupMember {
+  id       String      @id @default(uuid())
+  groupId  String
+  group    ArcadeGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt DateTime    @default(now())
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@map("arcade_group_members")
 }
 
 enum WordDuelMatchStatus {

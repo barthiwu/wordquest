@@ -11,6 +11,7 @@ import { ProgressionService } from '../../progression/progression.service';
 import { isUniqueConstraintError } from '../../common/prisma-errors';
 import { ArcadeChallengeService } from '../challenge.service';
 import { ArcadeVersusService } from '../versus/versus.service';
+import { ArcadeGroupService } from '../group/group.service';
 import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
@@ -124,14 +125,20 @@ export class HangmanService {
     private readonly ali: AliService,
     private readonly versus: ArcadeVersusService,
     private readonly playLimit: ArcadePlayLimitService,
+    private readonly group: ArcadeGroupService,
   ) {}
 
   /** Starts a new session, or resumes the one already in progress (an app
    * relaunch mid-run). Hangman has no countdown, so nothing expires. */
-  async start(userId: string, versusMatchId?: string): Promise<HangmanChallengeView> {
+  async start(
+    userId: string,
+    versusMatchId?: string,
+    groupId?: string,
+  ): Promise<HangmanChallengeView> {
     if (versusMatchId) return this.startVersus(userId, versusMatchId);
+    if (groupId) return this.startGroup(userId, groupId);
     const existing = await this.prisma.arcadeGameSession.findFirst({
-      where: { userId, game: 'HANGMAN', status: 'ACTIVE', versusMatchId: null },
+      where: { userId, game: 'HANGMAN', status: 'ACTIVE', versusMatchId: null, groupId: null },
     });
     const variant = await resolveEnglishVariant(this.prisma, userId);
     if (existing) return this.buildChallengeView(existing, variant);
@@ -202,6 +209,48 @@ export class HangmanService {
       if (!isUniqueConstraintError(err)) throw err;
       const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { versusMatchId_userId: { versusMatchId, userId } },
+      });
+      return this.buildChallengeView(existing, variant);
+    }
+  }
+
+  /**
+   * Opens this member's play in a Group Play round: the same session as a
+   * solo play, but on the group's shared word list (picked by whichever
+   * member starts first) and tied to the group. A relaunch resumes it.
+   * Group plays are not counted against the daily limit.
+   */
+  private async startGroup(userId: string, groupId: string) {
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const resolved = await this.group.resolveStart(userId, groupId, 'HANGMAN', async () =>
+      (
+        await this.challenges.pickChallenges(
+          userId,
+          HANGMAN_CONFIG.WORDS_PER_SESSION,
+          [],
+          HANGMAN_CONFIG.MIN_WORD_LENGTH,
+          HANGMAN_CONFIG.MAX_WORD_LENGTH,
+        )
+      ).map((c) => c.word.id),
+    );
+    if (resolved.existing) return this.buildChallengeView(resolved.existing, variant);
+
+    try {
+      const session = await this.prisma.arcadeGameSession.create({
+        data: {
+          userId,
+          game: 'HANGMAN',
+          wordsTotal: resolved.wordIds.length,
+          wordIds: resolved.wordIds,
+          groupId,
+        },
+      });
+      return this.buildChallengeView(session, variant);
+    } catch (err) {
+      // A double-tap raced us: the other request already created it.
+      if (!isUniqueConstraintError(err)) throw err;
+      const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
+        where: { groupId_userId: { groupId, userId } },
       });
       return this.buildChallengeView(existing, variant);
     }
