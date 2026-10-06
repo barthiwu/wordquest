@@ -4,6 +4,7 @@ import { WordInTheWildService } from './word-in-the-wild.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { SubmitEvidenceDto } from './dto/submit-evidence.dto';
 import { PhotoUploadUrlDto } from './dto/photo-upload-url.dto';
+import { WordInTheWildEnabledGuard } from './word-in-the-wild-enabled.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../auth/guards/email-verification.guard';
 import { CurrentUserId } from '../auth/decorators/current-user.decorator';
@@ -21,7 +22,7 @@ import { CurrentUserId } from '../auth/decorators/current-user.decorator';
  * problem as well as an abuse one.
  */
 @Controller('word-in-the-wild')
-@UseGuards(JwtAuthGuard, EmailVerificationGuard)
+@UseGuards(WordInTheWildEnabledGuard, JwtAuthGuard, EmailVerificationGuard)
 export class WordInTheWildController {
   constructor(private readonly witw: WordInTheWildService) {}
 

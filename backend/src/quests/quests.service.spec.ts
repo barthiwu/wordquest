@@ -1509,6 +1509,23 @@ describe('QuestsService', () => {
   });
 
   describe('createOptionalWildMission', () => {
+    const previousFlag = process.env.WORD_IN_THE_WILD_ENABLED;
+    beforeEach(() => {
+      process.env.WORD_IN_THE_WILD_ENABLED = 'true';
+    });
+    afterEach(() => {
+      if (previousFlag === undefined) delete process.env.WORD_IN_THE_WILD_ENABLED;
+      else process.env.WORD_IN_THE_WILD_ENABLED = previousFlag;
+    });
+
+    it('is switched off while Word in the Wild is parked for V2', async () => {
+      delete process.env.WORD_IN_THE_WILD_ENABLED;
+      await expect(service.createOptionalWildMission('u1', 'a1')).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(wordInTheWildMock.createMission).not.toHaveBeenCalled();
+    });
+
     const optionalWildAttempt = {
       id: 'a1',
       userId: 'u1',

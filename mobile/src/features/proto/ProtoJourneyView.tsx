@@ -20,7 +20,8 @@ export interface ProtoJourneyViewProps {
   showOrderLink: boolean;
   onOrder: () => void;
   onSkillRadar: () => void;
-  onWordInWild: () => void;
+  /** Omitted while Word in the Wild is parked for V2. */
+  onWordInWild?: () => void;
   celebration?: ReactNode;
 }
 
@@ -142,7 +143,9 @@ export function ProtoJourneyView(p: ProtoJourneyViewProps) {
 
         <View style={styles.actions}>
           <ProtoButton variant="outline" icon="analytics-outline" label={t('viewSkillRadar')} onPress={p.onSkillRadar} style={styles.action} />
-          <ProtoButton variant="outline" icon="search-outline" label={t('findWordInWild')} onPress={p.onWordInWild} style={styles.action} />
+          {p.onWordInWild && (
+            <ProtoButton variant="outline" icon="search-outline" label={t('findWordInWild')} onPress={p.onWordInWild} style={styles.action} />
+          )}
         </View>
       </View>
     </ScrollView>

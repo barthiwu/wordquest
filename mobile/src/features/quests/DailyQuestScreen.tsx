@@ -46,6 +46,7 @@ import {
   uploadPhotoToR2,
   type PhotoContentType,
 } from '@/services/word-in-the-wild';
+import { FEATURES } from '@/config/features';
 import { explainMistake } from '@/services/ali';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
@@ -640,16 +641,52 @@ export function DailyQuestScreen({ route, navigation }: Props) {
       trackEvent('QUEST_COMPLETED', { questKey });
       navigation.replace('QuestComplete', result);
     } catch (err) {
-      setWildError(err instanceof ApiError ? err.message : t('couldNotSubmitEvidence'));
+      setWildError(
+        err instanceof ApiError
+          ? err.message
+          : t(FEATURES.wordInTheWild ? 'couldNotSubmitEvidence' : 'couldNotFinishWord'),
+      );
     } finally {
       setWildBusy(false);
     }
   };
 
+  // Word in the Wild is parked for V2: the optional stage never shows. An
+  // attempt that reaches it (resumed mid-quest) is completed straight away.
+  const autoFinishedRef = useRef(false);
+  useEffect(() => {
+    if (FEATURES.wordInTheWild || stage !== 'optionalWild' || autoFinishedRef.current) return;
+    autoFinishedRef.current = true;
+    void finishWord(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
+
   if (stage === 'loading') {
     return (
       <View style={styles.centered}>
         <ActivityIndicator color={colors.arcaneSoft} />
+      </View>
+    );
+  }
+
+  if (stage === 'optionalWild' && !FEATURES.wordInTheWild) {
+    return (
+      <View style={styles.centered}>
+        {wildError ? (
+          <>
+            <Text style={styles.error}>{wildError}</Text>
+            <Pressable
+              style={styles.button}
+              onPress={() => void finishWord(false)}
+              accessibilityRole="button"
+              accessibilityLabel={t('retry')}
+            >
+              <Text style={styles.buttonText}>{t('retry')}</Text>
+            </Pressable>
+          </>
+        ) : (
+          <ActivityIndicator color={colors.arcaneSoft} />
+        )}
       </View>
     );
   }
@@ -1300,7 +1337,11 @@ export function DailyQuestScreen({ route, navigation }: Props) {
 
         <Pressable
           style={styles.button}
-          onPress={() => setStage('optionalWild')}
+          onPress={() => {
+            if (FEATURES.wordInTheWild) setStage('optionalWild');
+            else void finishWord(false);
+          }}
+          disabled={wildBusy}
           accessibilityRole="button"
           accessibilityLabel={t('continue')}
         >

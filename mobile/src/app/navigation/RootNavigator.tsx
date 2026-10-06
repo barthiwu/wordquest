@@ -28,6 +28,7 @@ import { QuestCompleteScreen } from '@/features/quests/QuestCompleteScreen';
 import { CatchUpCalendarScreen } from '@/features/quests/CatchUpCalendarScreen';
 import { CatchUpReplayScreen } from '@/features/quests/CatchUpReplayScreen';
 import { SkillRadarScreen } from '@/features/skills/SkillRadarScreen';
+import { FEATURES } from '@/config/features';
 import { WordInTheWildScreen } from '@/features/word-in-the-wild/WordInTheWildScreen';
 import { SubmitEvidenceScreen } from '@/features/word-in-the-wild/SubmitEvidenceScreen';
 import { EvidenceResultScreen } from '@/features/word-in-the-wild/EvidenceResultScreen';
@@ -229,9 +230,14 @@ export function RootNavigator() {
         <Stack.Screen name="CatchUpCalendar" component={framed(CatchUpCalendarScreen)} />
         <Stack.Screen name="CatchUpReplay" component={framed(CatchUpReplayScreen)} />
         <Stack.Screen name="SkillRadar" component={framed(SkillRadarScreen)} />
-        <Stack.Screen name="WordInTheWild" component={framed(WordInTheWildScreen)} />
-        <Stack.Screen name="SubmitEvidence" component={framed(SubmitEvidenceScreen)} />
-        <Stack.Screen name="EvidenceResult" component={framed(EvidenceResultScreen)} />
+        {/* Word in the Wild is parked for V2 (WordQuest+) -- see config/features. */}
+        {FEATURES.wordInTheWild && (
+          <>
+            <Stack.Screen name="WordInTheWild" component={framed(WordInTheWildScreen)} />
+            <Stack.Screen name="SubmitEvidence" component={framed(SubmitEvidenceScreen)} />
+            <Stack.Screen name="EvidenceResult" component={framed(EvidenceResultScreen)} />
+          </>
+        )}
         <Stack.Screen name="Achievements" component={framed(AchievementsScreen)} />
         <Stack.Screen name="Ali" component={framed(AliScreen)} />
         <Stack.Screen name="AliGallery" component={framed(AliGalleryScreen)} />

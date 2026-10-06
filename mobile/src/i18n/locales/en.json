@@ -706,6 +706,7 @@
     "cameraAccessNeeded": "WordQuest needs camera access to do this.",
     "photoLibraryAccessNeeded": "WordQuest needs photo library access to do this.",
     "couldNotSubmitEvidence": "Could not submit your evidence.",
+    "couldNotFinishWord": "Could not finish this word. Please try again.",
     "submitAndFinish": "Submit & finish",
     "submitAndFinishA11y": "Submit and finish",
     "skipAndFinish": "Skip & finish",

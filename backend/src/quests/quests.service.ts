@@ -23,6 +23,7 @@ import {
   WordInTheWildService,
   type MissionView,
 } from '../word-in-the-wild/word-in-the-wild.service';
+import { isWordInTheWildEnabled } from '../config/feature-flags';
 import { generateOmissionChallenge } from '../vocabulary/omission-engine';
 import { shuffleIndexes } from '../arcade/scramble-quest/scramble.util';
 import { gameplayRules, computeGuessXp } from '../config/gameplay-rules';
@@ -994,6 +995,8 @@ export class QuestsService {
    * instead of letting the player pick one.
    */
   async createOptionalWildMission(userId: string, questAttemptId: string): Promise<MissionView> {
+    // Parked for V2 (WordQuest+): the stage is skipped, never scored.
+    if (!isWordInTheWildEnabled()) throw new NotFoundException();
     const attempt = await this.loadInProgressAttempt(userId, questAttemptId, 'OPTIONAL_WILD');
     return this.wordInTheWild.createMission(userId, attempt.wordIds[attempt.currentIndex]);
   }

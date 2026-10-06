@@ -1,3 +1,4 @@
+import { FEATURES } from '@/config/features';
 import { useCallback, useRef, useState, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -110,7 +111,7 @@ export function JourneyScreen({ navigation }: Props) {
         showOrderLink={showOrderLink}
         onOrder={() => navigation.navigate('Order')}
         onSkillRadar={() => navigation.navigate('SkillRadar')}
-        onWordInWild={() => navigation.navigate('WordInTheWild')}
+        onWordInWild={FEATURES.wordInTheWild ? () => navigation.navigate('WordInTheWild') : undefined}
         celebration={
           celebrating ? (
             <JourneyCelebration
@@ -279,14 +280,16 @@ export function JourneyScreen({ navigation }: Props) {
         <Text style={styles.skillRadarButtonText}>{t('viewSkillRadar')}</Text>
       </Pressable>
 
-      <Pressable
-        style={styles.witwButton}
-        onPress={() => navigation.navigate('WordInTheWild')}
-        accessibilityRole="button"
-        accessibilityLabel={t('findWordInWild')}
-      >
-        <Text style={styles.witwButtonText}>{t('findWordInWild')}</Text>
-      </Pressable>
+      {FEATURES.wordInTheWild && (
+        <Pressable
+          style={styles.witwButton}
+          onPress={() => navigation.navigate('WordInTheWild')}
+          accessibilityRole="button"
+          accessibilityLabel={t('findWordInWild')}
+        >
+          <Text style={styles.witwButtonText}>{t('findWordInWild')}</Text>
+        </Pressable>
+      )}
     </ScrollView>
   );
 }
