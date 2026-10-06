@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type ComponentProps, type ReactNode } from 'react';
 import { Animated, Easing, View } from 'react-native';
 import Svg, {
   Circle,
@@ -63,6 +63,31 @@ const AnimatedG = Animated.createAnimatedComponent(G);
 const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
+
+type Pt = { x: number; y: number };
+
+/**
+ * Rotates / scales its children about `at`. Animated drives a react-native-svg
+ * group by calling setNativeProps with only the props that changed, and the
+ * native side then rebuilds the group's transform from those alone -- so an
+ * `origin` prop is dropped and a fanned feather swings about (0, 0), off the
+ * screen, on iOS (the web build is unaffected, which is how ALI's tail and
+ * wing feathers went missing only on the phone). The pivot is therefore baked
+ * into static translate groups around the animated one.
+ */
+function Pivot({
+  at,
+  children,
+  ...animated
+}: { at: Pt; children?: ReactNode } & Omit<ComponentProps<typeof AnimatedG>, 'origin' | 'children'>) {
+  return (
+    <G translate={`${at.x}, ${at.y}`}>
+      <AnimatedG {...animated}>
+        <G translate={`${-at.x}, ${-at.y}`}>{children}</G>
+      </AnimatedG>
+    </G>
+  );
+}
 
 type Node =
   | Animated.Value
@@ -294,7 +319,6 @@ export function AliCharacter({
   const negate = (n: Node): Node => Animated.multiply(n, -1);
   const gold = '#D9A94B';
   const showFar = resolved.farWing;
-  const eyeOrigin = originOf(EYE);
 
   const spreadAngle = (folded: number, open: number): Node =>
     ch.wingSpread.interpolate({ inputRange: [0, 1], outputRange: [folded, open] });
@@ -393,26 +417,24 @@ export function AliCharacter({
 
         {/* the bird: lift + travel, then lean about the feet */}
         <AnimatedG translateX={ch.travelX} translateY={hopLift}>
-          <AnimatedG rotation={ch.bodyRot} origin={originOf(FEET)}>
+          <Pivot at={FEET} rotation={ch.bodyRot}>
             {/* far wing (only when the wings open) */}
             {showFar && (
-              <AnimatedG
+              <Pivot at={WING_PIVOT}
                 opacity={ch.wingSpread.interpolate({
                   inputRange: [0.15, 0.35],
                   outputRange: [0, 0.75],
                   extrapolate: 'clamp',
                 })}
                 rotation={Animated.add(Animated.multiply(ch.wingLift, -0.6), -8)}
-                origin={originOf(WING_PIVOT)}
               >
                 <G translate="-6, -6">
                   {[...FAR_WING_FEATHER_INDEXES].reverse().map((i) => {
                     const f = WING_FEATHERS[i];
                     return (
-                      <AnimatedG
+                      <Pivot at={WING_PIVOT}
                         key={`fw${i}`}
                         rotation={spreadAngle(f.folded, f.open)}
-                        origin={originOf(WING_PIVOT)}
                       >
                         <Path
                           d={f.d}
@@ -421,24 +443,23 @@ export function AliCharacter({
                           strokeWidth={1.2}
                           strokeOpacity={0.55}
                         />
-                      </AnimatedG>
+                      </Pivot>
                     );
                   })}
                 </G>
-              </AnimatedG>
+              </Pivot>
             )}
 
             {/* tail fan */}
-            <AnimatedG rotation={ch.tailRot} origin={originOf(TAIL_PIVOT)}>
+            <Pivot at={TAIL_PIVOT} rotation={ch.tailRot}>
               {TAIL_FEATHERS.map((_, i) => i)
                 .reverse()
                 .map((i) => {
                   const f = TAIL_FEATHERS[i];
                   return (
-                    <AnimatedG
+                    <Pivot at={TAIL_PIVOT}
                       key={`t${i}`}
                       rotation={tailAngle(f.folded, f.open)}
-                      origin={originOf(TAIL_PIVOT)}
                     >
                       <Path
                         d={f.d}
@@ -448,10 +469,10 @@ export function AliCharacter({
                         strokeOpacity={0.5}
                       />
                       <Path d={f.shaft} stroke="#9de6d6" strokeWidth={1} opacity={0.3} />
-                    </AnimatedG>
+                    </Pivot>
                   );
                 })}
-            </AnimatedG>
+            </Pivot>
 
             {/* legs */}
             <AnimatedG opacity={ch.legs}>
@@ -470,7 +491,7 @@ export function AliCharacter({
             </AnimatedG>
 
             {/* body + belly (chest puff) */}
-            <AnimatedG scale={ch.puff} origin="236, 214">
+            <Pivot at={{ x: 236, y: 214 }} scale={ch.puff}>
               <Path d={BODY_D} fill={`url(#${id('blk')})`} />
               <Path d={BELLY_D} fill={`url(#${id('belly')})`} />
               <Path
@@ -481,10 +502,10 @@ export function AliCharacter({
                 opacity={0.55}
                 strokeLinecap="round"
               />
-            </AnimatedG>
+            </Pivot>
 
             {/* tucked quill — behind the head, ahead of the body; sways with the mood */}
-            <AnimatedG rotation={ch.quill} origin={originOf(QUILL)}>
+            <Pivot at={QUILL} rotation={ch.quill}>
               <G rotation={QUILL.angle} origin={originOf(QUILL)}>
                 <Path
                   d={QUILL_D}
@@ -495,19 +516,18 @@ export function AliCharacter({
                 <Path d={QUILL_SHAFT_D} stroke="#a79f8a" strokeWidth={1.6} />
                 <Path d={QUILL_BARBS_D} stroke="#cfc9b6" strokeWidth={1.2} strokeLinecap="round" />
               </G>
-            </AnimatedG>
+            </Pivot>
 
             {/* near wing */}
-            <AnimatedG rotation={negate(ch.wingLift)} origin={originOf(WING_PIVOT)}>
+            <Pivot at={WING_PIVOT} rotation={negate(ch.wingLift)}>
               {WING_FEATHERS.map((_, i) => i)
                 .reverse()
                 .map((i) => {
                   const f = WING_FEATHERS[i];
                   return (
-                    <AnimatedG
+                    <Pivot at={WING_PIVOT}
                       key={`w${i}`}
                       rotation={spreadAngle(f.folded, f.open)}
-                      origin={originOf(WING_PIVOT)}
                     >
                       <Path
                         d={f.d}
@@ -517,7 +537,7 @@ export function AliCharacter({
                         strokeOpacity={0.55}
                       />
                       <Path d={f.shaft} stroke="#bfe9ff" strokeWidth={1} opacity={0.28} />
-                    </AnimatedG>
+                    </Pivot>
                   );
                 })}
               <AnimatedPath
@@ -532,7 +552,7 @@ export function AliCharacter({
                 fill="none"
                 opacity={0.35}
               />
-            </AnimatedG>
+            </Pivot>
             <AnimatedPath
               d={SHOULDER_STREAK_D}
               fill="#f4f6fb"
@@ -544,15 +564,14 @@ export function AliCharacter({
             />
 
             {/* head: tilts, nods, droops as one unit */}
-            <AnimatedG translateY={ch.headY} rotation={ch.headRot} origin={originOf(HEAD_PIVOT)}>
+            <Pivot at={HEAD_PIVOT} translateY={ch.headY} rotation={ch.headRot}>
               <G scale={1.1} origin="262, 150">
                 <Path d={HEAD_D} fill={`url(#${id('head')})`} />
                 <Path d={HEAD_SHEEN_D} fill="#5a6cc0" opacity={0.28} />
 
                 {/* gold bill: upper and lower mandible part with `beak` */}
-                <AnimatedG
+                <Pivot at={BEAK_PIVOT}
                   rotation={Animated.multiply(ch.beak, -5.4)}
-                  origin={originOf(BEAK_PIVOT)}
                 >
                   <Path
                     d={BILL_UPPER_D}
@@ -567,10 +586,10 @@ export function AliCharacter({
                     opacity={0.7}
                     fill="none"
                   />
-                </AnimatedG>
-                <AnimatedG rotation={Animated.multiply(ch.beak, 12)} origin={originOf(BEAK_PIVOT)}>
+                </Pivot>
+                <Pivot at={BEAK_PIVOT} rotation={Animated.multiply(ch.beak, 12)}>
                   <Path d={BILL_LOWER_D} fill="#b8892f" stroke="#8a6a1f" strokeWidth={1} />
-                </AnimatedG>
+                </Pivot>
 
                 {/* cream eye, dark pupil, highlight; gaze shifts the pupil */}
                 <Circle cx={EYE.x} cy={EYE.y} r={EYE.r} fill="#F4F1E8" />
@@ -586,14 +605,14 @@ export function AliCharacter({
 
                 {/* held lids (clipped to the head so they never show outside it) */}
                 <G clipPath={`url(#${id('headClip')})`}>
-                  <AnimatedG rotation={ch.lidSlant} origin={eyeOrigin}>
+                  <Pivot at={EYE} rotation={ch.lidSlant}>
                     <AnimatedG translateY={Animated.multiply(ch.lid, 32)}>
                       <Path
                         d={`M${EYE.x - 20},${EYE.y - 54} L${EYE.x + 20},${EYE.y - 54} L${EYE.x + 20},${EYE.y - 17} Q${EYE.x},${EYE.y - 12} ${EYE.x - 20},${EYE.y - 17} Z`}
                         fill="#16132f"
                       />
                     </AnimatedG>
-                  </AnimatedG>
+                  </Pivot>
                   <AnimatedG translateY={Animated.multiply(ch.lower, -30)}>
                     <Path
                       d={`M${EYE.x - 20},${EYE.y + 54} L${EYE.x + 20},${EYE.y + 54} L${EYE.x + 20},${EYE.y + 17} Q${EYE.x},${EYE.y + 12} ${EYE.x - 20},${EYE.y + 17} Z`}
@@ -603,7 +622,7 @@ export function AliCharacter({
                 </G>
 
                 {/* brow */}
-                <AnimatedG rotation={Animated.multiply(ch.lidSlant, 0.8)} origin={eyeOrigin}>
+                <Pivot at={EYE} rotation={Animated.multiply(ch.lidSlant, 0.8)}>
                   <AnimatedG translateY={Animated.multiply(ch.brow, -4)}>
                     <AnimatedPath
                       d={`M${EYE.x - 15},${EYE.y - 23} Q${EYE.x},${EYE.y - 29} ${EYE.x + 15},${EYE.y - 22}`}
@@ -617,7 +636,7 @@ export function AliCharacter({
                       })}
                     />
                   </AnimatedG>
-                </AnimatedG>
+                </Pivot>
 
                 {/* gold monocle + chain */}
                 <Circle
@@ -645,8 +664,8 @@ export function AliCharacter({
                   opacity={0.9}
                 />
               </G>
-            </AnimatedG>
-          </AnimatedG>
+            </Pivot>
+          </Pivot>
         </AnimatedG>
 
         {/* the arcane rune, floating ahead of the beak */}
@@ -675,9 +694,8 @@ export function AliCharacter({
               extrapolate: 'clamp',
             })}
           >
-            <AnimatedG
+            <Pivot at={RUNE}
               rotation={idle.orbit.interpolate({ inputRange: [0, 1], outputRange: [0, 360] })}
-              origin={originOf(RUNE)}
             >
               <Circle
                 cx={RUNE.x}
@@ -692,7 +710,7 @@ export function AliCharacter({
               {RUNE_ORBIT_DOTS.map((d, i) => (
                 <Circle key={`od${i}`} cx={d.x} cy={d.y} r={1.8} fill="#efe6ff" opacity={0.85} />
               ))}
-            </AnimatedG>
+            </Pivot>
             <Circle
               cx={RUNE.x}
               cy={RUNE.y}
@@ -707,7 +725,7 @@ export function AliCharacter({
 
         {/* celebration sparkles */}
         {SPARKLE_SPOTS.slice(0, resolved.sparkles).map((sp, i) => (
-          <AnimatedG
+          <Pivot at={sp}
             key={`sp${i}`}
             opacity={
               motion
@@ -725,11 +743,10 @@ export function AliCharacter({
                   })
                 : 1
             }
-            origin={`${sp.x}, ${sp.y}`}
           >
             <Path d={starPath(sp.x, sp.y, 11 * sp.s)} fill="#fff4c2" />
             <Path d={starPath(sp.x, sp.y, 5 * sp.s)} fill="#ffffff" />
-          </AnimatedG>
+          </Pivot>
         ))}
       </Svg>
     </View>

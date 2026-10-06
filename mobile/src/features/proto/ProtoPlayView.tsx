@@ -186,9 +186,12 @@ const styles = StyleSheet.create({
   windows: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   windowChip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
   tileRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
-  tileRowMobile: { flexDirection: 'column', gap: 10 },
+  // Phone: one full-width tile per row. `flexWrap: 'nowrap'` matters -- a wrapping
+  // column container sizes each line to its widest child on iOS, which left the
+  // tiles half-width with clipped text.
+  tileRowMobile: { flexDirection: 'column', flexWrap: 'nowrap', alignItems: 'stretch', gap: 10 },
   tile: { flexGrow: 1, flexBasis: 240, minWidth: 220, borderWidth: 1, borderRadius: 18, overflow: 'hidden' },
-  tileMobile: { flexDirection: 'row', alignItems: 'center', padding: 10, gap: 12 },
+  tileMobile: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch', flexGrow: 0, flexShrink: 0, flexBasis: 'auto', minWidth: 0, padding: 10, gap: 12 },
   tileArt: { borderRadius: 0 },
   tileText: { padding: 12, gap: 4, flex: 1 },
   tileTitle: { fontSize: 16, fontWeight: '800' },

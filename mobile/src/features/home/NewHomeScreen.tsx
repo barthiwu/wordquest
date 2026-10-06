@@ -163,26 +163,29 @@ export function NewHomeScreen({ navigation }: Props) {
   );
 
   const ranks = (
-    <View style={[styles.grid, wide && styles.gridRow]}>
-      <View style={wide ? styles.cell : undefined}>
-        <ClanRankCard
-          colors={colors}
-          viewer={data.clanViewer}
-          onPress={() =>
-            data.clanViewer?.clanName ? goCompete() : navigation.navigate('ClanSelection', { fromHome: true })
-          }
-        />
-      </View>
-      <View style={wide ? styles.cell : undefined}>
-        <BossBattleRankCard colors={colors} viewer={data.bossBattleRankViewer} onPress={goCompete} />
-      </View>
-      <View style={wide ? styles.cell : undefined}>
-        <FriendRankCard
-          colors={colors}
-          viewer={data.friendRankViewer}
-          friendCount={data.friendCount}
-          onPress={goCompete}
-        />
+    <View style={styles.block}>
+      <Text style={styles.sectionTitle}>{t('rankings')}</Text>
+      <View style={[styles.grid, wide && styles.gridRow]}>
+        <View style={wide ? styles.cell : undefined}>
+          <ClanRankCard
+            colors={colors}
+            viewer={data.clanViewer}
+            onPress={() =>
+              data.clanViewer?.clanName ? goCompete() : navigation.navigate('ClanSelection', { fromHome: true })
+            }
+          />
+        </View>
+        <View style={wide ? styles.cell : undefined}>
+          <BossBattleRankCard colors={colors} viewer={data.bossBattleRankViewer} onPress={goCompete} />
+        </View>
+        <View style={wide ? styles.cell : undefined}>
+          <FriendRankCard
+            colors={colors}
+            viewer={data.friendRankViewer}
+            friendCount={data.friendCount}
+            onPress={goCompete}
+          />
+        </View>
       </View>
     </View>
   );
