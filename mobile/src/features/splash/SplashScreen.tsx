@@ -4,6 +4,7 @@ import { type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { useAuthStore } from '@/state/authStore';
 import { syncPushToken } from '@/utils/pushNotifications';
+import { getMe } from '@/services/users';
 import { AnimatedWordmark, WORDMARK_ANIMATION_DURATION_MS } from '@/components/AnimatedWordmark';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
@@ -41,6 +42,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
 const HOLD_AFTER_ANIMATION_MS = 250;
 const MIN_SPLASH_MS = WORDMARK_ANIMATION_DURATION_MS + HOLD_AFTER_ANIMATION_MS;
 const SAFETY_TIMEOUT_MS = 8000;
+const ONBOARDING_CHECK_TIMEOUT_MS = 4_000;
 
 export function SplashScreen({ navigation }: Props) {
   const colors = useThemeColors();
@@ -71,7 +73,19 @@ export function SplashScreen({ navigation }: Props) {
       const { accessToken } = useAuthStore.getState();
       if (accessToken) {
         syncPushToken(accessToken);
-        navigation.replace('Main');
+        // A player who signed up but closed the app before finishing
+        // onboarding should resume it, not land on Home with no username
+        // or clan. Best effort: if the profile can't be fetched quickly,
+        // Main is the safe default.
+        const onboarding = Promise.race([
+          getMe(accessToken).then((me) => (me.onboardingCompletedAt ? 'Main' : 'Biodata')),
+          new Promise<'Main'>((resolve) =>
+            setTimeout(() => resolve('Main'), ONBOARDING_CHECK_TIMEOUT_MS),
+          ),
+        ]).catch(() => 'Main' as const);
+        onboarding.then((next) => {
+          if (!cancelled) navigation.replace(next);
+        });
       } else {
         navigation.replace('Welcome');
       }

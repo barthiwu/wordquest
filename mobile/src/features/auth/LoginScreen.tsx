@@ -14,7 +14,12 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
-import { completeTwoFactorLogin, isTwoFactorChallenge, login, type AuthResult } from '@/services/auth';
+import {
+  completeTwoFactorLogin,
+  isTwoFactorChallenge,
+  login,
+  type AuthResult,
+} from '@/services/auth';
 import { getMe } from '@/services/users';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
@@ -48,23 +53,23 @@ export function LoginScreen({ navigation }: Props) {
   const canSubmit = email.includes('@') && password.length > 0;
 
   /** Password/2FA logins go straight in; a social sign-in that just created the account continues into onboarding. */
-  const enter = async (result: AuthResult, fromSocial = false) => {
+  const enter = async (result: AuthResult) => {
     await setSession(result);
     syncPushToken(result.accessToken);
+    // Every sign-in checks this, not just social: someone who registered
+    // with a password but quit mid-onboarding must resume it.
     let next: 'Main' | 'Biodata' = 'Main';
-    if (fromSocial) {
-      try {
-        const me = await getMe(result.accessToken);
-        if (!me.onboardingCompletedAt) next = 'Biodata';
-      } catch {
-        // Can't tell: Main is the safe default.
-      }
+    try {
+      const me = await getMe(result.accessToken);
+      if (!me.onboardingCompletedAt) next = 'Biodata';
+    } catch {
+      // Can't tell: Main is the safe default.
     }
     navigation.replace(next);
   };
 
   const social = useSocialAuth({
-    onSession: (result) => enter(result, true),
+    onSession: (result) => enter(result),
     onChallenge: setChallengeToken,
   });
 
@@ -80,7 +85,9 @@ export function LoginScreen({ navigation }: Props) {
         setError(t('twoFactor.errorExpired'));
       } else {
         setTwoFactorError(
-          err instanceof ApiError && err.status === 401 ? t('twoFactor.errorIncorrect') : t('login.errorGeneric'),
+          err instanceof ApiError && err.status === 401
+            ? t('twoFactor.errorIncorrect')
+            : t('login.errorGeneric'),
         );
       }
     } finally {
@@ -141,7 +148,11 @@ export function LoginScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
-        <WordmarkLogo align="start" fontSize={30} style={{ alignSelf: 'flex-start', marginBottom: 12 }} />
+        <WordmarkLogo
+          align="start"
+          fontSize={30}
+          style={{ alignSelf: 'flex-start', marginBottom: 12 }}
+        />
         <Text style={styles.title}>{t('login.title')}</Text>
         <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
       </View>
