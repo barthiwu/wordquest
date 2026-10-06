@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { requestPasswordReset, resetPassword } from '@/services/auth';
+import { classifyResetError, isAcceptablePassword } from './passwordPolicy';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -56,14 +57,21 @@ export function ForgotPasswordScreen({ navigation }: Props) {
   };
 
   const onReset = async () => {
-    if (!token.trim() || newPassword.length < 8 || submitting) return;
+    if (!token.trim() || !isAcceptablePassword(newPassword) || submitting) return;
     setSubmitting(true);
     setError(null);
     try {
       await resetPassword(token.trim(), newPassword);
       setStep('done');
-    } catch {
-      setError(t('forgotPassword.errorInvalidCode'));
+    } catch (e) {
+      const kind = classifyResetError(e);
+      setError(
+        kind === 'invalidCode'
+          ? t('forgotPassword.errorInvalidCode')
+          : kind === 'weakPassword'
+            ? t('forgotPassword.errorWeakPassword')
+            : t('forgotPassword.errorGeneric'),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -135,10 +143,10 @@ export function ForgotPasswordScreen({ navigation }: Props) {
           <Pressable
             style={[
               styles.button,
-              (!token.trim() || newPassword.length < 8) && styles.buttonDisabled,
+              (!token.trim() || !isAcceptablePassword(newPassword)) && styles.buttonDisabled,
             ]}
             onPress={onReset}
-            disabled={!token.trim() || newPassword.length < 8 || submitting}
+            disabled={!token.trim() || !isAcceptablePassword(newPassword) || submitting}
             accessibilityRole="button"
             accessibilityLabel={t('forgotPassword.resetPassword')}
           >

@@ -162,7 +162,7 @@
       "subtitle": "Every Legend starts as a new player.",
       "displayNamePlaceholder": "Display name",
       "emailPlaceholder": "Email",
-      "passwordPlaceholder": "Password (8+ characters)",
+      "passwordPlaceholder": "Password (8+ characters, with a letter and a number)",
       "showPassword": "Show password",
       "hidePassword": "Hide password",
       "dobLabel": "Date of birth",
@@ -198,8 +198,10 @@
       "emailPlaceholder": "Email",
       "sendCode": "Send code",
       "tokenPlaceholder": "Reset code",
-      "newPasswordPlaceholder": "New password",
+      "newPasswordPlaceholder": "New password (8+ characters, letter and number)",
       "errorInvalidCode": "That code is invalid or has expired. Request a new one.",
+      "errorWeakPassword": "Choose a password with 8-72 characters, including at least one letter and one number.",
+      "errorGeneric": "We couldn't reset your password just now. Check your connection and try again.",
       "resetPassword": "Reset password",
       "backToLogin": "Back to log in"
     },
@@ -220,8 +222,10 @@
       "title": "Choose a new password",
       "subtitle": "Confirm the code from your email if it isn't already filled in.",
       "tokenPlaceholder": "Reset code",
-      "newPasswordPlaceholder": "New password",
+      "newPasswordPlaceholder": "New password (8+ characters, letter and number)",
       "errorInvalidCode": "That code is invalid or has expired. Request a new one.",
+      "errorWeakPassword": "Choose a password with 8-72 characters, including at least one letter and one number.",
+      "errorGeneric": "We couldn't reset your password just now. Check your connection and try again.",
       "submit": "Reset password"
     },
     "verifyEmail": {

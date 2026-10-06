@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { resetPassword } from '@/services/auth';
+import { classifyResetError, isAcceptablePassword } from './passwordPolicy';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -40,7 +41,7 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSubmit = token.trim().length > 0 && newPassword.length >= 8;
+  const canSubmit = token.trim().length > 0 && isAcceptablePassword(newPassword);
 
   const onSubmit = async () => {
     if (!canSubmit || submitting) return;
@@ -49,8 +50,15 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
     try {
       await resetPassword(token.trim(), newPassword);
       setDone(true);
-    } catch {
-      setError(t('resetPassword.errorInvalidCode'));
+    } catch (e) {
+      const kind = classifyResetError(e);
+      setError(
+        kind === 'invalidCode'
+          ? t('resetPassword.errorInvalidCode')
+          : kind === 'weakPassword'
+            ? t('resetPassword.errorWeakPassword')
+            : t('resetPassword.errorGeneric'),
+      );
     } finally {
       setSubmitting(false);
     }

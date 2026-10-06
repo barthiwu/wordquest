@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors, useThemeStore } from '@/state/themeStore';
 import { register, type AuthResult } from '@/services/auth';
+import { isAcceptablePassword } from './passwordPolicy';
 import { getMe } from '@/services/users';
 import { ApiError } from '@/services/apiClient';
 import { useAuthStore } from '@/state/authStore';
@@ -79,7 +80,7 @@ export function RegistrationScreen({ navigation }: Props) {
   const dobValid = dobParts !== null && dobError === null;
 
   const canSubmit =
-    displayName.trim().length >= 2 && email.includes('@') && password.length >= 8 && dobValid;
+    displayName.trim().length >= 2 && email.includes('@') && isAcceptablePassword(password) && dobValid;
 
   const dobMaximumDate = useMemo(() => new Date(), []);
   const dobMinimumDate = useMemo(() => {
