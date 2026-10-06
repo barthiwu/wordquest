@@ -16,6 +16,8 @@ interface Props {
   confirmingRemoveId?: string | null;
   /** Hide the score columns (the lobby has none yet). */
   showScores: boolean;
+  /** The round is over: a half-finished or never-started play is labelled as such. */
+  ended?: boolean;
 }
 
 /** The members of a group, as a lobby roster or a ranked results table. */
@@ -26,6 +28,7 @@ export function GroupMemberList({
   onRemove,
   confirmingRemoveId,
   showScores,
+  ended = false,
 }: Props) {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { t } = useTranslation('arcade');
@@ -33,7 +36,16 @@ export function GroupMemberList({
   return (
     <View style={styles.list} accessibilityLabel={t('group.results.table')}>
       {members.map((m) => {
-        const scored = showScores && m.correct !== null;
+        const scored = showScores && m.correct !== null && m.state !== 'NOT_STARTED';
+        // The lobby has no progress to show; after the round, say what happened.
+        const stateLabel = !showScores
+          ? ''
+          : ended && m.state === 'PLAYING'
+            ? t('group.state.UNFINISHED')
+            : ended && m.state === 'NOT_STARTED'
+              ? t('group.state.ABSENT')
+              : t(`group.state.${m.state}`);
+        const sub = [m.isHost ? t('group.lobby.host') : '', stateLabel].filter(Boolean).join(' · ');
         return (
           <View key={m.userId} style={[styles.row, m.isMe && styles.rowMe]}>
             {showScores ? (
@@ -45,10 +57,11 @@ export function GroupMemberList({
                 {m.username}
                 {m.isMe ? ` (${t('group.lobby.you')})` : ''}
               </Text>
-              <Text style={styles.sub} numberOfLines={1}>
-                {m.isHost ? `${t('group.lobby.host')} · ` : ''}
-                {t(`group.state.${m.state}`)}
-              </Text>
+              {sub ? (
+                <Text style={styles.sub} numberOfLines={1}>
+                  {sub}
+                </Text>
+              ) : null}
             </View>
             {scored ? (
               <View style={styles.scoreCol}>

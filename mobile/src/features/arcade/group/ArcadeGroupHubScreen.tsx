@@ -157,6 +157,8 @@ export function ArcadeGroupHubScreen({ navigation, route }: Props) {
             <Switch
               value={showLeaderboard}
               onValueChange={setShowLeaderboard}
+              trackColor={{ false: colors.border, true: colors.arcane }}
+              thumbColor={colors.ink}
               accessibilityLabel={t('arcade:group.leaderboardLabel')}
             />
           </View>
@@ -288,7 +290,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontSize: typography.scale.md,
     },
     joinRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
-    joinInput: { flex: 1 },
+    joinInput: { flex: 1, minWidth: 0 },
     switchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
     switchText: { flex: 1, gap: 2 },
     switchTitle: { color: colors.ink, fontSize: typography.scale.md, fontWeight: '600' },
@@ -299,6 +301,7 @@ function createStyles(colors: ThemeColors, topInset: number) {
       alignItems: 'center',
     },
     smallButton: {
+      flexShrink: 0,
       backgroundColor: colors.arcane,
       borderRadius: radius.pill,
       paddingVertical: spacing.sm + 2,

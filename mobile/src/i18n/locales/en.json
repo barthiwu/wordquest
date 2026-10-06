@@ -1039,7 +1039,7 @@
       "creating": "Creating...",
       "createError": "Could not create the group. Please try again.",
       "joinHeading": "Have a link or code?",
-      "joinPlaceholder": "Paste the link or enter the code",
+      "joinPlaceholder": "Paste link or enter code",
       "joinGo": "Join",
       "joinBadCode": "That doesn't look like a group link or code.",
       "mineHeading": "Your groups",
@@ -1100,7 +1100,9 @@
       "state": {
         "NOT_STARTED": "Not started",
         "PLAYING": "Playing",
-        "FINISHED": "Done"
+        "FINISHED": "Done",
+        "UNFINISHED": "Didn't finish",
+        "ABSENT": "Didn't play"
       },
       "results": {
         "title": "Results",

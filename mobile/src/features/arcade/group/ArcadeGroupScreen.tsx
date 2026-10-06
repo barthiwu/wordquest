@@ -394,6 +394,7 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
           members={group.members}
           wordsTotal={group.wordsTotal}
           showScores={group.status !== 'LOBBY'}
+          ended={group.status === 'ENDED'}
           onRemove={group.isHost && group.status !== 'ENDED' ? onRemove : undefined}
           confirmingRemoveId={confirm?.startsWith('remove:') ? confirm.slice(7) : null}
         />
