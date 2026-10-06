@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   NavigationContainer,
   useNavigationContainerRef,
@@ -8,6 +8,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useThemeColors, useThemeStore } from '@/state/themeStore';
 import { useAuthStore } from '@/state/authStore';
 import { useTokenStore } from '@/state/tokenStore';
+import { usePendingGroupStore } from '@/state/pendingGroupStore';
 import { withResponsiveFrame as framed } from '@/components/layout/withResponsiveFrame';
 import { SplashScreen } from '@/features/splash/SplashScreen';
 import { WelcomeScreen } from '@/features/welcome/WelcomeScreen';
@@ -40,6 +41,8 @@ import { ScrambleQuestScreen } from '@/features/arcade/ScrambleQuestScreen';
 import { CompleteItScreen } from '@/features/arcade/CompleteItScreen';
 import { HangmanScreen } from '@/features/arcade/HangmanScreen';
 import { ArcadeVersusLobbyScreen } from '@/features/arcade/ArcadeVersusLobbyScreen';
+import { ArcadeGroupHubScreen } from '@/features/arcade/group/ArcadeGroupHubScreen';
+import { ArcadeGroupScreen } from '@/features/arcade/group/ArcadeGroupScreen';
 import type { ChallengeGame, VersusGame } from '@/services/arcadeVersus';
 import { WordDuelScreen } from '@/features/arcade/WordDuelScreen';
 import { BossBattleLeaderboardScreen } from '@/features/boss-battle/BossBattleLeaderboardScreen';
@@ -109,13 +112,16 @@ export type RootStackParamList = {
   Ali: undefined;
   AliGallery: undefined;
   BossBattle: undefined;
-  ScrambleQuest: { versusMatchId?: string } | undefined;
+  ScrambleQuest: { versusMatchId?: string; groupId?: string } | undefined;
   WordDuel:
     | { challengeFriendId?: string; challengeFriendName?: string; inviteMatchId?: string }
     | undefined;
-  CompleteIt: { versusMatchId?: string } | undefined;
-  Hangman: { versusMatchId?: string } | undefined;
+  CompleteIt: { versusMatchId?: string; groupId?: string } | undefined;
+  Hangman: { versusMatchId?: string; groupId?: string } | undefined;
   ArcadeVersus: { game?: VersusGame; matchId?: string; friendId?: string } | undefined;
+  ArcadeGroupHub: { game?: VersusGame } | undefined;
+  /** `code` opens the join screen (the invite link); `groupId` opens a group you are in. */
+  ArcadeGroup: { groupId?: string; code?: string };
   BossBattleLeaderboard: undefined;
   MasterChallenge: undefined;
   Order: undefined;
@@ -160,6 +166,15 @@ const SIGNED_OUT_ROUTES = new Set<string>([
   'DataDeletion',
 ]);
 
+/** Sign-in and onboarding screens: a saved group link waits until the player is past these. */
+const BEFORE_APP_ROUTES = new Set<string>([
+  ...SIGNED_OUT_ROUTES,
+  'Biodata',
+  'OnboardingGoal',
+  'ClanSelection',
+  'AppIntro',
+]);
+
 export function RootNavigator() {
   const colors = useThemeColors();
   const mode = useThemeStore((s) => s.mode);
@@ -202,9 +217,26 @@ export function RootNavigator() {
     [navigationRef],
   );
 
+  // A group invite link opened while signed out: once the player is signed in
+  // and past onboarding, take them to that group's join screen.
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const pendingGroupCode = usePendingGroupStore((s) => s.code);
+  const openPendingGroup = useCallback(() => {
+    const code = usePendingGroupStore.getState().code;
+    if (!code || !useAuthStore.getState().accessToken || !navigationRef.isReady()) return;
+    const current = navigationRef.getCurrentRoute()?.name;
+    if (!current || BEFORE_APP_ROUTES.has(current)) return;
+    usePendingGroupStore.getState().setCode(null);
+    navigationRef.navigate('ArcadeGroup', { code });
+  }, [navigationRef]);
+  useEffect(() => {
+    openPendingGroup();
+  }, [accessToken, pendingGroupCode, openPendingGroup]);
+
   return (
     <NavigationContainer
       ref={navigationRef}
+      onStateChange={openPendingGroup}
       linking={linking}
       theme={{
         dark: mode === 'dark',
@@ -253,6 +285,8 @@ export function RootNavigator() {
         <Stack.Screen name="CompleteIt" component={framed(CompleteItScreen)} />
         <Stack.Screen name="Hangman" component={framed(HangmanScreen)} />
         <Stack.Screen name="ArcadeVersus" component={framed(ArcadeVersusLobbyScreen)} />
+        <Stack.Screen name="ArcadeGroupHub" component={framed(ArcadeGroupHubScreen)} />
+        <Stack.Screen name="ArcadeGroup" component={framed(ArcadeGroupScreen)} />
         <Stack.Screen name="WordDuel" component={framed(WordDuelScreen)} />
         <Stack.Screen
           name="BossBattleLeaderboard"

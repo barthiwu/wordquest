@@ -71,11 +71,14 @@ export interface ScrambleQuestAnswerResult {
 export function startScrambleQuest(
   accessToken: string,
   versusMatchId?: string,
+  groupId?: string,
 ): Promise<ScrambleQuestChallenge> {
   return apiRequest<ScrambleQuestChallenge>('/arcade/scramble-quest/start', {
     method: 'POST',
     accessToken,
-    ...(versusMatchId ? { body: { versusMatchId } } : {}),
+    ...(versusMatchId || groupId
+      ? { body: { ...(versusMatchId ? { versusMatchId } : {}), ...(groupId ? { groupId } : {}) } }
+      : {}),
   });
 }
 

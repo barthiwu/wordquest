@@ -113,6 +113,10 @@ export function useArcadeLauncher(): {
           setPending(null);
           navigation.navigate('Friends', { challengeGame: game });
         }}
+        onGroup={(game) => {
+          setPending(null);
+          navigation.navigate('ArcadeGroupHub', { game });
+        }}
       />
     </>
   );

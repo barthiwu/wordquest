@@ -54,6 +54,8 @@ const KEY_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
  */
 export function HangmanScreen({ navigation, route }: Props) {
   const versusMatchId = route.params?.versusMatchId;
+  // Set when this play is part of a Group Play round.
+  const groupId = route.params?.groupId;
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
@@ -88,7 +90,7 @@ export function HangmanScreen({ navigation, route }: Props) {
     if (!accessToken) return;
     setPhase('loading');
     try {
-      const view = await startHangman(accessToken, versusMatchId);
+      const view = await startHangman(accessToken, versusMatchId, groupId);
       useArcadePlaysStore.getState().applyNotice(view.playLimit);
       trackEvent('ARCADE_SESSION_STARTED', { game: 'HANGMAN' });
       completedRef.current = false;
@@ -105,7 +107,7 @@ export function HangmanScreen({ navigation, route }: Props) {
       }
       setPhase('error');
     }
-  }, [accessToken, versusMatchId]);
+  }, [accessToken, versusMatchId, groupId]);
 
   useEffect(() => {
     void load();
@@ -255,14 +257,25 @@ export function HangmanScreen({ navigation, route }: Props) {
               text: t('sessionLongestStreak', { streak: completion.longestStreak }),
             },
           ]}
-          primaryLabel={versusMatchId ? t('arcade:versus.result.rematch') : t('playAgain')}
+          primaryLabel={
+            groupId
+              ? t('arcade:group.play.backToGroup')
+              : versusMatchId
+                ? t('arcade:versus.result.rematch')
+                : t('playAgain')
+          }
           onPrimary={
-            versusMatchId ? () => navigation.replace('ArcadeVersus', { game: 'HANGMAN' }) : load
+            groupId
+              ? () => navigation.replace('ArcadeGroup', { groupId })
+              : versusMatchId
+                ? () => navigation.replace('ArcadeVersus', { game: 'HANGMAN' })
+                : load
           }
           secondaryLabel={t('arcade:backToPlay')}
           onSecondary={() => navigation.goBack()}
         />
         {versusMatchId ? <VersusResultCard matchId={versusMatchId} /> : null}
+        {groupId ? <Text style={styles.groupNote}>{t('arcade:group.play.complete')}</Text> : null}
         <AliDeferredRecap
           reactions={completion.deferredAliReactions ?? []}
           colors={colors}
@@ -503,6 +516,7 @@ export function HangmanScreen({ navigation, route }: Props) {
 
 function createStyles(colors: ThemeColors, topInset: number) {
   return StyleSheet.create({
+    groupNote: { color: colors.inkMuted, fontSize: typography.scale.sm, textAlign: 'center' },
     flexFill: { flex: 1, backgroundColor: colors.background },
     container: {
       flexGrow: 1,

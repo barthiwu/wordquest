@@ -19,6 +19,7 @@ interface Props {
   onSingle: (game: VersusGame) => void;
   onRandom: (game: VersusGame) => void;
   onFriend: (game: VersusGame) => void;
+  onGroup: (game: VersusGame) => void;
 }
 
 interface OptionProps {
@@ -53,7 +54,7 @@ function Option({ styles, colors, icon, title, sub, onPress }: OptionProps) {
  * is tapped: single player, or multiplayer (random opponent or a friend).
  * Word Duel never shows it -- it is multiplayer only.
  */
-export function ArcadeModeSheet({ game, onClose, onSingle, onRandom, onFriend }: Props) {
+export function ArcadeModeSheet({ game, onClose, onSingle, onRandom, onFriend, onGroup }: Props) {
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { t } = useTranslation(['arcade', 'common']);
@@ -94,6 +95,14 @@ export function ArcadeModeSheet({ game, onClose, onSingle, onRandom, onFriend }:
                 title={t('arcade:versus.multi')}
                 sub={t('arcade:versus.multiSub')}
                 onPress={() => setStep('multi')}
+              />
+              <Option
+                styles={styles}
+                colors={colors}
+                icon="school-outline"
+                title={t('arcade:versus.group')}
+                sub={t('arcade:versus.groupSub')}
+                onPress={() => onGroup(game)}
               />
             </>
           ) : (

@@ -68,11 +68,14 @@ export interface HangmanHintResult {
 export function startHangman(
   accessToken: string,
   versusMatchId?: string,
+  groupId?: string,
 ): Promise<HangmanChallenge> {
   return apiRequest<HangmanChallenge>('/arcade/hangman/start', {
     method: 'POST',
     accessToken,
-    ...(versusMatchId ? { body: { versusMatchId } } : {}),
+    ...(versusMatchId || groupId
+      ? { body: { ...(versusMatchId ? { versusMatchId } : {}), ...(groupId ? { groupId } : {}) } }
+      : {}),
   });
 }
 

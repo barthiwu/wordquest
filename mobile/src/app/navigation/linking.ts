@@ -111,6 +111,8 @@ export const linking: LinkingOptions<RootStackParamList> = {
       CatchUpCalendar: 'catch-up',
       // Arcade head-to-head: a challenge / result notification opens the match.
       ArcadeVersus: 'arcade/versus/:matchId',
+      // Group Play invite link: https://<site>/g/<code>
+      ArcadeGroup: 'g/:code',
       WordDuel: 'arcade/word-duel/:inviteMatchId?',
       Main: {
         screens: {

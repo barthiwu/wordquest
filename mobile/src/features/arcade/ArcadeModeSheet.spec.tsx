@@ -40,6 +40,7 @@ describe('ArcadeModeSheet', () => {
     onSingle: jest.fn(),
     onRandom: jest.fn(),
     onFriend: jest.fn(),
+    onGroup: jest.fn(),
   });
 
   it('renders nothing until a game is chosen', () => {
@@ -47,15 +48,23 @@ describe('ArcadeModeSheet', () => {
     expect(tree.toJSON()).toBeNull();
   });
 
-  it('offers single player or multiplayer first', () => {
+  it('offers single player, multiplayer or group play first', () => {
     const h = handlers();
     const tree = render(<ArcadeModeSheet game="HANGMAN" {...h} />);
     expect(has(tree.root, 'arcade:versus.single')).toBe(true);
     expect(has(tree.root, 'arcade:versus.multi')).toBe(true);
+    expect(has(tree.root, 'arcade:versus.group')).toBe(true);
     expect(has(tree.root, 'arcade:versus.random')).toBe(false);
 
     press(tree.root, 'arcade:versus.single');
     expect(h.onSingle).toHaveBeenCalledWith('HANGMAN');
+  });
+
+  it('group play goes straight to the group hub for that game', () => {
+    const h = handlers();
+    const tree = render(<ArcadeModeSheet game="SCRAMBLE_QUEST" {...h} />);
+    press(tree.root, 'arcade:versus.group');
+    expect(h.onGroup).toHaveBeenCalledWith('SCRAMBLE_QUEST');
   });
 
   it('multiplayer opens the random / friend choice', () => {

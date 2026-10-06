@@ -64,11 +64,14 @@ export interface CompleteItAnswerResult {
 export function startCompleteIt(
   accessToken: string,
   versusMatchId?: string,
+  groupId?: string,
 ): Promise<CompleteItChallenge> {
   return apiRequest<CompleteItChallenge>('/arcade/complete-it/start', {
     method: 'POST',
     accessToken,
-    ...(versusMatchId ? { body: { versusMatchId } } : {}),
+    ...(versusMatchId || groupId
+      ? { body: { ...(versusMatchId ? { versusMatchId } : {}), ...(groupId ? { groupId } : {}) } }
+      : {}),
   });
 }
 

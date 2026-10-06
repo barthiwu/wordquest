@@ -1021,6 +1021,101 @@
         "scoreRule": "Most correct answers wins. A tie goes to the faster player.",
         "bonus": "+{{xp}} XP win bonus",
         "rematch": "Find a new opponent"
+      },
+      "group": "Group Play",
+      "groupSub": "Up to 50 players, one private link. Great for classes."
+    },
+    "group": {
+      "hubTitle": "Group Play",
+      "hubSub": "Up to 50 players play the same words in one timed round. Private: only people with your link can join.",
+      "chooseGame": "Game",
+      "titleLabel": "Group name (optional)",
+      "titlePlaceholder": "e.g. JSS2 Vocabulary Quiz",
+      "leaderboardLabel": "Show everyone's scores to players",
+      "leaderboardOn": "Players see the full leaderboard.",
+      "leaderboardOff": "Players see only their own result (good for assessments). You always see everyone.",
+      "create": "Create group and get link",
+      "maxPlayers": "Up to {{max}} players per group.",
+      "creating": "Creating...",
+      "createError": "Could not create the group. Please try again.",
+      "joinHeading": "Have a link or code?",
+      "joinPlaceholder": "Paste the link or enter the code",
+      "joinGo": "Join",
+      "joinBadCode": "That doesn't look like a group link or code.",
+      "mineHeading": "Your groups",
+      "mineEmpty": "Groups you create or join show up here.",
+      "mineMembers_one": "{{count}} player",
+      "mineMembers_other": "{{count}} players",
+      "mineHost": "You host",
+      "status": {
+        "LOBBY": "Waiting",
+        "ACTIVE": "In progress",
+        "ENDED": "Ended"
+      },
+      "join": {
+        "title": "Join this group",
+        "host": "Hosted by {{name}}",
+        "players": "{{count}} of {{max}} players",
+        "button": "Join group",
+        "joining": "Joining...",
+        "full": "This group is full.",
+        "invalid": "This link isn't valid, or the group has ended.",
+        "error": "Could not join the group. Please try again.",
+        "signIn": "Sign in to join this group."
+      },
+      "lobby": {
+        "shareTitle": "Invite players",
+        "shareHint": "Anyone with this link can join, so share it only with your group. Don't post it publicly.",
+        "copyLink": "Copy link",
+        "linkCopied": "Link copied",
+        "shareLink": "Share link",
+        "shareMessage": "Join my {{game}} group on WordQuest: {{url}}",
+        "codeLabel": "Or enter this code in WordQuest",
+        "players": "Players ({{count}} of {{max}})",
+        "you": "you",
+        "host": "host",
+        "waitingHost": "Waiting for the host to start the round. Stay on this screen.",
+        "roundLength": "Round length",
+        "minutes": "{{count}} min",
+        "start": "Start round",
+        "starting": "Starting...",
+        "remove": "Remove",
+        "confirmRemove": "Tap again to remove",
+        "leave": "Leave group",
+        "confirmLeave": "Tap again to leave",
+        "end": "End group",
+        "endRound": "End round now",
+        "confirmEnd": "Tap again to end",
+        "error": "Something went wrong. Please try again.",
+        "loadError": "Could not load the group.",
+        "retry": "Try again"
+      },
+      "active": {
+        "timeLeft": "{{time}} left",
+        "playNow": "Play now",
+        "continue": "Continue your play",
+        "doneWaiting": "You've finished. Waiting for the others...",
+        "hint": "Everyone plays the same words. The round ends when the time is up or the host ends it."
+      },
+      "state": {
+        "NOT_STARTED": "Not started",
+        "PLAYING": "Playing",
+        "FINISHED": "Done"
+      },
+      "results": {
+        "title": "Results",
+        "ended": "This round has ended.",
+        "yourRank": "You finished #{{rank}} of {{count}}",
+        "score": "{{correct}}/{{total}}",
+        "hidden": "The host turned the leaderboard off, so you can see only your own result.",
+        "wordsHeading": "How the group did on each word",
+        "wordLine": "{{correct}} of {{attempts}} correct",
+        "noWords": "No answers were recorded.",
+        "table": "Results table"
+      },
+      "play": {
+        "backToGroup": "Back to group",
+        "complete": "Your group play is complete. Check the group for results."
       }
     }
   },
