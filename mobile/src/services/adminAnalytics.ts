@@ -44,6 +44,8 @@ export interface ArcadeGameDashboardStats {
 export interface ArcadeDashboardStats {
   scrambleQuest: ArcadeGameDashboardStats;
   completeIt: ArcadeGameDashboardStats;
+  /** Absent from servers that predate Hangman. */
+  hangman?: ArcadeGameDashboardStats;
 }
 
 /** GET /analytics/dashboard/overview — admin/support-only server-side (RolesGuard); a non-admin token gets a 403. */

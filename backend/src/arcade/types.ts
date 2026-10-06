@@ -3,7 +3,7 @@ import { Word, WordDifficulty } from '@prisma/client';
 /** Which Arcade game a session/match belongs to. Mirrors the Prisma
  * ArcadeGame enum — kept as a separate TS type only so game modules
  * don't need to import @prisma/client just for this. */
-export type ArcadeGameKind = 'SCRAMBLE_QUEST' | 'WORD_DUEL' | 'COMPLETE_IT';
+export type ArcadeGameKind = 'SCRAMBLE_QUEST' | 'WORD_DUEL' | 'COMPLETE_IT' | 'HANGMAN';
 
 /**
  * A full, server-side-only vocabulary challenge — includes the answer

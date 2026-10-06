@@ -25,7 +25,7 @@ export interface ProtoPlayViewProps {
   error: string | null;
   onStartQuest: (key: string) => void;
   onSelectQuest: (key: string) => void;
-  onPlay: (game: 'SCRAMBLE_QUEST' | 'WORD_DUEL' | 'COMPLETE_IT' | 'BOSS_BATTLE') => void;
+  onPlay: (game: 'SCRAMBLE_QUEST' | 'WORD_DUEL' | 'COMPLETE_IT' | 'HANGMAN' | 'BOSS_BATTLE') => void;
   bossBadge?: string | null;
   bossSubtext?: string | null;
 }
@@ -45,6 +45,7 @@ export function ProtoPlayView(p: ProtoPlayViewProps) {
     { id: 'SCRAMBLE_QUEST' as const, kind: 'scramble' as const, title: t('arcade:scrambleQuestTitle'), sub: t('arcade:scrambleQuestSubtitle') },
     { id: 'WORD_DUEL' as const, kind: 'duel' as const, title: t('arcade:wordDuelTitle'), sub: t('arcade:wordDuelSubtitle') },
     { id: 'COMPLETE_IT' as const, kind: 'complete' as const, title: t('arcade:completeItTitle'), sub: t('arcade:completeItSubtitle') },
+    { id: 'HANGMAN' as const, kind: 'hangman' as const, title: t('arcade:hangmanTitle'), sub: t('arcade:hangmanSubtitle') },
   ];
 
   return (
@@ -174,9 +175,9 @@ const styles = StyleSheet.create({
   questTitle: { fontSize: 22, fontWeight: '900' },
   windows: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   windowChip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
-  tileRow: { flexDirection: 'row', gap: 14 },
+  tileRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
   tileRowMobile: { flexDirection: 'column', gap: 10 },
-  tile: { flex: 1, borderWidth: 1, borderRadius: 18, overflow: 'hidden' },
+  tile: { flexGrow: 1, flexBasis: 240, minWidth: 220, borderWidth: 1, borderRadius: 18, overflow: 'hidden' },
   tileMobile: { flexDirection: 'row', alignItems: 'center', padding: 10, gap: 12 },
   tileArt: { borderRadius: 0 },
   tileText: { padding: 12, gap: 4, flex: 1 },

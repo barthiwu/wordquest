@@ -74,6 +74,7 @@ export const NAMESPACES = [
   'legal',
   'arcade',
   'scrambleQuest',
+  'hangman',
   'play',
   'completeIt',
   'wordDuel',

@@ -20,7 +20,7 @@ import { getUpcomingBattle, type UpcomingBattle } from '@/services/bossBattle';
 import { useAuthStore } from '@/state/authStore';
 import { formatLocalClock, timeOfDayPeriod } from '@/utils/timeOfDay';
 import { formatBossBattleCountdown } from '@/utils/bossBattleCountdown';
-import { CompleteItIcon, ScrambleQuestIcon, WordDuelIcon } from '@/components/ArcadeGameIcons';
+import { CompleteItIcon, HangmanIcon, ScrambleQuestIcon, WordDuelIcon } from '@/components/ArcadeGameIcons';
 import { FirstTimeTip } from '@/components/FirstTimeTip';
 import { trackEvent } from '@/services/analyticsClient';
 import type { CompositeScreenProps } from '@react-navigation/native';
@@ -94,7 +94,7 @@ export function PlayScreen({ navigation }: Props) {
 
   const selectGame = (
     game: string,
-    screen: 'ScrambleQuest' | 'WordDuel' | 'CompleteIt' | 'BossBattle',
+    screen: 'ScrambleQuest' | 'WordDuel' | 'CompleteIt' | 'Hangman' | 'BossBattle',
   ) => {
     trackEvent('ARCADE_GAME_SELECTED', { game });
     navigation.navigate(screen);
@@ -291,6 +291,16 @@ export function PlayScreen({ navigation }: Props) {
         grid={wide}
       />
       <GameRow
+        title={t('arcade:hangmanTitle')}
+        subtitle={t('arcade:hangmanSubtitle')}
+        cta={t('arcade:play')}
+        enabled
+        onPress={() => selectGame('HANGMAN', 'Hangman')}
+        icon={<HangmanIcon colors={colors} />}
+        styles={styles}
+        grid={wide}
+      />
+      <GameRow
         title={t('home:bossBattle')}
         subtitle={t('play:bossBattleSubtitle')}
         cta={t('arcade:play')}
@@ -337,7 +347,9 @@ export function PlayScreen({ navigation }: Props) {
                 ? 'WordDuel'
                 : game === 'COMPLETE_IT'
                   ? 'CompleteIt'
-                  : 'BossBattle',
+                  : game === 'HANGMAN'
+                    ? 'Hangman'
+                    : 'BossBattle',
           )
         }
         bossBadge={battleCountdown?.compact}

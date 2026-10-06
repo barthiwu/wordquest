@@ -186,6 +186,7 @@ describe('AnalyticsQueryService', () => {
         avgHintsUsed: 0.3,
         avgResponseTimeMs: 4100,
       });
+      expect(result.hangman.sessionsCompleted).toBe(10);
     });
 
     it('returns null rates/averages rather than dividing by zero when a game has no answers yet', async () => {

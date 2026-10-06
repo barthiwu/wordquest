@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import Svg, { Line, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Line, Path, Rect } from 'react-native-svg';
 import type { ThemeColors } from '@/constants/theme';
 
 export interface ArcadeGameIconProps {
@@ -166,6 +166,23 @@ export function CompleteItIcon({ colors, size = DEFAULT_BADGE_SIZE }: ArcadeGame
           stroke={colors.arcaneSoft}
           strokeWidth={3}
         />
+      </Svg>
+    </IconBadge>
+  );
+}
+
+/** Hangman: a small gallows with a head and a body. */
+export function HangmanIcon({ colors, size = DEFAULT_BADGE_SIZE }: ArcadeGameIconProps) {
+  const glyph = size * GLYPH_RATIO;
+  return (
+    <IconBadge colors={colors} size={size}>
+      <Svg width={glyph} height={glyph} viewBox="0 0 100 100">
+        <Line x1={20} y1={84} x2={60} y2={84} stroke={colors.arcaneSoft} strokeWidth={6} strokeLinecap="round" />
+        <Line x1={34} y1={84} x2={34} y2={16} stroke={colors.arcaneSoft} strokeWidth={6} strokeLinecap="round" />
+        <Line x1={31} y1={16} x2={70} y2={16} stroke={colors.arcaneSoft} strokeWidth={6} strokeLinecap="round" />
+        <Line x1={70} y1={16} x2={70} y2={30} stroke={colors.glyph} strokeWidth={4} strokeLinecap="round" />
+        <Circle cx={70} cy={38} r={8} fill="none" stroke={colors.glyph} strokeWidth={4} />
+        <Line x1={70} y1={46} x2={70} y2={68} stroke={colors.glyph} strokeWidth={4} strokeLinecap="round" />
       </Svg>
     </IconBadge>
   );

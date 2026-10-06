@@ -1657,6 +1657,7 @@ enum ArcadeGame {
   SCRAMBLE_QUEST
   WORD_DUEL
   COMPLETE_IT
+  HANGMAN
 }
 
 enum ArcadeSessionStatus {
@@ -1716,6 +1717,14 @@ model ArcadeGameSession {
   // so a submitted answer's hint penalty can't be forged (spec §11:
   // "Never trust client-submitted ... hints").
   currentWordHintsUsed Int @default(0)
+
+  // Hangman only: the letters guessed so far on the CURRENT word, in the
+  // order they were guessed, and a counter that doubles as the
+  // compare-and-swap key for a guess (a double-tap or racing request for
+  // the same guess number loses cleanly). Both reset when currentIndex
+  // advances. Unused (empty / 0) for every other game.
+  currentWordGuesses    String[] @default([])
+  currentWordGuessCount Int      @default(0)
 
   startedAt DateTime  @default(now())
   endedAt   DateTime?

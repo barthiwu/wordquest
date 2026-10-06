@@ -38,6 +38,7 @@ import { AliGalleryScreen } from '@/features/ali/AliGalleryScreen';
 import { BossBattleScreen } from '@/features/boss-battle/BossBattleScreen';
 import { ScrambleQuestScreen } from '@/features/arcade/ScrambleQuestScreen';
 import { CompleteItScreen } from '@/features/arcade/CompleteItScreen';
+import { HangmanScreen } from '@/features/arcade/HangmanScreen';
 import { WordDuelScreen } from '@/features/arcade/WordDuelScreen';
 import { BossBattleLeaderboardScreen } from '@/features/boss-battle/BossBattleLeaderboardScreen';
 import { MasterChallengeScreen } from '@/features/master-challenge/MasterChallengeScreen';
@@ -109,6 +110,7 @@ export type RootStackParamList = {
   ScrambleQuest: undefined;
   WordDuel: undefined;
   CompleteIt: undefined;
+  Hangman: undefined;
   BossBattleLeaderboard: undefined;
   MasterChallenge: undefined;
   Order: undefined;
@@ -244,6 +246,7 @@ export function RootNavigator() {
         <Stack.Screen name="BossBattle" component={framed(BossBattleScreen)} />
         <Stack.Screen name="ScrambleQuest" component={framed(ScrambleQuestScreen)} />
         <Stack.Screen name="CompleteIt" component={framed(CompleteItScreen)} />
+        <Stack.Screen name="Hangman" component={framed(HangmanScreen)} />
         <Stack.Screen name="WordDuel" component={framed(WordDuelScreen)} />
         <Stack.Screen
           name="BossBattleLeaderboard"

@@ -1,6 +1,6 @@
 import { apiRequest } from './apiClient';
 
-export type ArcadeGameKind = 'SCRAMBLE_QUEST' | 'WORD_DUEL' | 'COMPLETE_IT';
+export type ArcadeGameKind = 'SCRAMBLE_QUEST' | 'WORD_DUEL' | 'COMPLETE_IT' | 'HANGMAN';
 
 export interface LastPlayedArcadeGame {
   game: ArcadeGameKind;

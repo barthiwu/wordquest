@@ -123,6 +123,32 @@ export const COMPLETE_IT_CONFIG = {
   MAX_WORD_LENGTH: 10,
 } as const;
 
+// ── Hangman ────────────────────────────────────────────────────────────
+export const HANGMAN_CONFIG = {
+  // Six body parts (head, body, two arms, two legs): the sixth wrong
+  // letter hangs the man and the word is lost.
+  MAX_WRONG_GUESSES: 6,
+  // A session is a run of words, like the other single-player games, so
+  // one "play" of Hangman is one run of this many words.
+  WORDS_PER_SESSION: 5,
+  // One hint per word reveals a letter the player has not found yet. It
+  // never reveals the last missing letter, and it costs XP (same shared
+  // per-hint penalty every Arcade game uses) but not a body part.
+  MAX_HINTS_PER_WORD: 1,
+  // Denominator for the shared speed modifier only. Hangman has no
+  // per-word countdown -- it is a thinking game, not a race -- so this
+  // only decides whether a solve counts as fast, normal or slow.
+  TIME_REFERENCE_SECONDS: 90,
+  // Each wrong letter costs this fraction of the XP on a win, compounding
+  // (0.9^wrong), so a clean solve beats a close escape.
+  MISTAKE_PENALTY_PER_WRONG_GUESS: 0.9,
+  // Same vault window as the other Arcade games: 3-10 letters. Longer
+  // words are easier to hang on, shorter ones are riskier, which suits
+  // a range of difficulties.
+  MIN_WORD_LENGTH: 3,
+  MAX_WORD_LENGTH: 10,
+} as const;
+
 // ── Word Duel ──────────────────────────────────────────────────────────
 export const WORD_DUEL_CONFIG = {
   MATCH_DURATION_MINUTES: 5,

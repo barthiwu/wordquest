@@ -34,6 +34,7 @@ import { JourneyMotif } from '@/components/JourneyMotif';
 import { AliMark } from '@/components/AliMark';
 import {
   CompleteItIcon,
+  HangmanIcon,
   ScrambleQuestIcon,
   WordDuelIcon,
 } from '@/components/ArcadeGameIcons';
@@ -47,12 +48,13 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-/** Only the three V1 arcade games — the prototype's extra "Odd Word Out" /
+/** The four arcade games — the prototype's extra "Odd Word Out" /
  * "Definition Dash" tiles are deliberately omitted (UI spec §10). */
 const ARCADE_GAMES = [
   { route: 'ScrambleQuest', titleKey: 'arcade:scrambleQuestTitle', subKey: 'arcade:scrambleQuestSubtitle', Icon: ScrambleQuestIcon },
   { route: 'WordDuel', titleKey: 'arcade:wordDuelTitle', subKey: 'arcade:wordDuelSubtitle', Icon: WordDuelIcon },
   { route: 'CompleteIt', titleKey: 'arcade:completeItTitle', subKey: 'arcade:completeItSubtitle', Icon: CompleteItIcon },
+  { route: 'Hangman', titleKey: 'arcade:hangmanTitle', subKey: 'arcade:hangmanSubtitle', Icon: HangmanIcon },
 ] as const;
 
 /**

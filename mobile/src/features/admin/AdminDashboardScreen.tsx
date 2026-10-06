@@ -215,6 +215,13 @@ export function AdminDashboardScreen({ navigation }: Props) {
 
           <Text style={styles.subheading}>{t('completeItSubheading')}</Text>
           <ArcadeGameCardGrid stats={arcade.completeIt} t={t} styles={styles} />
+
+          {arcade.hangman && (
+            <>
+              <Text style={styles.subheading}>{t('hangmanSubheading')}</Text>
+              <ArcadeGameCardGrid stats={arcade.hangman} t={t} styles={styles} />
+            </>
+          )}
         </View>
       )}
     </ScrollView>

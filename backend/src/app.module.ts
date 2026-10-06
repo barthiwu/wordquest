@@ -16,6 +16,7 @@ import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { ArcadeModule } from './arcade/arcade.module';
 import { ScrambleQuestModule } from './arcade/scramble-quest/scramble-quest.module';
 import { CompleteItModule } from './arcade/complete-it/complete-it.module';
+import { HangmanModule } from './arcade/hangman/hangman.module';
 import { WordDuelModule } from './arcade/word-duel/word-duel.module';
 import { MasteryModule } from './mastery/mastery.module';
 import { ProgressionModule } from './progression/progression.module';
@@ -69,6 +70,7 @@ import { FeedbackModule } from './feedback/feedback.module';
     ArcadeModule,
     ScrambleQuestModule,
     CompleteItModule,
+    HangmanModule,
     WordDuelModule,
     MasteryModule,
     ProgressionModule,

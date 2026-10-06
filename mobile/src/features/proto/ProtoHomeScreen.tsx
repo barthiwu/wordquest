@@ -170,6 +170,7 @@ export function ProtoHomeScreen({ navigation }: Props) {
             { route: 'ScrambleQuest', kind: 'scramble', title: t('arcade:scrambleQuestTitle'), sub: t('arcade:scrambleQuestSubtitle') },
             { route: 'WordDuel', kind: 'duel', title: t('arcade:wordDuelTitle'), sub: t('arcade:wordDuelSubtitle') },
             { route: 'CompleteIt', kind: 'complete', title: t('arcade:completeItTitle'), sub: t('arcade:completeItSubtitle') },
+            { route: 'Hangman', kind: 'hangman', title: t('arcade:hangmanTitle'), sub: t('arcade:hangmanSubtitle') },
           ] as const
         ).map((g) => (
           <Pressable
@@ -364,8 +365,8 @@ const styles = StyleSheet.create({
   statDivider: { width: 1, height: 40 },
   statValue: { fontSize: 24, fontWeight: '900' },
   statLabel: { fontSize: 12, fontWeight: '600' },
-  tileRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
-  tile: { flex: 1, borderWidth: 1, borderRadius: 16, padding: 8, alignItems: 'center', gap: 6 },
+  tileRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 },
+  tile: { flexGrow: 1, flexBasis: '22%', minWidth: 130, borderWidth: 1, borderRadius: 16, padding: 8, alignItems: 'center', gap: 6 },
   tileArt: { borderRadius: 12, alignSelf: 'stretch', width: '100%' },
   tileTitle: { fontSize: 14, fontWeight: '800', textAlign: 'center' },
   tileSub: { fontSize: 12, textAlign: 'center' },

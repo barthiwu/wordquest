@@ -70,7 +70,7 @@ export interface ArcadeGameDashboardStats {
 }
 
 /**
- * ScrambleQuest/Complete It, ground-truth (ArcadeGameSession/
+ * ScrambleQuest/Complete It/Hangman, ground-truth (ArcadeGameSession/
  * ArcadeAnswer, not analytics_events) — same reasoning as
  * WordDuelDashboardStats above. Word Duel is excluded even though it
  * shares the ArcadeGame enum: it isn't an ArcadeGameSession row (see
@@ -80,6 +80,7 @@ export interface ArcadeGameDashboardStats {
 export interface ArcadeDashboardStats {
   scrambleQuest: ArcadeGameDashboardStats;
   completeIt: ArcadeGameDashboardStats;
+  hangman: ArcadeGameDashboardStats;
 }
 
 /**
@@ -188,11 +189,12 @@ export class AnalyticsQueryService {
   }
 
   async getArcadeDashboard(): Promise<ArcadeDashboardStats> {
-    const [scrambleQuest, completeIt] = await Promise.all([
+    const [scrambleQuest, completeIt, hangman] = await Promise.all([
       this.getArcadeGameStats('SCRAMBLE_QUEST'),
       this.getArcadeGameStats('COMPLETE_IT'),
+      this.getArcadeGameStats('HANGMAN'),
     ]);
-    return { scrambleQuest, completeIt };
+    return { scrambleQuest, completeIt, hangman };
   }
 
   private async getArcadeGameStats(game: ArcadeGame): Promise<ArcadeGameDashboardStats> {

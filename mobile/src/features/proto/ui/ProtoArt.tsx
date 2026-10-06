@@ -19,7 +19,7 @@ import { View, type StyleProp, type ViewStyle } from 'react-native';
  * scroll + quill, Boss Battle demon, trophy, treasure chest, crown).
  * Every piece is plain SVG so it scales crisply and themes with the app.
  */
-export type ArtKind = 'scramble' | 'duel' | 'complete' | 'boss' | 'frost' | 'shadow' | 'titan';
+export type ArtKind = 'scramble' | 'duel' | 'complete' | 'hangman' | 'boss' | 'frost' | 'shadow' | 'titan';
 
 function Sword({ rotate, blade, guard }: { rotate: number; blade: string; guard: string }) {
   return (
@@ -107,6 +107,20 @@ export function ArcadeArt({ kind, width = 120, height = 90, style }: { kind: Art
             <Polygon points="82,56 84,62 79,70" fill="#2C2C2C" />
           </G>
         )}
+        {kind === 'hangman' && (
+          <G>
+            <Path d="M0,76 C24,68 44,74 60,70 C80,74 100,68 120,76 L120,90 L0,90 Z" fill="#0F2A1C" opacity={0.75} />
+            <Rect x={28} y={72} width={52} height={5} rx={2.5} fill="#B98B4E" />
+            <Rect x={38} y={14} width={5} height={60} rx={2.5} fill="#B98B4E" />
+            <Rect x={38} y={14} width={46} height={5} rx={2.5} fill="#B98B4E" />
+            <Path d="M38,34 L56,14" stroke="#B98B4E" strokeWidth={3.5} strokeLinecap="round" />
+            <Rect x={79} y={19} width={2} height={11} fill="#E8D7B0" />
+            <Circle cx={80} cy={36} r={7} fill="none" stroke="#FFFFFF" strokeWidth={2.6} />
+            <Path d="M80,43 L80,60 M80,48 L72,56 M80,48 L88,56" stroke="#FFFFFF" strokeWidth={2.6} strokeLinecap="round" fill="none" />
+            <Circle cx={20} cy={22} r={2} fill="#FFFFFF" opacity={0.8} />
+            <Circle cx={104} cy={26} r={1.6} fill="#FFFFFF" opacity={0.7} />
+          </G>
+        )}
         {(kind === 'boss' || kind === 'titan' || kind === 'shadow' || kind === 'frost') && <BossHead kind={kind} />}
       </Svg>
     </View>
@@ -117,6 +131,7 @@ const BG: Record<ArtKind, [string, string, string]> = {
   scramble: ['#14683A', '#0A2D5E', '#7EE0FF'],
   duel: ['#4C1D95', '#1B0B3B', '#C084FC'],
   complete: ['#B45309', '#5A2A06', '#FFD27A'],
+  hangman: ['#1F6F5B', '#0B2B2A', '#9EF0D0'],
   boss: ['#7A1308', '#1A0504', '#FF6A2A'],
   frost: ['#2F6DB8', '#0A1F45', '#BDEBFF'],
   shadow: ['#3B1A6B', '#0B0420', '#B58CFF'],
