@@ -21,7 +21,11 @@ export function sampleResultCard(
     p('u4', 'tunde', 4, 6, 59000),
     p('u5', 'kemi', 5, 4, 40000),
   ];
-  const players = base.map((x) => ({ ...x, isMe: x.rank === myRank, name: x.rank === myRank ? 'barth' : x.name }));
+  const players = base.map((x) => ({
+    ...x,
+    isMe: x.rank === myRank,
+    name: x.rank === myRank ? 'barth' : x.name,
+  }));
   return {
     kind: 'group',
     gameLabel: 'ScrambleQuest',

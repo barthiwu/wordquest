@@ -1,10 +1,12 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ArcadeGuestService } from './guest.service';
 import { GuestJoinDto } from './dto/guest-join.dto';
+import { ArcadeGroupService } from './group.service';
 
 /**
- * POST /api/v1/arcade/guest-join   public: join a group link with just a nickname
+ * GET  /api/v1/arcade/guest-join/preview/:code   public: what the link shows before joining
+ * POST /api/v1/arcade/guest-join                  public: join a group link with just a nickname
  *
  * Returns a normal session (tokens + user, `isGuest: true`) and the group.
  * Throttled per IP, but generously: a whole class or WhatsApp group on one
@@ -13,7 +15,17 @@ import { GuestJoinDto } from './dto/guest-join.dto';
  */
 @Controller('arcade/guest-join')
 export class ArcadeGuestController {
-  constructor(private readonly guests: ArcadeGuestService) {}
+  constructor(
+    private readonly guests: ArcadeGuestService,
+    private readonly groups: ArcadeGroupService,
+  ) {}
+
+  /** Same answer as the signed-in preview; the code in the link is the only secret. */
+  @Get('preview/:code')
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  preview(@Param('code') code: string) {
+    return this.groups.preview(code);
+  }
 
   @Post()
   @HttpCode(200)

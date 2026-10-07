@@ -1117,6 +1117,22 @@
       "play": {
         "backToGroup": "Rudi kwenye kikundi",
         "complete": "Mchezo wako wa kikundi umekamilika. Angalia kikundi kuona matokeo."
+      },
+      "guest": {
+        "joinTitle": "Jiunge kama mgeni",
+        "joinHint": "Huhitaji akaunti. Cheza katika kundi hili sasa, na fungua akaunti ya bure baadaye ukipenda.",
+        "nicknameLabel": "Jina lako kwenye mchezo",
+        "nicknamePlaceholder": "k.m. Chioma",
+        "nicknameShort": "Tafadhali weka jina lenye herufi {{min}} hadi {{max}}.",
+        "ageConfirm": "Nina umri wa miaka 13 au zaidi",
+        "ageRequired": "Tafadhali thibitisha kuwa una umri wa miaka 13 au zaidi.",
+        "joinButton": "Jiunge kama mgeni",
+        "orAccount": "Au tumia akaunti",
+        "logIn": "Ingia",
+        "createAccount": "Fungua akaunti",
+        "upgradeTitle": "Hifadhi maendeleo yako",
+        "upgradeBody": "Unacheza kama mgeni. Fungua akaunti ya bure ili kuhifadhi jina lako, kuendesha vikundi vyako mwenyewe na kufungua sehemu nyingine za WordQuest.",
+        "upgradeCta": "Fungua akaunti ya bure"
       }
     },
     "share": {

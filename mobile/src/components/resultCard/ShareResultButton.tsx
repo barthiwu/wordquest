@@ -38,7 +38,10 @@ export function ShareResultButton({
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <View style={styles.backdrop}>
           <ScrollView
-            contentContainerStyle={[styles.sheet, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 }]}
+            contentContainerStyle={[
+              styles.sheet,
+              { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 },
+            ]}
           >
             <Pressable
               style={styles.close}

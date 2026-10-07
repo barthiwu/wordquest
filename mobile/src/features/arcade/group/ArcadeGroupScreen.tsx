@@ -21,6 +21,7 @@ import {
   joinGroup,
   leaveGroup,
   previewGroup,
+  previewGroupPublic,
   removeGroupMember,
   startGroupRound,
   type ArcadeGroup,
@@ -31,6 +32,8 @@ import { canCopyText, copyText, shareMessage } from '@/utils/shareLink';
 import { ShareResultCard } from '@/components/resultCard/ShareResultCard';
 import { buildGroupResultCard } from '@/components/resultCard/buildData';
 import { GroupMemberList } from './GroupMemberList';
+import { GuestJoinPanel } from './GuestJoinPanel';
+import { GuestUpgradeBanner } from './GuestUpgradeBanner';
 import { formatClock } from './groupFormat';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ArcadeGroup'>;
@@ -58,6 +61,7 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
   const accessToken = useAuthStore((s) => s.accessToken);
   const isHydrated = useAuthStore((s) => s.isHydrated);
   const setPendingCode = usePendingGroupStore((s) => s.setCode);
+  const setSession = useAuthStore((s) => s.setSession);
 
   const [groupId, setGroupId] = useState<string | undefined>(route.params.groupId);
   const code = useMemo(
@@ -75,6 +79,8 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
   const [confirm, setConfirm] = useState<'end' | 'leave' | string | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const alive = useRef(true);
+  /** Set the moment a guest join succeeds, so signing the new session in does not start a second preview. */
+  const guestJoined = useRef(false);
 
   useEffect(() => {
     alive.current = true;
@@ -83,18 +89,12 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
     };
   }, []);
 
-  // A link opened while signed out: keep the code, sign in first.
+  // Opened from a link: show what the group is before joining it. Signed-out
+  // visitors see the same thing and can join as a guest (no account needed).
   useEffect(() => {
-    if (isHydrated && !accessToken && code) {
-      setPendingCode(code);
-      navigation.replace('Welcome');
-    }
-  }, [isHydrated, accessToken, code, navigation, setPendingCode]);
-
-  // Opened from a link: show what the group is before joining it.
-  useEffect(() => {
-    if (!accessToken || groupId || !code) return;
-    previewGroup(accessToken, code)
+    if (groupId || !code || !isHydrated || guestJoined.current) return;
+    const lookup = accessToken ? previewGroup(accessToken, code) : previewGroupPublic(code);
+    lookup
       .then((p) => alive.current && setPreview(p))
       .catch((err) => {
         if (alive.current) {
@@ -105,7 +105,7 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
           );
         }
       });
-  }, [accessToken, groupId, code, t]);
+  }, [accessToken, isHydrated, groupId, code, t]);
 
   const load = useCallback(async () => {
     if (!accessToken || !groupId) return;
@@ -195,6 +195,28 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
           <Text style={styles.buttonText}>{t('arcade:group.hubTitle')}</Text>
         </Pressable>
       </View>
+    );
+  } else if (!groupId && preview && !accessToken && code) {
+    body = (
+      <GuestJoinPanel
+        code={code}
+        preview={preview}
+        gameName={gameName(preview.game)}
+        onJoined={(result) => {
+          guestJoined.current = true;
+          setGroupId(result.group.id);
+          setGroup(result.group);
+          void setSession(result);
+        }}
+        onLogin={() => {
+          setPendingCode(code);
+          navigation.navigate('Login');
+        }}
+        onRegister={() => {
+          setPendingCode(code);
+          navigation.navigate('Registration');
+        }}
+      />
     );
   } else if (!groupId && preview) {
     body = (
@@ -431,6 +453,8 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
             )}
           </>
         ) : null}
+
+        <GuestUpgradeBanner groupCode={group.code} />
 
         <View style={styles.actions}>
           {group.status === 'ENDED' ? (

@@ -14,7 +14,8 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors, useThemeStore } from '@/state/themeStore';
-import { register, type AuthResult } from '@/services/auth';
+import { register, upgradeGuest, type AuthResult } from '@/services/auth';
+import { usePendingGroupStore } from '@/state/pendingGroupStore';
 import { isAcceptablePassword } from './passwordPolicy';
 import { getMe } from '@/services/users';
 import { ApiError } from '@/services/apiClient';
@@ -37,14 +38,19 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Registration'>;
  * Screen 3 of the UI/UX Screen Bible. Talks to the real
  * POST /api/v1/auth/register endpoint — no mock data.
  */
-export function RegistrationScreen({ navigation }: Props) {
+export function RegistrationScreen({ navigation, route }: Props) {
+  // A guest turning their session into a real account (their name and group carry over).
+  const upgrade = route.params?.upgrade === true;
+  const groupCode = route.params?.groupCode;
   const colors = useThemeColors();
   const themeMode = useThemeStore((s) => s.mode);
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation('auth');
   const setSession = useAuthStore((s) => s.setSession);
-  const [displayName, setDisplayName] = useState('');
+  const guestName = useAuthStore((s) => s.user?.displayName ?? '');
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const [displayName, setDisplayName] = useState(upgrade ? guestName : '');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -144,14 +150,18 @@ export function RegistrationScreen({ navigation }: Props) {
     setSubmitting(true);
     setError(null);
     try {
-      const result = await register({
+      const input = {
         email: email.trim(),
         password,
         displayName: displayName.trim(),
         dateOfBirth: toIsoDate(dobParts.year, dobParts.month, dobParts.day),
-      });
+      };
+      const result =
+        upgrade && accessToken ? await upgradeGuest(accessToken, input) : await register(input);
       await setSession(result);
       syncPushToken(result.accessToken);
+      // Back to the group they were playing once onboarding is done.
+      if (upgrade && groupCode) usePendingGroupStore.getState().setCode(groupCode);
       navigation.replace('Biodata');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t('registration.errorGeneric'));
@@ -193,8 +203,12 @@ export function RegistrationScreen({ navigation }: Props) {
           fontSize={30}
           style={{ alignSelf: 'flex-start', marginBottom: 12 }}
         />
-        <Text style={styles.title}>{t('registration.title')}</Text>
-        <Text style={styles.subtitle}>{t('registration.subtitle')}</Text>
+        <Text style={styles.title}>
+          {upgrade ? t('arcade:group.guest.upgradeTitle') : t('registration.title')}
+        </Text>
+        <Text style={styles.subtitle}>
+          {upgrade ? t('arcade:group.guest.upgradeBody') : t('registration.subtitle')}
+        </Text>
       </View>
 
       <View style={styles.form}>
@@ -279,12 +293,14 @@ export function RegistrationScreen({ navigation }: Props) {
           )}
         </Pressable>
 
-        <SocialButtons
-          providers={social.available}
-          busy={social.busy}
-          onPress={social.start}
-          error={social.error}
-        />
+        {upgrade ? null : (
+          <SocialButtons
+            providers={social.available}
+            busy={social.busy}
+            onPress={social.start}
+            error={social.error}
+          />
+        )}
 
         <Text style={styles.legalNote}>
           {t('registration.legalNotePrefix')}

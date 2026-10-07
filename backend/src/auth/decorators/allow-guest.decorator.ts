@@ -1,4 +1,9 @@
-import { createParamDecorator, ExecutionContext, ForbiddenException, SetMetadata } from '@nestjs/common';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  ForbiddenException,
+  SetMetadata,
+} from '@nestjs/common';
 import type { AuthenticatedRequest } from '../guards/jwt-auth.guard';
 
 export const ALLOW_GUEST_KEY = 'wordquest:allowGuest';

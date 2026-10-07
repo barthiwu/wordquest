@@ -51,9 +51,13 @@ export async function shareCardImage(
   opts: { fileName: string; title: string },
 ): Promise<ShareOutcome> {
   const blob = await render(node);
-  const file = new File([blob], opts.fileName.endsWith('.png') ? opts.fileName : `${opts.fileName}.png`, {
-    type: 'image/png',
-  });
+  const file = new File(
+    [blob],
+    opts.fileName.endsWith('.png') ? opts.fileName : `${opts.fileName}.png`,
+    {
+      type: 'image/png',
+    },
+  );
   if (canShareFiles() && navigator.canShare({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title: opts.title });

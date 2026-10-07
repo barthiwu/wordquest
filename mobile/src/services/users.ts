@@ -11,6 +11,8 @@ export interface Me {
   id: string;
   email: string;
   role: UserRole;
+  /** True while playing as a guest (Group Play link, no account). */
+  isGuest?: boolean;
   /** The account owner's real name -- shown only to the account owner, never other players. See `username`. */
   displayName: string;
   /** The public handle shown to other players (leaderboards, Boss Battle, Quest Cards). Lowercase letters, digits, underscores; 3-20 chars. */

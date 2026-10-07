@@ -1133,7 +1133,23 @@
       "mineMembers_zero": "{{count}} لاعبين",
       "mineMembers_two": "لاعبان ({{count}})",
       "mineMembers_few": "{{count}} لاعبين",
-      "mineMembers_many": "{{count}} لاعبًا"
+      "mineMembers_many": "{{count}} لاعبًا",
+      "guest": {
+        "joinTitle": "انضم كضيف",
+        "joinHint": "لا حاجة لحساب. العب في هذه المجموعة الآن، وأنشئ حسابًا مجانيًا لاحقًا إن أعجبتك التجربة.",
+        "nicknameLabel": "اسمك في اللعبة",
+        "nicknamePlaceholder": "مثال: تشيوما",
+        "nicknameShort": "أدخل اسمًا من {{min}} إلى {{max}} حرفًا.",
+        "ageConfirm": "عمري 13 عامًا أو أكثر",
+        "ageRequired": "يرجى تأكيد أن عمرك 13 عامًا أو أكثر.",
+        "joinButton": "انضم كضيف",
+        "orAccount": "أو استخدم حسابًا",
+        "logIn": "تسجيل الدخول",
+        "createAccount": "إنشاء حساب",
+        "upgradeTitle": "احتفظ بتقدمك",
+        "upgradeBody": "أنت تلعب كضيف. أنشئ حسابًا مجانيًا للاحتفاظ باسمك وإنشاء مجموعاتك الخاصة وفتح بقية ميزات WordQuest.",
+        "upgradeCta": "إنشاء حساب مجاني"
+      }
     },
     "share": {
       "dialogTitle": "شارك نتيجتك في WordQuest",

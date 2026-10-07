@@ -16,7 +16,11 @@ class WholeController {
   any() {}
 }
 
-function ctx(req: Partial<AuthenticatedRequest>, cls: new () => object, handler: string): ExecutionContext {
+function ctx(
+  req: Partial<AuthenticatedRequest>,
+  cls: new () => object,
+  handler: string,
+): ExecutionContext {
   return {
     switchToHttp: () => ({ getRequest: () => req }),
     getHandler: () => (cls.prototype as Record<string, () => void>)[handler],
@@ -59,7 +63,9 @@ describe('JwtAuthGuard guest allow-list', () => {
 
   it('keeps other handlers of a partly-open controller closed to guests', async () => {
     jwt.verifyAsync.mockResolvedValue({ sub: 'g1', guest: true });
-    await expect(guard.canActivate(ctx(req(), Open, 'closed'))).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(guard.canActivate(ctx(req(), Open, 'closed'))).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
   });
 
   it('still rejects missing and invalid tokens', async () => {
@@ -67,6 +73,8 @@ describe('JwtAuthGuard guest allow-list', () => {
       guard.canActivate(ctx({ headers: {} } as never, Plain, 'open')),
     ).rejects.toBeInstanceOf(UnauthorizedException);
     jwt.verifyAsync.mockRejectedValue(new Error('bad'));
-    await expect(guard.canActivate(ctx(req(), Plain, 'open'))).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(guard.canActivate(ctx(req(), Plain, 'open'))).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
   });
 });

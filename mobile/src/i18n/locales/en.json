@@ -1117,6 +1117,22 @@
       "play": {
         "backToGroup": "Back to group",
         "complete": "Your group play is complete. Check the group for results."
+      },
+      "guest": {
+        "joinTitle": "Join as a guest",
+        "joinHint": "No account needed. Play this group now, and create a free account later if you like it.",
+        "nicknameLabel": "Your name in the game",
+        "nicknamePlaceholder": "e.g. Chioma",
+        "nicknameShort": "Please enter a name of {{min}} to {{max}} characters.",
+        "ageConfirm": "I am 13 or older",
+        "ageRequired": "Please confirm that you are 13 or older.",
+        "joinButton": "Join as guest",
+        "orAccount": "Or use an account",
+        "logIn": "Log in",
+        "createAccount": "Create account",
+        "upgradeTitle": "Keep your progress",
+        "upgradeBody": "You are playing as a guest. Create a free account to keep your name, host your own groups and unlock the rest of WordQuest.",
+        "upgradeCta": "Create free account"
       }
     },
     "share": {

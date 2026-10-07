@@ -18,6 +18,7 @@ import { useThemeColors } from '@/state/themeStore';
 import { useAuthStore } from '@/state/authStore';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 import { BackButton } from '@/components/BackButton';
+import { GuestUpgradeBanner } from './GuestUpgradeBanner';
 import { ApiError } from '@/services/apiClient';
 import { VERSUS_GAME_ROUTE, type VersusGame } from '@/services/arcadeVersus';
 import {
@@ -48,6 +49,7 @@ export function ArcadeGroupHubScreen({ navigation, route }: Props) {
   const styles = useMemo(() => createStyles(colors, insets.top), [colors, insets.top]);
   const { t } = useTranslation(['arcade', 'common']);
   const accessToken = useAuthStore((s) => s.accessToken);
+  const isGuest = useAuthStore((s) => s.user?.isGuest === true);
 
   const [game, setGame] = useState<VersusGame>(route.params?.game ?? 'SCRAMBLE_QUEST');
   const [title, setTitle] = useState('');
@@ -109,12 +111,15 @@ export function ArcadeGroupHubScreen({ navigation, route }: Props) {
   return (
     <ScrollView style={styles.flexFill} contentContainerStyle={styles.container}>
       <View style={styles.column}>
-        <BackButton onPress={() => navigation.goBack()} />
+        {isGuest ? null : <BackButton onPress={() => navigation.goBack()} />}
         <Text style={styles.title} accessibilityRole="header">
           {t('arcade:group.hubTitle')}
         </Text>
         <Text style={styles.sub}>{t('arcade:group.hubSub')}</Text>
 
+        {isGuest ? <GuestUpgradeBanner /> : null}
+
+        {isGuest ? null : (
         <View style={styles.card}>
           <Text style={styles.label}>{t('arcade:group.chooseGame')}</Text>
           <View style={styles.chips}>
@@ -179,6 +184,7 @@ export function ArcadeGroupHubScreen({ navigation, route }: Props) {
             {t('arcade:group.maxPlayers', { max: GROUP_MAX_MEMBERS })}
           </Text>
         </View>
+        )}
 
         <View style={styles.card}>
           <Text style={styles.label}>{t('arcade:group.joinHeading')}</Text>

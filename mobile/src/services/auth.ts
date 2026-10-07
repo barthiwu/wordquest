@@ -20,6 +20,8 @@ export interface AuthUser {
    * stale until the next login.
    */
   avatarUrl: string | null;
+  /** True while playing as a guest (joined a group link without an account). */
+  isGuest?: boolean;
 }
 
 export interface AuthResult {
@@ -49,6 +51,21 @@ export function register(input: {
   dateOfBirth: string;
 }): Promise<AuthResult> {
   return apiRequest<AuthResult>('/auth/register', { method: 'POST', body: input });
+}
+
+/**
+ * A guest turns their session into a real account, keeping their name and the
+ * group they are in. Same fields as register(); needs the guest's access token.
+ */
+export function upgradeGuest(
+  accessToken: string,
+  input: Parameters<typeof register>[0] & { englishVariant?: 'US' | 'UK' },
+): Promise<AuthResult> {
+  return apiRequest<AuthResult>('/auth/guest/upgrade', {
+    method: 'POST',
+    body: input,
+    accessToken,
+  });
 }
 
 export function login(input: { email: string; password: string }): Promise<LoginResult> {

@@ -18,7 +18,14 @@ function ScoreRing({ value, label }: { value: number; label: string }) {
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke={P.ringTrack} strokeWidth={stroke} fill="none" />
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke={P.ringTrack}
+          strokeWidth={stroke}
+          fill="none"
+        />
         <Circle
           cx={size / 2}
           cy={size / 2}
@@ -119,7 +126,15 @@ export function QuestCardResult({ data }: { data: ResultCardData }) {
         <View style={s.foot}>
           <CardFooter footer={data.footer} brand={data.brand} />
         </View>
-        <Confetti width={INNER_W} height={190} count={18} seed={21} top={20} bottom={120} opacity={0.9} />
+        <Confetti
+          width={INNER_W}
+          height={190}
+          count={18}
+          seed={21}
+          top={20}
+          bottom={120}
+          opacity={0.9}
+        />
       </View>
     </LinearGradient>
   );

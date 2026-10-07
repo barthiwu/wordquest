@@ -1117,6 +1117,22 @@
       "play": {
         "backToGroup": "返回小组",
         "complete": "你的团体游玩已完成。请到小组查看结果。"
+      },
+      "guest": {
+        "joinTitle": "以访客身份加入",
+        "joinHint": "无需账号。现在就加入这个小组开玩，喜欢的话以后再创建免费账号。",
+        "nicknameLabel": "你在游戏中的名字",
+        "nicknamePlaceholder": "例如：小明",
+        "nicknameShort": "请输入 {{min}} 到 {{max}} 个字符的名字。",
+        "ageConfirm": "我已满 13 岁",
+        "ageRequired": "请确认你已满 13 岁。",
+        "joinButton": "以访客身份加入",
+        "orAccount": "或使用账号",
+        "logIn": "登录",
+        "createAccount": "创建账号",
+        "upgradeTitle": "保留你的进度",
+        "upgradeBody": "你正在以访客身份游玩。创建免费账号即可保留名字、创建自己的小组，并解锁 WordQuest 的更多功能。",
+        "upgradeCta": "创建免费账号"
       }
     },
     "share": {

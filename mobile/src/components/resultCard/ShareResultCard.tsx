@@ -1,5 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
@@ -7,7 +15,12 @@ import { useThemeColors } from '@/state/themeStore';
 import { PodiumNightCard } from './PodiumNightCard';
 import { QuestCardResult } from './QuestCardResult';
 import { CARD_HEIGHT, CARD_WIDTH, type ResultCardData } from './types';
-import { canShareFiles, downloadCardImage, shareCardImage, SUPPORTS_DOWNLOAD_BUTTON } from './shareCard';
+import {
+  canShareFiles,
+  downloadCardImage,
+  shareCardImage,
+  SUPPORTS_DOWNLOAD_BUTTON,
+} from './shareCard';
 
 export type ResultCardVariant = 'podium' | 'quest';
 
@@ -58,7 +71,9 @@ export function ShareResultCard({
         if (!node) throw new Error('no-node');
         const opts = { fileName, title: t('share.dialogTitle') };
         const out =
-          mode === 'download' ? await downloadCardImage(node, opts) : await shareCardImage(node, opts);
+          mode === 'download'
+            ? await downloadCardImage(node, opts)
+            : await shareCardImage(node, opts);
         if (out === 'downloaded') setNotice(t('share.saved'));
       } catch {
         setError(true);
@@ -86,7 +101,11 @@ export function ShareResultCard({
           style={{
             width: CARD_WIDTH,
             height: CARD_HEIGHT,
-            transform: [{ translateX: -(CARD_WIDTH * (1 - scale)) / 2 }, { translateY: -(CARD_HEIGHT * (1 - scale)) / 2 }, { scale }],
+            transform: [
+              { translateX: -(CARD_WIDTH * (1 - scale)) / 2 },
+              { translateY: -(CARD_HEIGHT * (1 - scale)) / 2 },
+              { scale },
+            ],
           }}
         >
           <Card data={data} variant={variant} />
@@ -115,12 +134,17 @@ export function ShareResultCard({
             ) : (
               <Ionicons name="share-outline" size={18} color={'#fff'} />
             )}
-            <Text style={styles.primaryText}>{busy === 'share' ? t('share.preparing') : t('share.share')}</Text>
+            <Text style={styles.primaryText}>
+              {busy === 'share' ? t('share.preparing') : t('share.share')}
+            </Text>
           </Pressable>
         )}
         {SUPPORTS_DOWNLOAD_BUTTON && (
           <Pressable
-            style={[canShareFiles() ? styles.secondary : styles.primary, busy ? styles.disabled : null]}
+            style={[
+              canShareFiles() ? styles.secondary : styles.primary,
+              busy ? styles.disabled : null,
+            ]}
             disabled={!!busy}
             onPress={() => run('download')}
             accessibilityRole="button"

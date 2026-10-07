@@ -68,7 +68,11 @@ export function buildGroupResultCard(group: ArcadeGroup, t: TFunction): ResultCa
         ? t('arcade:share.headlineWon')
         : t('arcade:share.headlineRank', { rank, count: players.length })
       : '',
-    aliMessage: won ? t('arcade:share.aliWon') : podium ? t('arcade:share.aliPodium') : t('arcade:share.aliTry'),
+    aliMessage: won
+      ? t('arcade:share.aliWon')
+      : podium
+        ? t('arcade:share.aliPodium')
+        : t('arcade:share.aliTry'),
     aliExpression: won ? 'TRIUMPHANT' : podium ? 'PROUD' : 'ENCOURAGING',
     aliPose: won ? 'WING_SPREAD_FULL' : 'APPROVING_NOD',
     aliIntensity: won ? 4 : 2,
@@ -95,8 +99,26 @@ export function buildVersusResultCard(
   const myRank = outcome === 'LOSS' ? 2 : 1;
   const theirRank = outcome === 'WIN' ? 2 : 1;
   const players: ResultPlayer[] = [
-    { id: 'me', name: me.name, avatarUrl: me.avatarUrl, rank: myRank, correct: me.correct, total, timeMs: me.timeMs, isMe: true },
-    { id: 'them', name: them.name, avatarUrl: them.avatarUrl, rank: theirRank, correct: them.correct, total, timeMs: them.timeMs, isMe: false },
+    {
+      id: 'me',
+      name: me.name,
+      avatarUrl: me.avatarUrl,
+      rank: myRank,
+      correct: me.correct,
+      total,
+      timeMs: me.timeMs,
+      isMe: true,
+    },
+    {
+      id: 'them',
+      name: them.name,
+      avatarUrl: them.avatarUrl,
+      rank: theirRank,
+      correct: them.correct,
+      total,
+      timeMs: them.timeMs,
+      isMe: false,
+    },
   ].sort((a, b) => (a.rank ?? 9) - (b.rank ?? 9));
   const win = outcome === 'WIN';
   const loss = outcome === 'LOSS';
@@ -109,7 +131,11 @@ export function buildVersusResultCard(
       : loss
         ? t('arcade:share.headlineLoss', { name: them.name })
         : t('arcade:share.headlineDraw'),
-    aliMessage: win ? t('arcade:share.aliVsWin') : loss ? t('arcade:share.aliVsLoss') : t('arcade:share.aliVsDraw'),
+    aliMessage: win
+      ? t('arcade:share.aliVsWin')
+      : loss
+        ? t('arcade:share.aliVsLoss')
+        : t('arcade:share.aliVsDraw'),
     aliExpression: win ? 'TRIUMPHANT' : loss ? 'ENCOURAGING' : 'PLEASED',
     aliPose: win ? 'WING_SPREAD_FULL' : 'APPROVING_NOD',
     aliIntensity: win ? 4 : 2,

@@ -5,7 +5,7 @@ describe('guest handles', () => {
   it('turns a typed name into a valid username base', () => {
     expect(guestHandleBase('Chioma')).toBe('chioma');
     expect(guestHandleBase('  Zoë Ade  ')).toBe('zoe_ade');
-    expect(guestHandleBase('Mr. O\'Neil!!')).toBe('mr_oneil');
+    expect(guestHandleBase("Mr. O'Neil!!")).toBe('mr_oneil');
     expect(guestHandleBase('A very long nickname indeed')).toHaveLength(14);
   });
 
@@ -22,7 +22,9 @@ describe('guest handles', () => {
     expect(guestHandleCandidate('chioma', 5, rnd)).toBe('chioma_500');
     expect(guestHandleCandidate('guest', 0, rnd)).toBe('guest_50');
     for (let a = 0; a < 12; a++) {
-      expect(USERNAME_REGEX.test(guestHandleCandidate('abcdefghijklmn', a, Math.random))).toBe(true);
+      expect(USERNAME_REGEX.test(guestHandleCandidate('abcdefghijklmn', a, Math.random))).toBe(
+        true,
+      );
     }
   });
 });

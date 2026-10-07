@@ -1,4 +1,5 @@
 import { apiRequest } from './apiClient';
+import type { AuthResult } from './auth';
 import type { VersusGame } from './arcadeVersus';
 
 /** The games that have a Group Play mode (Word Duel is a live 1v1 duel). */
@@ -126,6 +127,23 @@ export function createGroup(
 export function previewGroup(accessToken: string, code: string): Promise<GroupPreview> {
   return apiRequest<GroupPreview>(`/arcade/groups/preview/${encodeURIComponent(code)}`, {
     accessToken,
+  });
+}
+
+/** What a group link shows to someone who is not signed in. */
+export function previewGroupPublic(code: string): Promise<GroupPreview> {
+  return apiRequest<GroupPreview>(`/arcade/guest-join/preview/${encodeURIComponent(code)}`);
+}
+
+export interface GuestJoinResult extends AuthResult {
+  group: ArcadeGroup;
+}
+
+/** Joins a group with just a nickname (no account). Returns a guest session. */
+export function joinGroupAsGuest(code: string, nickname: string): Promise<GuestJoinResult> {
+  return apiRequest<GuestJoinResult>('/arcade/guest-join', {
+    method: 'POST',
+    body: { code, nickname, ageConfirmed: true },
   });
 }
 

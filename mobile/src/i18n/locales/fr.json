@@ -1117,6 +1117,22 @@
       "play": {
         "backToGroup": "Retour au groupe",
         "complete": "Ta partie de groupe est terminée. Consulte le groupe pour voir les résultats."
+      },
+      "guest": {
+        "joinTitle": "Rejoindre en invité",
+        "joinHint": "Pas besoin de compte. Joue dans ce groupe maintenant et crée un compte gratuit plus tard si ça te plaît.",
+        "nicknameLabel": "Ton nom dans le jeu",
+        "nicknamePlaceholder": "ex. Chioma",
+        "nicknameShort": "Saisis un nom de {{min}} à {{max}} caractères.",
+        "ageConfirm": "J'ai 13 ans ou plus",
+        "ageRequired": "Confirme que tu as 13 ans ou plus.",
+        "joinButton": "Rejoindre en invité",
+        "orAccount": "Ou utilise un compte",
+        "logIn": "Se connecter",
+        "createAccount": "Créer un compte",
+        "upgradeTitle": "Garde ta progression",
+        "upgradeBody": "Tu joues en invité. Crée un compte gratuit pour garder ton nom, créer tes propres groupes et débloquer le reste de WordQuest.",
+        "upgradeCta": "Créer un compte gratuit"
       }
     },
     "share": {

@@ -72,13 +72,18 @@ export function SplashScreen({ navigation }: Props) {
       }
       const { accessToken } = useAuthStore.getState();
       if (accessToken) {
-        syncPushToken(accessToken);
         // A player who signed up but closed the app before finishing
         // onboarding should resume it, not land on Home with no username
         // or clan. Best effort: if the profile can't be fetched quickly,
         // Main is the safe default.
         const onboarding = Promise.race([
-          getMe(accessToken).then((me) => (me.onboardingCompletedAt ? 'Main' : 'Biodata')),
+          getMe(accessToken).then((me) => {
+            // A guest (joined a group link without an account) has no
+            // onboarding and only Group Play, so their home is the group hub.
+            if (me.isGuest) return 'ArcadeGroupHub' as const;
+            syncPushToken(accessToken);
+            return me.onboardingCompletedAt ? ('Main' as const) : ('Biodata' as const);
+          }),
           new Promise<'Main'>((resolve) =>
             setTimeout(() => resolve('Main'), ONBOARDING_CHECK_TIMEOUT_MS),
           ),

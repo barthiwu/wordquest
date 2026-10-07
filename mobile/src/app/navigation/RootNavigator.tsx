@@ -43,7 +43,6 @@ import { HangmanScreen } from '@/features/arcade/HangmanScreen';
 import { ArcadeVersusLobbyScreen } from '@/features/arcade/ArcadeVersusLobbyScreen';
 import { ArcadeGroupHubScreen } from '@/features/arcade/group/ArcadeGroupHubScreen';
 import { ArcadeGroupScreen } from '@/features/arcade/group/ArcadeGroupScreen';
-import { ResultCardGalleryScreen } from '@/features/arcade/ResultCardGalleryScreen';
 import type { ChallengeGame, VersusGame } from '@/services/arcadeVersus';
 import { WordDuelScreen } from '@/features/arcade/WordDuelScreen';
 import { BossBattleLeaderboardScreen } from '@/features/boss-battle/BossBattleLeaderboardScreen';
@@ -86,7 +85,8 @@ import { linking } from './linking';
 export type RootStackParamList = {
   Splash: undefined;
   Welcome: undefined;
-  Registration: undefined;
+  /** `upgrade`: a guest creating a real account from their session. */
+  Registration: { upgrade?: boolean; groupCode?: string } | undefined;
   Login: undefined;
   ForgotPassword: undefined;
   RecoverAccount: undefined;
@@ -123,7 +123,6 @@ export type RootStackParamList = {
   ArcadeGroupHub: { game?: VersusGame } | undefined;
   /** `code` opens the join screen (the invite link); `groupId` opens a group you are in. */
   ArcadeGroup: { groupId?: string; code?: string };
-  ResultCardGallery: undefined;
   BossBattleLeaderboard: undefined;
   MasterChallenge: undefined;
   Order: undefined;
@@ -175,6 +174,27 @@ const BEFORE_APP_ROUTES = new Set<string>([
   'OnboardingGoal',
   'ClanSelection',
   'AppIntro',
+]);
+
+/**
+ * A guest (joined a group link with no account) can only reach Group Play and
+ * its games, sign-in/sign-up, and the legal pages; the server refuses
+ * everything else. Anywhere else they land on the group hub.
+ */
+const GUEST_ROUTES = new Set<string>([
+  'Splash',
+  'Welcome',
+  'Registration',
+  'Login',
+  'ForgotPassword',
+  'ArcadeGroupHub',
+  'ArcadeGroup',
+  'ScrambleQuest',
+  'CompleteIt',
+  'Hangman',
+  'PrivacyPolicy',
+  'TermsOfService',
+  'AgeRestriction',
 ]);
 
 export function RootNavigator() {
@@ -235,10 +255,25 @@ export function RootNavigator() {
     openPendingGroup();
   }, [accessToken, pendingGroupCode, openPendingGroup]);
 
+  const keepGuestInGroups = useCallback(() => {
+    if (!useAuthStore.getState().user?.isGuest || !navigationRef.isReady()) return;
+    const current = navigationRef.getCurrentRoute()?.name;
+    if (current && !GUEST_ROUTES.has(current)) {
+      navigationRef.reset({ index: 0, routes: [{ name: 'ArcadeGroupHub' }] });
+    }
+  }, [navigationRef]);
+  const isGuestUser = useAuthStore((s) => s.user?.isGuest === true);
+  useEffect(() => {
+    keepGuestInGroups();
+  }, [isGuestUser, keepGuestInGroups]);
+
   return (
     <NavigationContainer
       ref={navigationRef}
-      onStateChange={openPendingGroup}
+      onStateChange={() => {
+        openPendingGroup();
+        keepGuestInGroups();
+      }}
       linking={linking}
       theme={{
         dark: mode === 'dark',
@@ -289,7 +324,6 @@ export function RootNavigator() {
         <Stack.Screen name="ArcadeVersus" component={framed(ArcadeVersusLobbyScreen)} />
         <Stack.Screen name="ArcadeGroupHub" component={framed(ArcadeGroupHubScreen)} />
         <Stack.Screen name="ArcadeGroup" component={framed(ArcadeGroupScreen)} />
-        <Stack.Screen name="ResultCardGallery" component={framed(ResultCardGalleryScreen)} />
         <Stack.Screen name="WordDuel" component={framed(WordDuelScreen)} />
         <Stack.Screen
           name="BossBattleLeaderboard"
