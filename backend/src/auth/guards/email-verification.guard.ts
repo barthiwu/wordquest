@@ -38,6 +38,8 @@ export class EmailVerificationGuard implements CanActivate {
     if (!this.config.isEmailConfigured) return true; // see class doc comment above
 
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    // A guest has no email to verify; what they may do is already limited by JwtAuthGuard.
+    if (request.isGuest) return true;
     const userId = request.userId;
     if (!userId) return true; // JwtAuthGuard runs first in practice; nothing to check without it
 

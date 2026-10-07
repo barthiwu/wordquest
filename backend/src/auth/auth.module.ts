@@ -12,5 +12,6 @@ import { AnalyticsModule } from '../analytics/analytics.module';
   imports: [UsersModule, TokensModule, EmailModule, AnalyticsModule],
   controllers: [AuthController],
   providers: [AuthService, TwoFactorService, SocialVerifierService],
+  exports: [AuthService],
 })
 export class AuthModule {}

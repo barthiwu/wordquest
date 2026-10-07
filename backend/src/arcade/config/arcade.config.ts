@@ -289,9 +289,12 @@ export const ARCADE_VERSUS_CONFIG = {
 } as const;
 
 // ── Group Play ─────────────────────────────────────────────────────────
-// One host (a teacher, say) creates a private group, shares its link, and up
-// to MAX_MEMBERS people play the same words in one timed round (2026-10
-// request). Link-only: there is no public listing. Group plays are NOT
+// One host creates a private group, shares its link, and up to MAX_MEMBERS
+// people play the same words in one timed round (2026-10 request). The host
+// can be a teacher, but Group Play is NOT only for students: it is just as
+// much for a WhatsApp game night, a family, a club. So people can join the
+// link as a guest, with no account (see ArcadeGuestService), and sign up later
+// if they like it. Link-only: there is no public listing. Group plays are NOT
 // counted against the daily play limit, so a student who has used up their
 // own plays can still join their class.
 export const ARCADE_GROUP_GAMES = ['SCRAMBLE_QUEST', 'COMPLETE_IT', 'HANGMAN'] as const;
@@ -311,6 +314,11 @@ export const ARCADE_GROUP_CONFIG = {
   CODE_LENGTH: 10,
   // Ended groups stay readable (teachers look back at results) this long.
   ENDED_RETENTION_DAYS: 180,
+  // A guest (joined by link without an account) is deleted after this long, so
+  // an unclaimed guest never outlives the results it appears in.
+  GUEST_RETENTION_DAYS: 180,
+  GUEST_NICKNAME_MIN: 2,
+  GUEST_NICKNAME_MAX: 20,
 } as const;
 
 // ── Daily play limits ──────────────────────────────────────────────────

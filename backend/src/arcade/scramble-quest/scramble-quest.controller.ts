@@ -6,6 +6,11 @@ import { StartArcadeGameDto } from '../dto/start-arcade-game.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../../auth/guards/email-verification.guard';
 import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
+import {
+  AllowGuest,
+  assertGuestStartsGroupOnly,
+  IsGuest,
+} from '../../auth/decorators/allow-guest.decorator';
 
 /**
  * POST /api/v1/arcade/scramble-quest/start
@@ -20,12 +25,18 @@ import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
  */
 @Controller('arcade/scramble-quest')
 @UseGuards(JwtAuthGuard, EmailVerificationGuard)
+@AllowGuest() // guests may play inside a group; `start` below refuses everything else
 export class ScrambleQuestController {
   constructor(private readonly scrambleQuest: ScrambleQuestService) {}
 
   @Post('start')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  start(@CurrentUserId() userId: string, @Body() dto: StartArcadeGameDto) {
+  start(
+    @CurrentUserId() userId: string,
+    @IsGuest() isGuest: boolean,
+    @Body() dto: StartArcadeGameDto,
+  ) {
+    assertGuestStartsGroupOnly(isGuest, dto?.groupId);
     return this.scrambleQuest.start(userId, dto?.versusMatchId, dto?.groupId);
   }
 

@@ -66,6 +66,16 @@ model User {
   avatarKey    String?
   role         Role      @default(USER)
 
+  // Guest players (Oct 2026): someone who joined a Group Play link without
+  // making an account (a WhatsApp game night, a class, a family). A guest is
+  // a real row so group scores, sessions and tokens work unchanged, but it has
+  // a placeholder email and an unusable password, may only play inside groups
+  // (JwtAuthGuard allow-list), never appears on leaderboards or in friend
+  // search, and is deleted after GUEST_RETENTION_DAYS. Upgrading to a real
+  // account (AuthService.upgradeGuest) flips this to false in place, so the
+  // player keeps their name and history.
+  isGuest Boolean @default(false)
+
   // Player Timezone System (V1 Remaining Systems Spec §15) — IANA tz name,
   // e.g. "Africa/Lagos". Collected on onboarding/registration. Every
   // "player local date" the app computes (quest availability, streak,
@@ -181,6 +191,7 @@ model User {
   blocksReceived           Block[]                   @relation("BlockBlocked")
 
   @@index([clanId])
+  @@index([isGuest, createdAt])
   @@map("users")
 }
 

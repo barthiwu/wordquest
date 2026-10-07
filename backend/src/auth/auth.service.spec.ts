@@ -46,6 +46,7 @@ describe('AuthService', () => {
     },
     user: {
       findUniqueOrThrow: jest.fn().mockResolvedValue(fakeUser),
+      findUnique: jest.fn().mockResolvedValue({ isGuest: false }),
       update: jest.fn().mockResolvedValue({}),
     },
     emailVerificationToken: {
@@ -779,6 +780,102 @@ describe('AuthService', () => {
       expect(prismaMock.passwordResetToken.deleteMany).toHaveBeenCalledWith({
         where: { expiresAt: { lt: expect.any(Date) } },
       });
+    });
+  });
+
+  describe('guest sessions', () => {
+    const guestRow = {
+      ...fakeUser,
+      id: 'guest-1',
+      username: 'chioma',
+      isGuest: true,
+      status: 'ACTIVE',
+      dateOfBirth: null,
+      learningProfile: {},
+    };
+    const upgradeDto = {
+      email: 'Chioma@Example.com',
+      password: 'Str0ng!Passw0rd',
+      displayName: 'Chioma A',
+      dateOfBirth: '2000-01-15',
+    } as never;
+
+    it('signs the access token of a guest with a guest claim, and a normal one without', async () => {
+      await service.startGuestSession({ ...fakeUser, username: 'chioma' } as never);
+      expect(jwtMock.signAsync).toHaveBeenNthCalledWith(
+        1,
+        { sub: 'user-1', guest: true },
+        expect.any(Object),
+      );
+      jwtMock.signAsync.mockClear();
+      await service.register({
+        email: 'a@b.co',
+        password: 'x',
+        displayName: 'Ada',
+        dateOfBirth: '2000-01-15',
+      } as never);
+      expect(jwtMock.signAsync).toHaveBeenNthCalledWith(1, { sub: 'user-1' }, expect.any(Object));
+    });
+
+    it('keeps the guest claim when a guest session is refreshed', async () => {
+      jwtMock.verifyAsync.mockResolvedValueOnce({ sub: 'guest-1', jti: 'abc' });
+      prismaMock.refreshToken.findUnique.mockResolvedValueOnce({
+        id: 'rt-1',
+        userId: 'guest-1',
+        revokedAt: null,
+        expiresAt: new Date(Date.now() + 60_000),
+        sessionStartedAt: new Date(),
+      });
+      prismaMock.user.findUnique.mockResolvedValueOnce({ isGuest: true });
+      await service.refresh('guest.refresh.token');
+      expect(jwtMock.signAsync).toHaveBeenNthCalledWith(
+        1,
+        { sub: 'guest-1', guest: true },
+        expect.any(Object),
+      );
+    });
+
+    it('upgrades a guest in place: same row, real email/password, old sessions revoked', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce(guestRow);
+      usersMock.findByEmail.mockResolvedValueOnce(null);
+      prismaMock.user.update.mockResolvedValueOnce({ ...guestRow, isGuest: false, email: 'chioma@example.com' });
+      prismaMock.user.findUniqueOrThrow.mockResolvedValue({ ...guestRow, isGuest: false });
+      jwtMock.signAsync.mockClear();
+
+      const result = await service.upgradeGuest('guest-1', upgradeDto);
+
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'guest-1' },
+          data: expect.objectContaining({
+            isGuest: false,
+            email: 'chioma@example.com',
+            passwordHash: 'new-hashed-password',
+          }),
+        }),
+      );
+      expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith({
+        where: { userId: 'guest-1', revokedAt: null },
+        data: { revokedAt: expect.any(Date) },
+      });
+      expect(jwtMock.signAsync).toHaveBeenNthCalledWith(1, { sub: 'guest-1' }, expect.any(Object));
+      expect(result.user.isGuest).toBe(false);
+    });
+
+    it('refuses to upgrade a full account, an email already in use, or a child', async () => {
+      prismaMock.user.findUnique.mockResolvedValueOnce({ ...guestRow, isGuest: false });
+      await expect(service.upgradeGuest('guest-1', upgradeDto)).rejects.toThrow('already a full account');
+
+      prismaMock.user.findUnique.mockResolvedValueOnce(guestRow);
+      usersMock.findByEmail.mockResolvedValueOnce(fakeUser);
+      await expect(service.upgradeGuest('guest-1', upgradeDto)).rejects.toThrow('already exists');
+
+      prismaMock.user.findUnique.mockResolvedValueOnce(guestRow);
+      const thisYear = new Date().getFullYear();
+      await expect(
+        service.upgradeGuest('guest-1', { ...(upgradeDto as object), dateOfBirth: `${thisYear - 8}-01-01` } as never),
+      ).rejects.toThrow();
+      expect(prismaMock.user.update).not.toHaveBeenCalled();
     });
   });
 });

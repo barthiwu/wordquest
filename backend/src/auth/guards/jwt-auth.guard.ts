@@ -1,10 +1,14 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AppConfigService } from '../../config/config.service';
+import { ALLOW_GUEST_KEY, guestRestricted } from '../decorators/allow-guest.decorator';
 
 export interface AuthenticatedRequest extends Request {
   userId?: string;
+  /** True for a guest session (see AllowGuest). */
+  isGuest?: boolean;
 }
 
 /**
@@ -18,6 +22,7 @@ export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwt: JwtService,
     private readonly config: AppConfigService,
+    private readonly reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,15 +33,24 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Missing bearer token');
     }
 
+    let payload: { sub: string; guest?: boolean };
     try {
-      const payload = await this.jwt.verifyAsync<{ sub: string }>(token, {
+      payload = await this.jwt.verifyAsync<{ sub: string; guest?: boolean }>(token, {
         secret: this.config.jwtAccessSecret,
       });
-      request.userId = payload.sub;
-      return true;
     } catch {
       throw new UnauthorizedException('Invalid or expired access token');
     }
+    request.userId = payload.sub;
+    if (payload.guest === true) {
+      request.isGuest = true;
+      const allowed = this.reflector.getAllAndOverride<boolean>(ALLOW_GUEST_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]);
+      if (!allowed) throw guestRestricted();
+    }
+    return true;
   }
 
   private extractBearerToken(request: Request): string | undefined {

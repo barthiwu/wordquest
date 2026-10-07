@@ -116,7 +116,7 @@ describe('LeaderboardsService', () => {
       const result = await service.getGlobal('u9');
 
       expect(prismaMock.userProgression.count).toHaveBeenCalledWith({
-        where: { totalXp: { gt: 250 }, user: { status: { not: 'DELETED' } } },
+        where: { totalXp: { gt: 250 }, user: { status: { not: 'DELETED' }, isGuest: false } },
       });
       expect(result.viewer).toMatchObject({ userId: 'u9', rank: 42, totalXp: 250 });
     });
@@ -225,7 +225,7 @@ describe('LeaderboardsService', () => {
       const result = await service.getCountry('u2');
 
       expect(prismaMock.userProgression.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { user: { countryCode: 'NG', status: { not: 'DELETED' } } } }),
+        expect.objectContaining({ where: { user: { countryCode: 'NG', status: { not: 'DELETED' }, isGuest: false } } }),
       );
       expect(result.entries).toHaveLength(2);
       expect(result.viewer).toMatchObject({ userId: 'u2', rank: 2 });
@@ -258,7 +258,7 @@ describe('LeaderboardsService', () => {
 
       expect(prismaMock.userProgression.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { user: { countryCode: { in: expect.arrayContaining(['NG', 'GH']) }, status: { not: 'DELETED' } } },
+          where: { user: { countryCode: { in: expect.arrayContaining(['NG', 'GH']) }, status: { not: 'DELETED' }, isGuest: false } },
         }),
       );
       expect(result.entries).toHaveLength(2);
@@ -288,7 +288,7 @@ describe('LeaderboardsService', () => {
       const result = await service.getFriends('u1');
 
       expect(prismaMock.userProgression.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { userId: { in: ['u1', 'u2', 'u3'] }, OR: [{ userId: 'u1' }, { user: { status: { not: 'DELETED' } } }] } }),
+        expect.objectContaining({ where: { userId: { in: ['u1', 'u2', 'u3'] }, OR: [{ userId: 'u1' }, { user: { status: { not: 'DELETED' }, isGuest: false } }] } }),
       );
       expect(result.entries.map((e) => e.userId)).toEqual(['u2', 'u1', 'u3']);
       expect(result.viewer).toMatchObject({ userId: 'u1', rank: 2 });
@@ -421,7 +421,7 @@ describe('LeaderboardsService', () => {
       const result = await service.getClan('u2');
 
       expect(prismaMock.userProgression.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { user: { clanId: 'clan-1', status: { not: 'DELETED' } } } }),
+        expect.objectContaining({ where: { user: { clanId: 'clan-1', status: { not: 'DELETED' }, isGuest: false } } }),
       );
       expect(result.entries).toHaveLength(2);
       expect(result.viewer).toMatchObject({ userId: 'u2', rank: 2 });

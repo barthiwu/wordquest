@@ -5,6 +5,7 @@ import { CreateGroupDto, GroupMemberParamDto, JoinGroupDto, StartGroupDto } from
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../../auth/guards/email-verification.guard';
 import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
+import { AllowGuest } from '../../auth/decorators/allow-guest.decorator';
 
 /**
  * POST   /api/v1/arcade/groups                      create a private group (host)
@@ -16,6 +17,9 @@ import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
  * POST   /api/v1/arcade/groups/:id/end              host: end the round / group
  * POST   /api/v1/arcade/groups/:id/leave            member: leave
  * DELETE /api/v1/arcade/groups/:id/members/:userId  host: remove a member
+ *
+ * Guests (see AllowGuest) may read, join and leave groups and play in them;
+ * creating or running one needs an account.
  */
 @Controller('arcade/groups')
 @UseGuards(JwtAuthGuard, EmailVerificationGuard)
@@ -28,6 +32,7 @@ export class ArcadeGroupController {
     return this.groups.create(userId, dto);
   }
 
+  @AllowGuest()
   @Get('mine')
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
   mine(@CurrentUserId() userId: string) {
@@ -41,6 +46,7 @@ export class ArcadeGroupController {
     return this.groups.preview(code);
   }
 
+  @AllowGuest()
   @Post('join')
   @HttpCode(200)
   @Throttle({ default: { limit: 15, ttl: 60_000 } })
@@ -48,6 +54,7 @@ export class ArcadeGroupController {
     return this.groups.join(userId, dto.code);
   }
 
+  @AllowGuest()
   @Get(':id')
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   get(@CurrentUserId() userId: string, @Param('id') id: string) {
@@ -68,6 +75,7 @@ export class ArcadeGroupController {
     return this.groups.end(userId, id);
   }
 
+  @AllowGuest()
   @Post(':id/leave')
   @HttpCode(204)
   @Throttle({ default: { limit: 10, ttl: 60_000 } })

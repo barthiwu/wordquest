@@ -4,6 +4,7 @@ import { AnalyticsService } from './analytics.service';
 import { SubmitAnalyticsEventsDto } from './dto/submit-analytics-events.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user.decorator';
+import { AllowGuest } from '../auth/decorators/allow-guest.decorator';
 
 /**
  * POST /api/v1/analytics/events
@@ -23,6 +24,7 @@ import { CurrentUserId } from '../auth/decorators/current-user.decorator';
  */
 @Controller('analytics')
 @UseGuards(JwtAuthGuard)
+@AllowGuest()
 export class AnalyticsController {
   constructor(private readonly analytics: AnalyticsService) {}
 

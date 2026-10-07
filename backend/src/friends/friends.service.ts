@@ -104,9 +104,11 @@ export class FriendsService {
   async searchByUsername(viewerId: string, username: string): Promise<FriendPublicView | null> {
     const target = await this.prisma.user.findUnique({
       where: { username },
-      select: { id: true, username: true, avatarKey: true, status: true },
+      select: { id: true, username: true, avatarKey: true, status: true, isGuest: true },
     });
-    if (!target || target.id === viewerId || target.status === 'DELETED') return null;
+    if (!target || target.id === viewerId || target.status === 'DELETED' || target.isGuest) {
+      return null;
+    }
     if (await this.isBlockedEitherWay(viewerId, target.id)) return null;
     return this.toPublicView(target);
   }

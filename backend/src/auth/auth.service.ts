@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Cron } from '@nestjs/schedule';
 import { Prisma, SecurityEventType } from '@prisma/client';
@@ -8,7 +13,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AppConfigService } from '../config/config.service';
 import { EmailService } from '../email/email.service';
 import { gameplayRules } from '../config/gameplay-rules';
-import { calculateAge, isValidPastDate } from '../common/age';
+import { calculateAge, getAgeRange, isValidPastDate } from '../common/age';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -36,6 +41,8 @@ export interface AuthResult extends AuthTokens {
     username: string;
     countryCode: string | null;
     avatarUrl: string | null;
+    /** True for a guest session; absent/false for a real account. */
+    isGuest?: boolean;
   };
 }
 
@@ -443,7 +450,11 @@ export class AuthService {
       data: { revokedAt: new Date() },
     });
 
-    return this.issueTokens(payload.sub, stored.sessionStartedAt);
+    const owner = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+      select: { isGuest: true },
+    });
+    return this.issueTokens(payload.sub, stored.sessionStartedAt, owner?.isGuest === true);
   }
 
   async logout(rawRefreshToken: string): Promise<void> {
@@ -734,9 +745,82 @@ export class AuthService {
    * there always measures against when the session actually began, not
    * when this particular rotated token was issued.
    */
-  private async issueTokens(userId: string, sessionStartedAt?: Date): Promise<AuthTokens> {
+  /** Tokens + public user for a freshly created guest (see ArcadeGuestService). */
+  async startGuestSession(user: {
+    id: string;
+    email: string;
+    displayName: string;
+    username: string;
+    countryCode: string | null;
+    avatarKey: string | null;
+  }): Promise<AuthResult> {
+    const tokens = await this.issueTokens(user.id, undefined, true);
+    return { ...tokens, user: await this.toPublicUser({ ...user, isGuest: true }) };
+  }
+
+  /**
+   * A guest decides to keep playing: the same row becomes a real account (so
+   * their name and group history carry over). Same rules as register: adult
+   * date of birth, unique email, strong password, verification email.
+   */
+  async upgradeGuest(userId: string, dto: RegisterDto): Promise<AuthResult> {
+    const current = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!current || current.status === 'DELETED') throw new UnauthorizedException('Invalid session');
+    if (!current.isGuest) throw new BadRequestException('This is already a full account.');
+
+    const dateOfBirth = this.parseAdultDateOfBirth(dto.dateOfBirth);
+    const email = dto.email.toLowerCase();
+    const taken = await this.users.findByEmail(email);
+    if (taken) throw new ConflictException('An account with this email already exists');
+
+    const passwordHash = await this.users.hashPassword(dto.password);
+    const startingDifficulty =
+      gameplayRules.learningProfile.startingDifficultyByAgeRange[getAgeRange(dateOfBirth)];
+
+    let updated;
+    try {
+      updated = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          isGuest: false,
+          email,
+          passwordHash,
+          displayName: dto.displayName,
+          countryCode: dto.countryCode,
+          dateOfBirth,
+          englishVariant: dto.englishVariant,
+          learningProfile: { update: { currentDifficulty: startingDifficulty } },
+        },
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new ConflictException('An account with this email already exists');
+      }
+      throw err;
+    }
+
+    // The guest sessions end here; the app switches to the tokens below.
+    await this.prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    this.sendVerificationEmail(userId).catch(() => undefined);
+    this.analytics.track(userId, 'account_created', {
+      countryCode: updated.countryCode,
+      fromGuest: true,
+    });
+
+    const tokens = await this.issueTokens(userId);
+    return { ...tokens, user: await this.toPublicUser(updated) };
+  }
+
+  private async issueTokens(
+    userId: string,
+    sessionStartedAt?: Date,
+    guest = false,
+  ): Promise<AuthTokens> {
     const accessToken = await this.jwt.signAsync(
-      { sub: userId },
+      guest ? { sub: userId, guest: true } : { sub: userId },
       { secret: this.config.jwtAccessSecret, expiresIn: this.config.jwtAccessExpiresIn },
     );
 
@@ -788,8 +872,10 @@ export class AuthService {
     username: string;
     countryCode: string | null;
     avatarKey: string | null;
+    isGuest?: boolean;
   }) {
     return {
+      isGuest: user.isGuest === true,
       id: user.id,
       email: user.email,
       displayName: user.displayName,

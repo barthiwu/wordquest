@@ -73,9 +73,10 @@ const MAX_LIMIT = 100;
 /**
  * Who may appear on a leaderboard: deleted accounts never do (their
  * usernames, clans and activity used to stay listed). Suspended players
- * stay ranked, matching how their progress is kept.
+ * stay ranked, matching how their progress is kept. Guests (Group Play
+ * link, no account) never appear.
  */
-const LISTED_PLAYER = { status: { not: 'DELETED' as const } };
+const LISTED_PLAYER = { status: { not: 'DELETED' as const }, isGuest: false };
 
 @Injectable()
 export class LeaderboardsService {

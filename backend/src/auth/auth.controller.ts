@@ -15,9 +15,11 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUserId } from './decorators/current-user.decorator';
+import { AllowGuest } from './decorators/allow-guest.decorator';
 
 /**
  * POST /api/v1/auth/{register,login,refresh,logout}
+ * POST /api/v1/auth/guest/upgrade         (guest session -> real account)
  * POST /api/v1/auth/change-password       (protected)
  * POST /api/v1/auth/verify-email
  * POST /api/v1/auth/resend-verification   (protected)
@@ -47,6 +49,15 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   register(@Body() dto: RegisterDto) {
     return this.auth.register(dto);
+  }
+
+  /** A guest turns their session into a real account (same body as register). */
+  @Post('guest/upgrade')
+  @UseGuards(JwtAuthGuard)
+  @AllowGuest()
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  upgradeGuest(@CurrentUserId() userId: string, @Body() dto: RegisterDto) {
+    return this.auth.upgradeGuest(userId, dto);
   }
 
   @Post('login')

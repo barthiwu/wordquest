@@ -18,6 +18,7 @@ import { ConfirmAvatarDto } from './dto/confirm-avatar.dto';
 import { MasteryService } from '../mastery/mastery.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user.decorator';
+import { AllowGuest } from '../auth/decorators/allow-guest.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -28,6 +29,7 @@ export class UsersController {
   ) {}
 
   @Get('me')
+  @AllowGuest()
   async me(@CurrentUserId() userId: string) {
     const user = await this.users.findById(userId);
     if (!user) throw new NotFoundException('User not found');
@@ -40,6 +42,7 @@ export class UsersController {
       // convenience, the real gate is RolesGuard on the admin endpoints
       // themselves (Telemetry spec Phase 5/6).
       role: user.role,
+      isGuest: user.isGuest,
       displayName: user.displayName,
       username: user.username,
       countryCode: user.countryCode,
