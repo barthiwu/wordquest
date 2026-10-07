@@ -1060,7 +1060,8 @@
         "full": "Ce groupe est complet.",
         "invalid": "Ce lien n’est pas valide, ou le groupe est terminé.",
         "error": "Impossible de rejoindre le groupe. Réessaie.",
-        "signIn": "Connecte-toi pour rejoindre ce groupe."
+        "signIn": "Connecte-toi pour rejoindre ce groupe.",
+        "expired": "Ce lien d'invitation a expiré. Demande-en un nouveau à l'organisateur."
       },
       "lobby": {
         "shareTitle": "Inviter des joueurs",
@@ -1087,7 +1088,8 @@
         "confirmEnd": "Touche à nouveau pour terminer",
         "error": "Une erreur s’est produite. Réessaie.",
         "loadError": "Impossible de charger le groupe.",
-        "retry": "Réessayer"
+        "retry": "Réessayer",
+        "linkExpiry": "Ce lien cesse de fonctionner {{hours}} heures après la création du groupe : partage-le quand tu es prêt à jouer. Les personnes déjà dans le groupe ne sont pas concernées."
       },
       "active": {
         "timeLeft": "Il reste {{time}}",
@@ -1132,8 +1134,14 @@
         "createAccount": "Créer un compte",
         "upgradeTitle": "Garde ta progression",
         "upgradeBody": "Tu joues en invité. Crée un compte gratuit pour garder ton nom, créer tes propres groupes et débloquer le reste de WordQuest.",
-        "upgradeCta": "Créer un compte gratuit"
-      }
+        "upgradeCta": "Créer un compte gratuit",
+        "nicknameHint": "Le nom que tu veux. Les autres joueurs le voient et il apparaît sur ta carte de résultat.",
+        "accountsOnlyTitle": "Comptes uniquement",
+        "accountsOnly": "L'organisateur n'autorise que les personnes ayant un compte WordQuest. Connecte-toi ou crée un compte gratuit pour continuer."
+      },
+      "allowGuestsLabel": "Autoriser à rejoindre sans compte",
+      "allowGuestsOn": "Toute personne avec le lien peut rejoindre en invité en choisissant un nom.",
+      "allowGuestsOff": "Seules les personnes ayant un compte WordQuest peuvent rejoindre (utile quand tu dois savoir qui est qui)."
     },
     "share": {
       "dialogTitle": "Partage ton résultat WordQuest",

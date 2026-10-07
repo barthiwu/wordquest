@@ -1060,7 +1060,8 @@
         "full": "Este grupo está lleno.",
         "invalid": "Este enlace no es válido o el grupo ya terminó.",
         "error": "No se pudo unir al grupo. Inténtalo de nuevo.",
-        "signIn": "Inicia sesión para unirte a este grupo."
+        "signIn": "Inicia sesión para unirte a este grupo.",
+        "expired": "Este enlace de invitación ha caducado. Pide uno nuevo al anfitrión."
       },
       "lobby": {
         "shareTitle": "Invitar jugadores",
@@ -1087,7 +1088,8 @@
         "confirmEnd": "Toca de nuevo para terminar",
         "error": "Algo salió mal. Inténtalo de nuevo.",
         "loadError": "No se pudo cargar el grupo.",
-        "retry": "Intentar de nuevo"
+        "retry": "Intentar de nuevo",
+        "linkExpiry": "Este enlace deja de funcionar {{hours}} horas después de crear el grupo, así que compártelo cuando estés listo para jugar. Quienes ya están en el grupo no se ven afectados."
       },
       "active": {
         "timeLeft": "Quedan {{time}}",
@@ -1132,8 +1134,14 @@
         "createAccount": "Crear cuenta",
         "upgradeTitle": "Conserva tu progreso",
         "upgradeBody": "Estás jugando como invitado. Crea una cuenta gratis para conservar tu nombre, crear tus propios grupos y desbloquear el resto de WordQuest.",
-        "upgradeCta": "Crear cuenta gratis"
-      }
+        "upgradeCta": "Crear cuenta gratis",
+        "nicknameHint": "El nombre que quieras. Los demás jugadores lo ven y aparece en tu tarjeta de resultado.",
+        "accountsOnlyTitle": "Solo con cuenta",
+        "accountsOnly": "El anfitrión solo permite unirse a personas con cuenta de WordQuest. Inicia sesión o crea una cuenta gratis para continuar."
+      },
+      "allowGuestsLabel": "Permitir unirse sin cuenta",
+      "allowGuestsOn": "Cualquiera con el enlace puede unirse como invitado eligiendo un nombre.",
+      "allowGuestsOff": "Solo pueden unirse personas con cuenta de WordQuest (útil cuando necesitas saber quién es quién)."
     },
     "share": {
       "dialogTitle": "Comparte tu resultado de WordQuest",

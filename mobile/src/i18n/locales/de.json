@@ -1060,7 +1060,8 @@
         "full": "Diese Gruppe ist voll.",
         "invalid": "Dieser Link ist ungültig oder die Gruppe wurde beendet.",
         "error": "Der Gruppe konnte nicht beigetreten werden. Bitte versuche es erneut.",
-        "signIn": "Melde dich an, um dieser Gruppe beizutreten."
+        "signIn": "Melde dich an, um dieser Gruppe beizutreten.",
+        "expired": "Dieser Einladungslink ist abgelaufen. Bitte den Gastgeber um einen neuen."
       },
       "lobby": {
         "shareTitle": "Spieler einladen",
@@ -1087,7 +1088,8 @@
         "confirmEnd": "Zum Beenden erneut tippen",
         "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
         "loadError": "Die Gruppe konnte nicht geladen werden.",
-        "retry": "Erneut versuchen"
+        "retry": "Erneut versuchen",
+        "linkExpiry": "Dieser Link funktioniert {{hours}} Stunden nach dem Erstellen der Gruppe nicht mehr – teile ihn also, wenn ihr spielen wollt. Wer schon in der Gruppe ist, bleibt davon unberührt."
       },
       "active": {
         "timeLeft": "Noch {{time}}",
@@ -1132,8 +1134,14 @@
         "createAccount": "Konto erstellen",
         "upgradeTitle": "Behalte deinen Fortschritt",
         "upgradeBody": "Du spielst als Gast. Erstelle ein kostenloses Konto, um deinen Namen zu behalten, eigene Gruppen zu leiten und den Rest von WordQuest freizuschalten.",
-        "upgradeCta": "Kostenloses Konto erstellen"
-      }
+        "upgradeCta": "Kostenloses Konto erstellen",
+        "nicknameHint": "Ein beliebiger Name. Andere Spieler sehen ihn, und er erscheint auf deiner Ergebniskarte.",
+        "accountsOnlyTitle": "Nur mit Konto",
+        "accountsOnly": "Der Gastgeber lässt nur Personen mit WordQuest-Konto in diese Gruppe. Melde dich an oder erstelle ein kostenloses Konto, um weiterzumachen."
+      },
+      "allowGuestsLabel": "Beitritt ohne Konto erlauben",
+      "allowGuestsOn": "Jeder mit dem Link kann als Gast beitreten und sich einen Namen aussuchen.",
+      "allowGuestsOff": "Nur Personen mit WordQuest-Konto können beitreten (praktisch, wenn man wissen muss, wer wer ist)."
     },
     "share": {
       "dialogTitle": "Teile dein WordQuest-Ergebnis",

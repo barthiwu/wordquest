@@ -71,6 +71,11 @@ export function GuestJoinPanel({
 
       {preview.full ? (
         <Text style={styles.error}>{t('group.join.full')}</Text>
+      ) : !preview.allowGuests ? (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>{t('group.guest.accountsOnlyTitle')}</Text>
+          <Text style={styles.hint}>{t('group.guest.accountsOnly')}</Text>
+        </View>
       ) : (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t('group.guest.joinTitle')}</Text>
@@ -92,6 +97,7 @@ export function GuestJoinPanel({
             onSubmitEditing={() => void join()}
             accessibilityLabel={t('group.guest.nicknameLabel')}
           />
+          <Text style={styles.fine}>{t('group.guest.nicknameHint')}</Text>
           <Pressable
             style={styles.checkRow}
             onPress={() => {
@@ -174,6 +180,7 @@ function createStyles(colors: ThemeColors) {
     },
     cardTitle: { color: colors.ink, fontSize: typography.scale.lg, fontWeight: '800' },
     hint: { color: colors.inkMuted, fontSize: typography.scale.sm, lineHeight: 20 },
+    fine: { color: colors.inkMuted, fontSize: typography.scale.xs },
     label: {
       color: colors.inkMuted,
       fontSize: typography.scale.xs,

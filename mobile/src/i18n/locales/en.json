@@ -1060,7 +1060,8 @@
         "full": "This group is full.",
         "invalid": "This link isn't valid, or the group has ended.",
         "error": "Could not join the group. Please try again.",
-        "signIn": "Sign in to join this group."
+        "signIn": "Sign in to join this group.",
+        "expired": "This invite link has expired. Ask the host for a new one."
       },
       "lobby": {
         "shareTitle": "Invite players",
@@ -1087,7 +1088,8 @@
         "confirmEnd": "Tap again to end",
         "error": "Something went wrong. Please try again.",
         "loadError": "Could not load the group.",
-        "retry": "Try again"
+        "retry": "Try again",
+        "linkExpiry": "This link stops working {{hours}} hours after you create the group, so share it when you are ready to play. People already in the group are not affected."
       },
       "active": {
         "timeLeft": "{{time}} left",
@@ -1132,8 +1134,14 @@
         "createAccount": "Create account",
         "upgradeTitle": "Keep your progress",
         "upgradeBody": "You are playing as a guest. Create a free account to keep your name, host your own groups and unlock the rest of WordQuest.",
-        "upgradeCta": "Create free account"
-      }
+        "upgradeCta": "Create free account",
+        "nicknameHint": "Any name you like. Other players see it, and it appears on your result card.",
+        "accountsOnlyTitle": "Accounts only",
+        "accountsOnly": "The host only lets people with a WordQuest account join this group. Log in or create a free account to continue."
+      },
+      "allowGuestsLabel": "Let people join without an account",
+      "allowGuestsOn": "Anyone with the link can join as a guest by choosing a name.",
+      "allowGuestsOff": "Only people with a WordQuest account can join (good when you need to know who is who)."
     },
     "share": {
       "dialogTitle": "Share your WordQuest result",

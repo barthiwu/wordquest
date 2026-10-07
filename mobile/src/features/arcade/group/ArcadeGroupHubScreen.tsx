@@ -54,6 +54,7 @@ export function ArcadeGroupHubScreen({ navigation, route }: Props) {
   const [game, setGame] = useState<VersusGame>(route.params?.game ?? 'SCRAMBLE_QUEST');
   const [title, setTitle] = useState('');
   const [showLeaderboard, setShowLeaderboard] = useState(true);
+  const [allowGuests, setAllowGuests] = useState(true);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [code, setCode] = useState('');
@@ -87,6 +88,7 @@ export function ArcadeGroupHubScreen({ navigation, route }: Props) {
         game,
         title: title.trim() || undefined,
         showLeaderboard,
+        allowGuests,
       });
       navigation.navigate('ArcadeGroup', { groupId: group.id });
     } catch (err) {
@@ -165,6 +167,22 @@ export function ArcadeGroupHubScreen({ navigation, route }: Props) {
               trackColor={{ false: colors.border, true: colors.arcane }}
               thumbColor={colors.ink}
               accessibilityLabel={t('arcade:group.leaderboardLabel')}
+            />
+          </View>
+
+          <View style={styles.switchRow}>
+            <View style={styles.switchText}>
+              <Text style={styles.switchTitle}>{t('arcade:group.allowGuestsLabel')}</Text>
+              <Text style={styles.hint}>
+                {allowGuests ? t('arcade:group.allowGuestsOn') : t('arcade:group.allowGuestsOff')}
+              </Text>
+            </View>
+            <Switch
+              value={allowGuests}
+              onValueChange={setAllowGuests}
+              trackColor={{ false: colors.border, true: colors.arcane }}
+              thumbColor={colors.ink}
+              accessibilityLabel={t('arcade:group.allowGuestsLabel')}
             />
           </View>
 

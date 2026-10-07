@@ -4,8 +4,13 @@ import { randomBytes, randomUUID } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthService } from '../../auth/auth.service';
 import { ARCADE_GROUP_CONFIG } from '../config/arcade.config';
-import { ArcadeGroupService, type GroupView } from './group.service';
-import { guestHandleBase, guestHandleCandidate } from './guest.util';
+import { ArcadeGroupService, guestsNotAllowed, type GroupView } from './group.service';
+import {
+  guestDisplayName,
+  guestHandleBase,
+  guestHandleCandidate,
+  uniqueInGroup,
+} from './guest.util';
 
 export const GUEST_EMAIL_DOMAIN = 'guest.wordquest.invalid';
 
@@ -37,10 +42,16 @@ export class ArcadeGuestService {
       throw new ConflictException(`This group is full (${preview.maxMembers} players).`);
     }
 
-    const guest = await this.createGuest(nickname);
+    if (!preview.allowGuests) {
+      throw guestsNotAllowed();
+    }
+
+    // Shown exactly as typed ("Barth", not "barth_47"), made unique within the group.
+    const shown = uniqueInGroup(guestDisplayName(nickname), await this.groups.shownNames(code));
+    const guest = await this.createGuest(shown, nickname);
     let group: GroupView;
     try {
-      group = await this.groups.join(guest.id, code);
+      group = await this.groups.join(guest.id, code, true);
     } catch (err) {
       await this.prisma.user.delete({ where: { id: guest.id } }).catch(() => undefined);
       throw err;
@@ -49,8 +60,9 @@ export class ArcadeGuestService {
     return { ...session, group };
   }
 
-  private async createGuest(nickname: string) {
-    const base = guestHandleBase(nickname);
+  private async createGuest(displayName: string, typed: string) {
+    // The handle is only an internal unique key (guests are never shown by it).
+    const base = guestHandleBase(typed);
     for (let attempt = 0; attempt < 12; attempt++) {
       const username = guestHandleCandidate(base, attempt, Math.random);
       try {
@@ -60,7 +72,7 @@ export class ArcadeGuestService {
             email: `guest-${randomUUID()}@${GUEST_EMAIL_DOMAIN}`,
             // Not a bcrypt hash, so nothing can ever match it: a guest cannot sign in again.
             passwordHash: `!guest!${randomBytes(24).toString('hex')}`,
-            displayName: nickname,
+            displayName,
             username,
             progression: { create: {} },
             learningProfile: { create: {} },

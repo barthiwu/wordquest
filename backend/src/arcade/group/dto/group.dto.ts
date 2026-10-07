@@ -26,6 +26,11 @@ export class CreateGroupDto {
   @IsOptional()
   @IsBoolean()
   showLeaderboard?: boolean;
+
+  /** false = only people with an account can join (no guests). Default true. */
+  @IsOptional()
+  @IsBoolean()
+  allowGuests?: boolean;
 }
 
 export class JoinGroupDto {

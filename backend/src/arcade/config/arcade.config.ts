@@ -303,6 +303,10 @@ export const ARCADE_GROUP_CONFIG = {
   MAX_MEMBERS: 50,
   // An unused group (nobody started a round) lapses after this long.
   LOBBY_TTL_HOURS: 48,
+  // Every invite link stops working this long after the group is created, so a
+  // link is for a short, specific occasion and cannot be used to wander into a
+  // group that went quiet long ago. People already in the group are unaffected.
+  LINK_TTL_HOURS: 48,
   // How long a round runs once the host starts it (the host picks within the range).
   DEFAULT_WINDOW_MINUTES: 60,
   MIN_WINDOW_MINUTES: 10,

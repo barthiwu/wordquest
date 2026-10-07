@@ -26,3 +26,28 @@ export function guestHandleCandidate(base: string, attempt: number, random: () =
     .padStart(digits, '0');
   return `${base}_${n}`;
 }
+
+/**
+ * The name a guest is shown under, exactly as they typed it (capitals, spaces,
+ * any alphabet), minus anything that could break a screen or a card: control
+ * characters, angle brackets, runs of spaces.
+ */
+export function guestDisplayName(nickname: string, max = 20): string {
+  return nickname
+    .replace(/[\u0000-\u001f\u007f<>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max)
+    .trim();
+}
+
+/** Makes a name unique within a group by adding " 2", " 3"... when it is already shown there. */
+export function uniqueInGroup(name: string, taken: string[]): string {
+  const used = new Set(taken.map((n) => n.toLowerCase()));
+  if (!used.has(name.toLowerCase())) return name;
+  for (let n = 2; n < 100; n += 1) {
+    const candidate = `${name} ${n}`;
+    if (!used.has(candidate.toLowerCase())) return candidate;
+  }
+  return `${name} ${Math.floor(Math.random() * 1000)}`;
+}

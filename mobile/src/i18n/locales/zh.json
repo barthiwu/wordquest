@@ -1060,7 +1060,8 @@
         "full": "这个小组已满。",
         "invalid": "此链接无效，或小组已结束。",
         "error": "无法加入小组。请重试。",
-        "signIn": "请登录后加入这个小组。"
+        "signIn": "请登录后加入这个小组。",
+        "expired": "此邀请链接已过期，请向主持人索取新链接。"
       },
       "lobby": {
         "shareTitle": "邀请玩家",
@@ -1087,7 +1088,8 @@
         "confirmEnd": "再点一次以结束",
         "error": "出错了，请重试。",
         "loadError": "无法加载小组。",
-        "retry": "重试"
+        "retry": "重试",
+        "linkExpiry": "此链接在小组创建 {{hours}} 小时后失效，请在准备好开玩时再分享。已在小组中的人不受影响。"
       },
       "active": {
         "timeLeft": "剩余 {{time}}",
@@ -1132,8 +1134,14 @@
         "createAccount": "创建账号",
         "upgradeTitle": "保留你的进度",
         "upgradeBody": "你正在以访客身份游玩。创建免费账号即可保留名字、创建自己的小组，并解锁 WordQuest 的更多功能。",
-        "upgradeCta": "创建免费账号"
-      }
+        "upgradeCta": "创建免费账号",
+        "nicknameHint": "随便取个名字。其他玩家会看到它，它也会出现在你的成绩卡上。",
+        "accountsOnlyTitle": "仅限账号",
+        "accountsOnly": "主持人只允许拥有 WordQuest 账号的人加入此小组。请登录或创建免费账号后继续。"
+      },
+      "allowGuestsLabel": "允许无账号加入",
+      "allowGuestsOn": "任何拿到链接的人都可以选择一个名字以访客身份加入。",
+      "allowGuestsOff": "只有拥有 WordQuest 账号的人才能加入（需要知道谁是谁时很有用）。"
     },
     "share": {
       "dialogTitle": "分享你的 WordQuest 成绩",

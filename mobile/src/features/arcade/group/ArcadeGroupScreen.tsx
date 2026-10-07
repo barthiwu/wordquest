@@ -16,6 +16,7 @@ import {
   extractGroupCode,
   formatGroupCode,
   getGroup,
+  GROUP_LINK_HOURS,
   GROUP_WINDOW_CHOICES,
   groupShareUrl,
   joinGroup,
@@ -99,9 +100,11 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
       .catch((err) => {
         if (alive.current) {
           setFatal(
-            err instanceof ApiError && err.status !== 404
-              ? err.message
-              : t('arcade:group.join.invalid'),
+            err instanceof ApiError && err.status === 410
+              ? t('arcade:group.join.expired')
+              : err instanceof ApiError && err.status !== 404
+                ? err.message
+                : t('arcade:group.join.invalid'),
           );
         }
       });
@@ -148,7 +151,13 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
       await fn();
     } catch (err) {
       if (alive.current) {
-        setError(err instanceof ApiError ? err.message : t('arcade:group.lobby.error'));
+        setError(
+          err instanceof ApiError && err.status === 410
+            ? t('arcade:group.join.expired')
+            : err instanceof ApiError
+              ? err.message
+              : t('arcade:group.lobby.error'),
+        );
       }
     } finally {
       if (alive.current) setBusy(false);
@@ -287,6 +296,9 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
               {t('arcade:group.lobby.codeLabel')}: {formatGroupCode(group.code)}
             </Text>
             <Text style={styles.hint}>{t('arcade:group.lobby.shareHint')}</Text>
+            <Text style={styles.hint}>
+              {t('arcade:group.lobby.linkExpiry', { hours: GROUP_LINK_HOURS })}
+            </Text>
             <View style={styles.actions}>
               <Pressable
                 style={styles.smallButton}

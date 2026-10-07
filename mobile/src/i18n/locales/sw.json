@@ -1060,7 +1060,8 @@
         "full": "Kikundi hiki kimejaa.",
         "invalid": "Kiungo hiki si sahihi, au kikundi kimeisha.",
         "error": "Imeshindwa kujiunga na kikundi. Tafadhali jaribu tena.",
-        "signIn": "Ingia ili ujiunge na kikundi hiki."
+        "signIn": "Ingia ili ujiunge na kikundi hiki.",
+        "expired": "Kiungo hiki cha mwaliko kimeisha muda. Mwombe mwenyeji kiungo kipya."
       },
       "lobby": {
         "shareTitle": "Alika wachezaji",
@@ -1087,7 +1088,8 @@
         "confirmEnd": "Gusa tena ili kumaliza",
         "error": "Hitilafu imetokea. Tafadhali jaribu tena.",
         "loadError": "Imeshindwa kupakia kikundi.",
-        "retry": "Jaribu tena"
+        "retry": "Jaribu tena",
+        "linkExpiry": "Kiungo hiki huacha kufanya kazi saa {{hours}} baada ya kuunda kundi, kwa hiyo kishiriki ukiwa tayari kucheza. Waliokuwa tayari kwenye kundi hawaathiriki."
       },
       "active": {
         "timeLeft": "Zimebaki {{time}}",
@@ -1132,8 +1134,14 @@
         "createAccount": "Fungua akaunti",
         "upgradeTitle": "Hifadhi maendeleo yako",
         "upgradeBody": "Unacheza kama mgeni. Fungua akaunti ya bure ili kuhifadhi jina lako, kuendesha vikundi vyako mwenyewe na kufungua sehemu nyingine za WordQuest.",
-        "upgradeCta": "Fungua akaunti ya bure"
-      }
+        "upgradeCta": "Fungua akaunti ya bure",
+        "nicknameHint": "Jina lolote unalopenda. Wachezaji wengine wanaliona, na linaonekana kwenye kadi yako ya matokeo.",
+        "accountsOnlyTitle": "Akaunti pekee",
+        "accountsOnly": "Mwenyeji anaruhusu tu watu wenye akaunti ya WordQuest kujiunga na kundi hili. Ingia au fungua akaunti ya bure ili kuendelea."
+      },
+      "allowGuestsLabel": "Ruhusu kujiunga bila akaunti",
+      "allowGuestsOn": "Yeyote mwenye kiungo anaweza kujiunga kama mgeni kwa kuchagua jina.",
+      "allowGuestsOff": "Ni watu wenye akaunti ya WordQuest pekee wanaoweza kujiunga (inafaa unapohitaji kujua nani ni nani)."
     },
     "share": {
       "dialogTitle": "Shiriki matokeo yako ya WordQuest",

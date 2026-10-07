@@ -5,7 +5,7 @@ import { CreateGroupDto, GroupMemberParamDto, JoinGroupDto, StartGroupDto } from
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../../auth/guards/email-verification.guard';
 import { CurrentUserId } from '../../auth/decorators/current-user.decorator';
-import { AllowGuest } from '../../auth/decorators/allow-guest.decorator';
+import { AllowGuest, IsGuest } from '../../auth/decorators/allow-guest.decorator';
 
 /**
  * POST   /api/v1/arcade/groups                      create a private group (host)
@@ -50,8 +50,8 @@ export class ArcadeGroupController {
   @Post('join')
   @HttpCode(200)
   @Throttle({ default: { limit: 15, ttl: 60_000 } })
-  join(@CurrentUserId() userId: string, @Body() dto: JoinGroupDto) {
-    return this.groups.join(userId, dto.code);
+  join(@CurrentUserId() userId: string, @IsGuest() isGuest: boolean, @Body() dto: JoinGroupDto) {
+    return this.groups.join(userId, dto.code, isGuest);
   }
 
   @AllowGuest()

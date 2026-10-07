@@ -1,4 +1,9 @@
-import { guestHandleBase, guestHandleCandidate } from './guest.util';
+import {
+  guestDisplayName,
+  guestHandleBase,
+  guestHandleCandidate,
+  uniqueInGroup,
+} from './guest.util';
 import { USERNAME_REGEX } from '../../users/users.service';
 
 describe('guest handles', () => {
@@ -26,5 +31,24 @@ describe('guest handles', () => {
         true,
       );
     }
+  });
+});
+
+describe('guest display names', () => {
+  it('keeps capitals, spaces and other alphabets as typed', () => {
+    expect(guestDisplayName('  Barth  ')).toBe('Barth');
+    expect(guestDisplayName('Mama  Chidi')).toBe('Mama Chidi');
+    expect(guestDisplayName('小明')).toBe('小明');
+  });
+
+  it('strips markup and control characters and caps the length', () => {
+    expect(guestDisplayName('<b>Ada</b>\u0007')).toBe('bAda/b');
+    expect(guestDisplayName('x'.repeat(40))).toHaveLength(20);
+  });
+
+  it('numbers a name that is already shown in the group, ignoring case', () => {
+    expect(uniqueInGroup('Barth', [])).toBe('Barth');
+    expect(uniqueInGroup('Barth', ['barth'])).toBe('Barth 2');
+    expect(uniqueInGroup('Barth', ['barth', 'barth 2'])).toBe('Barth 3');
   });
 });

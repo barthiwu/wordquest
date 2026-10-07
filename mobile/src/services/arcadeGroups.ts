@@ -12,6 +12,8 @@ export const GROUP_MAX_MEMBERS = 50;
 /** Round lengths the host can choose, in minutes. */
 export const GROUP_WINDOW_CHOICES = [15, 30, 60, 120] as const;
 export const GROUP_DEFAULT_WINDOW_MINUTES = 60;
+/** An invite link stops working this long after the group is created (backend LINK_TTL_HOURS). */
+export const GROUP_LINK_HOURS = 48;
 /** Length of the secret in an invite link (backend ARCADE_GROUP_CONFIG.CODE_LENGTH). */
 export const GROUP_CODE_LENGTH = 10;
 
@@ -48,6 +50,10 @@ export interface ArcadeGroup {
   maxMembers: number;
   memberCount: number;
   showLeaderboard: boolean;
+  /** false = only people with an account can join. */
+  allowGuests: boolean;
+  /** When the invite link stops working for new people. */
+  linkExpiresAt: string;
   windowMinutes: number;
   wordsTotal: number | null;
   expiresAt: string;
@@ -68,6 +74,8 @@ export interface GroupPreview {
   memberCount: number;
   maxMembers: number;
   full: boolean;
+  /** false = the host only lets people with an account join. */
+  allowGuests: boolean;
 }
 
 export interface GroupSummary {
@@ -115,7 +123,7 @@ export function formatGroupCode(code: string): string {
 
 export function createGroup(
   accessToken: string,
-  input: { game: GroupGame; title?: string; showLeaderboard?: boolean },
+  input: { game: GroupGame; title?: string; showLeaderboard?: boolean; allowGuests?: boolean },
 ): Promise<ArcadeGroup> {
   return apiRequest<ArcadeGroup>('/arcade/groups', {
     method: 'POST',

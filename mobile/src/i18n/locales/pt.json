@@ -1060,7 +1060,8 @@
         "full": "Este grupo está cheio.",
         "invalid": "Este link não é válido ou o grupo já terminou.",
         "error": "Não foi possível entrar no grupo. Tente novamente.",
-        "signIn": "Entre na sua conta para participar deste grupo."
+        "signIn": "Entre na sua conta para participar deste grupo.",
+        "expired": "Este link de convite expirou. Peça um novo ao anfitrião."
       },
       "lobby": {
         "shareTitle": "Convidar jogadores",
@@ -1087,7 +1088,8 @@
         "confirmEnd": "Toque de novo para encerrar",
         "error": "Algo deu errado. Tente novamente.",
         "loadError": "Não foi possível carregar o grupo.",
-        "retry": "Tentar novamente"
+        "retry": "Tentar novamente",
+        "linkExpiry": "Este link deixa de funcionar {{hours}} horas depois da criação do grupo, então compartilhe quando estiver pronto para jogar. Quem já está no grupo não é afetado."
       },
       "active": {
         "timeLeft": "{{time}} restantes",
@@ -1132,8 +1134,14 @@
         "createAccount": "Criar conta",
         "upgradeTitle": "Guarde seu progresso",
         "upgradeBody": "Você está jogando como convidado. Crie uma conta grátis para manter seu nome, criar seus próprios grupos e desbloquear o resto do WordQuest.",
-        "upgradeCta": "Criar conta grátis"
-      }
+        "upgradeCta": "Criar conta grátis",
+        "nicknameHint": "O nome que quiser. Os outros jogadores o veem e ele aparece no seu cartão de resultado.",
+        "accountsOnlyTitle": "Somente com conta",
+        "accountsOnly": "O anfitrião só permite quem tem conta no WordQuest. Entre ou crie uma conta grátis para continuar."
+      },
+      "allowGuestsLabel": "Permitir entrar sem conta",
+      "allowGuestsOn": "Qualquer pessoa com o link pode entrar como convidada escolhendo um nome.",
+      "allowGuestsOff": "Só entra quem tem conta no WordQuest (útil quando você precisa saber quem é quem)."
     },
     "share": {
       "dialogTitle": "Compartilhe seu resultado no WordQuest",

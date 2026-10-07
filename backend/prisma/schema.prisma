@@ -1924,6 +1924,9 @@ model ArcadeGroup {
   // false = members see only their own result (assessment mode); the host
   // always sees everyone.
   showLeaderboard Boolean @default(true)
+  // false = only people with an account can join (no guest join), e.g. for an
+  // assessment or a class that must be identifiable.
+  allowGuests     Boolean @default(true)
   // How long the round runs once started.
   windowMinutes   Int     @default(60)
 

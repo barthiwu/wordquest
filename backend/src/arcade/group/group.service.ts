@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  GoneException,
   Injectable,
   Logger,
   NotFoundException,
@@ -56,6 +57,10 @@ export interface GroupView {
   maxMembers: number;
   memberCount: number;
   showLeaderboard: boolean;
+  /** false = only people with an account can join. */
+  allowGuests: boolean;
+  /** When the invite link stops working for new people. */
+  linkExpiresAt: string;
   windowMinutes: number;
   /** Null until the first member opens the round. */
   wordsTotal: number | null;
@@ -79,6 +84,8 @@ export interface GroupPreviewView {
   memberCount: number;
   maxMembers: number;
   full: boolean;
+  /** false = the host only lets people with an account join. */
+  allowGuests: boolean;
 }
 
 export interface GroupSummaryView {
@@ -94,6 +101,16 @@ export interface GroupSummaryView {
 }
 
 const NOT_FOUND = 'Group not found';
+
+/** 403 for a guest at a group whose host only lets people with an account in. */
+export function guestsNotAllowed(): ForbiddenException {
+  return new ForbiddenException({
+    statusCode: 403,
+    code: 'GUESTS_NOT_ALLOWED',
+    message: 'The host only lets people with an account join this group.',
+    error: 'Forbidden',
+  });
+}
 
 /**
  * Group Play: up to ARCADE_GROUP_CONFIG.MAX_MEMBERS people play the same
@@ -138,6 +155,7 @@ export class ArcadeGroupService {
             hostId: userId,
             maxMembers: ARCADE_GROUP_CONFIG.MAX_MEMBERS,
             showLeaderboard: dto.showLeaderboard ?? true,
+            allowGuests: dto.allowGuests ?? true,
             windowMinutes: ARCADE_GROUP_CONFIG.DEFAULT_WINDOW_MINUTES,
             expiresAt,
             members: { create: { userId } },
@@ -156,6 +174,7 @@ export class ArcadeGroupService {
     const group = await this.findByCode(rawCode);
     const fresh = await this.refresh(group);
     if (fresh.status === 'ENDED') throw new NotFoundException(NOT_FOUND);
+    this.assertLinkOpen(fresh);
     const host = await this.prisma.user.findUnique({
       where: { id: fresh.hostId },
       select: { username: true },
@@ -170,14 +189,17 @@ export class ArcadeGroupService {
       memberCount,
       maxMembers: fresh.maxMembers,
       full: memberCount >= fresh.maxMembers,
+      allowGuests: fresh.allowGuests,
     };
   }
 
   /** Idempotent: joining a group you are already in just returns it. */
-  async join(userId: string, rawCode: string): Promise<GroupView> {
+  async join(userId: string, rawCode: string, asGuest = false): Promise<GroupView> {
     const found = await this.findByCode(rawCode);
     const group = await this.refresh(found);
     if (group.status === 'ENDED') throw new NotFoundException(NOT_FOUND);
+    this.assertLinkOpen(group);
+    if (asGuest && !group.allowGuests) throw guestsNotAllowed();
 
     await this.prisma.$transaction(async (tx) => {
       // Serialized per group so the member cap holds when many join at once.
@@ -401,7 +423,11 @@ export class ArcadeGroupService {
     const [members, sessions] = await Promise.all([
       this.prisma.arcadeGroupMember.findMany({
         where: { groupId: group.id },
-        include: { user: { select: { id: true, username: true, avatarKey: true } } },
+        include: {
+          user: {
+            select: { id: true, username: true, displayName: true, isGuest: true, avatarKey: true },
+          },
+        },
         orderBy: { joinedAt: 'asc' },
       }),
       this.prisma.arcadeGameSession.findMany({
@@ -437,7 +463,8 @@ export class ArcadeGroupService {
       const visible = seesAll || side.userId === viewerId;
       return {
         userId: side.userId,
-        username: m?.user.username ?? '',
+        // A guest has no public handle: they appear under the name they chose.
+        username: (m?.user.isGuest ? m.user.displayName : m?.user.username) ?? '',
         avatarUrl: null,
         isHost: side.userId === group.hostId,
         isMe: side.userId === viewerId,
@@ -488,6 +515,8 @@ export class ArcadeGroupService {
       maxMembers: group.maxMembers,
       memberCount: members.length,
       showLeaderboard: group.showLeaderboard,
+      allowGuests: group.allowGuests,
+      linkExpiresAt: this.linkExpiry(group).toISOString(),
       windowMinutes: group.windowMinutes,
       wordsTotal: group.wordsPickedAt ? group.wordIds.length : null,
       expiresAt: group.expiresAt.toISOString(),
@@ -500,6 +529,31 @@ export class ArcadeGroupService {
   }
 
   // ── Lookups ───────────────────────────────────────────────────────────
+
+  /** When an invite link stops working: a fixed time after the group was created. */
+  private linkExpiry(group: GroupRow): Date {
+    return new Date(group.createdAt.getTime() + ARCADE_GROUP_CONFIG.LINK_TTL_HOURS * 3_600_000);
+  }
+
+  /** New people cannot use a link past its time, whatever state the group is in. */
+  private assertLinkOpen(group: GroupRow): void {
+    if (Date.now() >= this.linkExpiry(group).getTime()) {
+      throw new GoneException('This invite link has expired.');
+    }
+  }
+
+  /**
+   * The names currently shown in a group (lowercased): a guest's chosen name,
+   * a member's username. Lets a guest's name be made unique within the group.
+   */
+  async shownNames(rawCode: string): Promise<string[]> {
+    const group = await this.findByCode(rawCode);
+    const rows = await this.prisma.arcadeGroupMember.findMany({
+      where: { groupId: group.id },
+      select: { user: { select: { username: true, displayName: true, isGuest: true } } },
+    });
+    return rows.map((r) => (r.user.isGuest ? r.user.displayName : r.user.username).toLowerCase());
+  }
 
   private async findByCode(rawCode: string): Promise<GroupRow> {
     const code = normalizeGroupCode(rawCode, ARCADE_GROUP_CONFIG.CODE_LENGTH);

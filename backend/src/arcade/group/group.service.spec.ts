@@ -3,6 +3,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  GoneException,
   NotFoundException,
 } from '@nestjs/common';
 import { ArcadeGroupService } from './group.service';
@@ -26,7 +27,8 @@ describe('ArcadeGroupService', () => {
     windowMinutes: 60,
     wordIds: [] as string[],
     wordsPickedAt: null as Date | null,
-    createdAt: new Date('2026-10-06T08:00:00Z'),
+    createdAt: new Date(Date.now() - 3_600_000),
+    allowGuests: true,
     activatedAt: null as Date | null,
     expiresAt: new Date(Date.now() + 3_600_000),
     endedAt: null as Date | null,
@@ -187,6 +189,7 @@ describe('ArcadeGroupService', () => {
         memberCount: 12,
         maxMembers: 50,
         full: false,
+        allowGuests: true,
       });
     });
 
@@ -209,6 +212,46 @@ describe('ArcadeGroupService', () => {
       expect(prismaMock.arcadeGroup.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.objectContaining({ status: 'ENDED' }) }),
       );
+    });
+  });
+
+  describe('link expiry (48 hours after creation)', () => {
+    const old = () => groupRow({ createdAt: new Date(Date.now() - 49 * 3_600_000) });
+
+    it('refuses a preview once the link is older than 48 hours, even for a running group', async () => {
+      prismaMock.arcadeGroup.findUnique.mockResolvedValue(
+        Object.assign(old(), { status: 'ACTIVE' }),
+      );
+      await expect(service.preview(CODE)).rejects.toBeInstanceOf(GoneException);
+    });
+
+    it('refuses a new person joining after 48 hours', async () => {
+      prismaMock.arcadeGroup.findUnique.mockResolvedValue(
+        Object.assign(old(), { status: 'ACTIVE' }),
+      );
+      await expect(service.join('late', CODE)).rejects.toBeInstanceOf(GoneException);
+      expect(prismaMock.arcadeGroupMember.create).not.toHaveBeenCalled();
+    });
+
+    it('still works just inside the window', async () => {
+      prismaMock.arcadeGroup.findUnique.mockResolvedValue(
+        groupRow({ createdAt: new Date(Date.now() - 47 * 3_600_000) }),
+      );
+      prismaMock.user.findUnique.mockResolvedValueOnce({ username: 'host' });
+      prismaMock.arcadeGroupMember.count.mockResolvedValueOnce(2);
+      await expect(service.preview(CODE)).resolves.toMatchObject({ code: CODE });
+    });
+
+    it('tells the host when the link stops working', async () => {
+      prismaMock.arcadeGroup.create.mockImplementationOnce(({ data }: { data: object }) =>
+        Promise.resolve(groupRow({ ...(data as Record<string, unknown>), createdAt: new Date() })),
+      );
+      prismaMock.arcadeGroupMember.findMany.mockResolvedValue([]);
+      prismaMock.arcadeGameSession.findMany.mockResolvedValue([]);
+      const view = await service.create('host', { game: 'SCRAMBLE_QUEST' });
+      const left = new Date(view.linkExpiresAt).getTime() - Date.now();
+      expect(left).toBeGreaterThan(47 * 3_600_000);
+      expect(left).toBeLessThanOrEqual(48 * 3_600_000);
     });
   });
 
@@ -262,6 +305,16 @@ describe('ArcadeGroupService', () => {
     it('refuses an ended group', async () => {
       prismaMock.arcadeGroup.findUnique.mockResolvedValue(groupRow({ status: 'ENDED' }));
       await expect(service.join('stu', CODE)).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('keeps guests out of an accounts-only group, but not people with accounts', async () => {
+      prismaMock.arcadeGroup.findUnique.mockResolvedValue(groupRow({ allowGuests: false }));
+      await expect(service.join('guest', CODE, true)).rejects.toBeInstanceOf(ForbiddenException);
+      expect(prismaMock.arcadeGroupMember.create).not.toHaveBeenCalled();
+      prismaMock.arcadeGroupMember.findUnique.mockResolvedValueOnce(null);
+      prismaMock.arcadeGroupMember.count.mockResolvedValueOnce(1);
+      await service.join('member', CODE, false);
+      expect(prismaMock.arcadeGroupMember.create).toHaveBeenCalled();
     });
   });
 
