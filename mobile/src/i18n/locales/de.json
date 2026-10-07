@@ -1029,7 +1029,7 @@
       "hubSub": "Bis zu 50 Spieler spielen in einer Zeitrunde dieselben Wörter. Privat: Nur Personen mit deinem Link können beitreten.",
       "chooseGame": "Spiel",
       "titleLabel": "Gruppenname (optional)",
-      "titlePlaceholder": "z. B. Wortschatz-Quiz Klasse 7",
+      "titlePlaceholder": "z. B. Spieleabend am Freitag",
       "leaderboardLabel": "Allen Spielern die Ergebnisse aller zeigen",
       "leaderboardOn": "Die Spieler sehen die komplette Bestenliste.",
       "leaderboardOff": "Die Spieler sehen nur ihr eigenes Ergebnis (gut für Leistungstests). Du siehst immer alle.",
@@ -1118,6 +1118,34 @@
         "backToGroup": "Zurück zur Gruppe",
         "complete": "Dein Gruppenspiel ist abgeschlossen. Die Ergebnisse findest du in der Gruppe."
       }
+    },
+    "share": {
+      "dialogTitle": "Teile dein WordQuest-Ergebnis",
+      "share": "Teilen",
+      "download": "Bild herunterladen",
+      "preparing": "Wird vorbereitet...",
+      "failed": "Das Bild konnte nicht erstellt werden. Bitte versuche es erneut.",
+      "saved": "Bild gespeichert. Poste es aus deinen Downloads.",
+      "open": "Ergebnis teilen",
+      "close": "Schließen",
+      "you": "DU",
+      "ofPlayers": "von {{count}} Spielern",
+      "time": "ZEIT",
+      "accuracy": "TREFFERQUOTE",
+      "footerGroup": "Mach in der nächsten Runde mit",
+      "footerVersus": "Glaubst du, du schlägst mich?",
+      "headlineRank": "Du bist Platz {{rank}} von {{count}}",
+      "headlineWon": "Du hast die Runde gewonnen!",
+      "headlineWin": "Du hast gewonnen!",
+      "headlineLoss": "{{name}} hat diesmal gewonnen",
+      "headlineDraw": "Unentschieden",
+      "aliWon": "Champion des Abends!",
+      "aliPodium": "Auf dem Treppchen!",
+      "aliTry": "Knapp daneben. Die nächste Runde gehört dir!",
+      "aliVsWin": "Der Sieg schmeckt süß!",
+      "aliVsLoss": "Revanche? Ich glaube an dich!",
+      "aliVsDraw": "Gleichauf!",
+      "vsTitle": "Du vs {{name}}"
     }
   },
   "scrambleQuest": {

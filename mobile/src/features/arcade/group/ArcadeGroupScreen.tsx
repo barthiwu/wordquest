@@ -28,6 +28,8 @@ import {
   type GroupPreview,
 } from '@/services/arcadeGroups';
 import { canCopyText, copyText, shareMessage } from '@/utils/shareLink';
+import { ShareResultCard } from '@/components/resultCard/ShareResultCard';
+import { buildGroupResultCard } from '@/components/resultCard/buildData';
 import { GroupMemberList } from './GroupMemberList';
 import { formatClock } from './groupFormat';
 
@@ -125,6 +127,7 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
   }, [load]);
 
   const status = group?.status;
+  const resultCard = useMemo(() => (group ? buildGroupResultCard(group, t) : null), [group, t]);
   useEffect(() => {
     if (!accessToken || !groupId || fatal || status === 'ENDED') return undefined;
     const id = setInterval(() => void load(), POLL_MS);
@@ -382,6 +385,10 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
               <Text style={styles.hint}>{t('arcade:group.results.hidden')}</Text>
             ) : null}
           </View>
+        ) : null}
+
+        {resultCard ? (
+          <ShareResultCard data={resultCard} variant="podium" fileName={`wordquest-${group.code ?? 'group'}`} />
         ) : null}
 
         <Text style={styles.heading}>

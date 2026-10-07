@@ -65,6 +65,7 @@ export interface AliSceneProps {
   placement?: 'left' | 'center';
   fadeTo?: string;
   animated?: boolean;
+  forceMode?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
   children?: ReactNode;
 }
@@ -91,6 +92,7 @@ export function AliScene({
   bubbleTop,
   fadeTo,
   animated = true,
+  forceMode,
   style,
   children,
 }: AliSceneProps) {
@@ -106,6 +108,7 @@ export function AliScene({
       perch={!center}
       fadeTo={fadeTo}
       animated={animated}
+      forceMode={forceMode}
       style={style}
     >
       <View

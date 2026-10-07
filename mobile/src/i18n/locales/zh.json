@@ -1029,7 +1029,7 @@
       "hubSub": "最多 50 位玩家在一轮限时游戏中玩相同的单词。私密：只有拿到你的链接的人才能加入。",
       "chooseGame": "游戏",
       "titleLabel": "小组名称（可选）",
-      "titlePlaceholder": "例如：初二词汇小测",
+      "titlePlaceholder": "例如：周五游戏之夜",
       "leaderboardLabel": "向玩家显示所有人的得分",
       "leaderboardOn": "玩家可以看到完整排行榜。",
       "leaderboardOff": "玩家只能看到自己的成绩（适合测评）。你始终可以看到所有人。",
@@ -1118,6 +1118,34 @@
         "backToGroup": "返回小组",
         "complete": "你的团体游玩已完成。请到小组查看结果。"
       }
+    },
+    "share": {
+      "dialogTitle": "分享你的 WordQuest 成绩",
+      "share": "分享",
+      "download": "下载图片",
+      "preparing": "正在生成...",
+      "failed": "无法生成图片，请重试。",
+      "saved": "图片已保存，可从下载内容中发布。",
+      "open": "分享成绩",
+      "close": "关闭",
+      "you": "你",
+      "ofPlayers": "共 {{count}} 位玩家",
+      "time": "用时",
+      "accuracy": "正确率",
+      "footerGroup": "来参加下一轮",
+      "footerVersus": "你觉得能打败我吗？",
+      "headlineRank": "你在 {{count}} 人中排名第 {{rank}}",
+      "headlineWon": "你赢得了本轮！",
+      "headlineWin": "你赢了！",
+      "headlineLoss": "这次 {{name}} 赢了",
+      "headlineDraw": "平局",
+      "aliWon": "今晚的冠军！",
+      "aliPodium": "登上领奖台！",
+      "aliTry": "差一点点。下一轮就是你的！",
+      "aliVsWin": "胜利的滋味真甜！",
+      "aliVsLoss": "再来一局？我相信你！",
+      "aliVsDraw": "势均力敌！",
+      "vsTitle": "你 对 {{name}}"
     }
   },
   "scrambleQuest": {

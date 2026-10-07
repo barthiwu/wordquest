@@ -1029,7 +1029,7 @@
       "hubSub": "Hasta 50 jugadores juegan las mismas palabras en una ronda con tiempo. Es privado: solo puede unirse quien tenga tu enlace.",
       "chooseGame": "Juego",
       "titleLabel": "Nombre del grupo (opcional)",
-      "titlePlaceholder": "p. ej., Quiz de vocabulario 2.º B",
+      "titlePlaceholder": "p. ej., Noche de juegos del viernes",
       "leaderboardLabel": "Mostrar las puntuaciones de todos a los jugadores",
       "leaderboardOn": "Los jugadores ven la clasificación completa.",
       "leaderboardOff": "Los jugadores solo ven su propio resultado (ideal para evaluaciones). Tú siempre ves a todos.",
@@ -1118,6 +1118,34 @@
         "backToGroup": "Volver al grupo",
         "complete": "Tu partida en grupo ha terminado. Consulta los resultados en el grupo."
       }
+    },
+    "share": {
+      "dialogTitle": "Comparte tu resultado de WordQuest",
+      "share": "Compartir",
+      "download": "Descargar imagen",
+      "preparing": "Preparando...",
+      "failed": "No se pudo crear la imagen. Inténtalo de nuevo.",
+      "saved": "Imagen guardada. Publícala desde tus descargas.",
+      "open": "Compartir resultado",
+      "close": "Cerrar",
+      "you": "TÚ",
+      "ofPlayers": "de {{count}} jugadores",
+      "time": "TIEMPO",
+      "accuracy": "PRECISIÓN",
+      "footerGroup": "Únete a la próxima ronda",
+      "footerVersus": "¿Crees que puedes ganarme?",
+      "headlineRank": "Quedaste en el puesto {{rank}} de {{count}}",
+      "headlineWon": "¡Ganaste la ronda!",
+      "headlineWin": "¡Ganaste!",
+      "headlineLoss": "{{name}} ganó esta vez",
+      "headlineDraw": "Empate",
+      "aliWon": "¡Campeón de la noche!",
+      "aliPodium": "¡En el podio!",
+      "aliTry": "Casi. ¡La próxima ronda es tuya!",
+      "aliVsWin": "¡Qué dulce es la victoria!",
+      "aliVsLoss": "¿Revancha? ¡Creo en ti!",
+      "aliVsDraw": "¡Muy parejos!",
+      "vsTitle": "Tú vs {{name}}"
     }
   },
   "scrambleQuest": {

@@ -442,12 +442,15 @@ export interface SceneBackdropProps {
   fadeTo?: string;
   /** Run the clouds / fireflies animation (default true). */
   animated?: boolean;
+  /** Draw this time of day regardless of the app theme (share cards are always night). */
+  forceMode?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
   children?: ReactNode;
 }
 
-function SceneBackdropBase({ variant = 'forest', height = 240, perch, fadeTo, animated = true, style, children }: SceneBackdropProps) {
-  const mode = useThemeStore((s) => s.mode);
+function SceneBackdropBase({ variant = 'forest', height = 240, perch, fadeTo, animated = true, forceMode, style, children }: SceneBackdropProps) {
+  const themeMode = useThemeStore((s) => s.mode);
+  const mode = forceMode ?? themeMode;
   const set = PALETTES[variant];
   const p = mode === 'light' ? set.light : set.dark;
   const uid = `${variant}-${mode}`;

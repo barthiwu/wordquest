@@ -1029,7 +1029,7 @@
       "hubSub": "Jusqu’à 50 joueurs jouent les mêmes mots dans une manche chronométrée. Privé : seules les personnes ayant ton lien peuvent rejoindre.",
       "chooseGame": "Jeu",
       "titleLabel": "Nom du groupe (facultatif)",
-      "titlePlaceholder": "ex. Quiz de vocabulaire 6e B",
+      "titlePlaceholder": "ex. Soirée jeux du vendredi",
       "leaderboardLabel": "Montrer les scores de tous aux joueurs",
       "leaderboardOn": "Les joueurs voient le classement complet.",
       "leaderboardOff": "Les joueurs ne voient que leur propre résultat (idéal pour les évaluations). Tu vois toujours tout le monde.",
@@ -1118,6 +1118,34 @@
         "backToGroup": "Retour au groupe",
         "complete": "Ta partie de groupe est terminée. Consulte le groupe pour voir les résultats."
       }
+    },
+    "share": {
+      "dialogTitle": "Partage ton résultat WordQuest",
+      "share": "Partager",
+      "download": "Télécharger l'image",
+      "preparing": "Préparation...",
+      "failed": "Impossible de créer l'image. Réessaie.",
+      "saved": "Image enregistrée. Publie-la depuis tes téléchargements.",
+      "open": "Partager le résultat",
+      "close": "Fermer",
+      "you": "TOI",
+      "ofPlayers": "sur {{count}} joueurs",
+      "time": "TEMPS",
+      "accuracy": "PRÉCISION",
+      "footerGroup": "Rejoins la prochaine manche",
+      "footerVersus": "Tu crois pouvoir me battre ?",
+      "headlineRank": "Tu termines {{rank}}e sur {{count}}",
+      "headlineWon": "Tu as gagné la manche !",
+      "headlineWin": "Tu as gagné !",
+      "headlineLoss": "{{name}} a gagné cette fois",
+      "headlineDraw": "Égalité",
+      "aliWon": "Champion de la soirée !",
+      "aliPodium": "Sur le podium !",
+      "aliTry": "Presque. La prochaine manche est à toi !",
+      "aliVsWin": "Que la victoire est douce !",
+      "aliVsLoss": "Une revanche ? Je crois en toi !",
+      "aliVsDraw": "À égalité !",
+      "vsTitle": "Toi vs {{name}}"
     }
   },
   "scrambleQuest": {

@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import { useAuthStore } from '@/state/authStore';
+import { ShareResultButton } from '@/components/resultCard/ShareResultButton';
+import { buildVersusResultCard } from '@/components/resultCard/buildData';
 import { getVersusMatch, type VersusMatch } from '@/services/arcadeVersus';
 
 const POLL_MS = 3000;
@@ -50,6 +52,30 @@ export function VersusResultCard({ matchId }: { matchId: string }) {
   }, [accessToken, matchId]);
 
   const name = match?.opponent?.username ?? '';
+  const user = useAuthStore((s) => s.user);
+  const shareData = useMemo(
+    () =>
+      match?.result
+        ? buildVersusResultCard(t, {
+            game: match.game,
+            outcome: match.result.outcome,
+            me: {
+              name: user?.username ?? '',
+              avatarUrl: user?.avatarUrl,
+              correct: match.result.myCorrect,
+              timeMs: match.result.myTimeMs,
+            },
+            them: {
+              name,
+              avatarUrl: match.opponent?.avatarUrl,
+              correct: match.result.theirCorrect,
+              timeMs: match.result.theirTimeMs,
+            },
+            total: match.wordsTotal,
+          })
+        : null,
+    [match, name, t, user],
+  );
 
   if (!match || !match.result) {
     return (
@@ -103,6 +129,7 @@ export function VersusResultCard({ matchId }: { matchId: string }) {
       {r.bonusXp > 0 && (
         <Text style={styles.bonus}>{t('versus.result.bonus', { xp: r.bonusXp })}</Text>
       )}
+      <ShareResultButton data={shareData} variant="quest" fileName={`wordquest-${match.game.toLowerCase()}`} />
     </View>
   );
 }

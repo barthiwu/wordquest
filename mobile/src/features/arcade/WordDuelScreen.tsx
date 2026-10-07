@@ -27,6 +27,8 @@ import { useArcadePlaysStore } from '@/state/arcadePlaysStore';
 import { ArcadeLimitReached } from '@/components/ArcadeLimitReached';
 import { trackEvent } from '@/services/analyticsClient';
 import { useAuthStore } from '@/state/authStore';
+import { ShareResultButton } from '@/components/resultCard/ShareResultButton';
+import { buildVersusResultCard } from '@/components/resultCard/buildData';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
 import { AliDeferredRecap } from '@/components/AliDeferredRecap';
@@ -712,6 +714,21 @@ export function WordDuelScreen({ navigation, route }: Props) {
           onPrimary={join}
           secondaryLabel={t('arcade:backToPlay')}
           onSecondary={() => navigation.goBack()}
+        />
+        <ShareResultButton
+          variant="quest"
+          fileName="wordquest-word-duel"
+          data={buildVersusResultCard(t, {
+            game: 'WORD_DUEL',
+            outcome: result.winnerId === null ? 'DRAW' : result.youWon ? 'WIN' : 'LOSS',
+            me: { name: userUsername ?? '', avatarUrl: userAvatarUrl, correct: state.correctCount },
+            them: {
+              name: opponentIdentity?.username ?? t('opponentLabel'),
+              avatarUrl: opponentIdentity?.avatarUrl,
+              correct: state.opponent?.correctCount ?? 0,
+            },
+            total: state.wordsTotal,
+          })}
         />
         <AliDeferredRecap
           reactions={[

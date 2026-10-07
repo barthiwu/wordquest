@@ -1029,7 +1029,7 @@
       "hubSub": "Up to 50 players play the same words in one timed round. Private: only people with your link can join.",
       "chooseGame": "Game",
       "titleLabel": "Group name (optional)",
-      "titlePlaceholder": "e.g. JSS2 Vocabulary Quiz",
+      "titlePlaceholder": "e.g. Friday Game Night",
       "leaderboardLabel": "Show everyone's scores to players",
       "leaderboardOn": "Players see the full leaderboard.",
       "leaderboardOff": "Players see only their own result (good for assessments). You always see everyone.",
@@ -1118,6 +1118,34 @@
         "backToGroup": "Back to group",
         "complete": "Your group play is complete. Check the group for results."
       }
+    },
+    "share": {
+      "dialogTitle": "Share your WordQuest result",
+      "share": "Share",
+      "download": "Download image",
+      "preparing": "Preparing...",
+      "failed": "Couldn't create the image. Please try again.",
+      "saved": "Image saved. Post it from your downloads.",
+      "open": "Share result",
+      "close": "Close",
+      "you": "YOU",
+      "ofPlayers": "of {{count}} players",
+      "time": "TIME",
+      "accuracy": "ACCURACY",
+      "footerGroup": "Join the next round",
+      "footerVersus": "Think you can beat me?",
+      "headlineRank": "You finished #{{rank}} of {{count}}",
+      "headlineWon": "You won the round!",
+      "headlineWin": "You won!",
+      "headlineLoss": "{{name}} won this one",
+      "headlineDraw": "It's a draw",
+      "aliWon": "Champion of the night!",
+      "aliPodium": "On the podium!",
+      "aliTry": "So close. Next round is yours!",
+      "aliVsWin": "Victory is sweet!",
+      "aliVsLoss": "Rematch? I believe in you!",
+      "aliVsDraw": "Evenly matched!",
+      "vsTitle": "You vs {{name}}"
     }
   },
   "scrambleQuest": {

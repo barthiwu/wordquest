@@ -1029,7 +1029,7 @@
       "hubSub": "Hadi wachezaji 50 hucheza maneno yaleyale katika raundi moja yenye muda. Faragha: ni wenye kiungo chako tu wanaoweza kujiunga.",
       "chooseGame": "Mchezo",
       "titleLabel": "Jina la kikundi (hiari)",
-      "titlePlaceholder": "mf. Jaribio la Msamiati la Darasa la 6",
+      "titlePlaceholder": "k.m. Usiku wa Michezo wa Ijumaa",
       "leaderboardLabel": "Waonyeshe wachezaji alama za kila mtu",
       "leaderboardOn": "Wachezaji wanaona ubao kamili wa viwango.",
       "leaderboardOff": "Wachezaji wanaona matokeo yao tu (nzuri kwa tathmini). Wewe unaona kila mtu kila wakati.",
@@ -1118,6 +1118,34 @@
         "backToGroup": "Rudi kwenye kikundi",
         "complete": "Mchezo wako wa kikundi umekamilika. Angalia kikundi kuona matokeo."
       }
+    },
+    "share": {
+      "dialogTitle": "Shiriki matokeo yako ya WordQuest",
+      "share": "Shiriki",
+      "download": "Pakua picha",
+      "preparing": "Inaandaa...",
+      "failed": "Imeshindwa kutengeneza picha. Tafadhali jaribu tena.",
+      "saved": "Picha imehifadhiwa. Ichapishe kutoka kwenye vipakuliwa vyako.",
+      "open": "Shiriki matokeo",
+      "close": "Funga",
+      "you": "WEWE",
+      "ofPlayers": "kati ya wachezaji {{count}}",
+      "time": "MUDA",
+      "accuracy": "USAHIHI",
+      "footerGroup": "Jiunge na raundi ijayo",
+      "footerVersus": "Unadhani unaweza kunishinda?",
+      "headlineRank": "Umemaliza nafasi ya {{rank}} kati ya {{count}}",
+      "headlineWon": "Umeshinda raundi!",
+      "headlineWin": "Umeshinda!",
+      "headlineLoss": "{{name}} ameshinda mara hii",
+      "headlineDraw": "Sare",
+      "aliWon": "Bingwa wa usiku huu!",
+      "aliPodium": "Jukwaani!",
+      "aliTry": "Karibu sana. Raundi ijayo ni yako!",
+      "aliVsWin": "Ushindi ni mtamu!",
+      "aliVsLoss": "Mechi ya marudiano? Nakuamini!",
+      "aliVsDraw": "Mko sawa!",
+      "vsTitle": "Wewe dhidi ya {{name}}"
     }
   },
   "scrambleQuest": {

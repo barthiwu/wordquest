@@ -43,6 +43,7 @@ import { HangmanScreen } from '@/features/arcade/HangmanScreen';
 import { ArcadeVersusLobbyScreen } from '@/features/arcade/ArcadeVersusLobbyScreen';
 import { ArcadeGroupHubScreen } from '@/features/arcade/group/ArcadeGroupHubScreen';
 import { ArcadeGroupScreen } from '@/features/arcade/group/ArcadeGroupScreen';
+import { ResultCardGalleryScreen } from '@/features/arcade/ResultCardGalleryScreen';
 import type { ChallengeGame, VersusGame } from '@/services/arcadeVersus';
 import { WordDuelScreen } from '@/features/arcade/WordDuelScreen';
 import { BossBattleLeaderboardScreen } from '@/features/boss-battle/BossBattleLeaderboardScreen';
@@ -122,6 +123,7 @@ export type RootStackParamList = {
   ArcadeGroupHub: { game?: VersusGame } | undefined;
   /** `code` opens the join screen (the invite link); `groupId` opens a group you are in. */
   ArcadeGroup: { groupId?: string; code?: string };
+  ResultCardGallery: undefined;
   BossBattleLeaderboard: undefined;
   MasterChallenge: undefined;
   Order: undefined;
@@ -287,6 +289,7 @@ export function RootNavigator() {
         <Stack.Screen name="ArcadeVersus" component={framed(ArcadeVersusLobbyScreen)} />
         <Stack.Screen name="ArcadeGroupHub" component={framed(ArcadeGroupHubScreen)} />
         <Stack.Screen name="ArcadeGroup" component={framed(ArcadeGroupScreen)} />
+        <Stack.Screen name="ResultCardGallery" component={framed(ResultCardGalleryScreen)} />
         <Stack.Screen name="WordDuel" component={framed(WordDuelScreen)} />
         <Stack.Screen
           name="BossBattleLeaderboard"
