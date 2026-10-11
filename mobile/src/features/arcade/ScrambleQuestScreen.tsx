@@ -27,7 +27,9 @@ import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import type { AliExpressionCue } from '@/services/aliExpression';
 import { AliBubble } from '@/components/AliBubble';
 import { ProtoGameHeader } from '@/features/proto/ProtoGameHeader';
+import { AnswerReview } from '@/components/AnswerReview';
 import { VersusBar } from '@/components/VersusBar';
+import { VersusChat } from '@/components/VersusChat';
 import { VersusResultCard } from '@/components/VersusResultCard';
 import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
@@ -356,6 +358,7 @@ export function ScrambleQuestScreen({ navigation, route }: Props) {
           onSecondary={() => navigation.goBack()}
         />
         {versusMatchId ? <VersusResultCard matchId={versusMatchId} /> : null}
+        {versusMatchId ? <VersusChat matchId={versusMatchId} /> : null}
         {groupId ? <Text style={styles.groupNote}>{t('arcade:group.play.complete')}</Text> : null}
         <AliDeferredRecap
           reactions={feedback.deferredAliReactions ?? []}
@@ -382,6 +385,7 @@ export function ScrambleQuestScreen({ navigation, route }: Props) {
         <BackButton onPress={() => navigation.goBack()} />
         <ProtoGameHeader line={tp('gameScramble')} />
         {versusMatchId ? <VersusBar matchId={versusMatchId} /> : null}
+        {versusMatchId ? <VersusChat matchId={versusMatchId} /> : null}
 
         <View style={styles.headerRow}>
           <Text style={styles.progressLabel}>
@@ -507,11 +511,13 @@ export function ScrambleQuestScreen({ navigation, route }: Props) {
                   ? t('correctFeedback', { xp: feedback.xpAwarded })
                   : t('incorrectFeedback')}
             </Text>
-            {!feedback.isCorrect && (
-              <Text style={styles.revealText}>
-                {t('revealPrefix')} <Text style={styles.revealWord}>{feedback.correctAnswer}</Text>
-              </Text>
-            )}
+            <AnswerReview
+              colors={colors}
+              submitted={feedback.submittedAnswer}
+              correct={feedback.correctAnswer}
+              isCorrect={feedback.isCorrect}
+              timedOut={feedback.timedOut}
+            />
             <Pressable
               style={styles.meaningButton}
               onPress={() => setShowMeaning((v) => !v)}

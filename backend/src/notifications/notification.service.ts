@@ -35,6 +35,9 @@ const CATEGORY_BY_TYPE: Record<NotificationType, PreferenceCategory> = {
   ARCADE_CHALLENGE: 'competitionEnabled',
   ARCADE_RESULT: 'competitionEnabled',
   ARCADE_PLAY_LIMIT: 'competitionEnabled',
+  // The 8-hourly "come play" nudge: same switch as the other Arcade pushes,
+  // so one toggle in Settings turns all of them off.
+  ARCADE_REMINDER: 'competitionEnabled',
 };
 
 const DEFAULT_PREFERENCE = {

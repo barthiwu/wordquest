@@ -1170,6 +1170,34 @@
       "aliVsLoss": "Revanche? Eu acredito em você!",
       "aliVsDraw": "Empate técnico!",
       "vsTitle": "Você vs {{name}}"
+    },
+    "chat": {
+      "tab": {
+        "chat": "Chat",
+        "quick": "Rápido"
+      },
+      "quickOnly": "Com jogadores que você não conhece, só dá para enviar reações rápidas.",
+      "quick": {
+        "GOOD_LUCK": "Boa sorte",
+        "GOOD_GAME": "Bom jogo",
+        "NICE": "Boa!",
+        "WOW": "Uau",
+        "FIRE": "Pegando fogo",
+        "LAUGH": "Haha",
+        "OUCH": "Ai",
+        "THINKING": "Hmm",
+        "HURRY": "Anda logo",
+        "REMATCH": "Revanche?"
+      }
+    },
+    "answerReview": {
+      "yourAnswer": "Sua resposta",
+      "yourLetters": "Suas letras",
+      "correctAnswer": "Resposta correta",
+      "timeUpCorrect": "Acabou o tempo. A resposta era",
+      "noAnswer": "(sem resposta)",
+      "a11yCorrect": "Correto. Você escreveu {{answer}}",
+      "a11yWrong": "Errado. Você escreveu {{answer}}. A resposta correta é {{correct}}"
     }
   },
   "scrambleQuest": {
@@ -1227,7 +1255,8 @@
     "sessionSavedSummary": "{{saved}} de {{total}} palavras salvas",
     "sessionXpEarned": "{{xp}} XP ganhos",
     "sessionLongestStreak": "Maior sequência: {{streak}}",
-    "playAgain": "Jogar novamente"
+    "playAgain": "Jogar novamente",
+    "timeUpFeedback": "O tempo acabou! O boneco foi enforcado."
   },
   "play": {
     "title": "Jogar",
@@ -1319,7 +1348,8 @@
     "chatQuickGoodLuck": "Boa sorte!",
     "chatQuickNiceOne": "Mandou bem!",
     "chatQuickClose": "Foi por pouco!",
-    "chatQuickGg": "GG"
+    "chatQuickGg": "GG",
+    "incorrectFeedbackShort": "Quase."
   },
   "feedback": {
     "title": "Enviar feedback",

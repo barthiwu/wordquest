@@ -6,6 +6,8 @@ import {
   listMyVersus,
   queueVersus,
   respondToVersus,
+  getVersusChat,
+  sendVersusChat,
 } from './arcadeVersus';
 import { startScrambleQuest } from './scrambleQuest';
 import { startCompleteIt } from './completeIt';
@@ -80,6 +82,25 @@ describe('arcade versus service', () => {
       method: 'POST',
       accessToken: 't',
       body: { versusMatchId: 'm1' },
+    });
+  });
+
+  it('reads and sends challenge chat (typed and quick)', async () => {
+    await getVersusChat('t', 'm1', 7);
+    expect(apiRequest).toHaveBeenLastCalledWith('/arcade/versus/m1/chat?after=7', {
+      accessToken: 't',
+    });
+    await sendVersusChat('t', 'm1', { body: 'good luck' });
+    expect(apiRequest).toHaveBeenLastCalledWith('/arcade/versus/m1/chat', {
+      method: 'POST',
+      body: { body: 'good luck' },
+      accessToken: 't',
+    });
+    await sendVersusChat('t', 'm1', { quick: 'FIRE' });
+    expect(apiRequest).toHaveBeenLastCalledWith('/arcade/versus/m1/chat', {
+      method: 'POST',
+      body: { quick: 'FIRE' },
+      accessToken: 't',
     });
   });
 });

@@ -68,7 +68,8 @@ export function streakModifierFor(streakBeforeThisAnswer: number): number {
 
 // ── ScrambleQuest ─────────────────────────────────────────────────────
 export const SCRAMBLE_QUEST_CONFIG = {
-  TIMER_SECONDS: 30,
+  // 2026-10 decision (Barth): 45s per word, up from 30.
+  TIMER_SECONDS: 45,
   MAX_HINTS_PER_WORD: 3, // each reveals the next letter, left to right
   WORDS_PER_SESSION: 20,
   // 2026-09-30 decision (Barth): reaches all the way down to the vault's
@@ -135,10 +136,14 @@ export const HANGMAN_CONFIG = {
   // never reveals the last missing letter, and it costs XP (same shared
   // per-hint penalty every Arcade game uses) but not a body part.
   MAX_HINTS_PER_WORD: 1,
-  // Denominator for the shared speed modifier only. Hangman has no
-  // per-word countdown -- it is a thinking game, not a race -- so this
-  // only decides whether a solve counts as fast, normal or slow.
-  TIME_REFERENCE_SECONDS: 90,
+  // 2026-10 decision (Barth): every word has a 45-second countdown. A
+  // player had been looking words up online during untimed games. The
+  // deadline is server-authoritative (same model as ScrambleQuest): when it
+  // passes, the word is lost, and the speed modifier uses this same limit.
+  TIMER_SECONDS: 45,
+  // How early (ms) the server accepts the app's "time is up" call, to cover
+  // clock drift between phone and server. Never extends the time to guess.
+  TIMEOUT_CLOCK_TOLERANCE_MS: 1000,
   // Each wrong letter costs this fraction of the XP on a win, compounding
   // (0.9^wrong), so a clean solve beats a close escape.
   MISTAKE_PENALTY_PER_WRONG_GUESS: 0.9,
@@ -217,6 +222,8 @@ export const WORD_DUEL_CHAT_CONFIG = {
   MAX_LENGTH: 200,
   // Minimum gap between one player's messages.
   MIN_INTERVAL_MS: 1500,
+  // Quick chat (one-tap emoji) may be a little faster than typing.
+  QUICK_MIN_INTERVAL_MS: 700,
   MAX_MESSAGES_PER_PLAYER_PER_MATCH: 60,
   // The same text sent twice inside this window counts as spam.
   DUPLICATE_WINDOW_MS: 10_000,
@@ -226,6 +233,22 @@ export const WORD_DUEL_CHAT_CONFIG = {
   FETCH_LIMIT: 50,
   // Unreported messages are deleted after this long. Reported ones are kept
   // for the moderation team.
+  RETENTION_DAYS: 30,
+} as const;
+
+/** In-game chat during a head-to-head challenge (ScrambleQuest / Complete It
+ * / Hangman). Friends can type and send quick chat; strangers from the random
+ * queue get quick chat only (no free text with someone you have never met). */
+export const ARCADE_VERSUS_CHAT_CONFIG = {
+  MAX_LENGTH: 200,
+  MIN_INTERVAL_MS: 1500,
+  QUICK_MIN_INTERVAL_MS: 700,
+  MAX_MESSAGES_PER_PLAYER_PER_MATCH: 120,
+  DUPLICATE_WINDOW_MS: 10_000,
+  // Chat stays open this long after a match settles ("gg", "rematch?").
+  FRIEND_POST_MATCH_GRACE_MINUTES: 60,
+  RANDOM_POST_MATCH_GRACE_MINUTES: 5,
+  FETCH_LIMIT: 50,
   RETENTION_DAYS: 30,
 } as const;
 
@@ -323,6 +346,19 @@ export const ARCADE_GROUP_CONFIG = {
   GUEST_RETENTION_DAYS: 180,
   GUEST_NICKNAME_MIN: 2,
   GUEST_NICKNAME_MAX: 20,
+} as const;
+
+// ── Arcade reminder notification ───────────────────────────────────────
+// 2026-10 request (Barth): a push nudge for the Arcade, no more than one every
+// 8 hours per player. It is held to the player's local waking hours (so it
+// never lands at 3am and quiet hours are not silently burned), skipped for
+// anyone who played an Arcade game in the last INTERVAL_HOURS, and follows the
+// same Settings switch as the other Arcade pushes.
+export const ARCADE_REMINDER_CONFIG = {
+  INTERVAL_HOURS: 8,
+  FIRST_LOCAL_HOUR: 9,
+  LAST_LOCAL_HOUR: 21,
+  DEEP_LINK: 'wordquest://play',
 } as const;
 
 // ── Daily play limits ──────────────────────────────────────────────────

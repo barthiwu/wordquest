@@ -19,7 +19,9 @@ import {
   guessHangmanLetter,
   requestHangmanHint,
   startHangman,
+  timeoutHangmanWord,
   type HangmanChallenge,
+  type HangmanGuessResult,
   type HangmanWordCompletion,
 } from '@/services/hangman';
 import { ApiError } from '@/services/apiClient';
@@ -33,9 +35,12 @@ import { AliDeferredRecap } from '@/components/AliDeferredRecap';
 import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
+import { CountdownRing } from '@/components/CountdownRing';
 import { HangmanFigure } from '@/components/HangmanFigure';
 import { ProtoGameHeader } from '@/features/proto/ProtoGameHeader';
+import { AnswerReview } from '@/components/AnswerReview';
 import { VersusBar } from '@/components/VersusBar';
+import { VersusChat } from '@/components/VersusChat';
 import { VersusResultCard } from '@/components/VersusResultCard';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Hangman'>;
@@ -43,6 +48,11 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Hangman'>;
 type Phase = 'loading' | 'active' | 'busy' | 'wordDone' | 'complete' | 'error';
 
 const KEY_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+
+// The ring turns red and pulses for the last stretch of the word.
+const URGENT_THRESHOLD_SECONDS = 10;
+// After the server says "there is still time left", wait this long before asking again.
+const TIMEOUT_RETRY_MS = 1500;
 
 /**
  * Hangman: guess the hidden word one letter at a time. Every wrong letter
@@ -78,6 +88,10 @@ export function HangmanScreen({ navigation, route }: Props) {
   } | null>(null);
   const aliBubbleCounter = useRef(0);
   const completedRef = useRef(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(45);
+  // The word the "time is up" call was already sent for, and when it may be retried.
+  const timeoutSentForRef = useRef<string | null>(null);
+  const timeoutRetryAtRef = useRef(0);
 
   useEffect(() => {
     return () => {
@@ -113,6 +127,26 @@ export function HangmanScreen({ navigation, route }: Props) {
     void load();
   }, [load]);
 
+  // Draws what the server sent back for a guess or a timeout: the new word
+  // state, and (once the word is finished) its completion.
+  const applyResult = useCallback((result: HangmanGuessResult) => {
+    setChallenge(result.view);
+    if (result.completion) {
+      setCompletion(result.completion);
+      if (result.completion.aliQuickReaction && result.completion.aliQuickExpression) {
+        aliBubbleCounter.current += 1;
+        setAliBubble({
+          id: aliBubbleCounter.current,
+          message: result.completion.aliQuickReaction,
+          expression: result.completion.aliQuickExpression,
+        });
+      }
+      setPhase('wordDone');
+    } else {
+      setPhase('active');
+    }
+  }, []);
+
   const handleGuess = useCallback(
     async (letter: string) => {
       if (!accessToken || !challenge || phase !== 'active') return;
@@ -126,21 +160,7 @@ export function HangmanScreen({ navigation, route }: Props) {
           isCorrect: result.isHit,
           wordFinished: result.completion != null,
         });
-        setChallenge(result.view);
-        if (result.completion) {
-          setCompletion(result.completion);
-          if (result.completion.aliQuickReaction && result.completion.aliQuickExpression) {
-            aliBubbleCounter.current += 1;
-            setAliBubble({
-              id: aliBubbleCounter.current,
-              message: result.completion.aliQuickReaction,
-              expression: result.completion.aliQuickExpression,
-            });
-          }
-          setPhase('wordDone');
-        } else {
-          setPhase('active');
-        }
+        applyResult(result);
       } catch (err) {
         trackEvent('GAMEPLAY_ERROR', {
           game: 'HANGMAN',
@@ -156,8 +176,66 @@ export function HangmanScreen({ navigation, route }: Props) {
         setPhase('active');
       }
     },
-    [accessToken, challenge, phase, load, t],
+    [accessToken, challenge, phase, load, t, applyResult],
   );
+
+  // The countdown reached zero: the server settles the word as lost, once its
+  // own deadline has really passed.
+  const handleTimeout = useCallback(async () => {
+    if (!accessToken || !challenge) return;
+    setPhase('busy');
+    setInlineError(null);
+    try {
+      const result = await timeoutHangmanWord(accessToken, challenge.sessionId);
+      trackEvent('ARCADE_ANSWER_SUBMITTED', { game: 'HANGMAN', isCorrect: false, timedOut: true });
+      applyResult(result);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        // The server's clock says there is still a moment left: ask again shortly.
+        timeoutSentForRef.current = null;
+        timeoutRetryAtRef.current = Date.now() + TIMEOUT_RETRY_MS;
+        setPhase('active');
+        return;
+      }
+      if (err instanceof ApiError && err.status === 400) {
+        // The play already ended on the server (e.g. another device): re-sync.
+        await load();
+        return;
+      }
+      timeoutSentForRef.current = null;
+      timeoutRetryAtRef.current = Date.now() + TIMEOUT_RETRY_MS;
+      setInlineError(t('guessFailed'));
+      setPhase('active');
+    }
+  }, [accessToken, challenge, applyResult, load, t]);
+
+  // Cosmetic countdown drawn from the server-issued deadline. The server is
+  // the judge: this only shows the time and asks it to settle the word at zero.
+  const timeoutRef = useRef(handleTimeout);
+  timeoutRef.current = handleTimeout;
+  useEffect(() => {
+    if ((phase !== 'active' && phase !== 'busy') || !challenge) return undefined;
+    const key = `${challenge.sessionId}:${challenge.wordIndex}`;
+    const tick = () => {
+      const left = Math.max(
+        0,
+        Math.ceil((new Date(challenge.deadlineAt).getTime() - Date.now()) / 1000),
+      );
+      setRemainingSeconds(left);
+      if (
+        left <= 0 &&
+        phase === 'active' &&
+        timeoutSentForRef.current !== key &&
+        Date.now() >= timeoutRetryAtRef.current
+      ) {
+        timeoutSentForRef.current = key;
+        void timeoutRef.current();
+      }
+    };
+    tick();
+    const interval = setInterval(tick, 250);
+    return () => clearInterval(interval);
+  }, [phase, challenge]);
 
   const handleHint = async () => {
     if (!accessToken || !challenge || challenge.hintsRemaining <= 0 || phase !== 'active') return;
@@ -275,6 +353,7 @@ export function HangmanScreen({ navigation, route }: Props) {
           onSecondary={() => navigation.goBack()}
         />
         {versusMatchId ? <VersusResultCard matchId={versusMatchId} /> : null}
+        {versusMatchId ? <VersusChat matchId={versusMatchId} /> : null}
         {groupId ? <Text style={styles.groupNote}>{t('arcade:group.play.complete')}</Text> : null}
         <AliDeferredRecap
           reactions={completion.deferredAliReactions ?? []}
@@ -311,6 +390,7 @@ export function HangmanScreen({ navigation, route }: Props) {
           <BackButton onPress={() => navigation.goBack()} />
           <ProtoGameHeader line={tp('gameHangman')} />
           {versusMatchId ? <VersusBar matchId={versusMatchId} /> : null}
+          {versusMatchId ? <VersusChat matchId={versusMatchId} /> : null}
 
           <View style={styles.headerRow}>
             <Text style={styles.progressLabel}>
@@ -327,6 +407,15 @@ export function HangmanScreen({ navigation, route }: Props) {
               colors={colors}
             />
           </View>
+
+          {!finished && (
+            <CountdownRing
+              remainingSeconds={remainingSeconds}
+              totalSeconds={challenge.timeLimitSeconds}
+              colors={colors}
+              urgentThresholdSeconds={URGENT_THRESHOLD_SECONDS}
+            />
+          )}
 
           <View style={styles.stage}>
             <HangmanFigure
@@ -471,14 +560,18 @@ export function HangmanScreen({ navigation, route }: Props) {
               >
                 {completion.outcome === 'WON'
                   ? t('savedFeedback', { xp: completion.xpAwarded })
-                  : t('hangedFeedback')}
+                  : completion.timedOut
+                    ? t('timeUpFeedback')
+                    : t('hangedFeedback')}
               </Text>
-              {completion.outcome === 'LOST' && (
-                <Text style={styles.revealText}>
-                  {t('revealPrefix')}{' '}
-                  <Text style={styles.revealWord}>{completion.correctAnswer}</Text>
-                </Text>
-              )}
+              <AnswerReview
+                colors={colors}
+                letters
+                submitted={completion.guessedLetters.join('')}
+                correct={completion.correctAnswer}
+                isCorrect={completion.outcome === 'WON'}
+                timedOut={completion.timedOut}
+              />
               <Pressable
                 style={styles.meaningButton}
                 onPress={() => setShowMeaning((v) => !v)}

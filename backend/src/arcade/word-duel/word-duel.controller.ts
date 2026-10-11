@@ -105,7 +105,7 @@ export class WordDuelController {
     @Param('matchId') matchId: string,
     @Body() dto: SendDuelMessageDto,
   ) {
-    return this.chat.send(userId, matchId, dto.body);
+    return this.chat.send(userId, matchId, { body: dto.body, quick: dto.quick });
   }
 
   @Post(':matchId/answer')

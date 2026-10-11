@@ -177,6 +177,7 @@ model User {
   feedback                 Feedback[]
   arcadeGameSessions       ArcadeGameSession[]
   wordDuelMessages         WordDuelMessage[]         @relation("WordDuelMessageSender")
+  arcadeVersusMessages     ArcadeVersusMessage[]     @relation("ArcadeVersusMessageSender")
   arcadePlayCounts         ArcadePlayCount[]
   arcadeVersusHosted       ArcadeVersusMatch[]       @relation("ArcadeVersusHost")
   arcadeVersusJoined       ArcadeVersusMatch[]       @relation("ArcadeVersusGuest")
@@ -1275,6 +1276,9 @@ enum NotificationType {
   ARCADE_CHALLENGE
   ARCADE_RESULT
   ARCADE_PLAY_LIMIT
+  // A "come play an Arcade game" nudge, at most once every 8 hours per
+  // player (ARCADE_REMINDER_CONFIG), only while they are not already playing.
+  ARCADE_REMINDER
 }
 
 // A notification is always written here first (in-app history/inbox),
@@ -1628,11 +1632,17 @@ model Feedback {
 
 // ── Trust & safety ───────────────────────────────────────
 
+enum ChatMessageKind {
+  TEXT
+  QUICK
+}
+
 enum ReportTargetType {
   USER // a player's profile (display name, avatar)
   CLAN // a clan's name
   WORD_IN_THE_WILD_SUBMISSION // a piece of evidence (photo or text)
   WORD_DUEL_MESSAGE // a chat message sent during a Word Duel
+  ARCADE_VERSUS_MESSAGE // a chat message sent during a head-to-head challenge
 }
 
 enum ReportStatus {
@@ -1888,12 +1898,35 @@ model ArcadeVersusMatch {
   settledAt   DateTime?
 
   sessions ArcadeGameSession[]
+  messages ArcadeVersusMessage[]
 
   @@index([status, game, kind])
   @@index([hostId, status])
   @@index([guestId, status])
   @@index([expiresAt])
   @@map("arcade_versus_matches")
+}
+
+// One in-game chat message between the two players of a head-to-head
+// challenge (ScrambleQuest / Complete It / Hangman). Same design as
+// WordDuelMessage: seq is the polling cursor, hidden is the moderation
+// switch, old unreported rows are purged daily.
+model ArcadeVersusMessage {
+  id       String            @id @default(uuid())
+  seq      Int               @default(autoincrement())
+  matchId  String
+  match    ArcadeVersusMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  senderId String
+  sender   User              @relation("ArcadeVersusMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  kind     ChatMessageKind   @default(TEXT)
+  body     String            @db.VarChar(200)
+  hidden   Boolean           @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([matchId, seq])
+  @@index([createdAt])
+  @@map("arcade_versus_messages")
 }
 
 enum ArcadeGroupStatus {
@@ -2017,14 +2050,17 @@ model WordDuelMatch {
 // without deleting the evidence. Old, unreported messages are purged by
 // WordDuelChatService's daily cleanup.
 model WordDuelMessage {
-  id       String        @id @default(uuid())
-  seq      Int           @default(autoincrement())
+  id       String          @id @default(uuid())
+  seq      Int             @default(autoincrement())
+  // TEXT = typed message (body is the text); QUICK = one-tap emoji chat
+  // (body is a QUICK_CHAT_CODES code, rendered by the app).
+  kind     ChatMessageKind @default(TEXT)
   matchId  String
-  match    WordDuelMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  match    WordDuelMatch   @relation(fields: [matchId], references: [id], onDelete: Cascade)
   senderId String
-  sender   User          @relation("WordDuelMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  body     String        @db.VarChar(200)
-  hidden   Boolean       @default(false)
+  sender   User            @relation("WordDuelMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  body     String          @db.VarChar(200)
+  hidden   Boolean         @default(false)
 
   createdAt DateTime @default(now())
 

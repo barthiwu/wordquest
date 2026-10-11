@@ -1170,6 +1170,34 @@
       "aliVsLoss": "रीमैच? मुझे आप पर भरोसा है!",
       "aliVsDraw": "बराबर का मुकाबला!",
       "vsTitle": "आप बनाम {{name}}"
+    },
+    "chat": {
+      "tab": {
+        "chat": "चैट",
+        "quick": "क्विक"
+      },
+      "quickOnly": "अनजान खिलाड़ियों को आप सिर्फ़ क्विक रिएक्शन भेज सकते हैं।",
+      "quick": {
+        "GOOD_LUCK": "शुभकामनाएँ",
+        "GOOD_GAME": "अच्छा खेल",
+        "NICE": "शाबाश",
+        "WOW": "वाह",
+        "FIRE": "जोश में",
+        "LAUGH": "हाहा",
+        "OUCH": "अरे",
+        "THINKING": "हम्म",
+        "HURRY": "जल्दी करो",
+        "REMATCH": "रीमैच?"
+      }
+    },
+    "answerReview": {
+      "yourAnswer": "आपका जवाब",
+      "yourLetters": "आपके अक्षर",
+      "correctAnswer": "सही जवाब",
+      "timeUpCorrect": "समय खत्म। जवाब था",
+      "noAnswer": "(कोई जवाब नहीं)",
+      "a11yCorrect": "सही। आपने {{answer}} लिखा",
+      "a11yWrong": "गलत। आपने {{answer}} लिखा। सही जवाब {{correct}} है"
     }
   },
   "scrambleQuest": {
@@ -1227,7 +1255,8 @@
     "sessionSavedSummary": "{{total}} में से {{saved}} शब्द बचाए",
     "sessionXpEarned": "{{xp}} XP मिले",
     "sessionLongestStreak": "सबसे लंबी स्ट्रीक: {{streak}}",
-    "playAgain": "फिर से खेलें"
+    "playAgain": "फिर से खेलें",
+    "timeUpFeedback": "समय खत्म! आदमी को फाँसी हो गई।"
   },
   "play": {
     "title": "खेलें",
@@ -1319,7 +1348,8 @@
     "chatQuickGoodLuck": "शुभकामनाएं!",
     "chatQuickNiceOne": "बढ़िया!",
     "chatQuickClose": "बाल-बाल बचे!",
-    "chatQuickGg": "GG"
+    "chatQuickGg": "GG",
+    "incorrectFeedbackShort": "बिल्कुल सही नहीं।"
   },
   "feedback": {
     "title": "फ़ीडबैक भेजें",

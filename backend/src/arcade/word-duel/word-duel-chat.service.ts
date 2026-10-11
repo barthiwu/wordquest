@@ -1,8 +1,6 @@
 import {
   BadRequestException,
   ForbiddenException,
-  HttpException,
-  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
@@ -12,6 +10,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { FriendsService } from '../../friends/friends.service';
 import { WORD_DUEL_CHAT_CONFIG } from '../config/arcade.config';
 import { CHAT_REJECTION_MESSAGES, checkChatMessage } from './duel-chat-filter';
+import { isQuickChatCode } from '../chat/quick-chat';
+import { assertChatRateOk } from '../chat/chat-limits';
 
 /** One chat message as a player sees it. */
 export interface WordDuelChatMessageView {
@@ -21,6 +21,8 @@ export interface WordDuelChatMessageView {
   senderId: string;
   /** True when the viewer wrote it. */
   mine: boolean;
+  /** TEXT: `body` is the message. QUICK: `body` is a quick-chat code. */
+  kind: 'TEXT' | 'QUICK';
   body: string;
   createdAt: string;
 }
@@ -41,7 +43,11 @@ export class WordDuelChatService {
     private readonly friends: FriendsService,
   ) {}
 
-  async send(userId: string, matchId: string, rawBody: string): Promise<WordDuelChatMessageView> {
+  async send(
+    userId: string,
+    matchId: string,
+    input: { body?: string; quick?: string },
+  ): Promise<WordDuelChatMessageView> {
     const { match, opponentId } = await this.loadMatchForPlayer(userId, matchId);
 
     if (match.status === 'WAITING' || match.status === 'ABANDONED' || !opponentId) {
@@ -54,37 +60,30 @@ export class WordDuelChatService {
       throw new ForbiddenException('Chat is not available with this player.');
     }
 
-    const checked = checkChatMessage(rawBody);
-    if (!checked.ok) throw new BadRequestException(CHAT_REJECTION_MESSAGES[checked.reason]);
+    let kind: 'TEXT' | 'QUICK';
+    let body: string;
+    if (input.quick !== undefined) {
+      if (!isQuickChatCode(input.quick)) throw new BadRequestException('Unknown quick chat.');
+      kind = 'QUICK';
+      body = input.quick;
+    } else {
+      const checked = checkChatMessage(input.body ?? '');
+      if (!checked.ok) throw new BadRequestException(CHAT_REJECTION_MESSAGES[checked.reason]);
+      kind = 'TEXT';
+      body = checked.body;
+    }
 
     const mine = await this.prisma.wordDuelMessage.findMany({
       where: { matchId, senderId: userId },
       orderBy: { seq: 'desc' },
       take: 1,
-      select: { body: true, createdAt: true },
+      select: { body: true, kind: true, createdAt: true },
     });
-    const last = mine[0];
-    const now = Date.now();
-    if (last && now - last.createdAt.getTime() < WORD_DUEL_CHAT_CONFIG.MIN_INTERVAL_MS) {
-      throw new HttpException('Slow down a little.', HttpStatus.TOO_MANY_REQUESTS);
-    }
-    if (
-      last &&
-      last.body === checked.body &&
-      now - last.createdAt.getTime() < WORD_DUEL_CHAT_CONFIG.DUPLICATE_WINDOW_MS
-    ) {
-      throw new HttpException('You just sent that.', HttpStatus.TOO_MANY_REQUESTS);
-    }
     const total = await this.prisma.wordDuelMessage.count({ where: { matchId, senderId: userId } });
-    if (total >= WORD_DUEL_CHAT_CONFIG.MAX_MESSAGES_PER_PLAYER_PER_MATCH) {
-      throw new HttpException(
-        'You have reached the chat limit for this match.',
-        HttpStatus.TOO_MANY_REQUESTS,
-      );
-    }
+    assertChatRateOk(WORD_DUEL_CHAT_CONFIG, { kind, body }, mine[0], total);
 
     const created = await this.prisma.wordDuelMessage.create({
-      data: { matchId, senderId: userId, body: checked.body },
+      data: { matchId, senderId: userId, body, kind },
     });
     return this.toView(created, userId);
   }
@@ -154,7 +153,14 @@ export class WordDuelChatService {
   }
 
   private toView(
-    row: { id: string; seq: number; senderId: string; body: string; createdAt: Date },
+    row: {
+      id: string;
+      seq: number;
+      senderId: string;
+      kind: 'TEXT' | 'QUICK';
+      body: string;
+      createdAt: Date;
+    },
     viewerId: string,
   ): WordDuelChatMessageView {
     return {
@@ -162,6 +168,7 @@ export class WordDuelChatService {
       seq: row.seq,
       senderId: row.senderId,
       mine: row.senderId === viewerId,
+      kind: row.kind,
       body: row.body,
       createdAt: row.createdAt.toISOString(),
     };

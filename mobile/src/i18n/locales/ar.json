@@ -1186,6 +1186,34 @@
       "aliVsLoss": "مباراة إعادة؟ أنا أؤمن بك!",
       "aliVsDraw": "متكافئان!",
       "vsTitle": "أنت ضد {{name}}"
+    },
+    "chat": {
+      "tab": {
+        "chat": "دردشة",
+        "quick": "سريع"
+      },
+      "quickOnly": "مع اللاعبين الذين لا تعرفهم، يمكنك إرسال ردود فعل سريعة فقط.",
+      "quick": {
+        "GOOD_LUCK": "حظًا موفقًا",
+        "GOOD_GAME": "لعبة جيدة",
+        "NICE": "أحسنت",
+        "WOW": "واو",
+        "FIRE": "مشتعل",
+        "LAUGH": "ههه",
+        "OUCH": "آه",
+        "THINKING": "همم",
+        "HURRY": "أسرع",
+        "REMATCH": "مباراة إعادة؟"
+      }
+    },
+    "answerReview": {
+      "yourAnswer": "إجابتك",
+      "yourLetters": "حروفك",
+      "correctAnswer": "الإجابة الصحيحة",
+      "timeUpCorrect": "انتهى الوقت. كانت الإجابة",
+      "noAnswer": "(لا توجد إجابة)",
+      "a11yCorrect": "صحيح. كتبت {{answer}}",
+      "a11yWrong": "خطأ. كتبت {{answer}}. الإجابة الصحيحة هي {{correct}}"
     }
   },
   "scrambleQuest": {
@@ -1243,7 +1271,8 @@
     "sessionSavedSummary": "تم إنقاذ {{saved}} من {{total}} كلمات",
     "sessionXpEarned": "{{xp}} XP مكتسبة",
     "sessionLongestStreak": "أطول سلسلة: {{streak}}",
-    "playAgain": "العب مرة أخرى"
+    "playAgain": "العب مرة أخرى",
+    "timeUpFeedback": "انتهى الوقت! تم شنق الرجل."
   },
   "play": {
     "title": "لعب",
@@ -1335,7 +1364,8 @@
     "chatQuickGoodLuck": "بالتوفيق!",
     "chatQuickNiceOne": "أحسنت!",
     "chatQuickClose": "كانت قريبة!",
-    "chatQuickGg": "GG"
+    "chatQuickGg": "GG",
+    "incorrectFeedbackShort": "ليس تمامًا."
   },
   "feedback": {
     "title": "إرسال ملاحظات",

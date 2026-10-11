@@ -1170,6 +1170,34 @@
       "aliVsLoss": "Rematch? I believe in you!",
       "aliVsDraw": "Evenly matched!",
       "vsTitle": "You vs {{name}}"
+    },
+    "chat": {
+      "tab": {
+        "chat": "Chat",
+        "quick": "Quick"
+      },
+      "quickOnly": "You can send quick reactions to players you don't know.",
+      "quick": {
+        "GOOD_LUCK": "Good luck",
+        "GOOD_GAME": "Good game",
+        "NICE": "Nice one",
+        "WOW": "Wow",
+        "FIRE": "On fire",
+        "LAUGH": "Haha",
+        "OUCH": "Ouch",
+        "THINKING": "Hmm",
+        "HURRY": "Hurry up",
+        "REMATCH": "Rematch?"
+      }
+    },
+    "answerReview": {
+      "yourAnswer": "Your answer",
+      "yourLetters": "Your letters",
+      "correctAnswer": "Correct answer",
+      "timeUpCorrect": "Time's up. The answer was",
+      "noAnswer": "(no answer)",
+      "a11yCorrect": "Correct. You wrote {{answer}}",
+      "a11yWrong": "Wrong. You wrote {{answer}}. The correct answer is {{correct}}"
     }
   },
   "scrambleQuest": {
@@ -1227,7 +1255,8 @@
     "sessionSavedSummary": "{{saved}} of {{total}} words saved",
     "sessionXpEarned": "{{xp}} XP earned",
     "sessionLongestStreak": "Longest streak: {{streak}}",
-    "playAgain": "Play again"
+    "playAgain": "Play again",
+    "timeUpFeedback": "Time's up! The man is hanged."
   },
   "play": {
     "title": "Play",
@@ -1319,7 +1348,8 @@
       "closedBody": "It expired, was cancelled or someone else got there first.",
       "waitingTitle": "Waiting for {{name}}",
       "waitingSubtitle": "They have two minutes to accept. We've sent them a notification."
-    }
+    },
+    "incorrectFeedbackShort": "Not quite."
   },
   "feedback": {
     "title": "Send Feedback",

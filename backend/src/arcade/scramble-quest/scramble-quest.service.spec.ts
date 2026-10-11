@@ -461,7 +461,7 @@ describe('ScrambleQuestService', () => {
     it('treats an answer submitted after the timer as a timeout miss, even if correct', async () => {
       prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
         ...baseSession(),
-        currentWordStartedAt: new Date(Date.now() - 40_000), // 40s ago, timer is 30s
+        currentWordStartedAt: new Date(Date.now() - 50_000), // 50s ago, timer is 45s
       });
       prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
         ...baseSession(),

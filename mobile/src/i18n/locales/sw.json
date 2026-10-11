@@ -1170,6 +1170,34 @@
       "aliVsLoss": "Mechi ya marudiano? Nakuamini!",
       "aliVsDraw": "Mko sawa!",
       "vsTitle": "Wewe dhidi ya {{name}}"
+    },
+    "chat": {
+      "tab": {
+        "chat": "Gumzo",
+        "quick": "Haraka"
+      },
+      "quickOnly": "Kwa wachezaji usiowajua, unaweza kutuma miitikio ya haraka tu.",
+      "quick": {
+        "GOOD_LUCK": "Bahati njema",
+        "GOOD_GAME": "Mchezo mzuri",
+        "NICE": "Safi",
+        "WOW": "Wow",
+        "FIRE": "Moto",
+        "LAUGH": "Hahaha",
+        "OUCH": "Lo",
+        "THINKING": "Hmm",
+        "HURRY": "Harakisha",
+        "REMATCH": "Marudiano?"
+      }
+    },
+    "answerReview": {
+      "yourAnswer": "Jibu lako",
+      "yourLetters": "Herufi zako",
+      "correctAnswer": "Jibu sahihi",
+      "timeUpCorrect": "Muda umeisha. Jibu lilikuwa",
+      "noAnswer": "(hakuna jibu)",
+      "a11yCorrect": "Sahihi. Uliandika {{answer}}",
+      "a11yWrong": "Si sahihi. Uliandika {{answer}}. Jibu sahihi ni {{correct}}"
     }
   },
   "scrambleQuest": {
@@ -1227,7 +1255,8 @@
     "sessionSavedSummary": "Maneno {{saved}} kati ya {{total}} yameokolewa",
     "sessionXpEarned": "Umepata {{xp}} XP",
     "sessionLongestStreak": "Mfululizo mrefu zaidi: {{streak}}",
-    "playAgain": "Cheza tena"
+    "playAgain": "Cheza tena",
+    "timeUpFeedback": "Muda umeisha! Mtu amenyongwa."
   },
   "play": {
     "title": "Cheza",
@@ -1319,7 +1348,8 @@
     "chatQuickGoodLuck": "Kila la heri!",
     "chatQuickNiceOne": "Safi sana!",
     "chatQuickClose": "Ilikuwa karibu sana!",
-    "chatQuickGg": "GG"
+    "chatQuickGg": "GG",
+    "incorrectFeedbackShort": "Karibu kabisa."
   },
   "feedback": {
     "title": "Tuma Maoni",

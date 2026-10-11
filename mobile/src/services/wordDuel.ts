@@ -1,4 +1,5 @@
 import { apiRequest } from './apiClient';
+import type { ChatInput, ChatMessage } from './quickChat';
 import type { AliExpressionCue, AliDisplayMessage } from './aliExpression';
 
 /** Opponent's live score only — never their current word or answers
@@ -92,18 +93,12 @@ export interface WordDuelStateView {
 }
 
 /** One in-game chat message (backend WordDuelChatMessageView). `seq` is the polling cursor. */
-export interface WordDuelChatMessage {
-  id: string;
-  seq: number;
-  senderId: string;
-  /** True when this player wrote it. */
-  mine: boolean;
-  body: string;
-  createdAt: string;
-}
+export type WordDuelChatMessage = ChatMessage;
 
 export interface WordDuelAnswerResult {
   isCorrect: boolean;
+  /** Exactly what the player submitted, echoed by the server so it can be shown beside the right answer. */
+  submittedAnswer: string;
   correctAnswer: string;
   xpAwarded: number;
   currentStreak: number;
@@ -146,11 +141,11 @@ export function getWordDuelState(
 export function sendWordDuelMessage(
   accessToken: string,
   matchId: string,
-  body: string,
+  input: ChatInput,
 ): Promise<WordDuelChatMessage> {
   return apiRequest<WordDuelChatMessage>(`/arcade/word-duel/${matchId}/chat`, {
     method: 'POST',
-    body: { body },
+    body: input,
     accessToken,
   });
 }

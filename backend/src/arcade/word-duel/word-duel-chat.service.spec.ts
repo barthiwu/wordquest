@@ -41,17 +41,31 @@ describe('WordDuelChatService', () => {
 
   describe('send', () => {
     it('stores a clean message and returns it as mine', async () => {
-      const view = await service.send('me', 'm1', '  Good   luck! ');
+      const view = await service.send('me', 'm1', { body: '  Good   luck! ' });
       expect(prismaMock.wordDuelMessage.create).toHaveBeenCalledWith({
-        data: { matchId: 'm1', senderId: 'me', body: 'Good luck!' },
+        data: { matchId: 'm1', senderId: 'me', body: 'Good luck!', kind: 'TEXT' },
       });
       expect(view).toMatchObject({ id: 'msg1', seq: 7, mine: true, body: 'Good luck!' });
     });
 
+    it('sends a quick chat code without running the text filter', async () => {
+      const view = await service.send('me', 'm1', { quick: 'FIRE' });
+      expect(prismaMock.wordDuelMessage.create).toHaveBeenCalledWith({
+        data: { matchId: 'm1', senderId: 'me', body: 'FIRE', kind: 'QUICK' },
+      });
+      expect(view).toMatchObject({ kind: 'QUICK', body: 'FIRE' });
+    });
+
+    it('rejects an unknown quick chat code', async () => {
+      await expect(service.send('me', 'm1', { quick: 'NOT_A_CODE' })).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
     it('treats a match you are not in the same as a missing one', async () => {
-      await expect(service.send('stranger', 'm1', 'hi')).rejects.toThrow(NotFoundException);
+      await expect(service.send('stranger', 'm1', { body: 'hi' })).rejects.toThrow(NotFoundException);
       prismaMock.wordDuelMatch.findUnique.mockResolvedValueOnce(null);
-      await expect(service.send('me', 'nope', 'hi')).rejects.toThrow(NotFoundException);
+      await expect(service.send('me', 'nope', { body: 'hi' })).rejects.toThrow(NotFoundException);
     });
 
     it('is closed while still waiting for an opponent', async () => {
@@ -60,7 +74,7 @@ describe('WordDuelChatService', () => {
         status: 'WAITING',
         players: [{ userId: 'me' }],
       });
-      await expect(service.send('me', 'm1', 'hi')).rejects.toThrow(BadRequestException);
+      await expect(service.send('me', 'm1', { body: 'hi' })).rejects.toThrow(BadRequestException);
     });
 
     it('stays open for a few minutes after the match, then closes', async () => {
@@ -69,26 +83,26 @@ describe('WordDuelChatService', () => {
         status: 'COMPLETED',
         completedAt: new Date(Date.now() - 60_000),
       });
-      await expect(service.send('me', 'm1', 'gg')).resolves.toMatchObject({ body: 'gg' });
+      await expect(service.send('me', 'm1', { body: 'gg' })).resolves.toMatchObject({ body: 'gg' });
 
       prismaMock.wordDuelMatch.findUnique.mockResolvedValueOnce({
         ...activeMatch(),
         status: 'COMPLETED',
         completedAt: new Date(Date.now() - 30 * 60_000),
       });
-      await expect(service.send('me', 'm1', 'gg')).rejects.toThrow('This match has ended.');
+      await expect(service.send('me', 'm1', { body: 'gg' })).rejects.toThrow('This match has ended.');
     });
 
     it('refuses when either player has blocked the other', async () => {
       friendsMock.areBlocked.mockResolvedValue(true);
-      await expect(service.send('me', 'm1', 'hi')).rejects.toThrow(ForbiddenException);
+      await expect(service.send('me', 'm1', { body: 'hi' })).rejects.toThrow(ForbiddenException);
     });
 
     it('rejects links, contact details and bad language with a reason', async () => {
-      await expect(service.send('me', 'm1', 'add me www.example.com')).rejects.toThrow(
+      await expect(service.send('me', 'm1', { body: 'add me www.example.com' })).rejects.toThrow(
         "Links and contact details can't be shared in duel chat.",
       );
-      await expect(service.send('me', 'm1', 'you bitch')).rejects.toThrow(
+      await expect(service.send('me', 'm1', { body: 'you bitch' })).rejects.toThrow(
         'Please keep the chat friendly.',
       );
       expect(prismaMock.wordDuelMessage.create).not.toHaveBeenCalled();
@@ -96,29 +110,29 @@ describe('WordDuelChatService', () => {
 
     it('rate-limits a second message sent too quickly', async () => {
       prismaMock.wordDuelMessage.findMany.mockResolvedValueOnce([
-        { body: 'hello', createdAt: new Date(Date.now() - 300) },
+        { body: 'hello', kind: 'TEXT', createdAt: new Date(Date.now() - 300) },
       ]);
-      await expect(service.send('me', 'm1', 'again')).rejects.toBeInstanceOf(HttpException);
+      await expect(service.send('me', 'm1', { body: 'again' })).rejects.toBeInstanceOf(HttpException);
       expect(prismaMock.wordDuelMessage.create).not.toHaveBeenCalled();
     });
 
     it('rejects the same text repeated within the duplicate window', async () => {
       prismaMock.wordDuelMessage.findMany.mockResolvedValueOnce([
-        { body: 'hello', createdAt: new Date(Date.now() - 5000) },
+        { body: 'hello', kind: 'TEXT', createdAt: new Date(Date.now() - 5000) },
       ]);
-      await expect(service.send('me', 'm1', 'hello')).rejects.toThrow('You just sent that.');
+      await expect(service.send('me', 'm1', { body: 'hello' })).rejects.toThrow('You just sent that.');
     });
 
     it('allows the same text again once the window has passed', async () => {
       prismaMock.wordDuelMessage.findMany.mockResolvedValueOnce([
-        { body: 'hello', createdAt: new Date(Date.now() - 20_000) },
+        { body: 'hello', kind: 'TEXT', createdAt: new Date(Date.now() - 20_000) },
       ]);
-      await expect(service.send('me', 'm1', 'hello')).resolves.toMatchObject({ body: 'hello' });
+      await expect(service.send('me', 'm1', { body: 'hello' })).resolves.toMatchObject({ body: 'hello' });
     });
 
     it('caps how many messages one player can send in a match', async () => {
       prismaMock.wordDuelMessage.count.mockResolvedValue(60);
-      await expect(service.send('me', 'm1', 'one more')).rejects.toThrow(
+      await expect(service.send('me', 'm1', { body: 'one more' })).rejects.toThrow(
         'You have reached the chat limit for this match.',
       );
     });
@@ -131,6 +145,7 @@ describe('WordDuelChatService', () => {
           id: 'a',
           seq: 4,
           senderId: 'rival',
+          kind: 'TEXT',
           body: 'hi',
           createdAt: new Date('2026-10-06T12:00:00Z'),
         },
@@ -138,6 +153,7 @@ describe('WordDuelChatService', () => {
           id: 'b',
           seq: 5,
           senderId: 'me',
+          kind: 'TEXT',
           body: 'yo',
           createdAt: new Date('2026-10-06T12:00:01Z'),
         },

@@ -15,6 +15,8 @@ describe('NotificationSchedulerService', () => {
     learningProfile: { findUnique: jest.fn() },
     notification: { findFirst: jest.fn() },
     userProgression: { findUnique: jest.fn() },
+    arcadeGameSession: { findFirst: jest.fn() },
+    wordDuelPlayerState: { findFirst: jest.fn() },
   };
   const notificationsMock = { notifyFireAndForget: jest.fn() };
   const aliMock = { generateForgettingCurveReminder: jest.fn() };
@@ -624,6 +626,72 @@ describe('NotificationSchedulerService', () => {
       prismaMock.user.findMany.mockRejectedValueOnce(new Error('db down'));
 
       await expect(service.sendMonthEndCatchUpReminders()).resolves.toBeUndefined();
+    });
+  });
+
+  describe('sendArcadeReminders', () => {
+    const noon = () => jest.useFakeTimers().setSystemTime(utc(2026, 10, 11, 12, 30, 0));
+
+    beforeEach(() => {
+      prismaMock.user.findMany.mockResolvedValue([{ id: 'u1', timezone: 'UTC' }]);
+      prismaMock.notification.findFirst.mockResolvedValue(null);
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValue(null);
+      prismaMock.wordDuelPlayerState.findFirst.mockResolvedValue(null);
+    });
+
+    it('nudges a player who has not played in the last 8 hours', async () => {
+      noon();
+      await service.sendArcadeReminders();
+      expect(notificationsMock.notifyFireAndForget).toHaveBeenCalledWith(
+        'u1',
+        'ARCADE_REMINDER',
+        expect.any(String),
+        expect.any(String),
+        { deepLink: 'wordquest://play' },
+      );
+    });
+
+    it('never nudges more than once every 8 hours', async () => {
+      noon();
+      prismaMock.notification.findFirst.mockResolvedValue({
+        createdAt: utc(2026, 10, 11, 7, 30, 0), // 5h ago
+        data: null,
+      });
+      await service.sendArcadeReminders();
+      expect(notificationsMock.notifyFireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('nudges again once 8 hours have passed since the last one', async () => {
+      noon();
+      prismaMock.notification.findFirst.mockResolvedValue({
+        createdAt: utc(2026, 10, 11, 4, 30, 1), // 7h59m59s ago: cron jitter tolerated
+        data: null,
+      });
+      await service.sendArcadeReminders();
+      expect(notificationsMock.notifyFireAndForget).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays quiet outside the player-local waking hours', async () => {
+      jest.useFakeTimers().setSystemTime(utc(2026, 10, 11, 3, 30, 0));
+      await service.sendArcadeReminders();
+      expect(notificationsMock.notifyFireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('skips a player who just played an Arcade game', async () => {
+      noon();
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValue({ id: 's1' });
+      await service.sendArcadeReminders();
+      expect(notificationsMock.notifyFireAndForget).not.toHaveBeenCalled();
+    });
+
+    it('only considers real accounts with a registered device', async () => {
+      noon();
+      await service.sendArcadeReminders();
+      expect(prismaMock.user.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ isGuest: false, pushTokens: { some: {} } }),
+        }),
+      );
     });
   });
 });

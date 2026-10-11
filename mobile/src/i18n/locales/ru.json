@@ -1178,6 +1178,34 @@
       "aliVsLoss": "Реванш? Я в тебя верю!",
       "aliVsDraw": "Силы равны!",
       "vsTitle": "Вы vs {{name}}"
+    },
+    "chat": {
+      "tab": {
+        "chat": "Чат",
+        "quick": "Быстро"
+      },
+      "quickOnly": "Игрокам, которых вы не знаете, можно отправлять только быстрые реакции.",
+      "quick": {
+        "GOOD_LUCK": "Удачи",
+        "GOOD_GAME": "Хорошая игра",
+        "NICE": "Отлично",
+        "WOW": "Ого",
+        "FIRE": "В ударе",
+        "LAUGH": "Ха-ха",
+        "OUCH": "Ой",
+        "THINKING": "Хм",
+        "HURRY": "Поторопись",
+        "REMATCH": "Реванш?"
+      }
+    },
+    "answerReview": {
+      "yourAnswer": "Ваш ответ",
+      "yourLetters": "Ваши буквы",
+      "correctAnswer": "Правильный ответ",
+      "timeUpCorrect": "Время вышло. Ответ был",
+      "noAnswer": "(нет ответа)",
+      "a11yCorrect": "Верно. Вы написали {{answer}}",
+      "a11yWrong": "Неверно. Вы написали {{answer}}. Правильный ответ: {{correct}}"
     }
   },
   "scrambleQuest": {
@@ -1235,7 +1263,8 @@
     "sessionSavedSummary": "Спасено слов: {{saved}} из {{total}}",
     "sessionXpEarned": "Получено {{xp}} XP",
     "sessionLongestStreak": "Самая длинная серия: {{streak}}",
-    "playAgain": "Играть снова"
+    "playAgain": "Играть снова",
+    "timeUpFeedback": "Время вышло! Человечек повешен."
   },
   "play": {
     "title": "Играть",
@@ -1327,7 +1356,8 @@
     "chatQuickGoodLuck": "Удачи!",
     "chatQuickNiceOne": "Отлично!",
     "chatQuickClose": "Это было близко!",
-    "chatQuickGg": "GG"
+    "chatQuickGg": "GG",
+    "incorrectFeedbackShort": "Не совсем."
   },
   "feedback": {
     "title": "Отправить отзыв",

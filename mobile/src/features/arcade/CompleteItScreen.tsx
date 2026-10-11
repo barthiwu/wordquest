@@ -28,7 +28,9 @@ import { AliStreakPopout } from '@/components/AliStreakPopout';
 import { ArcadeHeroResults } from '@/components/ArcadeHeroResults';
 import { BackButton } from '@/components/BackButton';
 import { ProtoGameHeader } from '@/features/proto/ProtoGameHeader';
+import { AnswerReview } from '@/components/AnswerReview';
 import { VersusBar } from '@/components/VersusBar';
+import { VersusChat } from '@/components/VersusChat';
 import { VersusResultCard } from '@/components/VersusResultCard';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
@@ -316,6 +318,7 @@ export function CompleteItScreen({ navigation, route }: Props) {
           onSecondary={() => navigation.goBack()}
         />
         {versusMatchId ? <VersusResultCard matchId={versusMatchId} /> : null}
+        {versusMatchId ? <VersusChat matchId={versusMatchId} /> : null}
         {groupId ? <Text style={styles.groupNote}>{t('arcade:group.play.complete')}</Text> : null}
         <AliDeferredRecap
           reactions={feedback.deferredAliReactions ?? []}
@@ -342,6 +345,7 @@ export function CompleteItScreen({ navigation, route }: Props) {
         <BackButton onPress={() => navigation.goBack()} />
         <ProtoGameHeader line={tp('gameComplete')} />
         {versusMatchId ? <VersusBar matchId={versusMatchId} /> : null}
+        {versusMatchId ? <VersusChat matchId={versusMatchId} /> : null}
 
         <View style={styles.headerRow}>
           <Text style={styles.progressLabel}>
@@ -436,12 +440,13 @@ export function CompleteItScreen({ navigation, route }: Props) {
                   ? t('scrambleQuest:correctFeedback', { xp: feedback.xpAwarded })
                   : t('scrambleQuest:incorrectFeedback')}
             </Text>
-            {!feedback.isCorrect && (
-              <Text style={styles.revealText}>
-                {t('scrambleQuest:revealPrefix')}{' '}
-                <Text style={styles.revealWord}>{feedback.correctAnswer}</Text>
-              </Text>
-            )}
+            <AnswerReview
+              colors={colors}
+              submitted={feedback.submittedAnswer}
+              correct={feedback.correctAnswer}
+              isCorrect={feedback.isCorrect}
+              timedOut={feedback.timedOut}
+            />
             <Pressable
               style={styles.button}
               onPress={handleContinue}

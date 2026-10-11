@@ -110,6 +110,19 @@ export class ModerationService {
         }
         return;
       }
+      case 'ARCADE_VERSUS_MESSAGE': {
+        const message = await this.prisma.arcadeVersusMessage.findUnique({
+          where: { id: targetId },
+          select: { senderId: true, match: { select: { hostId: true, guestId: true } } },
+        });
+        const reporterInMatch =
+          !!message &&
+          (message.match.hostId === reporterId || message.match.guestId === reporterId);
+        if (!message || !reporterInMatch || message.senderId === reporterId) {
+          throw new BadRequestException('Reported message not found');
+        }
+        return;
+      }
     }
   }
 
@@ -153,6 +166,12 @@ export class ModerationService {
     // players. The row stays as evidence until the retention window passes.
     if (status === 'ACTIONED' && report.targetType === 'WORD_DUEL_MESSAGE') {
       await this.prisma.wordDuelMessage.updateMany({
+        where: { id: report.targetId },
+        data: { hidden: true },
+      });
+    }
+    if (status === 'ACTIONED' && report.targetType === 'ARCADE_VERSUS_MESSAGE') {
+      await this.prisma.arcadeVersusMessage.updateMany({
         where: { id: report.targetId },
         data: { hidden: true },
       });

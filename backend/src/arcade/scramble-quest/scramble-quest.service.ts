@@ -15,7 +15,7 @@ import { ArcadeGroupService } from '../group/group.service';
 import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
-import { normalizeAnswer } from '../answer-normalization';
+import { echoSubmittedAnswer, normalizeAnswer } from '../answer-normalization';
 import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, SCRAMBLE_QUEST_CONFIG } from '../config/arcade.config';
 import { hintRevealOrder, scrambleWord } from './scramble.util';
 import { renderWord } from '../../vocabulary/english-variant';
@@ -84,6 +84,8 @@ export interface ScrambleQuestWordMeaning {
 export interface ScrambleQuestAnswerResult {
   isCorrect: boolean;
   timedOut: boolean;
+  /** Exactly what the player submitted (trimmed, capped), echoed back so the app can show them their own answer next to the right one. Still echoed when the clock ran out, so a late answer is visible too. */
+  submittedAnswer: string;
   correctAnswer: string;
   xpAwarded: number;
   currentStreak: number;
@@ -524,6 +526,7 @@ export class ScrambleQuestService {
     return {
       isCorrect,
       timedOut,
+      submittedAnswer: echoSubmittedAnswer(rawAnswer),
       correctAnswer: rendered.text,
       xpAwarded: reward.finalXp,
       currentStreak: streakAfter,

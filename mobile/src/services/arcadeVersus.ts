@@ -1,5 +1,6 @@
 import { apiRequest } from './apiClient';
 import type { FriendPublicView } from './friends';
+import type { ChatInput, ChatMessage } from './quickChat';
 
 /** The games that have a head-to-head mode. Word Duel is its own,
  * real-time, multiplayer-only game. */
@@ -107,6 +108,39 @@ export function respondToVersus(
 export function cancelVersus(accessToken: string, matchId: string): Promise<VersusMatch> {
   return apiRequest<VersusMatch>(`/arcade/versus/${matchId}/cancel`, {
     method: 'POST',
+    accessToken,
+  });
+}
+
+/** The chat for a head-to-head challenge, plus what this player may send right now. */
+export interface VersusChatList {
+  messages: ChatMessage[];
+  /** Quick (emoji) chat is open. */
+  canQuick: boolean;
+  /** Typed chat is open (friends only). */
+  canType: boolean;
+}
+
+/** Messages after the `after` cursor (pass 0 the first time). */
+export function getVersusChat(
+  accessToken: string,
+  matchId: string,
+  after: number,
+): Promise<VersusChatList> {
+  return apiRequest<VersusChatList>(`/arcade/versus/${matchId}/chat?after=${after}`, {
+    accessToken,
+  });
+}
+
+/** Sends typed text or a quick-chat code to the opponent. The server filters links, contact details and bad language and returns a message safe to show. */
+export function sendVersusChat(
+  accessToken: string,
+  matchId: string,
+  input: ChatInput,
+): Promise<ChatMessage> {
+  return apiRequest<ChatMessage>(`/arcade/versus/${matchId}/chat`, {
+    method: 'POST',
+    body: input,
     accessToken,
   });
 }

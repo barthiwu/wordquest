@@ -50,6 +50,10 @@ export interface HangmanChallengeView {
   wrongCount: number;
   /** Wrong guesses allowed before the man is hanged. */
   maxWrong: number;
+  /** Seconds allowed for this word. */
+  timeLimitSeconds: number;
+  /** ISO timestamp, server-authoritative: render the countdown from it. */
+  deadlineAt: string;
   /** Always shown under the puzzle (the dictionary meaning). */
   definition: string;
   synonyms: string[];
@@ -68,6 +72,10 @@ export interface HangmanWordMeaning {
 /** Everything the client needs once a word is finished (saved or hanged). */
 export interface HangmanWordCompletion {
   outcome: 'WON' | 'LOST';
+  /** True when the word was lost because the 45 seconds ran out. */
+  timedOut: boolean;
+  /** Every letter the player tried on this word, in order, so they can see exactly what they guessed. */
+  guessedLetters: string[];
   correctAnswer: string;
   xpAwarded: number;
   currentStreak: number;
@@ -129,7 +137,7 @@ export class HangmanService {
   ) {}
 
   /** Starts a new session, or resumes the one already in progress (an app
-   * relaunch mid-run). Hangman has no countdown, so nothing expires. */
+   * relaunch mid-run). Each word has a 45s countdown; an expired word is settled by the timeout call. */
   async start(
     userId: string,
     versusMatchId?: string,
@@ -259,6 +267,7 @@ export class HangmanService {
 
   async requestHint(userId: string, sessionId: string): Promise<HangmanHintResult> {
     const session = await this.loadActiveSession(userId, sessionId);
+    if (this.isExpired(session)) throw new BadRequestException('Time is up for this word.');
     const word = await this.currentWord(session);
     const variant = await resolveEnglishVariant(this.prisma, userId);
     const rendered = renderWord(word, variant);
@@ -304,6 +313,10 @@ export class HangmanService {
     const letter = rawLetter.toLowerCase();
 
     const session = await this.loadActiveSession(userId, sessionId);
+    if (this.isExpired(session)) {
+      // The 45 seconds ran out before this guess arrived: the word is lost.
+      return this.settleTimeout(userId, session, letter);
+    }
     if (session.currentWordGuesses.includes(letter)) {
       throw new BadRequestException('You already guessed that letter.');
     }
@@ -362,6 +375,61 @@ export class HangmanService {
     return { letter, isHit, view: finalView, completion };
   }
 
+  /**
+   * The app's countdown hit zero. Settles the current word as lost, but only
+   * once the server's own deadline has passed (within a small clock-drift
+   * tolerance), so a client can never end a word early.
+   */
+  async timeoutWord(userId: string, sessionId: string): Promise<HangmanGuessResult> {
+    const session = await this.loadActiveSession(userId, sessionId);
+    const remaining = this.deadlineMs(session) - Date.now();
+    if (remaining > HANGMAN_CONFIG.TIMEOUT_CLOCK_TOLERANCE_MS) {
+      throw new ConflictException('There is still time left on this word.');
+    }
+    return this.settleTimeout(userId, session, null);
+  }
+
+  private deadlineMs(session: Pick<ArcadeGameSessionRow, 'currentWordStartedAt'>): number {
+    return session.currentWordStartedAt.getTime() + HANGMAN_CONFIG.TIMER_SECONDS * 1000;
+  }
+
+  private isExpired(session: Pick<ArcadeGameSessionRow, 'currentWordStartedAt'>): boolean {
+    return Date.now() >= this.deadlineMs(session);
+  }
+
+  private async settleTimeout(
+    userId: string,
+    session: ArcadeGameSessionRow,
+    lateLetter: string | null,
+  ): Promise<HangmanGuessResult> {
+    const word = await this.currentWord(session);
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    const rendered = renderWord(word, variant);
+    // A guess that arrived after the buzzer does not count.
+    const guesses = session.currentWordGuesses;
+    const state = evaluateGuesses(rendered.text, guesses, HANGMAN_CONFIG.MAX_WRONG_GUESSES);
+    const completion = await this.completeWord(
+      userId,
+      session,
+      word,
+      rendered.text,
+      guesses,
+      false,
+      state.wrongCount,
+      variant,
+      true,
+    );
+    const finalView = this.viewFromParts(
+      session,
+      rendered.text,
+      word,
+      guesses,
+      completion.currentStreak,
+      completion.longestStreak,
+    );
+    return { letter: lateLetter ?? '', isHit: false, view: finalView, completion };
+  }
+
   private async completeWord(
     userId: string,
     session: ArcadeGameSessionRow,
@@ -371,13 +439,16 @@ export class HangmanService {
     won: boolean,
     wrongCount: number,
     variant: 'US' | 'UK' | null,
+    timedOut = false,
   ): Promise<HangmanWordCompletion> {
     const sessionId = session.id;
-    const responseTimeMs = Date.now() - session.currentWordStartedAt.getTime();
-    const timeLimitMs = HANGMAN_CONFIG.TIME_REFERENCE_SECONDS * 1000;
+    const timeLimitMs = HANGMAN_CONFIG.TIMER_SECONDS * 1000;
+    const responseTimeMs = timedOut
+      ? timeLimitMs
+      : Math.min(Date.now() - session.currentWordStartedAt.getTime(), timeLimitMs);
 
     const streakBefore = session.currentStreak;
-    const streakAfter = nextStreak(streakBefore, { isCorrect: won, timedOut: false });
+    const streakAfter = nextStreak(streakBefore, { isCorrect: won, timedOut });
     const newLongestStreak = Math.max(session.longestStreak, streakAfter);
 
     let reward = { baseXp: 0, speedModifier: 1, hintModifier: 1, streakModifier: 1, finalXp: 0 };
@@ -421,7 +492,7 @@ export class HangmanService {
               submittedAnswer: guesses.join(''),
               isCorrect: won,
               hintsUsed: session.currentWordHintsUsed,
-              timedOut: false,
+              timedOut,
               baseXp: reward.baseXp,
               speedModifier: reward.speedModifier,
               hintModifier: reward.hintModifier,
@@ -523,6 +594,8 @@ export class HangmanService {
 
     return {
       outcome: won ? 'WON' : 'LOST',
+      timedOut,
+      guessedLetters: guesses,
       correctAnswer: renderedText,
       xpAwarded: reward.finalXp,
       currentStreak: streakAfter,
@@ -606,6 +679,8 @@ export class HangmanService {
       wrongLetters: state.wrongLetters,
       wrongCount: state.wrongCount,
       maxWrong: HANGMAN_CONFIG.MAX_WRONG_GUESSES,
+      timeLimitSeconds: HANGMAN_CONFIG.TIMER_SECONDS,
+      deadlineAt: new Date(session.currentWordStartedAt.getTime() + HANGMAN_CONFIG.TIMER_SECONDS * 1000).toISOString(),
       definition: word.definition,
       synonyms: word.synonyms,
       hintsRemaining: HANGMAN_CONFIG.MAX_HINTS_PER_WORD - hintsUsed,

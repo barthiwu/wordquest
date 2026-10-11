@@ -1170,6 +1170,34 @@
       "aliVsLoss": "مسابقهٔ برگشت؟ به تو ایمان دارم!",
       "aliVsDraw": "هم‌سطح!",
       "vsTitle": "شما در برابر {{name}}"
+    },
+    "chat": {
+      "tab": {
+        "chat": "گفتگو",
+        "quick": "سریع"
+      },
+      "quickOnly": "با بازیکنانی که نمی‌شناسید فقط می‌توانید واکنش سریع بفرستید.",
+      "quick": {
+        "GOOD_LUCK": "موفق باشی",
+        "GOOD_GAME": "بازی خوبی بود",
+        "NICE": "آفرین",
+        "WOW": "وای",
+        "FIRE": "داغ شدی",
+        "LAUGH": "هاها",
+        "OUCH": "آخ",
+        "THINKING": "هوم",
+        "HURRY": "عجله کن",
+        "REMATCH": "بازی دوباره؟"
+      }
+    },
+    "answerReview": {
+      "yourAnswer": "پاسخ شما",
+      "yourLetters": "حرف‌های شما",
+      "correctAnswer": "پاسخ درست",
+      "timeUpCorrect": "وقت تمام شد. پاسخ این بود",
+      "noAnswer": "(بدون پاسخ)",
+      "a11yCorrect": "درست. شما {{answer}} نوشتید",
+      "a11yWrong": "نادرست. شما {{answer}} نوشتید. پاسخ درست {{correct}} است"
     }
   },
   "scrambleQuest": {
@@ -1227,7 +1255,8 @@
     "sessionSavedSummary": "{{saved}} از {{total}} کلمه نجات یافت",
     "sessionXpEarned": "{{xp}} XP کسب شد",
     "sessionLongestStreak": "طولانی‌ترین پیاپی: {{streak}}",
-    "playAgain": "دوباره بازی کن"
+    "playAgain": "دوباره بازی کن",
+    "timeUpFeedback": "وقت تمام شد! آدمک به دار آویخته شد."
   },
   "play": {
     "title": "بازی",
@@ -1319,7 +1348,8 @@
     "chatQuickGoodLuck": "موفق باشی!",
     "chatQuickNiceOne": "آفرین!",
     "chatQuickClose": "نزدیک بود!",
-    "chatQuickGg": "GG"
+    "chatQuickGg": "GG",
+    "incorrectFeedbackShort": "کاملاً نه."
   },
   "feedback": {
     "title": "ارسال بازخورد",

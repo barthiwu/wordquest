@@ -15,7 +15,7 @@ import { ArcadeGroupService } from '../group/group.service';
 import { ArcadePlayLimitService, type ArcadePlayNotice } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
-import { normalizeAnswer } from '../answer-normalization';
+import { echoSubmittedAnswer, normalizeAnswer } from '../answer-normalization';
 import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, COMPLETE_IT_CONFIG } from '../config/arcade.config';
 import { blankSentence, isCompleteItSentenceUsable } from './complete-it.util';
 import { hintRevealOrder } from '../scramble-quest/scramble.util';
@@ -68,6 +68,8 @@ export interface CompleteItHintResult {
 export interface CompleteItAnswerResult {
   isCorrect: boolean;
   timedOut: boolean;
+  /** Exactly what the player submitted (trimmed, capped), echoed back so the app can show them their own answer next to the right one. Still echoed when the clock ran out, so a late answer is visible too. */
+  submittedAnswer: string;
   correctAnswer: string;
   xpAwarded: number;
   currentStreak: number;
@@ -525,6 +527,7 @@ export class CompleteItService {
     return {
       isCorrect,
       timedOut,
+      submittedAnswer: echoSubmittedAnswer(rawAnswer),
       correctAnswer: rendered.text,
       xpAwarded: reward.finalXp,
       currentStreak: streakAfter,

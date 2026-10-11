@@ -9,6 +9,16 @@ import { nextBattleWindow } from '../boss-battle/battle-schedule';
 import { AliService } from '../ali/ali.service';
 import { LeaderboardsService } from '../leaderboards/leaderboards.service';
 import { computeForgettingRisk } from '../vocabulary/review-schedule';
+import { ARCADE_REMINDER_CONFIG } from '../arcade/config/arcade.config';
+
+/** Rotating copy for the Arcade nudge, so the same text is not sent every 8 hours. */
+export const ARCADE_REMINDER_COPY: readonly { title: string; body: string }[] = [
+  { title: 'Arcade break?', body: 'Unscramble a few words in ScrambleQuest. 45 seconds a word.' },
+  { title: 'Save the man!', body: 'A quick round of Hangman is waiting. Can you beat the clock?' },
+  { title: 'Word Duel time', body: 'Challenge a friend to a Word Duel and settle it.' },
+  { title: 'Fill in the blank', body: 'Complete It is ready when you are. Test your vocabulary.' },
+  { title: 'Game night?', body: 'Start a Group Play round and send the link to your friends.' },
+];
 
 /** quest.key -> the NotificationType its window-open reminder uses. Any quest key not listed here is simply never reminded — a defensive default for a future timed quest added without updating this map, not a crash. */
 const QUEST_KEY_TO_NOTIFICATION_TYPE: Record<string, NotificationType> = {
@@ -357,6 +367,62 @@ export class NotificationSchedulerService {
       }
     } catch (err) {
       this.logger.warn(`sendLeaderboardNotifications failed: ${err}`);
+    }
+  }
+
+  /**
+   * ARCADE_REMINDER (2026-10, Barth): one Arcade nudge per player, no more
+   * than once every ARCADE_REMINDER_CONFIG.INTERVAL_HOURS. Only for real
+   * accounts that have a device registered, only inside the player's local
+   * waking hours, and never for someone who has played an Arcade game within
+   * the interval (they do not need reminding). The anti-repeat state is the
+   * last ARCADE_REMINDER Notification row, like every trigger above.
+   */
+  @Cron('30 * * * *')
+  async sendArcadeReminders(): Promise<void> {
+    try {
+      const { INTERVAL_HOURS, FIRST_LOCAL_HOUR, LAST_LOCAL_HOUR, DEEP_LINK } =
+        ARCADE_REMINDER_CONFIG;
+      const now = new Date();
+      const intervalMs = INTERVAL_HOURS * 60 * 60 * 1000;
+      const since = new Date(now.getTime() - intervalMs);
+
+      const users = await this.prisma.user.findMany({
+        where: {
+          timezone: { not: null },
+          deletedAt: null,
+          isGuest: false,
+          pushTokens: { some: {} },
+        },
+        select: { id: true, timezone: true },
+      });
+
+      const bucket = Math.floor(now.getTime() / intervalMs);
+      for (const user of users) {
+        const hour = playerLocalHour(user.timezone, now);
+        if (hour < FIRST_LOCAL_HOUR || hour > LAST_LOCAL_HOUR) continue;
+
+        const last = await this.lastNotificationOfType(user.id, 'ARCADE_REMINDER');
+        if (last && last.createdAt.getTime() > since.getTime() + 5 * 60_000) continue;
+
+        const playedRecently =
+          (await this.prisma.arcadeGameSession.findFirst({
+            where: { userId: user.id, startedAt: { gte: since } },
+            select: { id: true },
+          })) ??
+          (await this.prisma.wordDuelPlayerState.findFirst({
+            where: { userId: user.id, currentWordStartedAt: { gte: since } },
+            select: { id: true },
+          }));
+        if (playedRecently) continue;
+
+        const copy = ARCADE_REMINDER_COPY[(bucket + user.id.charCodeAt(0)) % ARCADE_REMINDER_COPY.length];
+        this.notifications.notifyFireAndForget(user.id, 'ARCADE_REMINDER', copy.title, copy.body, {
+          deepLink: DEEP_LINK,
+        });
+      }
+    } catch (err) {
+      this.logger.warn(`sendArcadeReminders failed: ${err}`);
     }
   }
 

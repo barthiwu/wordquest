@@ -11,41 +11,44 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
-import type { WordDuelChatMessage } from '@/services/wordDuel';
+import { QUICK_CHAT, quickChatEmoji, type ChatInput, type ChatMessage } from '@/services/quickChat';
+import type { ReportTargetType } from '@/services/reports';
 import { ReportButton } from './ReportButton';
 
 export const DUEL_CHAT_MAX_LENGTH = 200;
 
-/** Preset one-tap messages (keys under wordDuel:chatQuick*). */
-const QUICK_KEYS = [
-  'chatQuickGoodLuck',
-  'chatQuickNiceOne',
-  'chatQuickClose',
-  'chatQuickGg',
-] as const;
-
 export interface DuelChatProps {
   colors: ThemeColors;
-  messages: WordDuelChatMessage[];
+  messages: ChatMessage[];
   opponentName: string;
   open: boolean;
   onToggle: () => void;
   /** Unread messages from the opponent while the panel was closed. */
   unread: number;
   /** Resolves when the message was accepted; rejects with a player-safe Error message when not. */
-  onSend: (body: string) => Promise<void>;
+  onSend: (input: ChatInput) => Promise<void>;
   /** Opens the opponent's profile / add friend / block menu. */
   onOpponentMenu?: () => void;
   /** The server stopped chat for this pair (a block): hide the composer. */
   unavailable?: boolean;
+  /** Typed chat is allowed (false against strangers: quick chat only). Default true. */
+  canType?: boolean;
+  /** Quick (emoji) chat is allowed. Default true. */
+  canQuick?: boolean;
+  /** What a report on one of the opponent's messages is filed against. */
+  reportTargetType?: ReportTargetType;
 }
 
+type Tab = 'chat' | 'quick';
+
 /**
- * A small collapsible chat for the two players of a Word Duel. Closed it is
- * one slim row with an unread badge so it never gets in the way of the
- * duel; open it shows the conversation, four one-tap phrases, and a text
- * box. Messages from the opponent carry a flag to report them, and the
- * opponent's name opens the menu where they can be blocked.
+ * A small collapsible chat for the two players of a Word Duel or a
+ * head-to-head challenge. Closed it is one slim row with an unread badge so
+ * it never gets in the way of the game; open it has two sides: "Chat" (the
+ * conversation and a text box) and "Quick" (a grid of one-tap emoji
+ * reactions). Against strangers only the Quick side is offered. Messages from
+ * the opponent carry a flag to report them, and the opponent's name opens the
+ * menu where they can be blocked.
  */
 export function DuelChat({
   colors,
@@ -57,26 +60,34 @@ export function DuelChat({
   onSend,
   onOpponentMenu,
   unavailable = false,
+  canType = true,
+  canQuick = true,
+  reportTargetType = 'WORD_DUEL_MESSAGE',
 }: DuelChatProps) {
-  const { t } = useTranslation(['wordDuel']);
+  const { t } = useTranslation(['wordDuel', 'arcade']);
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>('chat');
   const listRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (open) listRef.current?.scrollToEnd({ animated: true });
   }, [open, messages.length]);
 
-  const send = async (text: string) => {
-    const body = text.trim();
+  // Quick-only chat (a stranger): the quick side is the only side.
+  const activeTab: Tab = !canType ? 'quick' : !canQuick ? 'chat' : tab;
+
+  const send = async (input: ChatInput) => {
+    const isQuick = 'quick' in input;
+    const body = isQuick ? input.quick : input.body.trim();
     if (!body || sending) return;
     setSending(true);
     setError(null);
     try {
-      await onSend(body);
-      setDraft('');
+      await onSend(isQuick ? { quick: body } : { body });
+      if (!isQuick) setDraft('');
     } catch (err) {
       setError(err instanceof Error && err.message ? err.message : t('wordDuel:chatSendFailed'));
     } finally {
@@ -127,13 +138,22 @@ export function DuelChat({
               messages.map((m) => (
                 <View key={m.id} style={[styles.row, m.mine && styles.rowMine]}>
                   <View style={[styles.bubble, m.mine ? styles.bubbleMine : styles.bubbleTheirs]}>
-                    <Text style={[styles.bubbleText, m.mine && { color: colors.ink }]}>
-                      {m.body}
-                    </Text>
+                    {m.kind === 'QUICK' ? (
+                      <View style={styles.quickBubble}>
+                        <Text style={styles.quickBubbleEmoji}>{quickChatEmoji(m.body)}</Text>
+                        <Text style={[styles.quickBubbleLabel, m.mine && { color: colors.ink }]}>
+                          {t(`arcade:chat.quick.${m.body}`, { defaultValue: '' })}
+                        </Text>
+                      </View>
+                    ) : (
+                      <Text style={[styles.bubbleText, m.mine && { color: colors.ink }]}>
+                        {m.body}
+                      </Text>
+                    )}
                   </View>
                   {!m.mine && (
                     <ReportButton
-                      targetType="WORD_DUEL_MESSAGE"
+                      targetType={reportTargetType}
                       targetId={m.id}
                       label={t('wordDuel:chatReportLabel')}
                     />
@@ -147,54 +167,84 @@ export function DuelChat({
             <Text style={styles.notice}>{t('wordDuel:chatUnavailable')}</Text>
           ) : (
             <>
-              <View style={styles.quickRow}>
-                {QUICK_KEYS.map((key) => (
-                  <Pressable
-                    key={key}
-                    style={styles.quickChip}
-                    onPress={() => void send(t(`wordDuel:${key}`))}
-                    disabled={sending}
-                    accessibilityRole="button"
-                    accessibilityLabel={t(`wordDuel:${key}`)}
-                  >
-                    <Text style={styles.quickChipText}>{t(`wordDuel:${key}`)}</Text>
-                  </Pressable>
-                ))}
-              </View>
+              {canType && canQuick && (
+                <View style={styles.tabs} accessibilityRole="tablist">
+                  {(['chat', 'quick'] as const).map((id) => (
+                    <Pressable
+                      key={id}
+                      style={[styles.tab, activeTab === id && styles.tabActive]}
+                      onPress={() => setTab(id)}
+                      accessibilityRole="tab"
+                      accessibilityState={{ selected: activeTab === id }}
+                      accessibilityLabel={t(`arcade:chat.tab.${id}`)}
+                    >
+                      <Text style={[styles.tabText, activeTab === id && styles.tabTextActive]}>
+                        {id === 'quick' ? '😀 ' : ''}
+                        {t(`arcade:chat.tab.${id}`)}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
 
-              <View style={styles.composer}>
-                <TextInput
-                  style={styles.input}
-                  value={draft}
-                  onChangeText={(v) => {
-                    setDraft(v);
-                    if (error) setError(null);
-                  }}
-                  placeholder={t('wordDuel:chatPlaceholder')}
-                  placeholderTextColor={colors.inkMuted}
-                  maxLength={DUEL_CHAT_MAX_LENGTH}
-                  editable={!sending}
-                  returnKeyType="send"
-                  blurOnSubmit={false}
-                  onSubmitEditing={() => void send(draft)}
-                  accessibilityLabel={t('wordDuel:chatPlaceholder')}
-                />
-                <Pressable
-                  style={[styles.sendButton, (!draft.trim() || sending) && styles.sendDisabled]}
-                  onPress={() => void send(draft)}
-                  disabled={!draft.trim() || sending}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('wordDuel:chatSend')}
-                >
-                  {sending ? (
-                    <ActivityIndicator color={colors.ink} size="small" />
-                  ) : (
-                    <Ionicons name="send" size={16} color={colors.ink} />
-                  )}
-                </Pressable>
-              </View>
+              {activeTab === 'quick' && canQuick && (
+                <View style={styles.quickGrid}>
+                  {QUICK_CHAT.map((q) => (
+                    <Pressable
+                      key={q.code}
+                      style={styles.quickCell}
+                      onPress={() => void send({ quick: q.code })}
+                      disabled={sending}
+                      accessibilityRole="button"
+                      accessibilityLabel={t(`arcade:chat.quick.${q.code}`)}
+                    >
+                      <Text style={styles.quickCellEmoji}>{q.emoji}</Text>
+                      <Text style={styles.quickCellLabel} numberOfLines={1}>
+                        {t(`arcade:chat.quick.${q.code}`)}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
+
+              {activeTab === 'chat' && canType && (
+                <>
+                  <View style={styles.composer}>
+                    <TextInput
+                      style={styles.input}
+                      value={draft}
+                      onChangeText={(v) => {
+                        setDraft(v);
+                        if (error) setError(null);
+                      }}
+                      placeholder={t('wordDuel:chatPlaceholder')}
+                      placeholderTextColor={colors.inkMuted}
+                      maxLength={DUEL_CHAT_MAX_LENGTH}
+                      editable={!sending}
+                      returnKeyType="send"
+                      blurOnSubmit={false}
+                      onSubmitEditing={() => void send({ body: draft })}
+                      accessibilityLabel={t('wordDuel:chatPlaceholder')}
+                    />
+                    <Pressable
+                      style={[styles.sendButton, (!draft.trim() || sending) && styles.sendDisabled]}
+                      onPress={() => void send({ body: draft })}
+                      disabled={!draft.trim() || sending}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('wordDuel:chatSend')}
+                    >
+                      {sending ? (
+                        <ActivityIndicator color={colors.ink} size="small" />
+                      ) : (
+                        <Ionicons name="send" size={16} color={colors.ink} />
+                      )}
+                    </Pressable>
+                  </View>
+                  <Text style={styles.rules}>{t('wordDuel:chatRules')}</Text>
+                </>
+              )}
+              {!canType && <Text style={styles.rules}>{t('arcade:chat.quickOnly')}</Text>}
               {error && <Text style={styles.error}>{error}</Text>}
-              <Text style={styles.rules}>{t('wordDuel:chatRules')}</Text>
             </>
           )}
         </View>
@@ -253,15 +303,36 @@ function createStyles(colors: ThemeColors) {
     bubbleMine: { backgroundColor: colors.arcane },
     bubbleTheirs: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
     bubbleText: { color: colors.ink, fontSize: typography.scale.sm },
-    quickRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
-    quickChip: {
+    tabs: { flexDirection: 'row', gap: spacing.xs },
+    tab: {
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: 6,
       borderRadius: radius.pill,
       borderWidth: 1,
-      borderColor: colors.arcaneSoft,
-      paddingHorizontal: spacing.md,
-      paddingVertical: 4,
+      borderColor: colors.border,
     },
-    quickChipText: { color: colors.arcaneSoft, fontSize: typography.scale.xs, fontWeight: '700' },
+    tabActive: { backgroundColor: colors.arcane, borderColor: colors.arcane },
+    tabText: { color: colors.inkMuted, fontSize: typography.scale.xs, fontWeight: '700' },
+    tabTextActive: { color: colors.ink },
+    quickGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
+    quickCell: {
+      width: '18.4%',
+      minWidth: 52,
+      flexGrow: 1,
+      alignItems: 'center',
+      gap: 2,
+      paddingVertical: 6,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    quickCellEmoji: { fontSize: 24 },
+    quickCellLabel: { color: colors.inkMuted, fontSize: 10, fontWeight: '700' },
+    quickBubble: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+    quickBubbleEmoji: { fontSize: 26 },
+    quickBubbleLabel: { color: colors.inkMuted, fontSize: typography.scale.xs, fontWeight: '700' },
     composer: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
     input: {
       flex: 1,

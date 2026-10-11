@@ -1170,6 +1170,34 @@
       "aliVsLoss": "再来一局？我相信你！",
       "aliVsDraw": "势均力敌！",
       "vsTitle": "你 对 {{name}}"
+    },
+    "chat": {
+      "tab": {
+        "chat": "聊天",
+        "quick": "快捷"
+      },
+      "quickOnly": "对于不认识的玩家，只能发送快捷表情。",
+      "quick": {
+        "GOOD_LUCK": "祝你好运",
+        "GOOD_GAME": "好局",
+        "NICE": "漂亮",
+        "WOW": "哇",
+        "FIRE": "火力全开",
+        "LAUGH": "哈哈",
+        "OUCH": "哎呀",
+        "THINKING": "嗯……",
+        "HURRY": "快点",
+        "REMATCH": "再来一局？"
+      }
+    },
+    "answerReview": {
+      "yourAnswer": "你的答案",
+      "yourLetters": "你的字母",
+      "correctAnswer": "正确答案",
+      "timeUpCorrect": "时间到。答案是",
+      "noAnswer": "（未作答）",
+      "a11yCorrect": "正确。你写的是 {{answer}}",
+      "a11yWrong": "错误。你写的是 {{answer}}。正确答案是 {{correct}}"
     }
   },
   "scrambleQuest": {
@@ -1227,7 +1255,8 @@
     "sessionSavedSummary": "{{total}} 个单词中救下 {{saved}} 个",
     "sessionXpEarned": "获得 {{xp}} XP",
     "sessionLongestStreak": "最长连续正确：{{streak}}",
-    "playAgain": "再玩一次"
+    "playAgain": "再玩一次",
+    "timeUpFeedback": "时间到！小人被绞死了。"
   },
   "play": {
     "title": "玩",
@@ -1319,7 +1348,8 @@
     "chatQuickGoodLuck": "祝你好运！",
     "chatQuickNiceOne": "干得漂亮！",
     "chatQuickClose": "好险啊！",
-    "chatQuickGg": "GG"
+    "chatQuickGg": "GG",
+    "incorrectFeedbackShort": "差一点。"
   },
   "feedback": {
     "title": "发送反馈",

@@ -8,3 +8,10 @@
 export function normalizeAnswer(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, ' ');
 }
+
+/** The player's own submission, echoed back in the answer result so every
+ * game can show them exactly what they wrote beside the right answer.
+ * Whitespace-trimmed and capped; never altered otherwise (case included). */
+export function echoSubmittedAnswer(value: string): string {
+  return value.trim().slice(0, 60);
+}

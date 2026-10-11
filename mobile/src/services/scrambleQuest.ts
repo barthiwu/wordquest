@@ -45,6 +45,8 @@ export interface ScrambleQuestWordMeaning {
 export interface ScrambleQuestAnswerResult {
   isCorrect: boolean;
   timedOut: boolean;
+  /** Exactly what the player submitted, echoed by the server so it can be shown beside the right answer. */
+  submittedAnswer: string;
   correctAnswer: string;
   xpAwarded: number;
   currentStreak: number;

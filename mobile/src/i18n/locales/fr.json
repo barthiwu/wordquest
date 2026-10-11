@@ -1170,6 +1170,34 @@
       "aliVsLoss": "Une revanche ? Je crois en toi !",
       "aliVsDraw": "À égalité !",
       "vsTitle": "Toi vs {{name}}"
+    },
+    "chat": {
+      "tab": {
+        "chat": "Chat",
+        "quick": "Rapide"
+      },
+      "quickOnly": "Avec les joueurs que tu ne connais pas, tu peux seulement envoyer des réactions rapides.",
+      "quick": {
+        "GOOD_LUCK": "Bonne chance",
+        "GOOD_GAME": "Bien joué",
+        "NICE": "Joli coup",
+        "WOW": "Waouh",
+        "FIRE": "En feu",
+        "LAUGH": "Haha",
+        "OUCH": "Aïe",
+        "THINKING": "Hmm",
+        "HURRY": "Dépêche-toi",
+        "REMATCH": "Revanche ?"
+      }
+    },
+    "answerReview": {
+      "yourAnswer": "Ta réponse",
+      "yourLetters": "Tes lettres",
+      "correctAnswer": "Bonne réponse",
+      "timeUpCorrect": "Temps écoulé. La réponse était",
+      "noAnswer": "(pas de réponse)",
+      "a11yCorrect": "Correct. Tu as écrit {{answer}}",
+      "a11yWrong": "Faux. Tu as écrit {{answer}}. La bonne réponse est {{correct}}"
     }
   },
   "scrambleQuest": {
@@ -1227,7 +1255,8 @@
     "sessionSavedSummary": "{{saved}} mots sauvés sur {{total}}",
     "sessionXpEarned": "{{xp}} XP gagnés",
     "sessionLongestStreak": "Plus longue série : {{streak}}",
-    "playAgain": "Rejouer"
+    "playAgain": "Rejouer",
+    "timeUpFeedback": "Temps écoulé ! Le bonhomme est pendu."
   },
   "play": {
     "title": "Jouer",
@@ -1319,7 +1348,8 @@
     "chatQuickGoodLuck": "Bonne chance !",
     "chatQuickNiceOne": "Bien joué !",
     "chatQuickClose": "C’était serré !",
-    "chatQuickGg": "GG"
+    "chatQuickGg": "GG",
+    "incorrectFeedbackShort": "Pas tout à fait."
   },
   "feedback": {
     "title": "Envoyer un avis",

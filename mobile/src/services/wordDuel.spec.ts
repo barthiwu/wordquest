@@ -58,7 +58,7 @@ describe('wordDuel service', () => {
 
   it('sends a chat message', async () => {
     (apiRequest as jest.Mock).mockResolvedValueOnce({});
-    await sendWordDuelMessage('tok', 'm1', 'Good luck!');
+    await sendWordDuelMessage('tok', 'm1', { body: 'Good luck!' });
     expect(apiRequest).toHaveBeenCalledWith('/arcade/word-duel/m1/chat', {
       method: 'POST',
       body: { body: 'Good luck!' },

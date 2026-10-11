@@ -43,7 +43,9 @@ import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
 import { AvatarActionMenu } from '@/components/AvatarActionMenu';
 import { AvatarBubble } from '@/components/AvatarBubble';
+import { AnswerReview } from '@/components/AnswerReview';
 import { DuelChat } from '@/components/DuelChat';
+import type { ChatInput } from '@/services/quickChat';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/RootNavigator';
 
@@ -73,7 +75,8 @@ const CHAT_AFTER_MATCH_MS = 5 * 60_000;
 /** How long a correct/incorrect flash stays up before clearing itself —
  * a duel doesn't pause for the player to hit "Continue" the way
  * ScrambleQuest does, since the opponent isn't waiting either. */
-const FEEDBACK_DISPLAY_MS = 1400;
+// Long enough to read your own answer next to the right one.
+const FEEDBACK_DISPLAY_MS = 3500;
 /** Mirrors backend WORD_DUEL_CONFIG.MATCH_DURATION_MINUTES -- the match
  * clock only ever gives this screen an absolute deadline (matchEndsAt),
  * not a total duration or start time, so the countdown ring's "how much
@@ -99,6 +102,7 @@ const CLUE_NAME_KEYS = [
 
 interface Feedback {
   isCorrect: boolean;
+  submittedAnswer: string;
   correctAnswer: string;
   xpAwarded: number;
 }
@@ -341,6 +345,7 @@ export function WordDuelScreen({ navigation, route }: Props) {
       setAnswer('');
       setFeedback({
         isCorrect: result.isCorrect,
+        submittedAnswer: result.submittedAnswer,
         correctAnswer: result.correctAnswer,
         xpAwarded: result.xpAwarded,
       });
@@ -427,10 +432,10 @@ export function WordDuelScreen({ navigation, route }: Props) {
   // Sends a chat message. Resolves when the server accepted it; rejects with
   // a player-safe message (filtered language, too fast, blocked...) that the
   // chat panel shows under the box.
-  const handleSendChat = async (body: string) => {
+  const handleSendChat = async (input: ChatInput) => {
     if (!accessToken || !state) return;
     try {
-      const message = await sendWordDuelMessage(accessToken, state.matchId, body);
+      const message = await sendWordDuelMessage(accessToken, state.matchId, input);
       mergeChat([message]);
     } catch (err) {
       if (err instanceof ApiError && err.status === 403) setChatUnavailable(true);
@@ -964,8 +969,14 @@ export function WordDuelScreen({ navigation, route }: Props) {
                 >
                   {feedback.isCorrect
                     ? t('correctFeedback', { xp: feedback.xpAwarded })
-                    : t('incorrectFeedback', { answer: feedback.correctAnswer })}
+                    : t('incorrectFeedbackShort')}
                 </Text>
+                <AnswerReview
+                  colors={colors}
+                  submitted={feedback.submittedAnswer}
+                  correct={feedback.correctAnswer}
+                  isCorrect={feedback.isCorrect}
+                />
               </View>
             )}
           </>
@@ -1190,8 +1201,8 @@ function createStyles(colors: ThemeColors, topInset: number) {
       fontSize: typography.scale.md,
       fontWeight: '600',
     },
-    feedbackBar: { alignItems: 'center' },
-    feedbackText: { fontSize: typography.scale.md, fontWeight: '700' },
+    feedbackBar: { alignItems: 'stretch', gap: spacing.sm },
+    feedbackText: { fontSize: typography.scale.md, fontWeight: '700', textAlign: 'center' },
     waitingForOpponentCard: {
       backgroundColor: colors.surface,
       borderRadius: radius.lg,

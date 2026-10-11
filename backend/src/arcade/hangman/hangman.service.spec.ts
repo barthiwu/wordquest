@@ -615,4 +615,71 @@ describe('HangmanService', () => {
       await expect(service.requestHint('u1', 's1')).rejects.toThrow(ConflictException);
     });
   });
+
+  describe('45-second word timer', () => {
+    const expired = () => ({
+      ...baseSession(),
+      currentStreak: 2,
+      longestStreak: 2,
+      currentWordStartedAt: new Date(Date.now() - 50_000), // 50s ago, timer is 45s
+      currentWordGuesses: ['c'],
+      currentWordGuessCount: 1,
+    });
+
+    it('includes the limit and a server deadline in the word view', async () => {
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce(baseSession());
+      const view = await service.start('u1');
+      expect(view.timeLimitSeconds).toBe(45);
+      const left = new Date(view.deadlineAt).getTime() - Date.now();
+      expect(left).toBeGreaterThan(40_000);
+      expect(left).toBeLessThanOrEqual(45_000);
+    });
+
+    it('a guess that arrives after the buzzer loses the word and does not count', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(expired());
+      prismaMock.arcadeAnswer.count.mockResolvedValueOnce(0);
+      prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 1,
+      });
+
+      const result = await service.guessLetter('u1', 's1', 'a');
+
+      expect(result.completion?.outcome).toBe('LOST');
+      expect(result.completion?.timedOut).toBe(true);
+      expect(result.completion?.guessedLetters).toEqual(['c']); // the late 'a' is not recorded
+      expect(result.completion?.correctAnswer).toBe('cat');
+      expect(result.completion?.xpAwarded).toBe(0);
+      expect(result.completion?.currentStreak).toBe(0);
+      expect(progressionMock.awardXp).not.toHaveBeenCalled();
+      expect(prismaMock.arcadeAnswer.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ timedOut: true, isCorrect: false }) }),
+      );
+    });
+
+    it('the timeout call settles an expired word as lost', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(expired());
+      prismaMock.arcadeAnswer.count.mockResolvedValueOnce(0);
+      prismaMock.arcadeGameSession.findUniqueOrThrow.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 1,
+      });
+      const result = await service.timeoutWord('u1', 's1');
+      expect(result.completion).toMatchObject({ outcome: 'LOST', timedOut: true });
+    });
+
+    it('the timeout call is refused while time remains (a client cannot end a word early)', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        currentWordStartedAt: new Date(Date.now() - 10_000),
+      });
+      await expect(service.timeoutWord('u1', 's1')).rejects.toThrow(ConflictException);
+      expect(prismaMock.arcadeAnswer.create).not.toHaveBeenCalled();
+    });
+
+    it('refuses a hint once time is up', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(expired());
+      await expect(service.requestHint('u1', 's1')).rejects.toThrow(BadRequestException);
+    });
+  });
 });

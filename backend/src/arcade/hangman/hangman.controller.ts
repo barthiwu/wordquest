@@ -16,6 +16,7 @@ import {
  * POST /api/v1/arcade/hangman/start
  * POST /api/v1/arcade/hangman/:sessionId/guess   { letter }
  * POST /api/v1/arcade/hangman/:sessionId/hint
+ * POST /api/v1/arcade/hangman/:sessionId/timeout   the 45s countdown hit zero
  *
  * Same guards and rate-limit shape as ScrambleQuest. A guess is one tap,
  * so its limit is a little higher than ScrambleQuest's answer limit.
@@ -51,5 +52,11 @@ export class HangmanController {
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   hint(@CurrentUserId() userId: string, @Param('sessionId') sessionId: string) {
     return this.hangman.requestHint(userId, sessionId);
+  }
+
+  @Post(':sessionId/timeout')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  timeout(@CurrentUserId() userId: string, @Param('sessionId') sessionId: string) {
+    return this.hangman.timeoutWord(userId, sessionId);
   }
 }

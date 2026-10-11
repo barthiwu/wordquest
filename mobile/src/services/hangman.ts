@@ -17,6 +17,10 @@ export interface HangmanChallenge {
   wrongLetters: string[];
   wrongCount: number;
   maxWrong: number;
+  /** Seconds allowed for this word (45). */
+  timeLimitSeconds: number;
+  /** ISO timestamp, server-authoritative: the countdown is drawn from it. */
+  deadlineAt: string;
   definition: string;
   synonyms: string[];
   hintsRemaining: number;
@@ -33,6 +37,10 @@ export interface HangmanWordMeaning {
 
 export interface HangmanWordCompletion {
   outcome: 'WON' | 'LOST';
+  /** True when the word was lost because the 45 seconds ran out. */
+  timedOut: boolean;
+  /** Every letter the player tried on this word, in order. */
+  guessedLetters: string[];
   correctAnswer: string;
   xpAwarded: number;
   currentStreak: number;
@@ -96,6 +104,17 @@ export function requestHangmanHint(
   sessionId: string,
 ): Promise<HangmanHintResult> {
   return apiRequest<HangmanHintResult>(`/arcade/hangman/${sessionId}/hint`, {
+    method: 'POST',
+    accessToken,
+  });
+}
+
+/** The countdown reached zero: asks the server to settle the word as lost. The server only agrees once its own deadline has passed. */
+export function timeoutHangmanWord(
+  accessToken: string,
+  sessionId: string,
+): Promise<HangmanGuessResult> {
+  return apiRequest<HangmanGuessResult>(`/arcade/hangman/${sessionId}/timeout`, {
     method: 'POST',
     accessToken,
   });

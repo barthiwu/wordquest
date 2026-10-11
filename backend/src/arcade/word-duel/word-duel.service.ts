@@ -12,7 +12,7 @@ import { ArcadeChallengeService } from '../challenge.service';
 import { ArcadePlayLimitService } from '../limits/play-limit.service';
 import { RewardEngineService } from '../reward-engine.service';
 import { nextStreak } from '../types';
-import { normalizeAnswer } from '../answer-normalization';
+import { echoSubmittedAnswer, normalizeAnswer } from '../answer-normalization';
 import {
   ARCADE_COUNTS_TOWARD_DAILY_STREAK,
   WORD_DUEL_CONFIG,
@@ -161,6 +161,8 @@ export interface WordDuelStateView {
 
 export interface WordDuelAnswerResult {
   isCorrect: boolean;
+  /** Exactly what the player submitted (trimmed, capped), echoed back so the app can show it beside the right answer. */
+  submittedAnswer: string;
   correctAnswer: string;
   xpAwarded: number;
   currentStreak: number;
@@ -498,6 +500,7 @@ export class WordDuelService {
 
     return {
       isCorrect,
+      submittedAnswer: echoSubmittedAnswer(rawAnswer),
       correctAnswer: rendered.text,
       xpAwarded: reward.finalXp,
       currentStreak: streakAfter,
