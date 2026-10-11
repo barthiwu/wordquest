@@ -46,6 +46,10 @@ on:
     tags: ["v*"]
   workflow_dispatch: {}
 
+# Least privilege by default; the image-push job widens this for itself only.
+permissions:
+  contents: read
+
 env:
   IMAGE: ghcr.io/${{ github.repository }}/backend
 
@@ -123,7 +127,7 @@ jobs:
       # above; that image is a separate, versioned audit/rollback
       # artifact, not Railway's deploy source.
       - name: Install Railway CLI
-        run: npm install -g @railway/cli
+        run: npm install -g @railway/cli@5.64.2   # pinned: a floating install runs whatever was published last, with RAILWAY_TOKEN in the environment
 
       # -c/--ci streams build logs and exits once the build completes
       # rather than tailing the running service's logs forever, which is

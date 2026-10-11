@@ -451,7 +451,11 @@
       "shareHeader": "Misimbo yangu ya kurejesha ya WordQuest",
       "savedThem": "Nimeihifadhi",
       "errorCode": "Msimbo huo haukufanya kazi. Angalia programu kisha ujaribu tena.",
-      "errorGeneric": "Hitilafu imetokea. Tafadhali jaribu tena."
+      "errorGeneric": "Hitilafu imetokea. Tafadhali jaribu tena.",
+      "passwordHint": "Weka nenosiri la akaunti yako ili kuiwasha.",
+      "passwordPlaceholder": "Nenosiri la akaunti",
+      "errorPassword": "Nenosiri hilo si sahihi. Jaribu tena.",
+      "errorVerifyEmail": "Thibitisha barua pepe yako kwanza, kisha rudi kuiwasha."
     }
   },
   "leaderboards": {

@@ -451,7 +451,11 @@
       "shareHeader": "Mes codes de secours WordQuest",
       "savedThem": "Je les ai enregistrés",
       "errorCode": "Ce code n’a pas fonctionné. Vérifiez l’application et réessayez.",
-      "errorGeneric": "Une erreur s’est produite. Veuillez réessayer."
+      "errorGeneric": "Une erreur s’est produite. Veuillez réessayer.",
+      "passwordHint": "Saisis le mot de passe de ton compte pour l'activer.",
+      "passwordPlaceholder": "Mot de passe du compte",
+      "errorPassword": "Ce mot de passe n'est pas le bon. Réessaie.",
+      "errorVerifyEmail": "Vérifie d'abord ton adresse e-mail, puis reviens l'activer."
     }
   },
   "leaderboards": {

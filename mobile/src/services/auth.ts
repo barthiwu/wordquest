@@ -121,9 +121,15 @@ export function getTwoFactorStatus(accessToken: string): Promise<TwoFactorStatus
   return apiRequest<TwoFactorStatus>('/auth/2fa/status', { accessToken });
 }
 
-/** Starts enrolment: returns the secret + otpauth:// URL to show as a QR code. Not active until confirmed. */
-export function beginTwoFactorSetup(accessToken: string): Promise<{ secret: string; otpauthUrl: string }> {
-  return apiRequest('/auth/2fa/setup', { method: 'POST', accessToken });
+/**
+ * Starts enrolment: returns the secret + otpauth:// URL to show as a QR code. Not active until confirmed.
+ * The account password is re-checked server-side, so a stolen session alone can't attach its own authenticator.
+ */
+export function beginTwoFactorSetup(
+  accessToken: string,
+  password: string,
+): Promise<{ secret: string; otpauthUrl: string }> {
+  return apiRequest('/auth/2fa/setup', { method: 'POST', accessToken, body: { password } });
 }
 
 /** Confirms enrolment with a first valid code; returns the one-time recovery codes. */

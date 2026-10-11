@@ -451,7 +451,11 @@
       "shareHeader": "我的 WordQuest 恢复码",
       "savedThem": "我已保存",
       "errorCode": "验证码无效。请检查应用后重试。",
-      "errorGeneric": "出错了，请重试。"
+      "errorGeneric": "出错了，请重试。",
+      "passwordHint": "输入你的账户密码以开启此功能。",
+      "passwordPlaceholder": "账户密码",
+      "errorPassword": "密码不正确，请再试一次。",
+      "errorVerifyEmail": "请先验证你的电子邮箱，然后再回来开启。"
     }
   },
   "leaderboards": {

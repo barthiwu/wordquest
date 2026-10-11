@@ -451,7 +451,11 @@
       "shareHeader": "My WordQuest recovery codes",
       "savedThem": "I've saved them",
       "errorCode": "That code didn't work. Check the app and try again.",
-      "errorGeneric": "Something went wrong. Please try again."
+      "errorGeneric": "Something went wrong. Please try again.",
+      "passwordHint": "Enter your account password to turn this on.",
+      "passwordPlaceholder": "Account password",
+      "errorPassword": "That password isn't right. Try again.",
+      "errorVerifyEmail": "Verify your email address first, then come back to turn this on."
     }
   },
   "leaderboards": {

@@ -49,6 +49,7 @@ export function TwoFactorSettingsScreen({ navigation }: Props) {
   const accessToken = useAuthStore((s) => s.accessToken);
   const [mode, setMode] = useState<Mode>({ kind: 'loading' });
   const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
   const [pending, setPending] = useState<Pending>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,17 +68,21 @@ export function TwoFactorSettingsScreen({ navigation }: Props) {
     loadStatus();
   }, [loadStatus]);
 
-  const run = async (fn: () => Promise<void>) => {
+  const run = async (fn: () => Promise<void>, wrongKey: 'errorCode' | 'errorPassword' = 'errorCode') => {
     setBusy(true);
     setError(null);
     try {
       await fn();
     } catch (err) {
-      setError(
-        err instanceof ApiError && (err.status === 401 || err.status === 400)
-          ? t('twoFactor.errorCode')
-          : t('twoFactor.errorGeneric'),
-      );
+      if (err instanceof ApiError && err.status === 403) {
+        setError(t('twoFactor.errorVerifyEmail'));
+      } else {
+        setError(
+          err instanceof ApiError && (err.status === 401 || err.status === 400)
+            ? t(`twoFactor.${wrongKey}`)
+            : t('twoFactor.errorGeneric'),
+        );
+      }
     } finally {
       setBusy(false);
     }
@@ -86,10 +91,11 @@ export function TwoFactorSettingsScreen({ navigation }: Props) {
   const startSetup = () =>
     run(async () => {
       if (!accessToken) return;
-      const { secret, otpauthUrl } = await beginTwoFactorSetup(accessToken);
+      const { secret, otpauthUrl } = await beginTwoFactorSetup(accessToken, password);
+      setPassword('');
       setCode('');
       setMode({ kind: 'setup', secret, otpauthUrl });
-    });
+    }, 'errorPassword');
 
   const confirmSetup = () =>
     run(async () => {
@@ -173,8 +179,22 @@ export function TwoFactorSettingsScreen({ navigation }: Props) {
       {mode.kind === 'status' && !mode.status.enabled && (
         <View style={styles.block}>
           <Text style={styles.body}>{t('twoFactor.intro')}</Text>
+          <Text style={styles.body}>{t('twoFactor.passwordHint')}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t('twoFactor.passwordPlaceholder')}
+            placeholderTextColor={colors.inkMuted}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            maxLength={128}
+            textContentType="password"
+            accessibilityLabel={t('twoFactor.passwordPlaceholder')}
+          />
           {error ? <Text style={styles.error}>{error}</Text> : null}
-          <Primary label={t('twoFactor.turnOn')} onPress={startSetup} />
+          <Primary label={t('twoFactor.turnOn')} onPress={startSetup} disabled={password.length === 0} />
         </View>
       )}
 

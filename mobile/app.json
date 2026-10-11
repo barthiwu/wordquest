@@ -51,7 +51,6 @@
       "bundleIdentifier": "com.wordquest.app",
       "infoPlist": {
         "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": true,
           "NSAllowsLocalNetworking": true
         },
         "UIApplicationSceneManifest": {

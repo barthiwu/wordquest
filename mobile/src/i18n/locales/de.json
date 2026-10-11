@@ -451,7 +451,11 @@
       "shareHeader": "Meine WordQuest-Wiederherstellungscodes",
       "savedThem": "Ich habe sie gespeichert",
       "errorCode": "Dieser Code hat nicht funktioniert. Prüfe die App und versuche es erneut.",
-      "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+      "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      "passwordHint": "Gib dein Kontopasswort ein, um das zu aktivieren.",
+      "passwordPlaceholder": "Kontopasswort",
+      "errorPassword": "Dieses Passwort stimmt nicht. Versuch es noch einmal.",
+      "errorVerifyEmail": "Bestätige zuerst deine E-Mail-Adresse und komm dann zurück, um das zu aktivieren."
     }
   },
   "leaderboards": {

@@ -451,7 +451,11 @@
       "shareHeader": "Meus códigos de recuperação do WordQuest",
       "savedThem": "Já salvei",
       "errorCode": "Esse código não funcionou. Confira o app e tente novamente.",
-      "errorGeneric": "Algo deu errado. Tente novamente."
+      "errorGeneric": "Algo deu errado. Tente novamente.",
+      "passwordHint": "Digite a senha da sua conta para ativar.",
+      "passwordPlaceholder": "Senha da conta",
+      "errorPassword": "Essa senha não está correta. Tente novamente.",
+      "errorVerifyEmail": "Confirme primeiro o seu e-mail e depois volte para ativar."
     }
   },
   "leaderboards": {

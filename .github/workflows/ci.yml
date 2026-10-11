@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, develop]
 
+# Least privilege: CI only needs to read the repo. No job here writes to it.
+permissions:
+  contents: read
+
 jobs:
   backend:
     name: Backend (lint, typecheck, test)
