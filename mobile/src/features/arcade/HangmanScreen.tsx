@@ -54,6 +54,15 @@ const URGENT_THRESHOLD_SECONDS = 10;
 // After the server says "there is still time left", wait this long before asking again.
 const TIMEOUT_RETRY_MS = 1500;
 
+/** True when the API sent the word's deadline (older servers don't, so the timer stays hidden). */
+function hasServerDeadline(c: { deadlineAt?: string; timeLimitSeconds?: number }): boolean {
+  return (
+    typeof c.deadlineAt === 'string' &&
+    typeof c.timeLimitSeconds === 'number' &&
+    !Number.isNaN(new Date(c.deadlineAt).getTime())
+  );
+}
+
 /**
  * Hangman: guess the hidden word one letter at a time. Every wrong letter
  * adds a body part to the man; the sixth hangs him and the word is lost,
@@ -215,6 +224,8 @@ export function HangmanScreen({ navigation, route }: Props) {
   timeoutRef.current = handleTimeout;
   useEffect(() => {
     if ((phase !== 'active' && phase !== 'busy') || !challenge) return undefined;
+    // A server that predates the timer sends no deadline: show no clock rather than "NaNs".
+    if (!hasServerDeadline(challenge)) return undefined;
     const key = `${challenge.sessionId}:${challenge.wordIndex}`;
     const tick = () => {
       const left = Math.max(
@@ -408,7 +419,7 @@ export function HangmanScreen({ navigation, route }: Props) {
             />
           </View>
 
-          {!finished && (
+          {!finished && hasServerDeadline(challenge) && (
             <CountdownRing
               remainingSeconds={remainingSeconds}
               totalSeconds={challenge.timeLimitSeconds}
