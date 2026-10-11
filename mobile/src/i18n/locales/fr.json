@@ -1151,7 +1151,37 @@
       },
       "allowGuestsLabel": "Autoriser à rejoindre sans compte",
       "allowGuestsOn": "Toute personne avec le lien peut rejoindre en invité en choisissant un nom.",
-      "allowGuestsOff": "Seules les personnes ayant un compte WordQuest peuvent rejoindre (utile quand tu dois savoir qui est qui)."
+      "allowGuestsOff": "Seules les personnes ayant un compte WordQuest peuvent rejoindre (utile quand tu dois savoir qui est qui).",
+      "sheet": {
+        "title": "Fiche de résultats complète",
+        "hintFinal": "Tout ce que chaque joueur a saisi, et le temps utilisé.",
+        "hintLive": "La manche est toujours en cours. Voici les résultats jusqu'à présent.",
+        "show": "Voir toutes les réponses",
+        "hide": "Masquer les réponses",
+        "download": {
+          "csv": "Télécharger le CSV",
+          "pdf": "Télécharger le PDF"
+        },
+        "downloadFailed": "Impossible de télécharger le fichier. Réessaie.",
+        "loadFailed": "Impossible de charger la fiche de résultats. Réessaie.",
+        "legend": "Vert = correct, rouge = faux.",
+        "legendLetters": "Vert = mot trouvé, rouge = non trouvé.",
+        "host": "hôte",
+        "didNotStart": "N'a pas commencé",
+        "correctOf": "{{correct}} / {{total}} correctes",
+        "totalTime": "temps total {{time}}",
+        "word": "Mot",
+        "typed": "Saisi",
+        "lettersGuessed": "Lettres proposées",
+        "seconds": "s",
+        "noAnswer": "(pas de réponse)",
+        "verdict": {
+          "correct": "Correct",
+          "wrong": "Faux",
+          "timedOut": "Temps écoulé",
+          "notAnswered": "Sans réponse"
+        }
+      }
     },
     "share": {
       "dialogTitle": "Partage ton résultat WordQuest",

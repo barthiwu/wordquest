@@ -1151,7 +1151,37 @@
       },
       "allowGuestsLabel": "允许无账号加入",
       "allowGuestsOn": "任何拿到链接的人都可以选择一个名字以访客身份加入。",
-      "allowGuestsOff": "只有拥有 WordQuest 账号的人才能加入（需要知道谁是谁时很有用）。"
+      "allowGuestsOff": "只有拥有 WordQuest 账号的人才能加入（需要知道谁是谁时很有用）。",
+      "sheet": {
+        "title": "完整成绩单",
+        "hintFinal": "每位玩家输入的全部内容以及所用时间。",
+        "hintLive": "本轮仍在进行中，这里显示目前的成绩。",
+        "show": "查看所有答案",
+        "hide": "隐藏答案",
+        "download": {
+          "csv": "下载 CSV",
+          "pdf": "下载 PDF"
+        },
+        "downloadFailed": "无法下载文件，请重试。",
+        "loadFailed": "无法加载成绩单，请重试。",
+        "legend": "绿色 = 正确，红色 = 错误。",
+        "legendLetters": "绿色 = 已猜出单词，红色 = 未猜出。",
+        "host": "主持人",
+        "didNotStart": "未开始",
+        "correctOf": "答对 {{correct}} / {{total}}",
+        "totalTime": "总用时 {{time}}",
+        "word": "单词",
+        "typed": "输入",
+        "lettersGuessed": "猜过的字母",
+        "seconds": "秒",
+        "noAnswer": "（无答案）",
+        "verdict": {
+          "correct": "正确",
+          "wrong": "错误",
+          "timedOut": "超时",
+          "notAnswered": "未作答"
+        }
+      }
     },
     "share": {
       "dialogTitle": "分享你的 WordQuest 成绩",

@@ -1151,7 +1151,37 @@
       },
       "allowGuestsLabel": "Ruhusu kujiunga bila akaunti",
       "allowGuestsOn": "Yeyote mwenye kiungo anaweza kujiunga kama mgeni kwa kuchagua jina.",
-      "allowGuestsOff": "Ni watu wenye akaunti ya WordQuest pekee wanaoweza kujiunga (inafaa unapohitaji kujua nani ni nani)."
+      "allowGuestsOff": "Ni watu wenye akaunti ya WordQuest pekee wanaoweza kujiunga (inafaa unapohitaji kujua nani ni nani).",
+      "sheet": {
+        "title": "Karatasi kamili ya matokeo",
+        "hintFinal": "Kila kitu alichoandika kila mchezaji, na muda alioutumia.",
+        "hintLive": "Raundi bado inaendelea. Hii inaonyesha matokeo hadi sasa.",
+        "show": "Tazama majibu yote",
+        "hide": "Ficha majibu",
+        "download": {
+          "csv": "Pakua CSV",
+          "pdf": "Pakua PDF"
+        },
+        "downloadFailed": "Imeshindwa kupakua faili. Tafadhali jaribu tena.",
+        "loadFailed": "Imeshindwa kupakia karatasi ya matokeo. Tafadhali jaribu tena.",
+        "legend": "Kijani = sahihi, nyekundu = si sahihi.",
+        "legendLetters": "Kijani = neno limepatikana, nyekundu = halijapatikana.",
+        "host": "mwenyeji",
+        "didNotStart": "Hakuanza",
+        "correctOf": "{{correct}} / {{total}} sahihi",
+        "totalTime": "muda wote {{time}}",
+        "word": "Neno",
+        "typed": "Alichoandika",
+        "lettersGuessed": "Herufi alizokisia",
+        "seconds": "sek",
+        "noAnswer": "(hakuna jibu)",
+        "verdict": {
+          "correct": "Sahihi",
+          "wrong": "Si sahihi",
+          "timedOut": "Muda umeisha",
+          "notAnswered": "Hakujibu"
+        }
+      }
     },
     "share": {
       "dialogTitle": "Shiriki matokeo yako ya WordQuest",

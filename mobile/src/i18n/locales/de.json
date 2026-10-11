@@ -1151,7 +1151,37 @@
       },
       "allowGuestsLabel": "Beitritt ohne Konto erlauben",
       "allowGuestsOn": "Jeder mit dem Link kann als Gast beitreten und sich einen Namen aussuchen.",
-      "allowGuestsOff": "Nur Personen mit WordQuest-Konto können beitreten (praktisch, wenn man wissen muss, wer wer ist)."
+      "allowGuestsOff": "Nur Personen mit WordQuest-Konto können beitreten (praktisch, wenn man wissen muss, wer wer ist).",
+      "sheet": {
+        "title": "Vollständige Ergebnisliste",
+        "hintFinal": "Alles, was jede Person getippt hat, und die benötigte Zeit.",
+        "hintLive": "Die Runde läuft noch. Hier siehst du die bisherigen Ergebnisse.",
+        "show": "Alle Antworten anzeigen",
+        "hide": "Antworten ausblenden",
+        "download": {
+          "csv": "CSV herunterladen",
+          "pdf": "PDF herunterladen"
+        },
+        "downloadFailed": "Die Datei konnte nicht heruntergeladen werden. Bitte versuche es erneut.",
+        "loadFailed": "Die Ergebnisliste konnte nicht geladen werden. Bitte versuche es erneut.",
+        "legend": "Grün = richtig, rot = falsch.",
+        "legendLetters": "Grün = Wort gelöst, rot = nicht gelöst.",
+        "host": "Host",
+        "didNotStart": "Nicht gestartet",
+        "correctOf": "{{correct}} / {{total}} richtig",
+        "totalTime": "Gesamtzeit {{time}}",
+        "word": "Wort",
+        "typed": "Getippt",
+        "lettersGuessed": "Geratene Buchstaben",
+        "seconds": "Sek.",
+        "noAnswer": "(keine Antwort)",
+        "verdict": {
+          "correct": "Richtig",
+          "wrong": "Falsch",
+          "timedOut": "Zeit abgelaufen",
+          "notAnswered": "Nicht beantwortet"
+        }
+      }
     },
     "share": {
       "dialogTitle": "Teile dein WordQuest-Ergebnis",

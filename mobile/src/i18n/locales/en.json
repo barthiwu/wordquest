@@ -1151,7 +1151,37 @@
       },
       "allowGuestsLabel": "Let people join without an account",
       "allowGuestsOn": "Anyone with the link can join as a guest by choosing a name.",
-      "allowGuestsOff": "Only people with a WordQuest account can join (good when you need to know who is who)."
+      "allowGuestsOff": "Only people with a WordQuest account can join (good when you need to know who is who).",
+      "sheet": {
+        "title": "Full result sheet",
+        "hintFinal": "Everything each player typed, and the time they used.",
+        "hintLive": "The round is still running. This shows results so far.",
+        "show": "View all answers",
+        "hide": "Hide answers",
+        "download": {
+          "csv": "Download CSV",
+          "pdf": "Download PDF"
+        },
+        "downloadFailed": "Couldn't download the file. Please try again.",
+        "loadFailed": "Couldn't load the result sheet. Please try again.",
+        "legend": "Green = correct, red = wrong.",
+        "legendLetters": "Green = word solved, red = not solved.",
+        "host": "host",
+        "didNotStart": "Did not start",
+        "correctOf": "{{correct}} / {{total}} correct",
+        "totalTime": "total time {{time}}",
+        "word": "Word",
+        "typed": "Typed",
+        "lettersGuessed": "Letters guessed",
+        "seconds": "sec",
+        "noAnswer": "(no answer)",
+        "verdict": {
+          "correct": "Correct",
+          "wrong": "Wrong",
+          "timedOut": "Timed out",
+          "notAnswered": "Not answered"
+        }
+      }
     },
     "share": {
       "dialogTitle": "Share your WordQuest result",

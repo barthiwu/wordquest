@@ -14,6 +14,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../../users/users.service';
 import { ARCADE_GROUP_CONFIG, ARCADE_GROUP_GAMES } from '../config/arcade.config';
 import { CreateGroupDto } from './dto/group.dto';
+import { buildResultSheet, GroupResultSheet } from './group-results.util';
 import {
   generateGroupCode,
   GroupSide,
@@ -294,6 +295,73 @@ export class ArcadeGroupService {
   /** One group; also the polling endpoint. Members only. */
   async get(userId: string, groupId: string): Promise<GroupView> {
     return this.getView(userId, groupId);
+  }
+
+  /**
+   * The full result sheet, host only: every member's rank, score and total
+   * time, and for each word exactly what they typed and whether it was right.
+   * Available once the round has been opened; `final` says whether it has
+   * ended. Members who were removed are not on it.
+   */
+  async getResultSheet(hostId: string, groupId: string): Promise<GroupResultSheet> {
+    const group = await this.loadHostGroup(hostId, groupId);
+    if (group.status === 'LOBBY' || !group.wordsPickedAt) {
+      throw new ConflictException('The round has not started yet, so there are no results.');
+    }
+    const [members, sessions, words] = await Promise.all([
+      this.prisma.arcadeGroupMember.findMany({
+        where: { groupId: group.id },
+        include: { user: { select: { username: true, displayName: true, isGuest: true } } },
+        orderBy: { joinedAt: 'asc' },
+      }),
+      this.prisma.arcadeGameSession.findMany({
+        where: { groupId: group.id },
+        include: {
+          answers: {
+            select: {
+              wordIndex: true,
+              submittedAnswer: true,
+              isCorrect: true,
+              timedOut: true,
+              responseTimeMs: true,
+            },
+          },
+        },
+      }),
+      this.prisma.word.findMany({
+        where: { id: { in: group.wordIds } },
+        select: { id: true, word: true, definition: true },
+      }),
+    ]);
+    const sessionByUser = new Map(sessions.map((s) => [s.userId, s]));
+    const wordById = new Map(words.map((w) => [w.id, w]));
+
+    return buildResultSheet({
+      groupId: group.id,
+      title: group.title,
+      game: group.game,
+      ended: group.status === 'ENDED',
+      activatedAt: group.activatedAt,
+      endedAt: group.endedAt,
+      now: new Date(),
+      words: group.wordIds.map((id, index) => ({
+        index,
+        word: wordById.get(id)?.word ?? '',
+        definition: wordById.get(id)?.definition ?? '',
+      })),
+      members: members.map((m) => {
+        const session = sessionByUser.get(m.userId);
+        return {
+          userId: m.userId,
+          // A guest has no public handle: they appear under the name they chose.
+          name: (m.user.isGuest ? m.user.displayName : m.user.username) ?? '',
+          isHost: m.userId === group.hostId,
+          session: session
+            ? { completed: session.status === 'COMPLETED', answers: session.answers }
+            : null,
+        };
+      }),
+    });
   }
 
   /** The groups this player is in: open ones, and ones that ended in the last week. */

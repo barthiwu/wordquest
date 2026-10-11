@@ -33,14 +33,16 @@ export function guestHandleCandidate(base: string, attempt: number, random: () =
  * characters, angle brackets, runs of spaces.
  */
 export function guestDisplayName(nickname: string, max = 20): string {
-  return nickname
-    // Control characters, brackets, and the invisible / direction-flipping characters
-    // that let one name impersonate another or scramble the screen.
-    .replace(/[\u0000-\u001f\u007f<>\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, max)
-    .trim();
+  return (
+    nickname
+      // Control characters, brackets, and the invisible / direction-flipping characters
+      // that let one name impersonate another or scramble the screen.
+      .replace(/[\u0000-\u001f\u007f<>\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, max)
+      .trim()
+  );
 }
 
 /** Makes a name unique within a group by adding " 2", " 3"... when it is already shown there. */

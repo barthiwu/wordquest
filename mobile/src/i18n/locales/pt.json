@@ -1151,7 +1151,37 @@
       },
       "allowGuestsLabel": "Permitir entrar sem conta",
       "allowGuestsOn": "Qualquer pessoa com o link pode entrar como convidada escolhendo um nome.",
-      "allowGuestsOff": "Só entra quem tem conta no WordQuest (útil quando você precisa saber quem é quem)."
+      "allowGuestsOff": "Só entra quem tem conta no WordQuest (útil quando você precisa saber quem é quem).",
+      "sheet": {
+        "title": "Folha de resultados completa",
+        "hintFinal": "Tudo o que cada jogador digitou e o tempo que usou.",
+        "hintLive": "A rodada ainda está em andamento. Aqui estão os resultados até agora.",
+        "show": "Ver todas as respostas",
+        "hide": "Ocultar respostas",
+        "download": {
+          "csv": "Baixar CSV",
+          "pdf": "Baixar PDF"
+        },
+        "downloadFailed": "Não foi possível baixar o arquivo. Tente novamente.",
+        "loadFailed": "Não foi possível carregar a folha de resultados. Tente novamente.",
+        "legend": "Verde = certo, vermelho = errado.",
+        "legendLetters": "Verde = palavra resolvida, vermelho = não resolvida.",
+        "host": "anfitrião",
+        "didNotStart": "Não começou",
+        "correctOf": "{{correct}} / {{total}} certas",
+        "totalTime": "tempo total {{time}}",
+        "word": "Palavra",
+        "typed": "Digitado",
+        "lettersGuessed": "Letras tentadas",
+        "seconds": "s",
+        "noAnswer": "(sem resposta)",
+        "verdict": {
+          "correct": "Certa",
+          "wrong": "Errada",
+          "timedOut": "Tempo esgotado",
+          "notAnswered": "Sem resposta"
+        }
+      }
     },
     "share": {
       "dialogTitle": "Compartilhe seu resultado no WordQuest",

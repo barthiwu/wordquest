@@ -1,6 +1,19 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Header,
+  HttpCode,
+  Param,
+  Post,
+  StreamableFile,
+  UseGuards,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ArcadeGroupService } from './group.service';
+import { renderResultPdf } from './group-results.pdf';
+import { sheetFileStem, toCsv } from './group-results.util';
 import { CreateGroupDto, GroupMemberParamDto, JoinGroupDto, StartGroupDto } from './dto/group.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../../auth/guards/email-verification.guard';
@@ -13,6 +26,9 @@ import { AllowGuest, IsGuest } from '../../auth/decorators/allow-guest.decorator
  * GET    /api/v1/arcade/groups/preview/:code        what the invite link shows before joining
  * POST   /api/v1/arcade/groups/join                 join by code
  * GET    /api/v1/arcade/groups/:id                  one group (members only; also the polling endpoint)
+ * GET    /api/v1/arcade/groups/:id/results          host: the full result sheet (typed words, times)
+ * GET    /api/v1/arcade/groups/:id/results.csv      host: the sheet as a CSV download
+ * GET    /api/v1/arcade/groups/:id/results.pdf      host: the sheet as a PDF download
  * POST   /api/v1/arcade/groups/:id/start            host: start the round
  * POST   /api/v1/arcade/groups/:id/end              host: end the round / group
  * POST   /api/v1/arcade/groups/:id/leave            member: leave
@@ -59,6 +75,36 @@ export class ArcadeGroupController {
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   get(@CurrentUserId() userId: string, @Param('id') id: string) {
     return this.groups.get(userId, id);
+  }
+
+  // Host only (the service checks): other members get the same 403 as any host action.
+  @Get(':id/results')
+  @Header('Cache-Control', 'no-store')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  results(@CurrentUserId() userId: string, @Param('id') id: string) {
+    return this.groups.getResultSheet(userId, id);
+  }
+
+  @Get(':id/results.csv')
+  @Header('Cache-Control', 'no-store')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  async resultsCsv(@CurrentUserId() userId: string, @Param('id') id: string) {
+    const sheet = await this.groups.getResultSheet(userId, id);
+    return new StreamableFile(Buffer.from(toCsv(sheet), 'utf8'), {
+      type: 'text/csv; charset=utf-8',
+      disposition: `attachment; filename="${sheetFileStem(sheet)}.csv"`,
+    });
+  }
+
+  @Get(':id/results.pdf')
+  @Header('Cache-Control', 'no-store')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  async resultsPdf(@CurrentUserId() userId: string, @Param('id') id: string) {
+    const sheet = await this.groups.getResultSheet(userId, id);
+    return new StreamableFile(await renderResultPdf(sheet), {
+      type: 'application/pdf',
+      disposition: `attachment; filename="${sheetFileStem(sheet)}.pdf"`,
+    });
   }
 
   @Post(':id/start')

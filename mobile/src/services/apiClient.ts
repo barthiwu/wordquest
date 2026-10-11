@@ -134,7 +134,12 @@ async function refreshAccessToken(): Promise<RefreshOutcome> {
   }
 }
 
-export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+/**
+ * Sends one request, spending the refresh token once on a 401 and retrying
+ * with the new access token. Returns the final response, ok or not; callers
+ * decide how to read it.
+ */
+async function sendWithRefresh(path: string, options: RequestOptions): Promise<Response> {
   const { method = 'GET', body, accessToken, headers } = options;
 
   const doFetch = (token?: string) =>
@@ -168,23 +173,55 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       throw new ApiError('WordQuest is reconnecting. Please try again in a moment.', 503);
     }
   }
+  return response;
+}
+
+/** Throws the ApiError for a failed response, reporting it once. */
+async function throwForFailure(
+  response: Response,
+  path: string,
+  method: string,
+  payload: unknown,
+): Promise<never> {
+  const message = (payload as { message?: string } | undefined)?.message || response.statusText;
+  // Single choke point (Telemetry spec, generic error tracking) --
+  // every failed API call in the app funnels through here, so this is the
+  // one place API_ERROR needs to fire rather than instrumenting every
+  // services/*.ts caller individually. `response` is already the final
+  // (post-retry, if any) response, so a request that succeeded after a
+  // silent token refresh never reports an error at all.
+  trackEvent('API_ERROR', { path, method, status: response.status, message });
+  throw new ApiError(message, response.status, payload);
+}
+
+export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const response = await sendWithRefresh(path, options);
 
   const isJson = response.headers.get('content-type')?.includes('application/json');
   const payload = isJson ? await response.json() : undefined;
 
-  if (!response.ok) {
-    const message = (payload && (payload as { message?: string }).message) || response.statusText;
-    // Single choke point (Telemetry spec, generic error tracking) --
-    // every failed API call in the app funnels through this one throw
-    // site, so this is the one place API_ERROR needs to fire rather
-    // than instrumenting every services/*.ts caller individually. Not
-    // wrapped in the 401-refresh-retry branch above: by the time
-    // execution reaches here, `response` is already the final
-    // (post-retry, if any) response, so a request that succeeded after
-    // a silent token refresh never reports an error at all.
-    trackEvent('API_ERROR', { path, method, status: response.status, message });
-    throw new ApiError(message, response.status, payload);
-  }
+  if (!response.ok) await throwForFailure(response, path, options.method ?? 'GET', payload);
 
   return payload as T;
+}
+
+export interface ApiFile {
+  bytes: ArrayBuffer;
+  mimeType: string;
+}
+
+/**
+ * GETs a file (a CSV or PDF the backend generates) with the same sign-in and
+ * token-refresh handling as every other call. Failures throw the same ApiError.
+ */
+export async function apiRequestFile(path: string, accessToken: string): Promise<ApiFile> {
+  const response = await sendWithRefresh(path, { accessToken });
+  if (!response.ok) {
+    const isJson = response.headers.get('content-type')?.includes('application/json');
+    await throwForFailure(response, path, 'GET', isJson ? await response.json() : undefined);
+  }
+  return {
+    bytes: await response.arrayBuffer(),
+    mimeType: response.headers.get('content-type') ?? 'application/octet-stream',
+  };
 }

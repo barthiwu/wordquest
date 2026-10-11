@@ -65,6 +65,45 @@ export interface ArcadeGroup {
   wordBreakdown: GroupWordStat[] | null;
 }
 
+/** One word's answer in the host's result sheet. */
+export interface GroupResultCell {
+  /** Exactly what the player typed (Hangman: the letters guessed); null = never reached. */
+  typed: string | null;
+  /** null = not answered. */
+  isCorrect: boolean | null;
+  timedOut: boolean;
+  timeMs: number | null;
+}
+
+export interface GroupResultPlayer {
+  userId: string;
+  name: string;
+  isHost: boolean;
+  state: GroupMemberState;
+  rank: number | null;
+  correct: number;
+  answered: number;
+  /** The time the player actually used: the sum of their per-word times. */
+  totalTimeMs: number;
+  cells: GroupResultCell[];
+}
+
+/** The host's full result sheet (GET /arcade/groups/:id/results). */
+export interface GroupResultSheet {
+  groupId: string;
+  title: string | null;
+  game: GroupGame;
+  /** true once the round has ended. */
+  final: boolean;
+  /** WORD = the spelling typed; LETTERS = Hangman's guessed letters. */
+  typedKind: 'WORD' | 'LETTERS';
+  generatedAt: string;
+  activatedAt: string | null;
+  endedAt: string | null;
+  words: Array<{ index: number; word: string; definition: string }>;
+  players: GroupResultPlayer[];
+}
+
 export interface GroupPreview {
   code: string;
   game: GroupGame;
@@ -165,6 +204,11 @@ export function joinGroup(accessToken: string, code: string): Promise<ArcadeGrou
 
 export function getGroup(accessToken: string, groupId: string): Promise<ArcadeGroup> {
   return apiRequest<ArcadeGroup>(`/arcade/groups/${groupId}`, { accessToken });
+}
+
+/** Host only: every player's answers and times for the round. */
+export function getGroupResults(accessToken: string, groupId: string): Promise<GroupResultSheet> {
+  return apiRequest<GroupResultSheet>(`/arcade/groups/${groupId}/results`, { accessToken });
 }
 
 export function listMyGroups(accessToken: string): Promise<GroupSummary[]> {

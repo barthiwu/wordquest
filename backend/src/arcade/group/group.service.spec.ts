@@ -521,6 +521,116 @@ describe('ArcadeGroupService', () => {
     });
   });
 
+  describe('getResultSheet (host download)', () => {
+    const picked = (over: Record<string, unknown> = {}) =>
+      groupRow({
+        status: 'ENDED',
+        game: 'COMPLETE_IT',
+        wordIds: ['w1', 'w2'],
+        wordsPickedAt: new Date(),
+        activatedAt: new Date(),
+        endedAt: new Date(),
+        ...over,
+      });
+    const typedAnswer = (
+      wordIndex: number,
+      submittedAnswer: string,
+      isCorrect: boolean,
+      responseTimeMs = 5000,
+    ) => ({ wordIndex, submittedAnswer, isCorrect, timedOut: false, responseTimeMs });
+    const populate = () => {
+      prismaMock.arcadeGroupMember.findMany.mockResolvedValue([
+        member('host', 'mrs.okoro'),
+        member('amaka'),
+        {
+          ...member('guestie'),
+          user: { id: 'guestie', username: 'guest_x1', displayName: 'Tolu', isGuest: true },
+        },
+      ]);
+      prismaMock.arcadeGameSession.findMany.mockResolvedValue([
+        {
+          userId: 'amaka',
+          status: 'COMPLETED',
+          answers: [typedAnswer(0, 'recjet', false, 9000), typedAnswer(1, 'accept', true, 3000)],
+        },
+        { userId: 'guestie', status: 'ACTIVE', answers: [typedAnswer(0, 'reject', true, 4000)] },
+      ]);
+      prismaMock.word.findMany.mockResolvedValue([
+        { id: 'w1', word: 'reject', definition: 'to refuse' },
+        { id: 'w2', word: 'accept', definition: 'to agree' },
+      ]);
+    };
+
+    it('gives the host every player with what they typed, whether it was right, and total time', async () => {
+      asMember(picked());
+      populate();
+
+      const sheet = await service.getResultSheet('host', 'g1');
+
+      expect(sheet.final).toBe(true);
+      expect(sheet.words.map((w) => w.word)).toEqual(['reject', 'accept']);
+      const amaka = sheet.players.find((p) => p.name === 'amaka');
+      expect(amaka?.cells.map((c) => [c.typed, c.isCorrect])).toEqual([
+        ['recjet', false],
+        ['accept', true],
+      ]);
+      expect(amaka?.totalTimeMs).toBe(12_000);
+      expect(sheet.players.map((p) => [p.name, p.rank])).toEqual([
+        ['amaka', 1],
+        ['Tolu', 2],
+        ['mrs.okoro', null],
+      ]);
+    });
+
+    it('shows a guest under the name they chose, not their internal handle', async () => {
+      asMember(picked());
+      populate();
+      const sheet = await service.getResultSheet('host', 'g1');
+      expect(sheet.players.map((p) => p.name)).toContain('Tolu');
+      expect(sheet.players.map((p) => p.name)).not.toContain('guest_x1');
+    });
+
+    it('is available while the round runs, marked as not final', async () => {
+      asMember(picked({ status: 'ACTIVE', endedAt: null }));
+      populate();
+      expect((await service.getResultSheet('host', 'g1')).final).toBe(false);
+    });
+
+    it('refuses anyone but the host', async () => {
+      asMember(picked());
+      populate();
+      await expect(service.getResultSheet('amaka', 'g1')).rejects.toBeInstanceOf(
+        ForbiddenException,
+      );
+    });
+
+    it('hides the group from someone who is not in it', async () => {
+      prismaMock.arcadeGroup.findFirst.mockResolvedValueOnce(null);
+      await expect(service.getResultSheet('stranger', 'g1')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+    });
+
+    it('has no sheet before the round has been opened', async () => {
+      asMember(groupRow({ status: 'LOBBY' }));
+      await expect(service.getResultSheet('host', 'g1')).rejects.toBeInstanceOf(ConflictException);
+      asMember(groupRow({ status: 'ACTIVE', wordsPickedAt: null }));
+      await expect(service.getResultSheet('host', 'g1')).rejects.toBeInstanceOf(ConflictException);
+    });
+
+    it("leaves a removed member's leftover answers off the sheet", async () => {
+      asMember(picked());
+      prismaMock.arcadeGroupMember.findMany.mockResolvedValue([member('host'), member('amaka')]);
+      prismaMock.arcadeGameSession.findMany.mockResolvedValue([
+        { userId: 'amaka', status: 'COMPLETED', answers: [typedAnswer(0, 'reject', true)] },
+        { userId: 'gone', status: 'ABANDONED', answers: [typedAnswer(0, 'reject', true)] },
+      ]);
+      prismaMock.word.findMany.mockResolvedValue([]);
+      const sheet = await service.getResultSheet('host', 'g1');
+      expect(sheet.players.map((p) => p.userId).sort()).toEqual(['amaka', 'host']);
+    });
+  });
+
   describe('resolveStart (used by the games)', () => {
     const pick = jest.fn();
     beforeEach(() => pick.mockReset());

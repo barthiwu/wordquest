@@ -33,6 +33,7 @@ import { canCopyText, copyText, shareMessage } from '@/utils/shareLink';
 import { ShareResultCard } from '@/components/resultCard/ShareResultCard';
 import { buildGroupResultCard } from '@/components/resultCard/buildData';
 import { GroupMemberList } from './GroupMemberList';
+import { GroupResultSheetCard } from './GroupResultSheet';
 import { GuestJoinPanel } from './GuestJoinPanel';
 import { GuestUpgradeBanner } from './GuestUpgradeBanner';
 import { formatClock } from './groupFormat';
@@ -439,6 +440,10 @@ export function ArcadeGroupScreen({ navigation, route }: Props) {
           onRemove={group.isHost && group.status !== 'ENDED' ? onRemove : undefined}
           confirmingRemoveId={confirm?.startsWith('remove:') ? confirm.slice(7) : null}
         />
+
+        {group.isHost && accessToken && group.status !== 'LOBBY' && group.wordsTotal !== null ? (
+          <GroupResultSheetCard colors={colors} group={group} accessToken={accessToken} />
+        ) : null}
 
         {group.wordBreakdown ? (
           <>

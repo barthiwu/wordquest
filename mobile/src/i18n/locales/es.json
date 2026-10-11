@@ -1151,7 +1151,37 @@
       },
       "allowGuestsLabel": "Permitir unirse sin cuenta",
       "allowGuestsOn": "Cualquiera con el enlace puede unirse como invitado eligiendo un nombre.",
-      "allowGuestsOff": "Solo pueden unirse personas con cuenta de WordQuest (útil cuando necesitas saber quién es quién)."
+      "allowGuestsOff": "Solo pueden unirse personas con cuenta de WordQuest (útil cuando necesitas saber quién es quién).",
+      "sheet": {
+        "title": "Hoja de resultados completa",
+        "hintFinal": "Todo lo que escribió cada jugador y el tiempo que usó.",
+        "hintLive": "La ronda sigue en curso. Aquí ves los resultados hasta ahora.",
+        "show": "Ver todas las respuestas",
+        "hide": "Ocultar respuestas",
+        "download": {
+          "csv": "Descargar CSV",
+          "pdf": "Descargar PDF"
+        },
+        "downloadFailed": "No se pudo descargar el archivo. Inténtalo de nuevo.",
+        "loadFailed": "No se pudo cargar la hoja de resultados. Inténtalo de nuevo.",
+        "legend": "Verde = correcto, rojo = incorrecto.",
+        "legendLetters": "Verde = palabra resuelta, rojo = no resuelta.",
+        "host": "anfitrión",
+        "didNotStart": "No empezó",
+        "correctOf": "{{correct}} / {{total}} correctas",
+        "totalTime": "tiempo total {{time}}",
+        "word": "Palabra",
+        "typed": "Escrito",
+        "lettersGuessed": "Letras probadas",
+        "seconds": "s",
+        "noAnswer": "(sin respuesta)",
+        "verdict": {
+          "correct": "Correcta",
+          "wrong": "Incorrecta",
+          "timedOut": "Tiempo agotado",
+          "notAnswered": "Sin responder"
+        }
+      }
     },
     "share": {
       "dialogTitle": "Comparte tu resultado de WordQuest",
