@@ -1,4 +1,4 @@
-import { IsDateString, IsEmail, IsIn, IsOptional, IsString, Length } from 'class-validator';
+import { IsDateString, IsEmail, IsIn, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 import { IsStrongPassword } from './password.validator';
 
 export class RegisterDto {
@@ -9,11 +9,13 @@ export class RegisterDto {
   password!: string;
 
   @IsString()
+  @MaxLength(80)
   @Length(2, 40)
   displayName!: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(8)
   @Length(2, 2, { message: 'countryCode must be an ISO 3166-1 alpha-2 code, e.g. "NG"' })
   countryCode?: string;
 

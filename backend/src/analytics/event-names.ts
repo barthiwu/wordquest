@@ -106,3 +106,34 @@ const EVENT_NAME_SET: ReadonlySet<string> = new Set(ANALYTICS_EVENT_NAMES);
 export function isKnownAnalyticsEventName(name: string): name is AnalyticsEventName {
   return EVENT_NAME_SET.has(name);
 }
+
+/**
+ * Events only the SERVER may record (it fires them itself, from the code path
+ * that actually did the thing). A client batch carrying one of these is
+ * dropped: otherwise any logged-in player (or a free guest token) could forge
+ * quest completions, purchases or achievements in the data the admin
+ * dashboard reports from.
+ */
+export const SERVER_ONLY_EVENT_NAMES: ReadonlySet<string> = new Set([
+  'account_created',
+  'quest_completed',
+  'boss_battle_joined',
+  'shop_purchase',
+  'XP_AWARDED',
+  'LEVEL_UP',
+  'JOURNEY_ADVANCED',
+  'ACHIEVEMENT_UNLOCKED',
+  'QUEST_CARD_EARNED',
+  'STREAK_MILESTONE',
+  'STREAK_BROKEN',
+  'MASTERY_ACHIEVED',
+  'DUEL_STARTED',
+  'DUEL_COMPLETED',
+]);
+
+export function isClientAllowedEventName(name: string): boolean {
+  return isKnownAnalyticsEventName(name) && !SERVER_ONLY_EVENT_NAMES.has(name);
+}
+
+/** Largest serialized `properties` blob accepted from a client event. */
+export const MAX_CLIENT_PROPERTIES_BYTES = 2048;

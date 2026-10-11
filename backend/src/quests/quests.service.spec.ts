@@ -679,9 +679,10 @@ describe('QuestsService', () => {
 
     describe('checkHistoryAnswer', () => {
       it('reports a correct answer and never touches Mastery/XP/global exposure', async () => {
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce({ id: 'a1' });
         prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
 
-        const result = await service.checkHistoryAnswer('u1', 'w1', 'Greeting');
+        const result = await service.checkHistoryAnswer('u1', 'w1', 'Greeting', '2026-09-24');
 
         expect(result).toEqual({ correct: true, correctWord: 'greeting' });
         expect(masteryMock.recordAnswer).not.toHaveBeenCalled();
@@ -690,11 +691,25 @@ describe('QuestsService', () => {
       });
 
       it('reports an incorrect answer', async () => {
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce({ id: 'a1' });
         prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);
 
-        const result = await service.checkHistoryAnswer('u1', 'w1', 'nope');
+        const result = await service.checkHistoryAnswer('u1', 'w1', 'nope', '2026-09-24');
 
         expect(result).toEqual({ correct: false, correctWord: 'greeting' });
+      });
+
+      it('refuses a word the player was not shown on a finished day (no answer oracle)', async () => {
+        prismaMock.questAttempt.findFirst.mockResolvedValueOnce(null);
+
+        await expect(service.checkHistoryAnswer('u1', 'w1', 'greeting', '2026-09-24')).rejects.toThrow(
+          NotFoundException,
+        );
+        expect(prismaMock.word.findUniqueOrThrow).not.toHaveBeenCalled();
+        expect(prismaMock.questAttempt.findFirst).toHaveBeenCalledWith({
+          where: { userId: 'u1', wordIds: { has: 'w1' }, localDate: { lt: '2026-09-24' } },
+          select: { id: true },
+        });
       });
     });
   });
@@ -2333,10 +2348,11 @@ describe('QuestsService', () => {
     });
 
     it('accepts the US spelling as correct in the catch-up replay for a US-preference player', async () => {
+      prismaMock.questAttempt.findFirst.mockResolvedValueOnce({ id: 'a1' });
       prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(colourWord);
       prismaMock.user.findUnique.mockResolvedValueOnce({ englishVariant: 'US' });
 
-      const result = await service.checkHistoryAnswer('u1', 'w-colour', 'color');
+      const result = await service.checkHistoryAnswer('u1', 'w-colour', 'color', '2026-09-24');
 
       expect(result).toEqual({ correct: true, correctWord: 'Color' });
     });

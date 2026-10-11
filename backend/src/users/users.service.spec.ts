@@ -151,6 +151,61 @@ describe('UsersService', () => {
       ).rejects.toBeInstanceOf(ConflictException);
     });
 
+    describe('timezone change cooldown', () => {
+      const day = 24 * 60 * 60 * 1000;
+      beforeEach(() => prismaMock.user.update.mockResolvedValue({ id: 'u1' }));
+
+      it('lets a player set their timezone the first time, without stamping a change', async () => {
+        prismaMock.user.findUnique.mockResolvedValueOnce({ timezone: null, timezoneChangedAt: null });
+        await service.updateProfile('u1', { timezone: 'Africa/Lagos' });
+        expect(prismaMock.user.update).toHaveBeenCalledWith({
+          where: { id: 'u1' },
+          data: { timezone: 'Africa/Lagos' },
+        });
+      });
+
+      it('allows a first real change and stamps timezoneChangedAt', async () => {
+        prismaMock.user.findUnique.mockResolvedValueOnce({ timezone: 'Africa/Lagos', timezoneChangedAt: null });
+        await service.updateProfile('u1', { timezone: 'Europe/London' });
+        expect(prismaMock.user.update).toHaveBeenCalledWith({
+          where: { id: 'u1' },
+          data: { timezone: 'Europe/London', timezoneChangedAt: expect.any(Date) },
+        });
+      });
+
+      it('refuses a second change inside the cooldown window', async () => {
+        prismaMock.user.findUnique.mockResolvedValueOnce({
+          timezone: 'Europe/London',
+          timezoneChangedAt: new Date(Date.now() - 2 * day),
+        });
+        await expect(service.updateProfile('u1', { timezone: 'Asia/Tokyo' })).rejects.toBeInstanceOf(
+          BadRequestException,
+        );
+        expect(prismaMock.user.update).not.toHaveBeenCalled();
+      });
+
+      it('allows another change once the cooldown has passed', async () => {
+        prismaMock.user.findUnique.mockResolvedValueOnce({
+          timezone: 'Europe/London',
+          timezoneChangedAt: new Date(Date.now() - 8 * day),
+        });
+        await service.updateProfile('u1', { timezone: 'Asia/Tokyo' });
+        expect(prismaMock.user.update).toHaveBeenCalled();
+      });
+
+      it('re-sending the same timezone is always fine', async () => {
+        prismaMock.user.findUnique.mockResolvedValueOnce({
+          timezone: 'Europe/London',
+          timezoneChangedAt: new Date(),
+        });
+        await service.updateProfile('u1', { timezone: 'Europe/London' });
+        expect(prismaMock.user.update).toHaveBeenCalledWith({
+          where: { id: 'u1' },
+          data: { timezone: 'Europe/London' },
+        });
+      });
+    });
+
     it('updates displayName independently of username', async () => {
       prismaMock.user.update.mockResolvedValueOnce({ id: 'u1', displayName: 'Grace H.' });
 

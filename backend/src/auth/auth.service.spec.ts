@@ -31,6 +31,8 @@ describe('AuthService', () => {
     findByEmail: jest.fn().mockResolvedValue(fakeUser),
     verifyPassword: jest.fn().mockResolvedValue(true),
     hashPassword: jest.fn().mockResolvedValue('new-hashed-password'),
+    burnPasswordCheck: jest.fn().mockResolvedValue(undefined),
+    findById: jest.fn(),
     // toPublicUser resolves avatarUrl through this -- null matches
     // fakeUser having no avatarKey, same as any real avatar-less player.
     resolveAvatarUrl: jest.fn().mockResolvedValue(null),
@@ -41,12 +43,14 @@ describe('AuthService', () => {
       create: jest.fn().mockResolvedValue({}),
       findUnique: jest.fn(),
       update: jest.fn(),
-      updateMany: jest.fn(),
+      updateMany: jest.fn().mockResolvedValue({ count: 1 }),
       deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
     },
     user: {
       findUniqueOrThrow: jest.fn().mockResolvedValue(fakeUser),
-      findUnique: jest.fn().mockResolvedValue({ isGuest: false }),
+      findUnique: jest
+        .fn()
+        .mockResolvedValue({ isGuest: false, status: 'ACTIVE', emailVerifiedAt: new Date() }),
       update: jest.fn().mockResolvedValue({}),
     },
     emailVerificationToken: {
@@ -384,8 +388,8 @@ describe('AuthService', () => {
 
     const result = await service.refresh('valid.jwt.token');
 
-    expect(prismaMock.refreshToken.update).toHaveBeenCalledWith({
-      where: { id: 'rt-1' },
+    expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith({
+      where: { id: 'rt-1', revokedAt: null },
       data: { revokedAt: expect.any(Date) },
     });
     expect(result.accessToken).toBe('signed.jwt.token');
@@ -427,8 +431,8 @@ describe('AuthService', () => {
       const result = await service.refresh('valid.recent.session.token');
 
       expect(result.accessToken).toBe('signed.jwt.token');
-      expect(prismaMock.refreshToken.update).toHaveBeenCalledWith({
-        where: { id: 'rt-1' },
+      expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith({
+        where: { id: 'rt-1', revokedAt: null },
         data: { revokedAt: expect.any(Date) },
       });
     });
@@ -650,12 +654,13 @@ describe('AuthService', () => {
         usedAt: null,
         expiresAt: new Date(Date.now() + 60_000),
       });
+      prismaMock.passwordResetToken.updateMany.mockResolvedValueOnce({ count: 1 });
 
       await service.resetPassword('good-token', 'NewPass123');
 
       expect(usersMock.hashPassword).toHaveBeenCalledWith('NewPass123');
-      expect(prismaMock.passwordResetToken.update).toHaveBeenCalledWith({
-        where: { id: 'prt-1' },
+      expect(prismaMock.passwordResetToken.updateMany).toHaveBeenCalledWith({
+        where: { id: 'prt-1', usedAt: null },
         data: { usedAt: expect.any(Date) },
       });
       expect(prismaMock.user.update).toHaveBeenCalledWith({
@@ -710,7 +715,7 @@ describe('AuthService', () => {
 
       expect(prismaMock.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
-        data: { status: 'ACTIVE', deletedAt: null },
+        data: { status: 'ACTIVE', deletedAt: null, failedLoginAttempts: 0, lockedUntil: null },
       });
       expect(result.accessToken).toBe('signed.jwt.token');
     });
@@ -826,7 +831,7 @@ describe('AuthService', () => {
         expiresAt: new Date(Date.now() + 60_000),
         sessionStartedAt: new Date(),
       });
-      prismaMock.user.findUnique.mockResolvedValueOnce({ isGuest: true });
+      prismaMock.user.findUnique.mockResolvedValueOnce({ isGuest: true, status: 'ACTIVE' });
       await service.refresh('guest.refresh.token');
       expect(jwtMock.signAsync).toHaveBeenNthCalledWith(
         1,
@@ -876,6 +881,150 @@ describe('AuthService', () => {
         service.upgradeGuest('guest-1', { ...(upgradeDto as object), dateOfBirth: `${thisYear - 8}-01-01` } as never),
       ).rejects.toThrow();
       expect(prismaMock.user.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('security hardening', () => {
+    it('reserves the login attempt BEFORE checking the password, so a parallel burst past the budget never reaches bcrypt', async () => {
+      prismaMock.user.update.mockResolvedValueOnce({ failedLoginAttempts: 6 });
+      await expect(
+        service.login({ email: 'ada@example.com', password: 'guess' }),
+      ).rejects.toThrow('Invalid email or password');
+      expect(usersMock.verifyPassword).not.toHaveBeenCalled();
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: { lockedUntil: expect.any(Date) },
+      });
+    });
+
+    it('starts a fresh attempt budget once a lock has expired', async () => {
+      usersMock.findByEmail.mockResolvedValueOnce({
+        ...fakeUser,
+        failedLoginAttempts: 5,
+        lockedUntil: new Date(Date.now() - 1000),
+      });
+      await service.login({ email: 'ada@example.com', password: 'Sup3rSecret' });
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: { failedLoginAttempts: 0, lockedUntil: null },
+      });
+    });
+
+    it('spends a dummy bcrypt check for an unknown email (no timing oracle)', async () => {
+      usersMock.findByEmail.mockResolvedValueOnce(null);
+      await expect(
+        service.login({ email: 'nobody@example.com', password: 'whatever1' }),
+      ).rejects.toThrow('Invalid email or password');
+      expect(usersMock.burnPasswordCheck).toHaveBeenCalledWith('whatever1');
+    });
+
+    it('refresh() refuses (and revokes) a suspended account instead of minting new tokens', async () => {
+      jwtMock.verifyAsync.mockResolvedValueOnce({ sub: 'user-1', jti: 'abc' });
+      prismaMock.refreshToken.findUnique.mockResolvedValueOnce({
+        id: 'rt-1',
+        userId: 'user-1',
+        revokedAt: null,
+        expiresAt: new Date(Date.now() + 60_000),
+        sessionStartedAt: new Date(),
+      });
+      prismaMock.user.findUnique.mockResolvedValueOnce({ isGuest: false, status: 'SUSPENDED' });
+      await expect(service.refresh('t')).rejects.toThrow(UnauthorizedException);
+      expect(jwtMock.signAsync).not.toHaveBeenCalled();
+      expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith({
+        where: { userId: 'user-1', revokedAt: null },
+        data: { revokedAt: expect.any(Date) },
+      });
+    });
+
+    it('refresh() treats losing the rotation race as token reuse and issues nothing', async () => {
+      jwtMock.verifyAsync.mockResolvedValueOnce({ sub: 'user-1', jti: 'abc' });
+      prismaMock.refreshToken.findUnique.mockResolvedValueOnce({
+        id: 'rt-1',
+        userId: 'user-1',
+        revokedAt: null,
+        expiresAt: new Date(Date.now() + 60_000),
+        sessionStartedAt: new Date(),
+      });
+      prismaMock.refreshToken.updateMany.mockResolvedValueOnce({ count: 0 });
+      await expect(service.refresh('t')).rejects.toThrow('reuse');
+      expect(jwtMock.signAsync).not.toHaveBeenCalled();
+    });
+
+    it('resetPassword() on a never-verified email verifies it and wipes any squatter 2FA', async () => {
+      prismaMock.passwordResetToken.findUnique.mockResolvedValueOnce({
+        id: 'prt-1',
+        userId: 'user-1',
+        usedAt: null,
+        expiresAt: new Date(Date.now() + 60_000),
+      });
+      prismaMock.passwordResetToken.updateMany.mockResolvedValueOnce({ count: 1 });
+      prismaMock.user.findUnique.mockResolvedValueOnce({ emailVerifiedAt: null });
+      (prismaMock as any).twoFactorRecoveryCode = { deleteMany: jest.fn().mockResolvedValue({ count: 0 }) };
+
+      await service.resetPassword('tok', 'NewPass123');
+
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: expect.objectContaining({
+          passwordHash: 'new-hashed-password',
+          emailVerifiedAt: expect.any(Date),
+          twoFactorSecretEnc: null,
+          twoFactorEnabledAt: null,
+        }),
+      });
+      expect((prismaMock as any).twoFactorRecoveryCode.deleteMany).toHaveBeenCalledWith({
+        where: { userId: 'user-1' },
+      });
+    });
+
+    it('resetPassword() refuses a link that a parallel request already consumed', async () => {
+      prismaMock.passwordResetToken.findUnique.mockResolvedValueOnce({
+        id: 'prt-1',
+        userId: 'user-1',
+        usedAt: null,
+        expiresAt: new Date(Date.now() + 60_000),
+      });
+      prismaMock.passwordResetToken.updateMany.mockResolvedValueOnce({ count: 0 });
+      await expect(service.resetPassword('tok', 'NewPass123')).rejects.toThrow(UnauthorizedException);
+      expect(prismaMock.user.update).not.toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ passwordHash: expect.anything() }) }),
+      );
+    });
+
+    describe('beginTwoFactorSetup', () => {
+      const twoFactorMock = { beginSetup: jest.fn() };
+      beforeEach(() => {
+        // The service is built with a TwoFactorService stub elsewhere; reach it via the instance.
+        (service as any).twoFactor = twoFactorMock;
+        twoFactorMock.beginSetup.mockResolvedValue({ secret: 's', otpauthUrl: 'u' });
+        prismaMock.user.update.mockResolvedValue({ failedLoginAttempts: 1 });
+      });
+
+      it('requires a verified email', async () => {
+        usersMock.findById.mockResolvedValue({ ...fakeUser, status: 'ACTIVE', emailVerifiedAt: null });
+        await expect(service.beginTwoFactorSetup('user-1', 'Sup3rSecret')).rejects.toThrow('Verify your email');
+        expect(twoFactorMock.beginSetup).not.toHaveBeenCalled();
+      });
+
+      it('rejects a wrong password and counts it toward the lockout', async () => {
+        usersMock.findById.mockResolvedValue({ ...fakeUser, status: 'ACTIVE', emailVerifiedAt: new Date() });
+        usersMock.verifyPassword.mockResolvedValueOnce(false);
+        await expect(service.beginTwoFactorSetup('user-1', 'nope')).rejects.toThrow(UnauthorizedException);
+        expect(prismaMock.user.update).toHaveBeenCalledWith({
+          where: { id: 'user-1' },
+          data: { failedLoginAttempts: { increment: 1 } },
+          select: { failedLoginAttempts: true },
+        });
+        expect(twoFactorMock.beginSetup).not.toHaveBeenCalled();
+      });
+
+      it('starts enrolment when the password is right', async () => {
+        usersMock.findById.mockResolvedValue({ ...fakeUser, status: 'ACTIVE', emailVerifiedAt: new Date() });
+        await expect(service.beginTwoFactorSetup('user-1', 'Sup3rSecret')).resolves.toEqual({
+          secret: 's',
+          otpauthUrl: 'u',
+        });
+      });
     });
   });
 });

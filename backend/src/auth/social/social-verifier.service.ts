@@ -127,8 +127,12 @@ export class SocialVerifierService {
       provider: 'FACEBOOK',
       subject: me.id,
       email: me.email ? me.email.toLowerCase() : null,
-      // Graph only returns an email the person has confirmed with Facebook.
-      emailVerified: !!me.email,
+      // NOT treated as verified: Facebook has historically let accounts carry
+      // an email they never confirmed, and "verified" is what allows linking
+      // to an EXISTING WordQuest account. Unverified here means a Facebook
+      // sign-in can create a new account (with a verification email) but can
+      // never take over an existing one.
+      emailVerified: false,
       name: me.name ?? null,
     };
   }

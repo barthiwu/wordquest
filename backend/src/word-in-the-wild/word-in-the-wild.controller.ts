@@ -33,6 +33,7 @@ export class WordInTheWildController {
   }
 
   @Post('missions/:missionId/photo-upload-url')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   createPhotoUploadTarget(
     @CurrentUserId() userId: string,
     @Param('missionId') missionId: string,

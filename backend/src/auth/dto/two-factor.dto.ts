@@ -13,3 +13,11 @@ export class TwoFactorLoginDto extends TwoFactorCodeDto {
   @MaxLength(2048)
   challengeToken!: string;
 }
+
+/** Starting 2FA enrolment re-proves the account password, so a stolen session alone can't lock the owner out. */
+export class TwoFactorSetupDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(128)
+  password!: string;
+}

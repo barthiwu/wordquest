@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserId } from '../auth/decorators/current-user.decorator';
 import { WordsService } from './words.service';
+import { currentQuestWordIds } from '../common/active-quest-words';
 
 /**
  * Spec v2 §19: GET /api/v1/words/:id — a word looked up on its own,
@@ -61,9 +62,12 @@ export class WordsController {
   ) {
     const take = Math.min(Math.max(Number(limit) || 20, 1), 50);
 
+    // The word of a quest question that is still open is never searchable.
+    const hidden = await currentQuestWordIds(this.prisma, userId);
     const words = await this.prisma.word.findMany({
       where: {
         isActive: true,
+        ...(hidden.length > 0 ? { id: { notIn: hidden } } : {}),
         ...(query.trim() ? { word: { contains: query.trim(), mode: 'insensitive' } } : {}),
         challengeAttempts: { some: { userId, challengeType: 'LETTER_OMISSION' } },
       },
@@ -76,9 +80,11 @@ export class WordsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@CurrentUserId() userId: string, @Param('id') id: string) {
     const word = await this.prisma.word.findUnique({ where: { id } });
-    if (!word || !word.isActive) {
+    // Same 404 for "no such word" and "the word you are being asked right
+    // now": looking up an open quest question's word would hand over its answer.
+    if (!word || !word.isActive || (await currentQuestWordIds(this.prisma, userId)).includes(id)) {
       throw new NotFoundException('Word not found');
     }
 

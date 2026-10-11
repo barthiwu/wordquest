@@ -8,8 +8,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
-  ValidateNested,
-} from 'class-validator';
+  ValidateNested, MaxLength } from 'class-validator';
 import { ANALYTICS_EVENT_NAMES } from '../event-names';
 
 /**
@@ -35,6 +34,7 @@ export class AnalyticsEventDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(100)
   screen?: string;
 
   @IsDateString()
@@ -58,6 +58,7 @@ export class SubmitAnalyticsEventsDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(32)
   appVersion?: string;
 
   @ValidateNested({ each: true })

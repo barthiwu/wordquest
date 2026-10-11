@@ -47,7 +47,8 @@ export class PracticeController {
   }
 
   @Post('words/:wordId/sentence')
-  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  // Each call is a paid AI evaluation, so this is tighter than the answer routes.
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   submitSentence(
     @CurrentUserId() userId: string,
     @Param('wordId') wordId: string,
@@ -57,7 +58,8 @@ export class PracticeController {
   }
 
   @Post('words/:wordId/paragraph')
-  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  // Each call is a paid AI evaluation, so this is tighter than the answer routes.
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   submitParagraph(
     @CurrentUserId() userId: string,
     @Param('wordId') wordId: string,

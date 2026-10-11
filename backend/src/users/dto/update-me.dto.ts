@@ -6,8 +6,7 @@ import {
   IsString,
   IsUUID,
   Length,
-  Matches,
-} from 'class-validator';
+  Matches, MaxLength } from 'class-validator';
 import { USERNAME_REGEX } from '../users.service';
 
 export enum LearningGoalDto {
@@ -26,6 +25,7 @@ export enum LearningGoalDto {
 export class UpdateMeDto {
   @IsOptional()
   @IsString()
+  @MaxLength(80)
   @Length(2, 40)
   displayName?: string;
 
@@ -39,22 +39,26 @@ export class UpdateMeDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(8)
   @Length(2, 2)
   countryCode?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(16)
   @Length(2, 10)
   nativeLanguage?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(16)
   @Length(2, 10)
   targetLanguage?: string;
 
   /** IANA timezone name, e.g. "Africa/Lagos" — collected once during onboarding (Player Timezone System §15); validated server-side via Intl, not just format-checked here. */
   @IsOptional()
   @IsString()
+  @MaxLength(64)
   @Length(1, 64)
   timezone?: string;
 

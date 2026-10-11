@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -112,6 +113,13 @@ export class AuthService {
   async login(dto: LoginDto, meta: RequestMeta = {}): Promise<LoginResult> {
     const user = await this.users.findByEmail(dto.email);
 
+    if (!user) {
+      // Burn the same bcrypt cost a real account would, so response time
+      // doesn't tell an attacker which emails are registered.
+      await this.users.burnPasswordCheck(dto.password);
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
     // Locked accounts fail the SAME generic message as a wrong
     // password, below — checked before verifyPassword (which is
     // itself the expensive bcrypt.compare step) so a lockout also
@@ -119,15 +127,26 @@ export class AuthService {
     // from "wrong password" to preserve the existing enumeration
     // resistance (a distinct "account locked" message would confirm
     // the email is registered).
-    const isLocked = !!user?.lockedUntil && user.lockedUntil > new Date();
-    const passwordValid =
-      user && !isLocked ? await this.users.verifyPassword(dto.password, user.passwordHash) : false;
+    let isLocked = !!user.lockedUntil && user.lockedUntil > new Date();
 
-    if (!user || !passwordValid || user.status === 'DELETED') {
-      if (user) {
-        this.logSecurityEvent(user.id, isLocked ? 'LOGIN_BLOCKED_LOCKED' : 'LOGIN_FAILED', meta);
-        if (!isLocked) await this.registerFailedLogin(user.id);
-      }
+    // The attempt is RESERVED (atomically counted) BEFORE the password is
+    // checked. Counting only after a failure let a burst of parallel
+    // requests all pass the lock check and all get a free guess; with the
+    // reservation, at most `maxFailedLoginAttempts` of any burst ever reach
+    // bcrypt and the rest are refused as locked.
+    let reserved = 0;
+    if (!isLocked) {
+      reserved = await this.reserveLoginAttempt(user);
+      if (reserved > gameplayRules.auth.maxFailedLoginAttempts) isLocked = true;
+    }
+
+    const passwordValid = !isLocked
+      ? await this.users.verifyPassword(dto.password, user.passwordHash)
+      : false;
+
+    if (!passwordValid || user.status === 'DELETED') {
+      this.logSecurityEvent(user.id, isLocked ? 'LOGIN_BLOCKED_LOCKED' : 'LOGIN_FAILED', meta);
+      if (reserved >= gameplayRules.auth.maxFailedLoginAttempts) await this.lockAccount(user.id);
       throw new UnauthorizedException('Invalid email or password');
     }
 
@@ -136,7 +155,7 @@ export class AuthService {
       throw new UnauthorizedException('This account has been suspended.');
     }
 
-    return this.finishLogin(user, meta);
+    return this.finishLogin(user, meta, reserved > 0);
   }
 
   /**
@@ -147,12 +166,16 @@ export class AuthService {
   private async finishLogin(
     user: Awaited<ReturnType<UsersService['findById']>> & object,
     meta: RequestMeta,
+    attemptReserved = false,
   ): Promise<LoginResult> {
     // With two-step on, the failure counter is only cleared once the CODE
     // succeeds (completeTwoFactorLogin). Clearing it here, after the password
     // alone, let someone with a stolen password try 4 codes, log in again,
     // and repeat without ever reaching the lockout.
-    if (!user.twoFactorEnabledAt && (user.failedLoginAttempts > 0 || user.lockedUntil)) {
+    if (
+      !user.twoFactorEnabledAt &&
+      (attemptReserved || user.failedLoginAttempts > 0 || user.lockedUntil)
+    ) {
       await this.prisma.user.update({
         where: { id: user.id },
         data: { failedLoginAttempts: 0, lockedUntil: null },
@@ -201,21 +224,62 @@ export class AuthService {
       throw new UnauthorizedException('Invalid code');
     }
 
+    // Reserve the attempt first (see login()) so parallel code guesses can't
+    // all slip past the lock check.
+    const reserved = await this.reserveLoginAttempt(user);
+    const { maxFailedLoginAttempts } = gameplayRules.auth;
+    if (reserved > maxFailedLoginAttempts) {
+      await this.lockAccount(user.id);
+      this.logSecurityEvent(user.id, 'LOGIN_BLOCKED_LOCKED', meta);
+      throw new UnauthorizedException('Invalid code');
+    }
     if (!(await this.twoFactor.checkCode(user.id, code))) {
       this.logSecurityEvent(user.id, 'TWO_FACTOR_FAILED', meta);
-      await this.registerFailedLogin(user.id);
+      if (reserved >= maxFailedLoginAttempts) await this.lockAccount(user.id);
       throw new UnauthorizedException('Invalid code');
     }
 
-    if (user.failedLoginAttempts > 0 || user.lockedUntil) {
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: { failedLoginAttempts: 0, lockedUntil: null },
-      });
-    }
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { failedLoginAttempts: 0, lockedUntil: null },
+    });
     const tokens = await this.issueTokens(user.id);
     this.logSecurityEvent(user.id, 'LOGIN_SUCCESS', meta);
     return { ...tokens, user: await this.toPublicUser(user) };
+  }
+
+  /**
+   * Step one of 2FA enrolment. A bearer token alone isn't enough: the current
+   * password must be re-proven (and failures count toward the login lockout),
+   * and the email must be verified — otherwise a briefly stolen session could
+   * attach the thief's authenticator and lock the real owner out. Accounts
+   * that only ever used social sign-in set a password through "Forgot
+   * password" first.
+   */
+  async beginTwoFactorSetup(userId: string, password: string) {
+    const user = await this.users.findById(userId);
+    if (!user || user.status !== 'ACTIVE') throw new UnauthorizedException('Invalid session');
+    if (!user.emailVerifiedAt) {
+      throw new ForbiddenException('Verify your email address before turning on two-step verification.');
+    }
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      throw new UnauthorizedException('That password is not correct.');
+    }
+    const { maxFailedLoginAttempts } = gameplayRules.auth;
+    const reserved = await this.reserveLoginAttempt(user);
+    const valid =
+      reserved <= maxFailedLoginAttempts &&
+      (await this.users.verifyPassword(password, user.passwordHash));
+    if (!valid) {
+      this.logSecurityEvent(user.id, 'LOGIN_FAILED');
+      if (reserved >= maxFailedLoginAttempts) await this.lockAccount(user.id);
+      throw new UnauthorizedException('That password is not correct.');
+    }
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { failedLoginAttempts: 0, lockedUntil: null },
+    });
+    return this.twoFactor.beginSetup(userId);
   }
 
   /** Which social providers this deployment has configured (the app hides the rest). */
@@ -375,20 +439,33 @@ export class AuthService {
     return dateOfBirth;
   }
 
-  /** Account lockout (Sprint 5 "Authentication hardening") — see User.failedLoginAttempts/lockedUntil and gameplayRules.auth. */
-  private async registerFailedLogin(userId: string): Promise<void> {
-    const { maxFailedLoginAttempts, lockoutDurationMinutes } = gameplayRules.auth;
+  /**
+   * Account lockout (Sprint 5 "Authentication hardening") — see User.failedLoginAttempts/lockedUntil and gameplayRules.auth.
+   * Counts one attempt atomically and returns the new count. A lock that has
+   * already run out starts a fresh budget instead of re-locking on the very
+   * next failure.
+   */
+  private async reserveLoginAttempt(user: { id: string; lockedUntil: Date | null }): Promise<number> {
+    if (user.lockedUntil && user.lockedUntil <= new Date()) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { failedLoginAttempts: 0, lockedUntil: null },
+      });
+    }
     const updated = await this.prisma.user.update({
-      where: { id: userId },
+      where: { id: user.id },
       data: { failedLoginAttempts: { increment: 1 } },
       select: { failedLoginAttempts: true },
     });
-    if (updated.failedLoginAttempts >= maxFailedLoginAttempts) {
-      await this.prisma.user.update({
-        where: { id: userId },
-        data: { lockedUntil: new Date(Date.now() + lockoutDurationMinutes * 60_000) },
-      });
-    }
+    return updated.failedLoginAttempts;
+  }
+
+  private async lockAccount(userId: string): Promise<void> {
+    const { lockoutDurationMinutes } = gameplayRules.auth;
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { lockedUntil: new Date(Date.now() + lockoutDurationMinutes * 60_000) },
+    });
   }
 
   async refresh(rawRefreshToken: string): Promise<AuthTokens> {
@@ -444,17 +521,39 @@ export class AuthService {
       throw new UnauthorizedException('Session has expired. Please log in again.');
     }
 
-    // Rotate: the presented token is single-use.
-    await this.prisma.refreshToken.update({
-      where: { id: stored.id },
-      data: { revokedAt: new Date() },
-    });
-
+    // A suspended or deleted account must not keep minting sessions just
+    // because it still holds an old refresh token.
     const owner = await this.prisma.user.findUnique({
       where: { id: payload.sub },
-      select: { isGuest: true },
+      select: { isGuest: true, status: true },
     });
-    return this.issueTokens(payload.sub, stored.sessionStartedAt, owner?.isGuest === true);
+    if (!owner || owner.status !== 'ACTIVE') {
+      await this.prisma.refreshToken.updateMany({
+        where: { userId: stored.userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    // Rotate: the presented token is single-use. Claimed with a conditional
+    // update so two parallel refreshes with the same token can't both mint
+    // a new pair — the loser is treated exactly like a reuse of a spent token.
+    const rotated = await this.prisma.refreshToken.updateMany({
+      where: { id: stored.id, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    if (rotated.count !== 1) {
+      await this.prisma.refreshToken.updateMany({
+        where: { userId: stored.userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+      this.logSecurityEvent(stored.userId, 'REFRESH_TOKEN_REUSE_DETECTED');
+      throw new UnauthorizedException(
+        'Refresh token reuse detected — all sessions have been revoked. Please log in again.',
+      );
+    }
+
+    return this.issueTokens(payload.sub, stored.sessionStartedAt, owner.isGuest === true);
   }
 
   async logout(rawRefreshToken: string): Promise<void> {
@@ -545,12 +644,34 @@ export class AuthService {
 
     const passwordHash = await this.users.hashPassword(newPassword);
 
+    const owner = await this.prisma.user.findUnique({
+      where: { id: stored.userId },
+      select: { emailVerifiedAt: true },
+    });
+
     await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      await tx.passwordResetToken.update({
-        where: { id: stored.id },
+      // Single-use, atomically: two parallel requests with the same link
+      // can't both pass (the loser sees count 0).
+      const claimed = await tx.passwordResetToken.updateMany({
+        where: { id: stored.id, usedAt: null },
         data: { usedAt: new Date() },
       });
-      await tx.user.update({ where: { id: stored.userId }, data: { passwordHash } });
+      if (claimed.count !== 1) throw new UnauthorizedException('Invalid or expired reset link');
+
+      // Proving control of the mailbox is what the reset link does. If the
+      // address had never been verified, whoever registered it first (a
+      // squatter) may also have attached their own two-step device — so the
+      // rightful owner taking the account back must also wipe that, and the
+      // address is now verified by this very act.
+      const userData: Prisma.UserUpdateInput = { passwordHash };
+      if (!owner?.emailVerifiedAt) {
+        userData.emailVerifiedAt = new Date();
+        userData.twoFactorSecretEnc = null;
+        userData.twoFactorEnabledAt = null;
+        userData.twoFactorLastStep = null;
+        await tx.twoFactorRecoveryCode.deleteMany({ where: { userId: stored.userId } });
+      }
+      await tx.user.update({ where: { id: stored.userId }, data: userData });
       // Standard security practice: a password reset invalidates every
       // existing session, not just the device that requested it — if
       // the reset was prompted by a compromised password, a still-live
@@ -689,15 +810,31 @@ export class AuthService {
 
   /** Account recovery: the same credentials that worked before deletion restore access — this is not a password-reset-strength flow, since it requires knowing the password, not just the email. */
   async recoverAccount(dto: RecoverAccountDto): Promise<AuthResult> {
+    const ineligible = () =>
+      new UnauthorizedException('Invalid email or password, or this account is not eligible for recovery.');
     const user = await this.users.findByEmail(dto.email);
-    const passwordValid = user
-      ? await this.users.verifyPassword(dto.password, user.passwordHash)
-      : false;
+    if (!user) {
+      await this.users.burnPasswordCheck(dto.password);
+      throw ineligible();
+    }
 
-    if (!user || !passwordValid || user.status !== 'DELETED') {
-      throw new UnauthorizedException(
-        'Invalid email or password, or this account is not eligible for recovery.',
-      );
+    // Recovery is a password oracle for deleted accounts, so it shares the
+    // login lockout budget (only for DELETED accounts — counting against live
+    // ones would let anyone lock a stranger out through this endpoint).
+    let reserved = 0;
+    if (user.status === 'DELETED') {
+      if (user.lockedUntil && user.lockedUntil > new Date()) throw ineligible();
+      reserved = await this.reserveLoginAttempt(user);
+      if (reserved > gameplayRules.auth.maxFailedLoginAttempts) {
+        await this.lockAccount(user.id);
+        throw ineligible();
+      }
+    }
+    const passwordValid = await this.users.verifyPassword(dto.password, user.passwordHash);
+
+    if (!passwordValid || user.status !== 'DELETED') {
+      if (reserved >= gameplayRules.auth.maxFailedLoginAttempts) await this.lockAccount(user.id);
+      throw ineligible();
     }
 
     // A recovered account with 2FA on must prove the second factor too —
@@ -708,15 +845,14 @@ export class AuthService {
         : false;
       if (!ok) {
         this.logSecurityEvent(user.id, 'TWO_FACTOR_FAILED');
-        throw new UnauthorizedException(
-          'Invalid email or password, or this account is not eligible for recovery.',
-        );
+        if (reserved >= gameplayRules.auth.maxFailedLoginAttempts) await this.lockAccount(user.id);
+        throw ineligible();
       }
     }
 
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { status: 'ACTIVE', deletedAt: null },
+      data: { status: 'ACTIVE', deletedAt: null, failedLoginAttempts: 0, lockedUntil: null },
     });
 
     const tokens = await this.issueTokens(user.id);

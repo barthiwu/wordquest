@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, MaxLength } from 'class-validator';
 import { IsStrongPassword } from './password.validator';
 
 export class ChangePasswordDto {
@@ -6,6 +6,7 @@ export class ChangePasswordDto {
   // already holds the account rather than just an emailed token, so it
   // needs the CURRENT password too, not just a new one.
   @IsString()
+  @MaxLength(128)
   currentPassword!: string;
 
   @IsStrongPassword()

@@ -67,4 +67,20 @@ describe('UserAwareThrottlerGuard', () => {
       '1.2.3.4',
     );
   });
+
+  it('counts credential routes (@ThrottleByIp) per IP even with a valid token, so guest tokens cannot buy fresh login budgets', async () => {
+    const token = await jwt.signAsync({ sub: 'guest1', guest: true }, { secret: SECRET });
+    class AuthLike {}
+    Reflect.defineMetadata('throttleByIp', true, AuthLike);
+    const context = {
+      getHandler: () => function login() {},
+      getClass: () => AuthLike,
+    };
+    const byIp = await (
+      guard as unknown as {
+        getTracker(r: Record<string, unknown>, c: unknown): Promise<string>;
+      }
+    ).getTracker({ ip: '6.6.6.6', headers: { authorization: `Bearer ${token}` } }, context);
+    expect(byIp).toBe('6.6.6.6');
+  });
 });

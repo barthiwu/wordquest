@@ -14,6 +14,7 @@ export class SocialLoginDto {
   /** Apple only shares the name on the very first sign-in, and only to the client. */
   @IsOptional()
   @IsString()
+  @MaxLength(80)
   @Length(2, 40)
   displayName?: string;
 
@@ -24,6 +25,7 @@ export class SocialLoginDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(8)
   @Length(2, 2)
   countryCode?: string;
 

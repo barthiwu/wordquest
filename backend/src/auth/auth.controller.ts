@@ -6,7 +6,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RecoverAccountDto } from './dto/recover-account.dto';
 import { SocialLoginDto } from './dto/social-login.dto';
-import { TwoFactorCodeDto, TwoFactorLoginDto } from './dto/two-factor.dto';
+import { TwoFactorCodeDto, TwoFactorLoginDto, TwoFactorSetupDto } from './dto/two-factor.dto';
 import { TwoFactorService } from './two-factor/two-factor.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
@@ -16,6 +16,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUserId } from './decorators/current-user.decorator';
 import { AllowGuest } from './decorators/allow-guest.decorator';
+import { ThrottleByIp } from '../common/throttle-by-ip.decorator';
 
 /**
  * POST /api/v1/auth/{register,login,refresh,logout}
@@ -39,6 +40,7 @@ function requestMeta(req: Request): RequestMeta {
 }
 
 @Controller('auth')
+@ThrottleByIp()
 export class AuthController {
   constructor(
     private readonly auth: AuthService,
@@ -176,8 +178,8 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
-  twoFactorSetup(@CurrentUserId() userId: string) {
-    return this.twoFactor.beginSetup(userId);
+  twoFactorSetup(@CurrentUserId() userId: string, @Body() dto: TwoFactorSetupDto) {
+    return this.auth.beginTwoFactorSetup(userId, dto.password);
   }
 
   @Post('2fa/enable')

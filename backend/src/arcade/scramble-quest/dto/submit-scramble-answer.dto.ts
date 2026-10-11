@@ -1,6 +1,7 @@
-import { IsString } from 'class-validator';
+import { IsString, MaxLength } from 'class-validator';
 
 export class SubmitScrambleAnswerDto {
   @IsString()
+  @MaxLength(100)
   answer!: string;
 }

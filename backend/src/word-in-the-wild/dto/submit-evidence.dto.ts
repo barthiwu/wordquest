@@ -2,6 +2,7 @@ import { IsIn, IsString, MaxLength, ValidateIf } from 'class-validator';
 
 export class SubmitEvidenceDto {
   @IsString()
+  @MaxLength(64)
   missionId!: string;
 
   @IsIn(['TEXT', 'PHOTO'])

@@ -124,7 +124,7 @@ describe('SocialVerifierService', () => {
       svc.responses[debugUrl] = { data: { is_valid: true, app_id: 'fb-app', user_id: 'f-1' } };
       svc.responses[meUrl] = { id: 'f-1', name: 'Fay', email: 'Fay@x.com' };
       expect(await svc.verify('FACEBOOK', 'tok')).toEqual({
-        provider: 'FACEBOOK', subject: 'f-1', email: 'fay@x.com', emailVerified: true, name: 'Fay',
+        provider: 'FACEBOOK', subject: 'f-1', email: 'fay@x.com', emailVerified: false, name: 'Fay',
       });
     });
 

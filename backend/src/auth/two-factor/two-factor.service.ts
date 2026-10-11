@@ -155,10 +155,15 @@ export class TwoFactorService {
     if (/^\d{3}\s?\d{3}$/.test(submitted)) {
       const step = verifyTotp(this.decryptSecret(user.twoFactorSecretEnc), submitted);
       if (step === null) return false;
-      // Replay protection: a step already accepted can't be used again.
+      // Replay protection: a step already accepted can't be used again. The
+      // check-and-advance is ONE conditional update so two parallel requests
+      // carrying the same code can't both win.
       if (user.twoFactorLastStep !== null && step <= user.twoFactorLastStep) return false;
-      await this.prisma.user.update({ where: { id: userId }, data: { twoFactorLastStep: step } });
-      return true;
+      const advanced = await this.prisma.user.updateMany({
+        where: { id: userId, OR: [{ twoFactorLastStep: null }, { twoFactorLastStep: { lt: step } }] },
+        data: { twoFactorLastStep: step },
+      });
+      return advanced.count === 1;
     }
 
     const normalized = this.normalizeRecoveryCode(submitted);

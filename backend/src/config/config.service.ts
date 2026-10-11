@@ -96,6 +96,30 @@ export class AppConfigService {
     return this.config.get<string>('twoFactor.encryptionKey') || undefined;
   }
 
+  /**
+   * Weak-secret findings for a production boot, as human-readable lines
+   * (empty = fine). Returned rather than thrown on purpose: a deploy that
+   * crash-loops over a short-but-working secret is its own outage, so main.ts
+   * logs these at ERROR level on every boot until they are fixed.
+   */
+  secretWarnings(): string[] {
+    if (!this.isProduction) return [];
+    const warnings: string[] = [];
+    const access = this.jwtAccessSecret;
+    const refresh = this.jwtRefreshSecret;
+    if (access.length < 32) warnings.push('JWT_ACCESS_SECRET is shorter than 32 characters.');
+    if (refresh.length < 32) warnings.push('JWT_REFRESH_SECRET is shorter than 32 characters.');
+    if (access === refresh) {
+      warnings.push('JWT_ACCESS_SECRET and JWT_REFRESH_SECRET are identical; they must differ.');
+    }
+    if (!this.twoFactorEncryptionKey) {
+      warnings.push(
+        'TWO_FACTOR_ENCRYPTION_KEY is not set; 2FA secrets are encrypted with a key derived from JWT_REFRESH_SECRET, so rotating that secret would lock every 2FA user out.',
+      );
+    }
+    return warnings;
+  }
+
   get jwtAccessExpiresIn(): StringValue {
     return this.parseDuration('auth.accessExpiresIn', '15m');
   }

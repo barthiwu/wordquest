@@ -15,6 +15,13 @@ function build() {
       findUniqueOrThrow: jest.fn(async () => ({ ...state.user })),
       findUnique: jest.fn(async () => ({ ...state.user })),
       update: jest.fn(async ({ data }: { data: Partial<typeof state.user> }) => { Object.assign(state.user, data); return state.user; }),
+      updateMany: jest.fn(async ({ data }: { data: Partial<typeof state.user> }) => {
+        // Mirrors the service's conditional advance: only a strictly newer step wins.
+        const step = data.twoFactorLastStep as number;
+        if (state.user.twoFactorLastStep !== null && state.user.twoFactorLastStep >= step) return { count: 0 };
+        Object.assign(state.user, data);
+        return { count: 1 };
+      }),
     },
     twoFactorRecoveryCode: {
       count: jest.fn(async () => state.codes.filter((c) => !c.usedAt).length),

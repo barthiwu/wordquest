@@ -11,6 +11,7 @@ export class GuestJoinDto {
   /** The name other players see. Not unique: a number is added if it is taken. */
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
+  @MaxLength(40)
   @Length(ARCADE_GROUP_CONFIG.GUEST_NICKNAME_MIN, ARCADE_GROUP_CONFIG.GUEST_NICKNAME_MAX)
   nickname!: string;
 

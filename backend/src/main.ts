@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AppConfigService } from './config/config.service';
@@ -38,6 +38,9 @@ async function bootstrap() {
   ];
   if (requiredAtStartup.some((v) => !v)) {
     throw new Error('Required startup configuration is missing.'); // unreachable — the getters above throw first
+  }
+  for (const warning of config.secretWarnings()) {
+    Logger.error(`SECURITY CONFIG: ${warning}`, 'Bootstrap');
   }
 
   // Railway (and any hosting edge) sits in front of this server, so the TCP

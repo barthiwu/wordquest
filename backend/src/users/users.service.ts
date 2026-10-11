@@ -19,6 +19,9 @@ import {
   type UploadContentType,
 } from '../storage/object-storage.service';
 
+/** Minimum days between timezone changes (see updateProfile). */
+export const TIMEZONE_CHANGE_COOLDOWN_DAYS = 7;
+
 const PASSWORD_SALT_ROUNDS = 12;
 
 /**
@@ -147,6 +150,19 @@ export class UsersService {
     return bcrypt.compare(plainPassword, passwordHash);
   }
 
+  private dummyHash?: Promise<string>;
+
+  /**
+   * Spends the cost of one real password check against a throwaway hash.
+   * Called for emails that don't exist so "unknown email" and "wrong
+   * password" take the same time — otherwise response latency is an
+   * account-enumeration oracle.
+   */
+  async burnPasswordCheck(plainPassword: string): Promise<void> {
+    this.dummyHash ??= this.hashPassword('wordquest-timing-equalizer');
+    await bcrypt.compare(plainPassword, await this.dummyHash);
+  }
+
   /**
    * Profile picture upload -- same two-step pattern as WordInTheWild's
    * evidence photos: the mobile app PUTs bytes directly to object
@@ -244,6 +260,27 @@ export class UsersService {
       throw new BadRequestException(`"${input.timezone}" is not a recognized timezone`);
     }
 
+    // A timezone change redefines the player's local "today", which resets
+    // daily caps and can rescue a broken streak — so a CHANGE (setting it the
+    // first time, or re-sending the same value, is free) is limited to once a
+    // week. Real relocation is rare; replaying the day is the abuse.
+    let timezoneChanged = false;
+    if (input.timezone !== undefined) {
+      const current = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { timezone: true, timezoneChangedAt: true },
+      });
+      if (current?.timezone && current.timezone !== input.timezone) {
+        const cooldownMs = TIMEZONE_CHANGE_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+        if (current.timezoneChangedAt && Date.now() - current.timezoneChangedAt.getTime() < cooldownMs) {
+          throw new BadRequestException(
+            `Your timezone can only be changed once every ${TIMEZONE_CHANGE_COOLDOWN_DAYS} days.`,
+          );
+        }
+        timezoneChanged = true;
+      }
+    }
+
     if (input.username !== undefined) {
       // The DTO already format-checks this; re-checking here means the
       // format guarantee holds for every caller of this service method,
@@ -273,6 +310,7 @@ export class UsersService {
           ...(input.targetLanguage !== undefined && { targetLanguage: input.targetLanguage }),
           ...(input.englishVariant !== undefined && { englishVariant: input.englishVariant }),
           ...(input.timezone !== undefined && { timezone: input.timezone }),
+          ...(timezoneChanged && { timezoneChangedAt: new Date() }),
           ...(input.learningGoal !== undefined && { learningGoal: input.learningGoal }),
           ...(input.clanId !== undefined && { clanId: input.clanId }),
           ...(input.completeOnboarding && { onboardingCompletedAt: new Date() }),

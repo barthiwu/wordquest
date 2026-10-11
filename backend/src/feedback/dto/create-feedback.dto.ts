@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsObject, IsOptional, IsString, Length, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsObject, IsOptional, IsString, Length, Max, Min, MaxLength } from 'class-validator';
 import { FeedbackCategory, FeedbackType } from '@prisma/client';
 
 /**
@@ -22,11 +22,13 @@ export class CreateFeedbackDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(2000)
   @Length(0, 2000)
   message?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(100)
   screen?: string;
 
   @IsOptional()

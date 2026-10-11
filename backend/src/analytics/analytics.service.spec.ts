@@ -149,6 +149,36 @@ describe('AnalyticsService', () => {
       expect(result).toEqual({ accepted: 1, rejected: 1 });
     });
 
+    it('drops server-only events a client tries to forge (quest_completed, shop_purchase, XP_AWARDED…)', async () => {
+      prismaMock.analyticsEvent.createMany.mockResolvedValue({ count: 1 });
+      const result = await service.trackClientBatch(
+        'u1',
+        [
+          { clientEventId: 'c1', eventName: 'DUEL_CLUE_USED', occurredAt },
+          { clientEventId: 'c2', eventName: 'quest_completed', occurredAt },
+          { clientEventId: 'c3', eventName: 'shop_purchase', occurredAt },
+          { clientEventId: 'c4', eventName: 'XP_AWARDED', occurredAt },
+        ],
+        {},
+      );
+      expect(prismaMock.analyticsEvent.createMany).toHaveBeenCalledWith(
+        expect.objectContaining({ data: [expect.objectContaining({ eventName: 'DUEL_CLUE_USED' })] }),
+      );
+      expect(result).toEqual({ accepted: 1, rejected: 3 });
+    });
+
+    it('stores an oversized properties blob as {} rather than bloating the table', async () => {
+      prismaMock.analyticsEvent.createMany.mockResolvedValue({ count: 1 });
+      await service.trackClientBatch(
+        'u1',
+        [{ clientEventId: 'c1', eventName: 'DUEL_CLUE_USED', occurredAt, properties: { blob: 'x'.repeat(5000) } }],
+        {},
+      );
+      expect(prismaMock.analyticsEvent.createMany).toHaveBeenCalledWith(
+        expect.objectContaining({ data: [expect.objectContaining({ properties: {} })] }),
+      );
+    });
+
     it('returns accepted: 0 without calling createMany when every event is unknown', async () => {
       const result = await service.trackClientBatch(
         'u1',

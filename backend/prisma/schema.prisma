@@ -84,6 +84,11 @@ model User {
   // because an account can exist before onboarding sets it; every localDate
   // derivation falls back to UTC until it's set (see common/timezone.ts).
   timezone String?
+  // When `timezone` last CHANGED (null = never changed since first being set).
+  // Used to rate-limit changes: swapping timezone resets the player's local
+  // day, so unlimited changes would let a player replay daily caps and
+  // rescue broken streaks (UsersService.updateProfile).
+  timezoneChangedAt DateTime?
 
   // WordQuest+ (V2 subscription): until this moment the player has no daily
   // Arcade play limit. Null = free plan. There is no purchase flow yet; the

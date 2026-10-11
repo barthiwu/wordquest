@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { currentQuestWordIds } from '../common/active-quest-words';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProgressionService } from '../progression/progression.service';
@@ -436,8 +437,10 @@ export class MasteryService {
    * working on before older words.
    */
   async listForUser(userId: string): Promise<MasteryListItem[]> {
+    // An open quest question's word is withheld until the question is over.
+    const hidden = await currentQuestWordIds(this.prisma, userId);
     const rows = await this.prisma.mastery.findMany({
-      where: { userId },
+      where: { userId, ...(hidden.length > 0 ? { wordId: { notIn: hidden } } : {}) },
       orderBy: [{ lastPresentedAt: 'desc' }],
       include: { word: { select: { word: true } } },
     });

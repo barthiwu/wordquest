@@ -618,7 +618,16 @@ export class QuestsService {
     userId: string,
     wordId: string,
     rawAnswer: string,
+    todayLocalDate: string,
   ): Promise<{ correct: boolean; correctWord: string }> {
+    // Only a word this player was shown on a day that has already ended may be
+    // checked here. Without this, the endpoint answers "is this the word?" and
+    // reveals the spelling for ANY word id, including the one being asked now.
+    const shown = await this.prisma.questAttempt.findFirst({
+      where: { userId, wordIds: { has: wordId }, localDate: { lt: todayLocalDate } },
+      select: { id: true },
+    });
+    if (!shown) throw new NotFoundException('That word is not in your catch-up history.');
     const word = await this.prisma.word.findUniqueOrThrow({ where: { id: wordId } });
     const variant = await resolveEnglishVariant(this.prisma, userId);
     const rendered = renderWord(word, variant);

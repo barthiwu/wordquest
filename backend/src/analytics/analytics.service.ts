@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { isKnownAnalyticsEventName } from './event-names';
+import { isClientAllowedEventName, MAX_CLIENT_PROPERTIES_BYTES } from './event-names';
 
 /** Optional extra fields for a single server-authored track() call —
  * almost always omitted; server-side call sites rarely have a
@@ -97,7 +97,7 @@ export class AnalyticsService {
     events: ClientAnalyticsEventInput[],
     batchMeta: { platform?: string; appVersion?: string },
   ): Promise<{ accepted: number; rejected: number }> {
-    const valid = events.filter((event) => isKnownAnalyticsEventName(event.eventName));
+    const valid = events.filter((event) => isClientAllowedEventName(event.eventName));
     const rejected = events.length - valid.length;
     if (valid.length === 0) {
       return { accepted: 0, rejected };
@@ -114,13 +114,25 @@ export class AnalyticsService {
           occurredAt: event.occurredAt,
           platform: batchMeta.platform,
           appVersion: batchMeta.appVersion,
-          properties: (event.properties ?? {}) as Prisma.InputJsonValue,
+          properties: this.boundedProperties(event.properties),
         })),
         skipDuplicates: true,
       });
       return { accepted: result.count, rejected };
     } catch {
       return { accepted: 0, rejected: events.length };
+    }
+  }
+
+  /** Client-supplied properties are stored as-is only when small; an oversized blob is dropped, not truncated into broken JSON. */
+  private boundedProperties(properties: Record<string, unknown> | undefined): Prisma.InputJsonValue {
+    if (!properties) return {};
+    try {
+      return JSON.stringify(properties).length <= MAX_CLIENT_PROPERTIES_BYTES
+        ? (properties as Prisma.InputJsonValue)
+        : {};
+    } catch {
+      return {};
     }
   }
 }

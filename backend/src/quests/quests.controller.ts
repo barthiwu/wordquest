@@ -79,8 +79,12 @@ export class QuestsController {
 
   @Post('history/check')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
-  checkHistoryAnswer(@CurrentUserId() userId: string, @Body() dto: CheckHistoryAnswerDto) {
-    return this.quests.checkHistoryAnswer(userId, dto.wordId, dto.answer);
+  async checkHistoryAnswer(
+    @CurrentUserId() userId: string,
+    @Body() dto: CheckHistoryAnswerDto,
+  ) {
+    const { localDate } = await this.clock.now(userId);
+    return this.quests.checkHistoryAnswer(userId, dto.wordId, dto.answer, localDate);
   }
 
   @Post('attempts/:attemptId/answer')
@@ -114,7 +118,8 @@ export class QuestsController {
   }
 
   @Post('attempts/:attemptId/sentence')
-  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  // Each call is a paid AI evaluation, so this is tighter than the answer routes.
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   submitSentence(
     @CurrentUserId() userId: string,
     @Param('attemptId') attemptId: string,
@@ -124,7 +129,8 @@ export class QuestsController {
   }
 
   @Post('attempts/:attemptId/paragraph')
-  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  // Each call is a paid AI evaluation, so this is tighter than the answer routes.
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   submitParagraph(
     @CurrentUserId() userId: string,
     @Param('attemptId') attemptId: string,
