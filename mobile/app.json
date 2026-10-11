@@ -93,6 +93,13 @@
       }
     },
     "owner": "barthiwus-team",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0ef38d51-a343-43ae-83ef-fe83e173374d",
+      "fallbackToCacheTimeout": 0
+    },
     "experiments": {
       "baseUrl": "/wordquest"
     }
