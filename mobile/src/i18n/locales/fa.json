@@ -42,6 +42,8 @@
       "subtitle": "دلیلی را که بیشتر مناسب است انتخاب کنید.",
       "sentTitle": "گزارش ارسال شد",
       "sentMessage": "ممنون — بررسی می‌کنیم.",
+      "report": "گزارش",
+      "chatSentMessage": "ممنون. این پیام برای تو پنهان شد. اگر ادامه پیدا کرد، می‌توانی این بازیکن را مسدود کنی.",
       "errorTitle": "ارسال گزارش ممکن نشد",
       "errorFallback": "لطفاً دوباره تلاش کنید.",
       "reasons": {
@@ -49,7 +51,11 @@
         "harassmentOrBullying": "آزار یا قلدری",
         "inappropriatePhoto": "عکس نامناسب",
         "spam": "اسپم",
-        "other": "سایر"
+        "other": "سایر",
+        "insults": "توهین یا زبان توهین‌آمیز",
+        "offensiveLanguage": "زبان زشت یا جنسی",
+        "threats": "تهدید",
+        "spamOrLinks": "هرزنامه یا پیوند"
       }
     },
     "streakMilestoneRibbon": {

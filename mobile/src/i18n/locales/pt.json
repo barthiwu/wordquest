@@ -42,6 +42,8 @@
       "subtitle": "Escolha o motivo que mais se encaixa.",
       "sentTitle": "Denúncia enviada",
       "sentMessage": "Obrigado — vamos dar uma olhada.",
+      "report": "Denunciar",
+      "chatSentMessage": "Obrigado. Essa mensagem foi ocultada para você. Se continuar, você também pode bloquear este jogador.",
       "errorTitle": "Não foi possível enviar a denúncia",
       "errorFallback": "Tente novamente.",
       "reasons": {
@@ -49,7 +51,11 @@
         "harassmentOrBullying": "Assédio ou bullying",
         "inappropriatePhoto": "Foto inadequada",
         "spam": "Spam",
-        "other": "Outro"
+        "other": "Outro",
+        "insults": "Insultos ou linguagem abusiva",
+        "offensiveLanguage": "Linguagem ofensiva ou sexual",
+        "threats": "Ameaças",
+        "spamOrLinks": "Spam ou links"
       }
     },
     "streakMilestoneRibbon": {

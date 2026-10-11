@@ -1,6 +1,6 @@
-import { ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ServiceUnavailableException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { ObjectStorageService } from './object-storage.service';
+import { detectImageType, ObjectStorageService } from './object-storage.service';
 import { AppConfigService } from '../config/config.service';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
@@ -136,7 +136,7 @@ describe('ObjectStorageService', () => {
     it('collects the response body stream into a single Buffer', async () => {
       const { S3Client } = jest.requireMock('@aws-sdk/client-s3');
       async function* fakeStream() {
-        yield new Uint8Array([1, 2, 3]);
+        yield new Uint8Array([0xff, 0xd8, 0xff]);
         yield new Uint8Array([4, 5]);
       }
       S3Client.mockImplementationOnce(() => ({
@@ -150,7 +150,35 @@ describe('ObjectStorageService', () => {
 
       const bytes = await freshService.getObjectBytes('word-in-the-wild/u1/abc.jpg');
 
-      expect(bytes).toEqual(Buffer.from([1, 2, 3, 4, 5]));
+      expect(bytes).toEqual(Buffer.from([0xff, 0xd8, 0xff, 4, 5]));
+    });
+
+    it('refuses a file that is not really a PNG or JPEG', async () => {
+      const { S3Client } = jest.requireMock('@aws-sdk/client-s3');
+      async function* notAnImage() {
+        yield new Uint8Array(Buffer.from('<html>definitely not a photo</html>'));
+      }
+      S3Client.mockImplementationOnce(() => ({
+        send: jest.fn().mockResolvedValue({ Body: notAnImage() }),
+      }));
+      const moduleRef = await Test.createTestingModule({
+        providers: [ObjectStorageService, { provide: AppConfigService, useValue: configMock }],
+      }).compile();
+      await expect(
+        moduleRef.get(ObjectStorageService).getObjectBytes('word-in-the-wild/u1/abc.jpg'),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('detectImageType', () => {
+    it('recognises JPEG and PNG by their first bytes and nothing else', () => {
+      expect(detectImageType(new Uint8Array([0xff, 0xd8, 0xff, 0xe0]))).toBe('image/jpeg');
+      expect(
+        detectImageType(new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0])),
+      ).toBe('image/png');
+      expect(detectImageType(new Uint8Array(Buffer.from('GIF89a')))).toBeNull();
+      expect(detectImageType(new Uint8Array(Buffer.from('<svg onload=x>')))).toBeNull();
+      expect(detectImageType(new Uint8Array([]))).toBeNull();
     });
   });
 });

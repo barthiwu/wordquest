@@ -6,9 +6,10 @@ import { ProgressionModule } from '../../progression/progression.module';
 import { ArcadeVersusService } from './versus.service';
 import { ArcadeVersusController } from './versus.controller';
 import { ArcadeVersusChatService } from './versus-chat.service';
+import { ChatSafetyModule } from '../chat/chat-safety.module';
 
 @Module({
-  imports: [ArcadeModule, FriendsModule, NotificationModule, ProgressionModule],
+  imports: [ArcadeModule, ChatSafetyModule, FriendsModule, NotificationModule, ProgressionModule],
   controllers: [ArcadeVersusController],
   providers: [ArcadeVersusService, ArcadeVersusChatService],
   exports: [ArcadeVersusService],

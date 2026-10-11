@@ -5,8 +5,9 @@ backend, mobile app, and CI, with every finding checked against the code
 before it was changed. It is a code review, not a third-party penetration
 test.
 
-Commits: `50ad320` (backend), `1d4124f` (app + CI). Backend: 1508 tests
-pass, `tsc` clean. Mobile: 323 tests pass, `tsc` clean.
+Commits: `50ad320` (backend), `1d4124f` (app + CI), plus the follow-up in
+"Addendum" below. Backend: 1568 tests pass, `tsc` clean. Mobile: 323 tests
+pass, `tsc` clean.
 
 ## Bottom line
 
@@ -105,28 +106,27 @@ had. All of those are fixed. What remains is lower risk and listed below.
   use another sign-in method instead of being linked.
 - **Timezone** can't be changed more than once a week.
 
-## Still open (none of these is exploitable for account or data takeover)
+## Still open
 
-| Item | Risk | Suggested next step |
+Fixed in the follow-up are marked in the Addendum below. What genuinely
+remains (none of it is exploitable for account or data takeover):
+
+| Item | Risk | Why it is still open |
 |---|---|---|
-| Word Duel allows typed chat with random strangers | Players can pass answers or be abused. Versus chat is already quick-chat-only for strangers | Decision for you: restrict Word Duel strangers to quick chat too |
-| Web build stores tokens in `localStorage`, no CSP | An XSS bug would expose tokens | Add a CSP and move web tokens to httpOnly cookies. Needs browser testing, so I didn't ship it blind |
-| `JwtAuthGuard` doesn't re-check account status | A suspended user keeps a working access token for up to 15 min | Accept, or add a cached status check |
-| Rate limiter state is in-memory per instance | Limits multiply by instance count if you scale out | Move the throttler store to Redis before running more than one instance |
-| Upload confirm doesn't verify file type or size server-side | Someone can PUT a non-image to storage | HEAD/magic-byte check at confirm, plus a bucket lifecycle rule for unconfirmed uploads |
-| AI submissions can be double-sent | Two parallel submissions both trigger a paid AI call | Claim the quest stage before calling the model |
-| Guest nicknames: no profanity filter, no bidi/zero-width stripping | Impersonation, abuse | Normalise and filter nicknames |
-| Friend request to someone who blocked you returns 403 | Reveals that you are blocked | Return the same response as a normal pending request |
-| Host-removed group members can rejoin by link | Host can't truly remove someone | Track removals per group |
-| `EmailVerificationGuard` isn't on the AI routes | Unverified accounts can spend AI quota | Add the guard |
-| Mobile `npm audit`: 78 findings (2 critical) | All sit in Expo/React Native build tooling (`@expo/cli`, `tar`, `shell-quote`), not in the shipped app; the fix is an Expo SDK upgrade | Fold into your next SDK upgrade |
-| GitHub Actions pinned by tag, not commit SHA | A compromised action tag runs in CI | Pin to SHAs |
+| Web build stores tokens in `localStorage`, no CSP | An XSS bug would expose tokens | Needs a CSP plus httpOnly cookies and real browser testing; not shipped blind |
+| `JwtAuthGuard` doesn't re-check account status | A suspended user keeps a working access token for up to 15 min | Accepted: refresh already checks status. A per-request DB check costs more than it buys |
+| Rate limiter state is in-memory per instance | Limits multiply by instance count if you scale out | Only matters past one instance. Move the throttler store to Redis first |
+| `EmailVerificationGuard` isn't on the AI routes | Unverified accounts can spend AI quota | Deliberately skipped: it would block core gameplay for new users. Per-minute limits already cap spend |
+| Removed group guests can rejoin as a *new* guest | Host can't permanently remove a guest | Guests have no stable identity. Account bans are permanent; guest bans would need device fingerprinting |
+| Mobile `npm audit`: 78 findings (2 critical) | All sit in Expo/React Native build tooling, not the shipped app | The fix is an Expo SDK upgrade |
+| GitHub Actions pinned by tag, not commit SHA | A compromised action tag runs in CI | Pin to SHAs when convenient |
 
 ## What you need to do
 
-1. Push `93aec47`, `a2f2dab`, `50ad320`, `1d4124f`. The two migrations from
-   the chat/reminder work and `20261011120000` apply automatically on the
-   Railway deploy.
+1. Push the commits. The migrations (`20261011120000` corrected,
+   `20261011130000_chat_flags`, `20261011140000_arcade_group_bans`) apply on
+   the Railway deploy. If an earlier run left `20261011120000` marked failed,
+   clear it with `prisma migrate resolve --rolled-back` first.
 2. In Railway, set `TWO_FACTOR_ENCRYPTION_KEY` (32 random bytes as 64 hex
    characters) and make sure `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET`
    are different and at least 32 characters. Check the deploy logs for
@@ -138,4 +138,46 @@ had. All of those are fixed. What remains is lower risk and listed below.
 3. Rebuild the iOS app natively (ATS change), then ship an app update for the
    2FA password field.
 4. Add an S3/R2 lifecycle rule that deletes unconfirmed uploads after a day.
-5. Tell me what you want to do about Word Duel typed chat with strangers.
+
+## Addendum: follow-up fixes and chat moderation
+
+### Items from "still open" that are now fixed
+
+- **Friend request to someone who blocked you** returned 403, which revealed
+  the block. It now answers like a normal pending request.
+- **Host-removed members could rejoin by link.** New `ArcadeGroupBan` table:
+  removing an account now bans it from that group. (Guests can still rejoin
+  as a new guest; see above.)
+- **Guest nicknames and display names** had no profanity filter and no
+  bidi/zero-width stripping. Guest names and registration/profile names are
+  now filtered (a deliberately narrower filter than chat, so real names such
+  as Shittu, Dick or Cockburn still pass) and invisible direction-override
+  characters are stripped.
+- **Upload confirm didn't check the file.** Confirming an avatar now reads the
+  uploaded bytes and checks the magic number (JPEG or PNG only, which are the two types the app uploads).
+  A non-image is rejected and removed.
+- **AI submissions could be double-sent.** A per-attempt in-memory lock means
+  two parallel submissions of the same quest answer produce one paid AI call.
+
+### Word Duel chat: reporting and word flagging
+
+Typed chat with strangers stays, but it is now policed:
+
+- **Report an insult.** Every opponent message has a visible *Report* control
+  (insults, offensive language, threats, spam or links). The reported message
+  disappears from the reporter's chat immediately and the server never
+  returns it to them again. One report per player per message.
+- **Sensitive words are flagged, not just refused.** Profanity, slurs and
+  threats (including spaced, leetspeak and repeated-letter evasions) are
+  blocked as before, and now each one is recorded in a new `chat_flags`
+  ledger with severity BLOCKED. Mild insults ("idiot", "stupid") are
+  delivered but recorded as INSULT. Reports from the other player are
+  recorded as REPORTED.
+- **Automatic chat mute.** Thresholds in `CHAT_SAFETY_CONFIG` temporarily mute
+  chat for repeat offenders (distinct reporters are counted so one person
+  can't mute someone alone). A mute blocks chat only, never play.
+- **Review.** `GET /moderation/chat-flags` lists flags for admins.
+- The same safety service now backs Versus chat.
+
+New migrations: `20261011130000_chat_flags`, `20261011140000_arcade_group_bans`.
+

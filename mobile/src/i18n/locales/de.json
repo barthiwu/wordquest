@@ -42,6 +42,8 @@
       "subtitle": "Wähle den Grund, der am besten passt.",
       "sentTitle": "Meldung gesendet",
       "sentMessage": "Danke — wir schauen uns das an.",
+      "report": "Melden",
+      "chatSentMessage": "Danke. Die Nachricht ist für dich ausgeblendet. Wenn es weitergeht, kannst du den Spieler auch blockieren.",
       "errorTitle": "Meldung konnte nicht gesendet werden",
       "errorFallback": "Bitte versuche es erneut.",
       "reasons": {
@@ -49,7 +51,11 @@
         "harassmentOrBullying": "Belästigung oder Mobbing",
         "inappropriatePhoto": "Unangemessenes Foto",
         "spam": "Spam",
-        "other": "Sonstiges"
+        "other": "Sonstiges",
+        "insults": "Beleidigungen oder beschimpfende Sprache",
+        "offensiveLanguage": "Anstößige oder sexuelle Sprache",
+        "threats": "Drohungen",
+        "spamOrLinks": "Spam oder Links"
       }
     },
     "streakMilestoneRibbon": {

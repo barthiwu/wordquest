@@ -86,29 +86,62 @@ const BLOCKED_WORDS = new Set([
   'dyke',
   'coon',
   'paki',
+  'dumbass',
+  'jackass',
+  'fatass',
+  'smartass',
+  'prick',
+  'douche',
+  'douchebag',
+  'stfu',
+  'gtfo',
+  'cum',
+  'cumshot',
 ]);
 
 /** Blocked when a token STARTS with one of these (catches suffixed forms). */
-const BLOCKED_STEMS = ['fuck', 'shit', 'cunt', 'bitch', 'nigg', 'fagg', 'whore', 'retard', 'wank'];
+const BLOCKED_STEMS = [
+  'fuck',
+  'shit',
+  'cunt',
+  'bitch',
+  'nigg',
+  'fagg',
+  'whore',
+  'retard',
+  'wank',
+  'slut',
+  'asshol',
+];
 
 /** Multi-word phrases, checked against the letters-and-single-spaces form. */
-const BLOCKED_PHRASES = ['kill yourself', 'kill your self', 'go die', 'kill urself'];
+const BLOCKED_PHRASES = [
+  'kill yourself',
+  'kill your self',
+  'go die',
+  'kill urself',
+  'suck my',
+  'i will find you',
+  'i hope you die',
+];
 
 function squashRepeats(word: string): string {
   return word.replace(/(.)\1{2,}/g, '$1$1');
 }
 
-/** True when the text contains profanity, a slur, or a self-harm taunt. */
-export function hasBlockedLanguage(text: string): boolean {
-  const lowered = text
+/** The lower-cased, leet-decoded, letters-and-single-spaces form of a text. */
+function spacedLetters(text: string): string {
+  return text
     .toLowerCase()
     .split('')
     .map((ch) => LEET[ch] ?? ch)
-    .join('');
-  const spaced = lowered.replace(/[^a-z]+/g, ' ').trim();
+    .join('')
+    .replace(/[^a-z]+/g, ' ')
+    .trim();
+}
 
-  if (BLOCKED_PHRASES.some((p) => ` ${spaced} `.includes(` ${p} `))) return true;
-
+/** Every spelling of each word worth checking: as typed, repeats squashed, and "f u c k" runs joined. */
+function wordCandidates(spaced: string): Set<string> {
   const tokens = spaced.split(' ').filter(Boolean);
   const candidates = new Set<string>();
   tokens.forEach((t) => {
@@ -127,12 +160,104 @@ export function hasBlockedLanguage(text: string): boolean {
     }
   }
   if (run.length >= 3) candidates.add(run);
+  return candidates;
+}
 
-  for (const c of candidates) {
+/** True when the text contains profanity, a slur, or a self-harm taunt. */
+export function hasBlockedLanguage(text: string): boolean {
+  const spaced = spacedLetters(text);
+  if (BLOCKED_PHRASES.some((p) => ` ${spaced} `.includes(` ${p} `))) return true;
+  for (const c of wordCandidates(spaced)) {
     if (BLOCKED_WORDS.has(c)) return true;
     if (BLOCKED_STEMS.some((stem) => c.startsWith(stem))) return true;
   }
   return false;
+}
+
+/**
+ * The same idea for names (display names, guest nicknames, usernames), but
+ * narrower on purpose: real names such as "Shittu", "Dick" or "Cockburn" must
+ * still pass, so only unambiguous profanity and slurs are refused.
+ */
+const NAME_BLOCKED_WORDS = new Set([
+  'cunt',
+  'fuck',
+  'fucker',
+  'motherfucker',
+  'fucking',
+  'bitch',
+  'whore',
+  'slut',
+  'asshole',
+  'ass',
+  'pussy',
+  'twat',
+  'wanker',
+  'nigger',
+  'nigga',
+  'faggot',
+  'fag',
+  'retard',
+  'rapist',
+  'kike',
+  'spic',
+  'chink',
+  'tranny',
+]);
+const NAME_BLOCKED_STEMS = ['fuck', 'cunt', 'nigg', 'fagg', 'whore', 'bitch', 'asshol'];
+
+export function hasBlockedName(text: string): boolean {
+  for (const c of wordCandidates(spacedLetters(text))) {
+    if (NAME_BLOCKED_WORDS.has(c)) return true;
+    if (NAME_BLOCKED_STEMS.some((stem) => c.startsWith(stem))) return true;
+  }
+  return false;
+}
+
+/** Milder insults: not refused (they happen in the heat of a duel), but recorded and reportable. */
+const INSULT_WORDS = new Set([
+  'idiot',
+  'idiots',
+  'idiotic',
+  'stupid',
+  'dumb',
+  'moron',
+  'moronic',
+  'imbecile',
+  'loser',
+  'losers',
+  'ugly',
+  'trash',
+  'garbage',
+  'useless',
+  'pathetic',
+  'worthless',
+  'dumbo',
+  'brainless',
+  'clueless',
+  'cheater',
+]);
+const INSULT_PHRASES = ['shut up', 'you suck', 'hate you', 'nobody likes you', 'you are trash'];
+
+/** True when the text insults the other player without crossing into the blocked list. */
+export function hasInsult(text: string): boolean {
+  const spaced = text
+    .toLowerCase()
+    .split('')
+    .map((ch) => LEET[ch] ?? ch)
+    .join('')
+    .replace(/[^a-z]+/g, ' ')
+    .trim();
+  if (INSULT_PHRASES.some((p) => ` ${spaced} `.includes(` ${p} `))) return true;
+  return spaced
+    .split(' ')
+    .some(
+      (t) =>
+        INSULT_WORDS.has(t) ||
+        INSULT_WORDS.has(squashRepeats(t)) ||
+        // "stuuupid": every repeated letter collapsed to one.
+        INSULT_WORDS.has(t.replace(/(.)\1+/g, '$1')),
+    );
 }
 
 /** The single entry point: clean the message, then check it. */

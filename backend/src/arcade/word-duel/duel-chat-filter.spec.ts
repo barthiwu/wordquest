@@ -1,5 +1,7 @@
 import {
   checkChatMessage,
+  hasBlockedName,
+  hasInsult,
   hasBlockedLanguage,
   hasContactInfo,
   normalizeChatBody,
@@ -93,4 +95,39 @@ describe('duel chat filter', () => {
       expect(checkChatMessage('you suck, bitch')).toEqual({ ok: false, reason: 'LANGUAGE' });
     });
   });
+});
+
+describe('hasInsult', () => {
+  it.each(['you are an idiot', 'what a loser', 'stuuupid game', 'shut up', 'you suck', 'ur trash'])(
+    'flags %s',
+    (text) => expect(hasInsult(text)).toBe(true),
+  );
+  it.each(['good game', 'nice one', 'that was close', 'I suck at hangman lol', 'trashcan'])(
+    'leaves %s alone',
+    (text) => expect(hasInsult(text)).toBe(false),
+  );
+});
+
+describe('expanded blocked language', () => {
+  it.each(['you dumbass', 'what a jackass', 'stfu', 'suck my', 'u slut', 'a55hole'])(
+    'blocks %s',
+    (text) => expect(hasBlockedLanguage(text)).toBe(true),
+  );
+  it.each(['pass the class', 'I assume so', 'classic move', 'Cassandra', 'bass guitar'])(
+    'does not block %s',
+    (text) => expect(hasBlockedLanguage(text)).toBe(false),
+  );
+});
+
+
+describe('hasBlockedName', () => {
+  it.each(['fuck you', 'Cunt', 'b1tch', 'f u c k', 'nigger', 'ass_man_99'])('refuses %s', (name) => {
+    expect(hasBlockedName(name)).toBe(true);
+  });
+  it.each(['Shittu', 'Dick Grayson', 'Cockburn', 'Ada Lovelace', 'Chioma', 'Cassandra', 'Barth Iwuoha', 'Bass'])(
+    'lets the real name %s through',
+    (name) => {
+      expect(hasBlockedName(name)).toBe(false);
+    },
+  );
 });

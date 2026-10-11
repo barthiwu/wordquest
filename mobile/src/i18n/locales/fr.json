@@ -42,6 +42,8 @@
       "subtitle": "Choisis la raison qui correspond le mieux.",
       "sentTitle": "Signalement envoyé",
       "sentMessage": "Merci — nous allons y jeter un œil.",
+      "report": "Signaler",
+      "chatSentMessage": "Merci. Ce message est masqué pour toi. Si cela continue, tu peux aussi bloquer ce joueur.",
       "errorTitle": "Impossible d’envoyer le signalement",
       "errorFallback": "Réessaie.",
       "reasons": {
@@ -49,7 +51,11 @@
         "harassmentOrBullying": "Harcèlement ou intimidation",
         "inappropriatePhoto": "Photo inappropriée",
         "spam": "Spam",
-        "other": "Autre"
+        "other": "Autre",
+        "insults": "Insultes ou propos abusifs",
+        "offensiveLanguage": "Langage offensant ou sexuel",
+        "threats": "Menaces",
+        "spamOrLinks": "Spam ou liens"
       }
     },
     "streakMilestoneRibbon": {

@@ -182,7 +182,9 @@ export class FriendsService {
       throw new BadRequestException('You cannot add yourself as a friend.');
     }
     if (await this.isBlockedEitherWay(requesterId, target.id)) {
-      throw new ForbiddenException('You cannot add this player.');
+      // Same answer as a username that doesn't exist: a 403 here would tell
+      // someone they have been blocked.
+      throw new NotFoundException('No player with that username.');
     }
 
     const reverseExisting = await this.prisma.friendship.findUnique({

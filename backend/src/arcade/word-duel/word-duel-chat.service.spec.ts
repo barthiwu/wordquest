@@ -18,6 +18,11 @@ describe('WordDuelChatService', () => {
     report: { findMany: jest.fn() },
   };
   const friendsMock = { areBlocked: jest.fn() };
+  const safetyMock = {
+    assertCanChat: jest.fn(),
+    record: jest.fn(),
+    reportedByViewer: jest.fn(),
+  };
   let service: WordDuelChatService;
 
   const activeMatch = () => ({
@@ -36,10 +41,52 @@ describe('WordDuelChatService', () => {
       Promise.resolve({ id: 'msg1', seq: 7, createdAt: new Date('2026-10-06T12:00:00Z'), ...data }),
     );
     friendsMock.areBlocked.mockResolvedValue(false);
-    service = new WordDuelChatService(prismaMock as any, friendsMock as any);
+    safetyMock.assertCanChat.mockResolvedValue(undefined);
+    safetyMock.record.mockResolvedValue(false);
+    safetyMock.reportedByViewer.mockResolvedValue(new Set());
+    service = new WordDuelChatService(prismaMock as any, friendsMock as any, safetyMock as any);
   });
 
   describe('send', () => {
+    it('refuses profanity, records it as a flag, and never stores it', async () => {
+      await expect(service.send('me', 'm1', { body: 'you are a cunt' })).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(prismaMock.wordDuelMessage.create).not.toHaveBeenCalled();
+      expect(safetyMock.record).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: 'me', source: 'WORD_DUEL', severity: 'BLOCKED', matchId: 'm1' }),
+      );
+    });
+
+    it('tells the sender their chat is paused once the flag earns a mute', async () => {
+      safetyMock.record.mockResolvedValueOnce(true);
+      await expect(service.send('me', 'm1', { body: 'fuck this' })).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('does not flag a clean message or a refusal that is not about language', async () => {
+      await service.send('me', 'm1', { body: 'good game' });
+      await expect(service.send('me', 'm1', { body: 'see www.example.com' })).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(safetyMock.record).not.toHaveBeenCalled();
+    });
+
+    it('delivers a milder insult but records it against the message', async () => {
+      const view = await service.send('me', 'm1', { body: 'you are an idiot' });
+      expect(view.body).toBe('you are an idiot');
+      expect(safetyMock.record).toHaveBeenCalledWith(
+        expect.objectContaining({ severity: 'INSULT', messageId: 'msg1' }),
+      );
+    });
+
+    it('stops a muted player before anything else', async () => {
+      safetyMock.assertCanChat.mockRejectedValueOnce(new ForbiddenException('paused'));
+      await expect(service.send('me', 'm1', { body: 'hi' })).rejects.toThrow('paused');
+      expect(prismaMock.wordDuelMessage.create).not.toHaveBeenCalled();
+    });
+
     it('stores a clean message and returns it as mine', async () => {
       const view = await service.send('me', 'm1', { body: '  Good   luck! ' });
       expect(prismaMock.wordDuelMessage.create).toHaveBeenCalledWith({

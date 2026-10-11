@@ -200,6 +200,11 @@ export class ArcadeGroupService {
     if (group.status === 'ENDED') throw new NotFoundException(NOT_FOUND);
     this.assertLinkOpen(group);
     if (asGuest && !group.allowGuests) throw guestsNotAllowed();
+    const banned = await this.prisma.arcadeGroupBan.findUnique({
+      where: { groupId_userId: { groupId: group.id, userId } },
+      select: { userId: true },
+    });
+    if (banned) throw new ForbiddenException('The host removed you from this group.');
 
     await this.prisma.$transaction(async (tx) => {
       // Serialized per group so the member cap holds when many join at once.
@@ -234,6 +239,12 @@ export class ArcadeGroupService {
       throw new BadRequestException('The host cannot be removed. End the group instead.');
     }
     await this.removeMembership(group.id, targetId);
+    // Removed means removed: the same account can't walk back in through the link.
+    await this.prisma.arcadeGroupBan.upsert({
+      where: { groupId_userId: { groupId: group.id, userId: targetId } },
+      create: { groupId: group.id, userId: targetId },
+      update: {},
+    });
     return this.buildView(group, hostId);
   }
 

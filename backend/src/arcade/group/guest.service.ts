@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { randomBytes, randomUUID } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -11,6 +11,7 @@ import {
   guestHandleCandidate,
   uniqueInGroup,
 } from './guest.util';
+import { hasBlockedName } from '../word-duel/duel-chat-filter';
 
 export const GUEST_EMAIL_DOMAIN = 'guest.wordquest.invalid';
 
@@ -44,6 +45,10 @@ export class ArcadeGuestService {
 
     if (!preview.allowGuests) {
       throw guestsNotAllowed();
+    }
+
+    if (hasBlockedName(nickname)) {
+      throw new BadRequestException('Please choose a different name.');
     }
 
     // Shown exactly as typed ("Barth", not "barth_47"), made unique within the group.

@@ -9,7 +9,8 @@ import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../../prisma/prisma.service';
 import { FriendsService } from '../../friends/friends.service';
 import { WORD_DUEL_CHAT_CONFIG } from '../config/arcade.config';
-import { CHAT_REJECTION_MESSAGES, checkChatMessage } from './duel-chat-filter';
+import { CHAT_REJECTION_MESSAGES, checkChatMessage, hasInsult } from './duel-chat-filter';
+import { CHAT_MUTED_MESSAGE, ChatSafetyService } from '../chat/chat-safety.service';
 import { isQuickChatCode } from '../chat/quick-chat';
 import { assertChatRateOk } from '../chat/chat-limits';
 
@@ -41,6 +42,7 @@ export class WordDuelChatService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly friends: FriendsService,
+    private readonly safety: ChatSafetyService,
   ) {}
 
   async send(
@@ -59,6 +61,7 @@ export class WordDuelChatService {
     if (await this.friends.areBlocked(userId, opponentId)) {
       throw new ForbiddenException('Chat is not available with this player.');
     }
+    await this.safety.assertCanChat(userId);
 
     let kind: 'TEXT' | 'QUICK';
     let body: string;
@@ -68,7 +71,20 @@ export class WordDuelChatService {
       body = input.quick;
     } else {
       const checked = checkChatMessage(input.body ?? '');
-      if (!checked.ok) throw new BadRequestException(CHAT_REJECTION_MESSAGES[checked.reason]);
+      if (!checked.ok) {
+        if (checked.reason === 'LANGUAGE') {
+          // Refused, never delivered — but recorded, and a pattern earns a chat pause.
+          const muted = await this.safety.record({
+            userId,
+            source: 'WORD_DUEL',
+            matchId,
+            severity: 'BLOCKED',
+            body: input.body ?? '',
+          });
+          if (muted) throw new ForbiddenException(CHAT_MUTED_MESSAGE);
+        }
+        throw new BadRequestException(CHAT_REJECTION_MESSAGES[checked.reason]);
+      }
       kind = 'TEXT';
       body = checked.body;
     }
@@ -85,6 +101,17 @@ export class WordDuelChatService {
     const created = await this.prisma.wordDuelMessage.create({
       data: { matchId, senderId: userId, body, kind },
     });
+    if (kind === 'TEXT' && hasInsult(body)) {
+      // Delivered (heated duels happen) but on the record, and reportable.
+      await this.safety.record({
+        userId,
+        source: 'WORD_DUEL',
+        matchId,
+        messageId: created.id,
+        severity: 'INSULT',
+        body,
+      });
+    }
     return this.toView(created, userId);
   }
 
@@ -104,7 +131,13 @@ export class WordDuelChatService {
       orderBy: { seq: 'asc' },
       take: WORD_DUEL_CHAT_CONFIG.FETCH_LIMIT,
     });
-    return rows.map((row) => this.toView(row, userId));
+    // A message the viewer reported is gone from their screen for good.
+    const reported = await this.safety.reportedByViewer(
+      userId,
+      'WORD_DUEL_MESSAGE',
+      rows.filter((r) => r.senderId !== userId).map((r) => r.id),
+    );
+    return rows.filter((row) => !reported.has(row.id)).map((row) => this.toView(row, userId));
   }
 
   /** Daily purge of old messages. Anything a player reported is kept for

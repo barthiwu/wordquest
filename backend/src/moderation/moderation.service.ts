@@ -2,6 +2,15 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException 
 import { ReportStatus, ReportTargetType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ObjectStorageService } from '../storage/object-storage.service';
+import { ChatSafetyService } from '../arcade/chat/chat-safety.service';
+
+/** What a chat-message report points at, so the sender's record can be updated. */
+interface ChatReportContext {
+  senderId: string;
+  source: 'WORD_DUEL' | 'ARCADE_VERSUS';
+  matchId: string;
+  body: string;
+}
 
 export interface ReportView {
   id: string;
@@ -51,6 +60,7 @@ export class ModerationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly storage: ObjectStorageService,
+    private readonly chatSafety: ChatSafetyService,
   ) {}
 
   async fileReport(
@@ -59,12 +69,34 @@ export class ModerationService {
     targetId: string,
     reason: string,
   ): Promise<{ id: string }> {
-    await this.assertTargetExists(targetType, targetId, reporterId);
+    const chat = await this.assertTargetExists(targetType, targetId, reporterId);
+
+    // One report per player per message: tapping twice must not count twice
+    // toward an automatic chat pause.
+    if (chat) {
+      const already = await this.prisma.report.findFirst({
+        where: { reporterId, targetType, targetId },
+        select: { id: true },
+      });
+      if (already) return already;
+    }
 
     const report = await this.prisma.report.create({
       data: { reporterId, targetType, targetId, reason: reason.trim() },
       select: { id: true },
     });
+    if (chat) {
+      // Reports from several different players pause the sender's chat.
+      await this.chatSafety.record({
+        userId: chat.senderId,
+        source: chat.source,
+        matchId: chat.matchId,
+        messageId: targetId,
+        reporterId,
+        severity: 'REPORTED',
+        body: chat.body,
+      });
+    }
     return report;
   }
 
@@ -72,17 +104,17 @@ export class ModerationService {
     targetType: ReportTargetType,
     targetId: string,
     reporterId: string,
-  ): Promise<void> {
+  ): Promise<ChatReportContext | null> {
     switch (targetType) {
       case 'USER': {
         const user = await this.prisma.user.findUnique({ where: { id: targetId }, select: { id: true } });
         if (!user) throw new BadRequestException('Reported user not found');
-        return;
+        return null;
       }
       case 'CLAN': {
         const clan = await this.prisma.clan.findUnique({ where: { id: targetId }, select: { id: true } });
         if (!clan) throw new BadRequestException('Reported clan not found');
-        return;
+        return null;
       }
       case 'WORD_IN_THE_WILD_SUBMISSION': {
         const submission = await this.prisma.wordInTheWildSubmission.findUnique({
@@ -90,14 +122,14 @@ export class ModerationService {
           select: { id: true },
         });
         if (!submission) throw new BadRequestException('Reported submission not found');
-        return;
+        return null;
       }
       case 'WORD_DUEL_MESSAGE': {
         // Only the player on the receiving end of a message can report it,
         // and the report never confirms a message id to anyone else.
         const message = await this.prisma.wordDuelMessage.findUnique({
           where: { id: targetId },
-          select: { matchId: true, senderId: true },
+          select: { matchId: true, senderId: true, body: true, kind: true },
         });
         const reporterInMatch = message
           ? await this.prisma.wordDuelPlayerState.findFirst({
@@ -108,12 +140,23 @@ export class ModerationService {
         if (!message || !reporterInMatch || message.senderId === reporterId) {
           throw new BadRequestException('Reported message not found');
         }
-        return;
+        return {
+          senderId: message.senderId,
+          source: 'WORD_DUEL',
+          matchId: message.matchId,
+          body: message.kind === 'QUICK' ? `[quick chat: ${message.body}]` : message.body,
+        };
       }
       case 'ARCADE_VERSUS_MESSAGE': {
         const message = await this.prisma.arcadeVersusMessage.findUnique({
           where: { id: targetId },
-          select: { senderId: true, match: { select: { hostId: true, guestId: true } } },
+          select: {
+            senderId: true,
+            matchId: true,
+            body: true,
+            kind: true,
+            match: { select: { hostId: true, guestId: true } },
+          },
         });
         const reporterInMatch =
           !!message &&
@@ -121,9 +164,19 @@ export class ModerationService {
         if (!message || !reporterInMatch || message.senderId === reporterId) {
           throw new BadRequestException('Reported message not found');
         }
-        return;
+        return {
+          senderId: message.senderId,
+          source: 'ARCADE_VERSUS',
+          matchId: message.matchId,
+          body: message.kind === 'QUICK' ? `[quick chat: ${message.body}]` : message.body,
+        };
       }
     }
+  }
+
+  /** Admin view of flagged chat: refused language, delivered insults, and reports against messages. */
+  listChatFlags(severity?: 'BLOCKED' | 'INSULT' | 'REPORTED') {
+    return this.chatSafety.listRecent(severity);
   }
 
   async listReports(status?: ReportStatus): Promise<ReportView[]> {

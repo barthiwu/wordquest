@@ -70,6 +70,8 @@ export function DuelChat({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('chat');
+  // Messages this player reported: gone from their screen straight away.
+  const [reportedIds, setReportedIds] = useState<ReadonlySet<string>>(new Set());
   const listRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -135,31 +137,35 @@ export function DuelChat({
             {messages.length === 0 ? (
               <Text style={styles.empty}>{t('wordDuel:chatEmpty')}</Text>
             ) : (
-              messages.map((m) => (
-                <View key={m.id} style={[styles.row, m.mine && styles.rowMine]}>
-                  <View style={[styles.bubble, m.mine ? styles.bubbleMine : styles.bubbleTheirs]}>
-                    {m.kind === 'QUICK' ? (
-                      <View style={styles.quickBubble}>
-                        <Text style={styles.quickBubbleEmoji}>{quickChatEmoji(m.body)}</Text>
-                        <Text style={[styles.quickBubbleLabel, m.mine && { color: colors.ink }]}>
-                          {t(`arcade:chat.quick.${m.body}`, { defaultValue: '' })}
+              messages
+                .filter((m) => !reportedIds.has(m.id))
+                .map((m) => (
+                  <View key={m.id} style={[styles.row, m.mine && styles.rowMine]}>
+                    <View style={[styles.bubble, m.mine ? styles.bubbleMine : styles.bubbleTheirs]}>
+                      {m.kind === 'QUICK' ? (
+                        <View style={styles.quickBubble}>
+                          <Text style={styles.quickBubbleEmoji}>{quickChatEmoji(m.body)}</Text>
+                          <Text style={[styles.quickBubbleLabel, m.mine && { color: colors.ink }]}>
+                            {t(`arcade:chat.quick.${m.body}`, { defaultValue: '' })}
+                          </Text>
+                        </View>
+                      ) : (
+                        <Text style={[styles.bubbleText, m.mine && { color: colors.ink }]}>
+                          {m.body}
                         </Text>
-                      </View>
-                    ) : (
-                      <Text style={[styles.bubbleText, m.mine && { color: colors.ink }]}>
-                        {m.body}
-                      </Text>
+                      )}
+                    </View>
+                    {!m.mine && (
+                      <ReportButton
+                        targetType={reportTargetType}
+                        targetId={m.id}
+                        label={t('wordDuel:chatReportLabel')}
+                        variant="chat"
+                        onReported={() => setReportedIds((prev) => new Set(prev).add(m.id))}
+                      />
                     )}
                   </View>
-                  {!m.mine && (
-                    <ReportButton
-                      targetType={reportTargetType}
-                      targetId={m.id}
-                      label={t('wordDuel:chatReportLabel')}
-                    />
-                  )}
-                </View>
-              ))
+                ))
             )}
           </ScrollView>
 

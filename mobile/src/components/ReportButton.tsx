@@ -17,16 +17,32 @@ const REASONS = [
   'Other',
 ] as const;
 
+// What a player can say about something an opponent typed in chat. The
+// first one is the one most reports are about, so it is first.
+const CHAT_REASONS = [
+  'Insults or abusive language',
+  'Offensive or sexual language',
+  'Threats',
+  'Spam or links',
+  'Other',
+] as const;
+
+type Reason = (typeof REASONS)[number] | (typeof CHAT_REASONS)[number];
+
 // Display-only translation keys for REASONS — the values submitted to
 // fileReport() stay the original English strings (REASONS itself is
 // unchanged) since that's the payload the moderation queue expects;
 // only what's shown on screen is translated.
-const REASON_KEYS: Record<(typeof REASONS)[number], string> = {
+const REASON_KEYS: Record<Reason, string> = {
   'Inappropriate name': 'reportButton.reasons.inappropriateName',
   'Harassment or bullying': 'reportButton.reasons.harassmentOrBullying',
   'Inappropriate photo': 'reportButton.reasons.inappropriatePhoto',
   Spam: 'reportButton.reasons.spam',
   Other: 'reportButton.reasons.other',
+  'Insults or abusive language': 'reportButton.reasons.insults',
+  'Offensive or sexual language': 'reportButton.reasons.offensiveLanguage',
+  Threats: 'reportButton.reasons.threats',
+  'Spam or links': 'reportButton.reasons.spamOrLinks',
 };
 
 interface Props {
@@ -34,6 +50,10 @@ interface Props {
   targetId: string;
   /** What's being reported, for the confirmation copy and accessibility label — e.g. a display name or clan name. */
   label: string;
+  /** 'chat' shows the reasons that fit a message ("Insults or abusive language" first) and a visible "Report" label. */
+  variant?: 'default' | 'chat';
+  /** Called once the report has gone through, e.g. so the message can be hidden. */
+  onReported?: () => void;
 }
 
 /**
@@ -43,7 +63,14 @@ interface Props {
  * reasons is faster to use on a phone and enough context for a reviewer
  * to triage against the target itself.
  */
-export function ReportButton({ targetType, targetId, label }: Props) {
+export function ReportButton({
+  targetType,
+  targetId,
+  label,
+  variant = 'default',
+  onReported,
+}: Props) {
+  const reasons: readonly Reason[] = variant === 'chat' ? CHAT_REASONS : REASONS;
   const { t } = useTranslation('common');
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -57,7 +84,11 @@ export function ReportButton({ targetType, targetId, label }: Props) {
     try {
       await fileReport(accessToken, { targetType, targetId, reason });
       setOpen(false);
-      notify(t('reportButton.sentTitle'), t('reportButton.sentMessage'));
+      notify(
+        t('reportButton.sentTitle'),
+        t(variant === 'chat' ? 'reportButton.chatSentMessage' : 'reportButton.sentMessage'),
+      );
+      onReported?.();
     } catch (err) {
       notify(
         t('reportButton.errorTitle'),
@@ -78,6 +109,9 @@ export function ReportButton({ targetType, targetId, label }: Props) {
         style={styles.button}
       >
         <Ionicons name="flag-outline" size={16} color={colors.inkMuted} />
+        {variant === 'chat' ? (
+          <Text style={styles.buttonLabel}>{t('reportButton.report')}</Text>
+        ) : null}
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
@@ -85,7 +119,7 @@ export function ReportButton({ targetType, targetId, label }: Props) {
           <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
             <Text style={styles.title}>{t('reportButton.title', { label })}</Text>
             <Text style={styles.subtitle}>{t('reportButton.subtitle')}</Text>
-            {REASONS.map((reason) => (
+            {reasons.map((reason) => (
               <Pressable
                 key={reason}
                 style={styles.reasonRow}
@@ -109,7 +143,8 @@ export function ReportButton({ targetType, targetId, label }: Props) {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-    button: { padding: spacing.xs },
+    button: { padding: spacing.xs, flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+    buttonLabel: { color: colors.inkMuted, fontSize: typography.scale.xs, fontWeight: '600' },
     backdrop: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,0.5)',

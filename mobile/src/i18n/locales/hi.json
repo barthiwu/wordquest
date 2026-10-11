@@ -42,6 +42,8 @@
       "subtitle": "सबसे सही कारण चुनें।",
       "sentTitle": "रिपोर्ट भेजी गई",
       "sentMessage": "धन्यवाद — हम इसे देखेंगे।",
+      "report": "रिपोर्ट करें",
+      "chatSentMessage": "धन्यवाद। यह संदेश आपके लिए छिपा दिया गया है। अगर ऐसा होता रहे तो आप इस खिलाड़ी को ब्लॉक भी कर सकते हैं।",
       "errorTitle": "रिपोर्ट नहीं भेजी जा सकी",
       "errorFallback": "कृपया फिर से कोशिश करें।",
       "reasons": {
@@ -49,7 +51,11 @@
         "harassmentOrBullying": "उत्पीड़न या धमकाना",
         "inappropriatePhoto": "अनुचित फ़ोटो",
         "spam": "स्पैम",
-        "other": "अन्य"
+        "other": "अन्य",
+        "insults": "अपमान या गाली-गलौज वाली भाषा",
+        "offensiveLanguage": "अश्लील या आपत्तिजनक भाषा",
+        "threats": "धमकियाँ",
+        "spamOrLinks": "स्पैम या लिंक"
       }
     },
     "streakMilestoneRibbon": {

@@ -9,7 +9,12 @@ import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../../prisma/prisma.service';
 import { FriendsService } from '../../friends/friends.service';
 import { ARCADE_VERSUS_CHAT_CONFIG } from '../config/arcade.config';
-import { CHAT_REJECTION_MESSAGES, checkChatMessage } from '../word-duel/duel-chat-filter';
+import {
+  CHAT_REJECTION_MESSAGES,
+  checkChatMessage,
+  hasInsult,
+} from '../word-duel/duel-chat-filter';
+import { CHAT_MUTED_MESSAGE, ChatSafetyService } from '../chat/chat-safety.service';
 import { isQuickChatCode } from '../chat/quick-chat';
 import { assertChatRateOk } from '../chat/chat-limits';
 
@@ -46,6 +51,7 @@ export class ArcadeVersusChatService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly friends: FriendsService,
+    private readonly safety: ChatSafetyService,
   ) {}
 
   async send(
@@ -60,6 +66,7 @@ export class ArcadeVersusChatService {
     if (await this.friends.areBlocked(userId, opponentId)) {
       throw new ForbiddenException('Chat is not available with this player.');
     }
+    await this.safety.assertCanChat(userId);
 
     let kind: 'TEXT' | 'QUICK';
     let body: string;
@@ -72,7 +79,19 @@ export class ArcadeVersusChatService {
         throw new ForbiddenException('Typed chat is only for friends. Use quick chat.');
       }
       const checked = checkChatMessage(input.body ?? '');
-      if (!checked.ok) throw new BadRequestException(CHAT_REJECTION_MESSAGES[checked.reason]);
+      if (!checked.ok) {
+        if (checked.reason === 'LANGUAGE') {
+          const muted = await this.safety.record({
+            userId,
+            source: 'ARCADE_VERSUS',
+            matchId,
+            severity: 'BLOCKED',
+            body: input.body ?? '',
+          });
+          if (muted) throw new ForbiddenException(CHAT_MUTED_MESSAGE);
+        }
+        throw new BadRequestException(CHAT_REJECTION_MESSAGES[checked.reason]);
+      }
       kind = 'TEXT';
       body = checked.body;
     }
@@ -91,6 +110,16 @@ export class ArcadeVersusChatService {
     const created = await this.prisma.arcadeVersusMessage.create({
       data: { matchId, senderId: userId, body, kind },
     });
+    if (kind === 'TEXT' && hasInsult(body)) {
+      await this.safety.record({
+        userId,
+        source: 'ARCADE_VERSUS',
+        matchId,
+        messageId: created.id,
+        severity: 'INSULT',
+        body,
+      });
+    }
     return this.toView(created, userId);
   }
 
@@ -99,16 +128,21 @@ export class ArcadeVersusChatService {
     const { match, opponentId } = await this.loadMatchForPlayer(userId, matchId);
     const open = !!opponentId && this.isOpen(match);
     const blocked = !!opponentId && (await this.friends.areBlocked(userId, opponentId));
-    const messages =
-      !opponentId || blocked
-        ? []
-        : (
-            await this.prisma.arcadeVersusMessage.findMany({
-              where: { matchId, hidden: false, seq: { gt: Math.max(0, afterSeq) } },
-              orderBy: { seq: 'asc' },
-              take: ARCADE_VERSUS_CHAT_CONFIG.FETCH_LIMIT,
-            })
-          ).map((row) => this.toView(row, userId));
+    let messages: VersusChatMessageView[] = [];
+    if (opponentId && !blocked) {
+      const rows = await this.prisma.arcadeVersusMessage.findMany({
+        where: { matchId, hidden: false, seq: { gt: Math.max(0, afterSeq) } },
+        orderBy: { seq: 'asc' },
+        take: ARCADE_VERSUS_CHAT_CONFIG.FETCH_LIMIT,
+      });
+      // A message the viewer reported is gone from their screen for good.
+      const reported = await this.safety.reportedByViewer(
+        userId,
+        'ARCADE_VERSUS_MESSAGE',
+        rows.filter((r) => r.senderId !== userId).map((r) => r.id),
+      );
+      messages = rows.filter((row) => !reported.has(row.id)).map((row) => this.toView(row, userId));
+    }
     return {
       messages,
       canQuick: open && !blocked,

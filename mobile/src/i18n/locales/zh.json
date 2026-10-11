@@ -42,6 +42,8 @@
       "subtitle": "选择最符合的原因。",
       "sentTitle": "举报已发送",
       "sentMessage": "谢谢——我们会尽快处理。",
+      "report": "举报",
+      "chatSentMessage": "谢谢。该消息已对你隐藏。如果这种情况持续发生，你也可以屏蔽这位玩家。",
       "errorTitle": "无法发送举报",
       "errorFallback": "请重试。",
       "reasons": {
@@ -49,7 +51,11 @@
         "harassmentOrBullying": "骚扰或欺凌",
         "inappropriatePhoto": "不当照片",
         "spam": "垃圾信息",
-        "other": "其他"
+        "other": "其他",
+        "insults": "侮辱或辱骂性语言",
+        "offensiveLanguage": "冒犯或色情语言",
+        "threats": "威胁",
+        "spamOrLinks": "垃圾信息或链接"
       }
     },
     "streakMilestoneRibbon": {

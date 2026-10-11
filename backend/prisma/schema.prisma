@@ -89,6 +89,9 @@ model User {
   // day, so unlimited changes would let a player replay daily caps and
   // rescue broken streaks (UsersService.updateProfile).
   timezoneChangedAt DateTime?
+  // Chat is paused for this player until this moment (language flags or
+  // repeated reports from other players; see ChatSafetyService). Null = free to chat.
+  chatMutedUntil DateTime?
 
   // WordQuest+ (V2 subscription): until this moment the player has no daily
   // Arcade play limit. Null = free plan. There is no purchase flow yet; the
@@ -183,6 +186,8 @@ model User {
   arcadeGameSessions       ArcadeGameSession[]
   wordDuelMessages         WordDuelMessage[]         @relation("WordDuelMessageSender")
   arcadeVersusMessages     ArcadeVersusMessage[]     @relation("ArcadeVersusMessageSender")
+  chatFlags                ChatFlag[]                @relation("ChatFlagsAgainst")
+  arcadeGroupBans          ArcadeGroupBan[]          @relation("ArcadeGroupBans")
   arcadePlayCounts         ArcadePlayCount[]
   arcadeVersusHosted       ArcadeVersusMatch[]       @relation("ArcadeVersusHost")
   arcadeVersusJoined       ArcadeVersusMatch[]       @relation("ArcadeVersusGuest")
@@ -1934,6 +1939,39 @@ model ArcadeVersusMessage {
   @@map("arcade_versus_messages")
 }
 
+enum ChatFlagSource {
+  WORD_DUEL
+  ARCADE_VERSUS
+}
+
+enum ChatFlagSeverity {
+  BLOCKED // profanity / slur / threat: the message was refused and never delivered
+  INSULT // a milder insult: delivered, but recorded
+  REPORTED // the other player reported a message from this sender
+}
+
+// An audit row for chat behaviour worth a moderator's eye, and the input to
+// automatic chat mutes. One row per refused message, per delivered insult,
+// and per report filed against a message (reporterId set). `body` keeps the
+// flagged text (capped) so a reviewer sees what was actually said.
+model ChatFlag {
+  id         String           @id @default(uuid())
+  userId     String // the sender the flag is about
+  user       User             @relation("ChatFlagsAgainst", fields: [userId], references: [id], onDelete: Cascade)
+  reporterId String?
+  source     ChatFlagSource
+  matchId    String
+  messageId  String?
+  severity   ChatFlagSeverity
+  body       String           @db.VarChar(300)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([severity, createdAt])
+  @@map("chat_flags")
+}
+
 enum ArcadeGroupStatus {
   LOBBY // created, people are joining via the link; the host has not started
   ACTIVE // the host started the round: everyone plays the same words
@@ -1980,6 +2018,7 @@ model ArcadeGroup {
   endedAt     DateTime?
 
   members  ArcadeGroupMember[]
+  bans     ArcadeGroupBan[]
   sessions ArcadeGameSession[]
 
   @@index([hostId, status])
@@ -1998,6 +2037,20 @@ model ArcadeGroupMember {
   @@unique([groupId, userId])
   @@index([userId])
   @@map("arcade_group_members")
+}
+
+// Someone the host removed: they cannot come back into the same group through
+// its link. (A guest could still join again under a new nickname, which is a
+// new guest identity; this stops accounts.)
+model ArcadeGroupBan {
+  groupId   String
+  group     ArcadeGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User        @relation("ArcadeGroupBans", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+
+  @@id([groupId, userId])
+  @@map("arcade_group_bans")
 }
 
 enum WordDuelMatchStatus {

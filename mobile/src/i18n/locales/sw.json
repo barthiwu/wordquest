@@ -42,6 +42,8 @@
       "subtitle": "Chagua sababu inayofaa zaidi.",
       "sentTitle": "Ripoti imetumwa",
       "sentMessage": "Asante — tutaiangalia.",
+      "report": "Ripoti",
+      "chatSentMessage": "Asante. Ujumbe huo umefichwa kwako. Ikiendelea, unaweza pia kumzuia mchezaji huyu.",
       "errorTitle": "Imeshindwa kutuma ripoti",
       "errorFallback": "Tafadhali jaribu tena.",
       "reasons": {
@@ -49,7 +51,11 @@
         "harassmentOrBullying": "Unyanyasaji au udhalilishaji",
         "inappropriatePhoto": "Picha isiyofaa",
         "spam": "Taka",
-        "other": "Nyingine"
+        "other": "Nyingine",
+        "insults": "Matusi au lugha ya kuudhi",
+        "offensiveLanguage": "Lugha chafu au ya ngono",
+        "threats": "Vitisho",
+        "spamOrLinks": "Barua taka au viungo"
       }
     },
     "streakMilestoneRibbon": {

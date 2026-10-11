@@ -6,10 +6,17 @@ describe('ModerationService', () => {
     user: { findUnique: jest.fn() },
     clan: { findUnique: jest.fn() },
     wordInTheWildSubmission: { findUnique: jest.fn(), findMany: jest.fn(), update: jest.fn() },
-    report: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn() },
+    report: {
+      create: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      update: jest.fn(),
+    },
     wordDuelMessage: { findUnique: jest.fn(), updateMany: jest.fn() },
     wordDuelPlayerState: { findFirst: jest.fn() },
   };
+  const chatSafetyMock = { record: jest.fn(), listRecent: jest.fn() };
   const storageMock = {
     isStorageConfigured: jest.fn().mockReturnValue(true),
     getDownloadUrl: jest.fn(),
@@ -21,7 +28,8 @@ describe('ModerationService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     storageMock.isStorageConfigured.mockReturnValue(true);
-    service = new ModerationService(prismaMock as any, storageMock as any);
+    chatSafetyMock.record.mockResolvedValue(false);
+    service = new ModerationService(prismaMock as any, storageMock as any, chatSafetyMock as any);
   });
 
   describe('fileReport', () => {
@@ -65,8 +73,14 @@ describe('ModerationService', () => {
 
   describe('fileReport for a Word Duel message', () => {
     it("files a report from the other player in that message's match", async () => {
-      prismaMock.wordDuelMessage.findUnique.mockResolvedValue({ matchId: 'm1', senderId: 'rival' });
+      prismaMock.wordDuelMessage.findUnique.mockResolvedValue({
+        matchId: 'm1',
+        senderId: 'rival',
+        body: 'you idiot',
+        kind: 'TEXT',
+      });
       prismaMock.wordDuelPlayerState.findFirst.mockResolvedValue({ id: 'ps1' });
+      prismaMock.report.findFirst.mockResolvedValue(null);
       prismaMock.report.create.mockResolvedValue({ id: 'report-9' });
 
       const result = await service.fileReport('me', 'WORD_DUEL_MESSAGE', 'msg-1', 'Harassment');
@@ -76,6 +90,47 @@ describe('ModerationService', () => {
         where: { matchId: 'm1', userId: 'me' },
         select: { id: true },
       });
+    });
+
+    it('puts the report on the sender record (what drives an automatic chat pause)', async () => {
+      prismaMock.wordDuelMessage.findUnique.mockResolvedValue({
+        matchId: 'm1',
+        senderId: 'rival',
+        body: 'you idiot',
+        kind: 'TEXT',
+      });
+      prismaMock.wordDuelPlayerState.findFirst.mockResolvedValue({ id: 'ps1' });
+      prismaMock.report.findFirst.mockResolvedValue(null);
+      prismaMock.report.create.mockResolvedValue({ id: 'report-9' });
+
+      await service.fileReport('me', 'WORD_DUEL_MESSAGE', 'msg-1', 'Insults or abusive language');
+
+      expect(chatSafetyMock.record).toHaveBeenCalledWith({
+        userId: 'rival',
+        source: 'WORD_DUEL',
+        matchId: 'm1',
+        messageId: 'msg-1',
+        reporterId: 'me',
+        severity: 'REPORTED',
+        body: 'you idiot',
+      });
+    });
+
+    it('ignores a second report of the same message by the same player', async () => {
+      prismaMock.wordDuelMessage.findUnique.mockResolvedValue({
+        matchId: 'm1',
+        senderId: 'rival',
+        body: 'x',
+        kind: 'TEXT',
+      });
+      prismaMock.wordDuelPlayerState.findFirst.mockResolvedValue({ id: 'ps1' });
+      prismaMock.report.findFirst.mockResolvedValue({ id: 'report-9' });
+
+      const result = await service.fileReport('me', 'WORD_DUEL_MESSAGE', 'msg-1', 'Spam');
+
+      expect(result).toEqual({ id: 'report-9' });
+      expect(prismaMock.report.create).not.toHaveBeenCalled();
+      expect(chatSafetyMock.record).not.toHaveBeenCalled();
     });
 
     it('rejects a message that does not exist', async () => {

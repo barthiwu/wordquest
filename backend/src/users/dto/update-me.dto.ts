@@ -8,6 +8,7 @@ import {
   Length,
   Matches, MaxLength } from 'class-validator';
 import { USERNAME_REGEX } from '../users.service';
+import { IsCleanName } from '../../common/is-clean-name.validator';
 
 export enum LearningGoalDto {
   CASUAL = 'CASUAL',
@@ -27,6 +28,7 @@ export class UpdateMeDto {
   @IsString()
   @MaxLength(80)
   @Length(2, 40)
+  @IsCleanName()
   displayName?: string;
 
   /** Lowercase letters, digits, underscores; 3-20 chars -- see USERNAME_REGEX's doc comment. */
@@ -35,6 +37,7 @@ export class UpdateMeDto {
   @Matches(USERNAME_REGEX, {
     message: 'username must be 3-20 characters: lowercase letters, numbers, and underscores only',
   })
+  @IsCleanName()
   username?: string;
 
   @IsOptional()

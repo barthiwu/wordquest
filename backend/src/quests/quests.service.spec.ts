@@ -1244,6 +1244,28 @@ describe('QuestsService', () => {
       );
     });
 
+    it('refuses a second submission while the first is still being scored (no double AI bill)', async () => {
+      prismaMock.questAttempt.findUnique.mockResolvedValue({ ...sentenceAttempt });
+      prismaMock.word.findUniqueOrThrow.mockResolvedValue(greetingWord);
+      let release!: (v: typeof evaluation) => void;
+      sentenceEvaluationMock.evaluate.mockReturnValueOnce(
+        new Promise<typeof evaluation>((resolve) => {
+          release = resolve;
+        }),
+      );
+
+      const first = service.submitSentence('u1', 'a1', 'She gave a warm greeting.');
+      // Let the first call reach the evaluator before the second arrives.
+      await new Promise((r) => setImmediate(r));
+      await expect(service.submitSentence('u1', 'a1', 'She gave a warm greeting.')).rejects.toThrow(
+        'already being scored',
+      );
+      expect(sentenceEvaluationMock.evaluate).toHaveBeenCalledTimes(1);
+
+      release(evaluation);
+      await first;
+    });
+
     it('sends the word, definition, and part of speech to the evaluator', async () => {
       prismaMock.questAttempt.findUnique.mockResolvedValueOnce({ ...sentenceAttempt });
       prismaMock.word.findUniqueOrThrow.mockResolvedValueOnce(greetingWord);

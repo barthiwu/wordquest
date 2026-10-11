@@ -34,7 +34,9 @@ export function guestHandleCandidate(base: string, attempt: number, random: () =
  */
 export function guestDisplayName(nickname: string, max = 20): string {
   return nickname
-    .replace(/[\u0000-\u001f\u007f<>]/g, '')
+    // Control characters, brackets, and the invisible / direction-flipping characters
+    // that let one name impersonate another or scramble the screen.
+    .replace(/[\u0000-\u001f\u007f<>\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, max)

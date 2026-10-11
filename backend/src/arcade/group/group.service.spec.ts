@@ -53,6 +53,7 @@ describe('ArcadeGroupService', () => {
       create: jest.fn(),
       deleteMany: jest.fn(),
     },
+    arcadeGroupBan: { findUnique: jest.fn(), upsert: jest.fn() },
     arcadeGameSession: { findMany: jest.fn(), findUnique: jest.fn(), updateMany: jest.fn() },
     word: { findMany: jest.fn() },
     user: { findUnique: jest.fn() },
@@ -96,6 +97,8 @@ describe('ArcadeGroupService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     prismaMock.arcadeGroup.updateMany.mockResolvedValue({ count: 1 });
+    prismaMock.arcadeGroupBan.findUnique.mockResolvedValue(null);
+    prismaMock.arcadeGroupBan.upsert.mockResolvedValue({});
     prismaMock.arcadeGameSession.updateMany.mockResolvedValue({ count: 0 });
     prismaMock.arcadeGroupMember.findMany.mockResolvedValue([member('host')]);
     prismaMock.arcadeGameSession.findMany.mockResolvedValue([]);
@@ -395,6 +398,17 @@ describe('ArcadeGroupService', () => {
       expect(prismaMock.arcadeGroupMember.deleteMany).toHaveBeenCalledWith({
         where: { groupId: 'g1', userId: 'stu' },
       });
+      // ...and the same account can't come back through the link.
+      expect(prismaMock.arcadeGroupBan.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { groupId_userId: { groupId: 'g1', userId: 'stu' } } }),
+      );
+    });
+
+    it('refuses a removed player who tries the link again', async () => {
+      prismaMock.arcadeGroup.findUnique.mockResolvedValue(groupRow());
+      prismaMock.arcadeGroupBan.findUnique.mockResolvedValueOnce({ userId: 'stu' });
+      await expect(service.join('stu', CODE)).rejects.toBeInstanceOf(ForbiddenException);
+      expect(prismaMock.arcadeGroupMember.create).not.toHaveBeenCalled();
     });
   });
 

@@ -42,6 +42,8 @@
       "subtitle": "اختر السبب الأنسب.",
       "sentTitle": "تم إرسال البلاغ",
       "sentMessage": "شكرًا — سنلقي نظرة على ذلك.",
+      "report": "إبلاغ",
+      "chatSentMessage": "شكرًا. تم إخفاء هذه الرسالة عنك. إذا استمر الأمر يمكنك أيضًا حظر هذا اللاعب.",
       "errorTitle": "تعذّر إرسال البلاغ",
       "errorFallback": "يرجى المحاولة مرة أخرى.",
       "reasons": {
@@ -49,7 +51,11 @@
         "harassmentOrBullying": "تحرّش أو تنمّر",
         "inappropriatePhoto": "صورة غير لائقة",
         "spam": "رسائل مزعجة",
-        "other": "أخرى"
+        "other": "أخرى",
+        "insults": "إهانات أو لغة مسيئة",
+        "offensiveLanguage": "لغة بذيئة أو جنسية",
+        "threats": "تهديدات",
+        "spamOrLinks": "رسائل مزعجة أو روابط"
       }
     },
     "streakMilestoneRibbon": {

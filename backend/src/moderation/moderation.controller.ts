@@ -24,6 +24,13 @@ export class ModerationController {
     return this.moderation.listReports(status);
   }
 
+  /** Flagged chat: GET /moderation/chat-flags?severity=BLOCKED|INSULT|REPORTED */
+  @Get('chat-flags')
+  listChatFlags(@Query('severity') severity?: 'BLOCKED' | 'INSULT' | 'REPORTED') {
+    const allowed = ['BLOCKED', 'INSULT', 'REPORTED'];
+    return this.moderation.listChatFlags(severity && allowed.includes(severity) ? severity : undefined);
+  }
+
   @Patch('reports/:id')
   reviewReport(@CurrentUserId() reviewerId: string, @Param('id') id: string, @Body() dto: ReviewReportDto) {
     return this.moderation.reviewReport(reviewerId, id, dto.status, dto.reviewNotes);

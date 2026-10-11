@@ -1,4 +1,9 @@
-import { Injectable, PayloadTooLargeException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  PayloadTooLargeException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -20,6 +25,16 @@ const DOWNLOAD_URL_EXPIRY_SECONDS = 60 * 60; // long enough to view, short enoug
  */
 export const MAX_UPLOAD_BYTES = 4.5 * 1024 * 1024;
 export const UPLOAD_TOO_LARGE_MESSAGE = 'That photo is too large. Please use one under 4.5 MB.';
+
+export const NOT_AN_IMAGE_MESSAGE = 'That file is not a PNG or JPEG photo.';
+
+/** Which image format the first bytes say a file is (a presigned PUT can't check this itself). */
+export function detectImageType(head: Uint8Array): UploadContentType | null {
+  if (head.length >= 3 && head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) return 'image/jpeg';
+  const png = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+  if (head.length >= 8 && png.every((b, i) => head[i] === b)) return 'image/png';
+  return null;
+}
 
 export type UploadContentType = 'image/jpeg' | 'image/png';
 
@@ -109,7 +124,28 @@ export class ObjectStorageService {
       if (total > maxBytes) throw new PayloadTooLargeException(UPLOAD_TOO_LARGE_MESSAGE);
       chunks.push(chunk);
     }
-    return Buffer.concat(chunks);
+    const bytes = Buffer.concat(chunks);
+    if (!detectImageType(bytes)) throw new BadRequestException(NOT_AN_IMAGE_MESSAGE);
+    return bytes;
+  }
+
+  /**
+   * Deletes the object and throws unless its first bytes are a PNG or JPEG.
+   * The upload goes straight to the bucket, so this is the only place the
+   * file's real type is checked.
+   */
+  async assertIsImage(key: string): Promise<void> {
+    const client = this.getClient();
+    const response = await client.send(
+      new GetObjectCommand({ Bucket: this.config.storageBucket, Key: key, Range: 'bytes=0-15' }),
+    );
+    const stream = response.Body as unknown as AsyncIterable<Uint8Array>;
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of stream) chunks.push(chunk);
+    if (!detectImageType(Buffer.concat(chunks))) {
+      await this.delete(key).catch(() => undefined);
+      throw new BadRequestException(NOT_AN_IMAGE_MESSAGE);
+    }
   }
 
   /** Size of a stored object in bytes, or null when it doesn't exist. */

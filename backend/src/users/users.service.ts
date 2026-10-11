@@ -193,6 +193,7 @@ export class UsersService {
         await this.storage.delete(key).catch(() => undefined);
         throw new PayloadTooLargeException(UPLOAD_TOO_LARGE_MESSAGE);
       }
+      await this.storage.assertIsImage(key);
     }
 
     const existing = await this.prisma.user.findUnique({

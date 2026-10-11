@@ -253,6 +253,28 @@ export const ARCADE_VERSUS_CHAT_CONFIG = {
 } as const;
 
 /**
+ * Automatic chat mutes. Every refused message, delivered insult and report
+ * from another player is a ChatFlag; these thresholds turn a pattern of them
+ * into a timed pause on the sender's chat (they can still play).
+ */
+export const CHAT_SAFETY_CONFIG = {
+  // Refused (profanity / slur / threat) messages in the last 24 hours.
+  BLOCKED_SOFT_MUTE_AT: 3,
+  BLOCKED_SOFT_MUTE_MINUTES: 60,
+  BLOCKED_HARD_MUTE_AT: 6,
+  BLOCKED_HARD_MUTE_MINUTES: 24 * 60,
+  // Milder insults that were delivered, in the last 24 hours.
+  INSULT_MUTE_AT: 5,
+  INSULT_MUTE_MINUTES: 30,
+  // Different players who reported this sender in the last 7 days.
+  REPORTERS_MUTE_AT: 3,
+  REPORTERS_MUTE_MINUTES: 24 * 60,
+  REPORT_WINDOW_DAYS: 7,
+  // Kept short: reviewers need the gist, not an archive of abuse.
+  FLAG_BODY_MAX: 300,
+} as const;
+
+/**
  * Whether Arcade play counts toward the player's existing daily-activity
  * streak (UserProgression.currentStreak via ProgressionService.
  * recordDailyActivity). 2026-09 product decision: YES — this deliberately

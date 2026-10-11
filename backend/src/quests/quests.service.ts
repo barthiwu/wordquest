@@ -252,6 +252,26 @@ export interface WordCompletionResult {
  */
 @Injectable()
 export class QuestsService {
+  /**
+   * Attempts whose sentence/paragraph is being scored by the AI right now.
+   * Two parallel submissions of the same step used to each trigger a paid
+   * evaluation (only one could win the stage claim afterwards). Per process,
+   * which is enough to stop a double-tap or a scripted burst on one server.
+   */
+  private readonly scoringInFlight = new Set<string>();
+
+  private async withScoringLock<T>(attemptId: string, run: () => Promise<T>): Promise<T> {
+    if (this.scoringInFlight.has(attemptId)) {
+      throw new ConflictException('Your answer is already being scored.');
+    }
+    this.scoringInFlight.add(attemptId);
+    try {
+      return await run();
+    } finally {
+      this.scoringInFlight.delete(attemptId);
+    }
+  }
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly words: WordsService,
@@ -853,12 +873,14 @@ export class QuestsService {
     // UK headword for a US-preference player.
     const rendered = renderWord(word, player?.englishVariant ?? null);
 
-    const evaluation = await this.sentenceEvaluation.evaluate(
-      rendered.text,
-      word.definition,
-      word.partOfSpeech,
-      sentence,
-      player?.nativeLanguage,
+    const evaluation = await this.withScoringLock(attempt.id, () =>
+      this.sentenceEvaluation.evaluate(
+        rendered.text,
+        word.definition,
+        word.partOfSpeech,
+        sentence,
+        player?.nativeLanguage,
+      ),
     );
 
     await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -932,12 +954,14 @@ export class QuestsService {
     // the spelling they were actually shown.
     const rendered = renderWord(word, player?.englishVariant ?? null);
 
-    const evaluation = await this.paragraphEvaluation.evaluate(
-      rendered.text,
-      word.definition,
-      word.partOfSpeech,
-      paragraph,
-      player?.nativeLanguage,
+    const evaluation = await this.withScoringLock(attempt.id, () =>
+      this.paragraphEvaluation.evaluate(
+        rendered.text,
+        word.definition,
+        word.partOfSpeech,
+        paragraph,
+        player?.nativeLanguage,
+      ),
     );
 
     await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {

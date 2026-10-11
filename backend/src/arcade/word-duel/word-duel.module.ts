@@ -9,10 +9,12 @@ import { WordDuelController } from './word-duel.controller';
 import { WordDuelChatService } from './word-duel-chat.service';
 import { WordDuelInviteService } from './word-duel-invite.service';
 import { NotificationModule } from '../../notifications/notification.module';
+import { ChatSafetyModule } from '../chat/chat-safety.module';
 
 @Module({
   imports: [
     ArcadeModule,
+    ChatSafetyModule,
     ProgressionModule,
     FriendsModule,
     AliModule,

@@ -1,5 +1,6 @@
 import { IsDateString, IsEmail, IsIn, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 import { IsStrongPassword } from './password.validator';
+import { IsCleanName } from '../../common/is-clean-name.validator';
 
 export class RegisterDto {
   @IsEmail()
@@ -11,6 +12,7 @@ export class RegisterDto {
   @IsString()
   @MaxLength(80)
   @Length(2, 40)
+  @IsCleanName()
   displayName!: string;
 
   @IsOptional()

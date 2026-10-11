@@ -42,6 +42,8 @@
       "subtitle": "Pick the reason that fits best.",
       "sentTitle": "Report sent",
       "sentMessage": "Thanks — we'll take a look.",
+      "report": "Report",
+      "chatSentMessage": "Thanks. That message is hidden for you. If it keeps happening, you can also block this player.",
       "errorTitle": "Could not send report",
       "errorFallback": "Please try again.",
       "reasons": {
@@ -49,7 +51,11 @@
         "harassmentOrBullying": "Harassment or bullying",
         "inappropriatePhoto": "Inappropriate photo",
         "spam": "Spam",
-        "other": "Other"
+        "other": "Other",
+        "insults": "Insults or abusive language",
+        "offensiveLanguage": "Offensive or sexual language",
+        "threats": "Threats",
+        "spamOrLinks": "Spam or links"
       }
     },
     "streakMilestoneRibbon": {

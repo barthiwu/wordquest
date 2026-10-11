@@ -141,14 +141,14 @@ describe('FriendsService', () => {
       await expect(service.sendRequest('u1', 'me')).rejects.toThrow(BadRequestException);
     });
 
-    it('throws ForbiddenException when either side has blocked the other', async () => {
+    it('answers "no such player" when either side has blocked the other (a 403 would reveal the block)', async () => {
       prismaMock.user.findUnique.mockResolvedValueOnce({
         id: 'u2',
         username: 'bo',
         avatarKey: null,
       });
       prismaMock.block.findFirst.mockResolvedValueOnce({ id: 'block-1' });
-      await expect(service.sendRequest('u1', 'bo')).rejects.toThrow(ForbiddenException);
+      await expect(service.sendRequest('u1', 'bo')).rejects.toThrow(NotFoundException);
     });
 
     it('auto-accepts when the target already requested the viewer', async () => {
