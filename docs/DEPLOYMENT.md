@@ -61,12 +61,22 @@ both the Dockerfile's first draft and `package.json`'s `start:prod` script,
 caught by actually running the compiled build locally rather than assuming
 the path — see the Validation section below.)
 
-The image does **not** run migrations on boot. `prisma migrate deploy` is a
-separate, explicit pipeline step (see `.github/workflows/deploy.yml`'s
-`migrate-staging` job) that runs once per release, before the new containers
-take traffic. Baking it into the container's startup would mean every
-replica races to migrate concurrently on every restart — exactly the
-failure mode a deploy pipeline exists to prevent.
+The image's `CMD` does **not** run migrations. Instead, `backend/railway.json`
+sets Railway's **pre-deploy command** to `npx prisma migrate deploy`: on every
+Railway deploy (git push or `railway up`), Railway runs it once, inside the new
+image and against the service's private `DATABASE_URL`, before the new container
+takes traffic. It only applies pending migrations (safe to repeat), and if one
+fails the deploy is aborted and the previous version keeps serving. The Prisma
+CLI therefore lives in `dependencies`, not `devDependencies`.
+
+To check or apply by hand (e.g. the first time, or to inspect state), use the
+Postgres service's **public** connection string:
+
+```bash
+cd backend
+DATABASE_URL="<public url>" npx prisma migrate status   # what is pending?
+DATABASE_URL="<public url>" npx prisma migrate deploy   # apply pending
+```
 
 Build it locally with:
 

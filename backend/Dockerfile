@@ -5,13 +5,15 @@
 # production dependencies), so the shipped image never carries the
 # TypeScript toolchain, ts-jest, eslint, etc.
 #
-# Database migrations are NOT run by this image on boot — see
-# docs/DEPLOYMENT.md. `prisma migrate deploy` is a separate, explicit
-# step in the deploy pipeline (see .github/workflows/deploy.yml), run
-# once per release before the new containers take traffic, never as a
-# container-startup side effect (concurrent replicas racing to migrate
-# on boot is exactly the kind of failure mode a deploy pipeline should
-# prevent, not reproduce).
+# Database migrations are NOT run by this image's CMD on boot. They run
+# as Railway's PRE-DEPLOY COMMAND (backend/railway.json:
+# `npx prisma migrate deploy`), which Railway executes once per deploy,
+# in this same image, against the service's DATABASE_URL, BEFORE the new
+# container takes traffic. If a migration fails the deploy is aborted and
+# the old version keeps serving. That is why the Prisma CLI is a runtime
+# dependency (package.json `dependencies`), not a devDependency. Never
+# bake migrate into CMD: concurrent replicas racing to migrate on boot is
+# the failure mode a pre-deploy step exists to prevent.
 #
 # Validation note: the sandbox this was authored in has no network
 # route to registry-1.docker.io (blocked by the environment's egress
