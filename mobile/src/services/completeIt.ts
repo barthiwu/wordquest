@@ -94,7 +94,20 @@ export function submitCompleteItAnswer(
 ): Promise<CompleteItAnswerResult> {
   return apiRequest<CompleteItAnswerResult>(`/arcade/complete-it/${sessionId}/answer`, {
     method: 'POST',
-    body: { answer },
+    // deferNext: don't send the next word yet. Its clock must not run while the
+    // player reads this result; beginCompleteItWord starts it on Continue.
+    body: { answer, deferNext: true },
+    accessToken,
+  });
+}
+
+/** The player tapped Continue: starts the held-back next word's clock and returns the word. Safe to repeat. */
+export function beginCompleteItWord(
+  accessToken: string,
+  sessionId: string,
+): Promise<CompleteItChallenge> {
+  return apiRequest<CompleteItChallenge>(`/arcade/complete-it/${sessionId}/begin`, {
+    method: 'POST',
     accessToken,
   });
 }

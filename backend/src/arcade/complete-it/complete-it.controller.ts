@@ -15,7 +15,8 @@ import {
 /**
  * POST /api/v1/arcade/complete-it/start
  * POST /api/v1/arcade/complete-it/:sessionId/hint
- * POST /api/v1/arcade/complete-it/:sessionId/answer
+ * POST /api/v1/arcade/complete-it/:sessionId/answer   { answer, deferNext? }
+ * POST /api/v1/arcade/complete-it/:sessionId/begin    start the held-back next word's clock
  *
  * Hints are enabled here (2026-09 decision, Barth) — sized to 60% of
  * the word's own letter count (CompleteItService.maxHintsFor) rather
@@ -55,6 +56,12 @@ export class CompleteItController {
     @Param('sessionId') sessionId: string,
     @Body() dto: SubmitCompleteItAnswerDto,
   ) {
-    return this.completeIt.submitAnswer(userId, sessionId, dto.answer);
+    return this.completeIt.submitAnswer(userId, sessionId, dto.answer, dto.deferNext === true);
+  }
+
+  @Post(':sessionId/begin')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  beginWord(@CurrentUserId() userId: string, @Param('sessionId') sessionId: string) {
+    return this.completeIt.beginWord(userId, sessionId);
   }
 }

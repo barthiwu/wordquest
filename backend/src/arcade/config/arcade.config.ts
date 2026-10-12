@@ -131,7 +131,7 @@ export const HANGMAN_CONFIG = {
   MAX_WRONG_GUESSES: 6,
   // A session is a run of words, like the other single-player games, so
   // one "play" of Hangman is one run of this many words.
-  WORDS_PER_SESSION: 5,
+  WORDS_PER_SESSION: 10,
   // One hint per word reveals a letter the player has not found yet. It
   // never reveals the last missing letter, and it costs XP (same shared
   // per-hint penalty every Arcade game uses) but not a body part.

@@ -19,6 +19,7 @@ import { ARCADE_COUNTS_TOWARD_DAILY_STREAK, HANGMAN_CONFIG } from '../config/arc
 import { evaluateGuesses, isValidGuess, pickHintLetter } from './hangman.util';
 import { renderWord } from '../../vocabulary/english-variant';
 import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant';
+import { beginPendingWord } from '../word-clock';
 import {
   AliService,
   type AliEvent,
@@ -149,7 +150,9 @@ export class HangmanService {
       where: { userId, game: 'HANGMAN', status: 'ACTIVE', versusMatchId: null, groupId: null },
     });
     const variant = await resolveEnglishVariant(this.prisma, userId);
-    if (existing) return this.buildChallengeView(existing, variant);
+    if (existing) {
+      return this.buildChallengeView(await beginPendingWord(this.prisma, existing), variant);
+    }
 
     await this.playLimit.assertCanPlay(userId, 'HANGMAN');
 
@@ -196,7 +199,12 @@ export class HangmanService {
         )
       ).map((c) => c.word.id),
     );
-    if (resolved.existing) return this.buildChallengeView(resolved.existing, variant);
+    if (resolved.existing) {
+      return this.buildChallengeView(
+        await beginPendingWord(this.prisma, resolved.existing),
+        variant,
+      );
+    }
 
     // A head-to-head play is counted when it is finished (see submitAnswer),
     // so starting only checks that today's plays are not already used up.
@@ -219,7 +227,7 @@ export class HangmanService {
       const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { versusMatchId_userId: { versusMatchId, userId } },
       });
-      return this.buildChallengeView(existing, variant);
+      return this.buildChallengeView(await beginPendingWord(this.prisma, existing), variant);
     }
   }
 
@@ -242,7 +250,12 @@ export class HangmanService {
         )
       ).map((c) => c.word.id),
     );
-    if (resolved.existing) return this.buildChallengeView(resolved.existing, variant);
+    if (resolved.existing) {
+      return this.buildChallengeView(
+        await beginPendingWord(this.prisma, resolved.existing),
+        variant,
+      );
+    }
 
     try {
       const session = await this.prisma.arcadeGameSession.create({
@@ -261,7 +274,7 @@ export class HangmanService {
       const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { groupId_userId: { groupId, userId } },
       });
-      return this.buildChallengeView(existing, variant);
+      return this.buildChallengeView(await beginPendingWord(this.prisma, existing), variant);
     }
   }
 
@@ -304,10 +317,21 @@ export class HangmanService {
     return { letter, view: await this.buildChallengeView(refreshed, variant) };
   }
 
+  /**
+   * The player moved on to the next word (tapped Continue): start its clock.
+   * Idempotent -- a retry or double tap returns the same word and deadline.
+   */
+  async beginWord(userId: string, sessionId: string): Promise<HangmanChallengeView> {
+    const session = await this.loadActiveSession(userId, sessionId, { allowPending: true });
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    return this.buildChallengeView(await beginPendingWord(this.prisma, session), variant);
+  }
+
   async guessLetter(
     userId: string,
     sessionId: string,
     rawLetter: string,
+    deferNext = false,
   ): Promise<HangmanGuessResult> {
     if (!isValidGuess(rawLetter)) throw new BadRequestException('Guess a single letter A-Z.');
     const letter = rawLetter.toLowerCase();
@@ -315,7 +339,7 @@ export class HangmanService {
     const session = await this.loadActiveSession(userId, sessionId);
     if (this.isExpired(session)) {
       // The 45 seconds ran out before this guess arrived: the word is lost.
-      return this.settleTimeout(userId, session, letter);
+      return this.settleTimeout(userId, session, letter, deferNext);
     }
     if (session.currentWordGuesses.includes(letter)) {
       throw new BadRequestException('You already guessed that letter.');
@@ -363,6 +387,8 @@ export class HangmanService {
       state.won,
       state.wrongCount,
       variant,
+      false,
+      deferNext,
     );
     const finalView = this.viewFromParts(
       session,
@@ -380,13 +406,17 @@ export class HangmanService {
    * once the server's own deadline has passed (within a small clock-drift
    * tolerance), so a client can never end a word early.
    */
-  async timeoutWord(userId: string, sessionId: string): Promise<HangmanGuessResult> {
+  async timeoutWord(
+    userId: string,
+    sessionId: string,
+    deferNext = false,
+  ): Promise<HangmanGuessResult> {
     const session = await this.loadActiveSession(userId, sessionId);
     const remaining = this.deadlineMs(session) - Date.now();
     if (remaining > HANGMAN_CONFIG.TIMEOUT_CLOCK_TOLERANCE_MS) {
       throw new ConflictException('There is still time left on this word.');
     }
-    return this.settleTimeout(userId, session, null);
+    return this.settleTimeout(userId, session, null, deferNext);
   }
 
   private deadlineMs(session: Pick<ArcadeGameSessionRow, 'currentWordStartedAt'>): number {
@@ -401,6 +431,7 @@ export class HangmanService {
     userId: string,
     session: ArcadeGameSessionRow,
     lateLetter: string | null,
+    deferNext = false,
   ): Promise<HangmanGuessResult> {
     const word = await this.currentWord(session);
     const variant = await resolveEnglishVariant(this.prisma, userId);
@@ -418,6 +449,7 @@ export class HangmanService {
       state.wrongCount,
       variant,
       true,
+      deferNext,
     );
     const finalView = this.viewFromParts(
       session,
@@ -440,6 +472,7 @@ export class HangmanService {
     wrongCount: number,
     variant: 'US' | 'UK' | null,
     timedOut = false,
+    deferNext = false,
   ): Promise<HangmanWordCompletion> {
     const sessionId = session.id;
     const timeLimitMs = HANGMAN_CONFIG.TIMER_SECONDS * 1000;
@@ -522,6 +555,9 @@ export class HangmanService {
             longestStreak: newLongestStreak,
             totalXpAwarded: { increment: reward.finalXp },
             currentWordStartedAt: new Date(),
+            // deferNext: hold the next word back until the player taps Continue
+            // (the app then calls /begin, which starts the real clock).
+            currentWordPending: deferNext && !isLastWord,
             currentWordHintsUsed: 0,
             currentWordGuesses: [],
             currentWordGuessCount: 0,
@@ -551,7 +587,7 @@ export class HangmanService {
     );
 
     let nextChallenge: HangmanChallengeView | null = null;
-    if (!isLastWord) {
+    if (!isLastWord && !deferNext) {
       const refreshed = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { id: sessionId },
       });
@@ -621,6 +657,7 @@ export class HangmanService {
   private async loadActiveSession(
     userId: string,
     sessionId: string,
+    options: { allowPending?: boolean } = {},
   ): Promise<ArcadeGameSessionRow> {
     const session = await this.prisma.arcadeGameSession.findUnique({ where: { id: sessionId } });
     if (!session) throw new NotFoundException('Hangman session not found');
@@ -630,6 +667,11 @@ export class HangmanService {
     }
     if (session.status !== 'ACTIVE') {
       throw new BadRequestException('This Hangman session has already ended');
+    }
+    // The previous word was answered and the player has not moved on yet: no
+    // answer, hint or timeout can apply to a word whose clock has not started.
+    if (session.currentWordPending && !options.allowPending) {
+      throw new ConflictException('Start the next word first.');
     }
     return session;
   }
@@ -680,7 +722,9 @@ export class HangmanService {
       wrongCount: state.wrongCount,
       maxWrong: HANGMAN_CONFIG.MAX_WRONG_GUESSES,
       timeLimitSeconds: HANGMAN_CONFIG.TIMER_SECONDS,
-      deadlineAt: new Date(session.currentWordStartedAt.getTime() + HANGMAN_CONFIG.TIMER_SECONDS * 1000).toISOString(),
+      deadlineAt: new Date(
+        session.currentWordStartedAt.getTime() + HANGMAN_CONFIG.TIMER_SECONDS * 1000,
+      ).toISOString(),
       definition: word.definition,
       synonyms: word.synonyms,
       hintsRemaining: HANGMAN_CONFIG.MAX_HINTS_PER_WORD - hintsUsed,

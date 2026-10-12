@@ -101,7 +101,20 @@ export function submitScrambleAnswer(
 ): Promise<ScrambleQuestAnswerResult> {
   return apiRequest<ScrambleQuestAnswerResult>(`/arcade/scramble-quest/${sessionId}/answer`, {
     method: 'POST',
-    body: { answer },
+    // deferNext: don't send the next word yet. Its clock must not run while the
+    // player reads this result; beginScrambleWord starts it on Continue.
+    body: { answer, deferNext: true },
+    accessToken,
+  });
+}
+
+/** The player tapped Continue: starts the held-back next word's clock and returns the word. Safe to repeat. */
+export function beginScrambleWord(
+  accessToken: string,
+  sessionId: string,
+): Promise<ScrambleQuestChallenge> {
+  return apiRequest<ScrambleQuestChallenge>(`/arcade/scramble-quest/${sessionId}/begin`, {
+    method: 'POST',
     accessToken,
   });
 }

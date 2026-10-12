@@ -1760,6 +1760,15 @@ model ArcadeGameSession {
   // Date.now() - currentWordStartedAt, never a client-reported value.
   currentWordStartedAt DateTime @default(now())
 
+  // True between "the previous word was answered" and "the player moved on
+  // to this one". The app asks for the next word to be held back after an
+  // answer (deferNext), shows the result, and only calls /begin when the
+  // player taps Continue; /begin sets currentWordStartedAt = now and clears
+  // this. So the clock never runs while the player is still reading the
+  // last result. Old app builds never defer, so this stays false for them
+  // and their behaviour is unchanged.
+  currentWordPending Boolean @default(false)
+
   // Hints spent on the CURRENT word only — reset every time
   // currentIndex advances. Tracked server-side (never client-submitted)
   // so a submitted answer's hint penalty can't be forged (spec §11:

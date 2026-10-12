@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { radius, spacing, typography, type ThemeColors } from '@/constants/theme';
 import { useThemeColors } from '@/state/themeStore';
 import {
+  beginCompleteItWord,
   requestCompleteItHint,
   startCompleteIt,
   submitCompleteItAnswer,
@@ -34,6 +35,7 @@ import { VersusChat } from '@/components/VersusChat';
 import { VersusResultCard } from '@/components/VersusResultCard';
 import { CountdownRing } from '@/components/CountdownRing';
 import { LetterBoxInput } from '@/components/LetterBoxInput';
+import { mergeRevealedAnswer, typedAfterReveal } from '@/components/letterBoxAnswer';
 import { trackEvent } from '@/services/analyticsClient';
 import { ApiError } from '@/services/apiClient';
 import { isPlayLimitError } from '@/services/arcadePlays';
@@ -51,27 +53,6 @@ type Phase = 'loading' | 'active' | 'submitting' | 'feedback' | 'complete' | 'er
  * card -- applied here for visual consistency across Arcade (Barth:
  * "Let's do same for the Complete It, and the Word Duel"). */
 const URGENT_THRESHOLD_SECONDS = 10;
-
-/**
- * Reconstructs the full word from the player's typed characters (which
- * only cover the still-editable, non-hint-revealed positions -- see
- * LetterBoxInput's `revealed` prop) plus the hint-revealed letters, so
- * the server always receives a complete answer of the right length.
- * Identical to ScrambleQuestScreen's own helper of the same name.
- */
-function mergeRevealedAnswer(
-  typed: string,
-  revealedLetters: { position: number; letter: string }[],
-  length: number,
-): string {
-  const revealedMap = new Map(revealedLetters.map((r) => [r.position, r.letter]));
-  const editablePositions = Array.from({ length }, (_, i) => i).filter((i) => !revealedMap.has(i));
-  const letters = Array.from({ length }, (_, i) => revealedMap.get(i) ?? '');
-  editablePositions.forEach((position, editableIndex) => {
-    letters[position] = typed[editableIndex] ?? '';
-  });
-  return letters.join('');
-}
 
 /**
  * Complete It (spec §5 sibling of ScrambleQuest) — the player sees the
@@ -104,6 +85,8 @@ export function CompleteItScreen({ navigation, route }: Props) {
   // Set when the server refuses the start because today's plays are used up.
   const [limitHit, setLimitHit] = useState(false);
   const [challenge, setChallenge] = useState<CompleteItChallenge | null>(null);
+  const challengeRef = useRef(challenge);
+  challengeRef.current = challenge;
   const [answer, setAnswer] = useState('');
   const answerRef = useRef('');
   answerRef.current = answer;
@@ -121,6 +104,8 @@ export function CompleteItScreen({ navigation, route }: Props) {
 
   // See ScrambleQuestScreen's identical pattern/comment (Telemetry spec §11).
   const completedRef = useRef(false);
+  const continuingRef = useRef(false);
+  const [continueFailed, setContinueFailed] = useState(false);
   useEffect(() => {
     return () => {
       if (!completedRef.current) {
@@ -222,6 +207,20 @@ export function CompleteItScreen({ navigation, route }: Props) {
     if (!accessToken || !challenge || challenge.hintsRemaining <= 0) return;
     try {
       const hint = await requestCompleteItHint(accessToken, challenge.sessionId);
+      // The hint letter REPLACES whatever the player typed in that box; it
+      // must not push their letters one box along (Excet + I -> Excit, not
+      // Exciet). Re-lay the typed text over the new set of locked boxes.
+      const current = challengeRef.current;
+      if (current) {
+        setAnswer(
+          typedAfterReveal(
+            answerRef.current,
+            current.revealedLetters,
+            hint.position,
+            current.wordLength,
+          ),
+        );
+      }
       setChallenge((prev) =>
         prev
           ? {
@@ -240,9 +239,9 @@ export function CompleteItScreen({ navigation, route }: Props) {
     }
   };
 
-  const handleContinue = () => {
-    if (!feedback) return;
-    if (feedback.sessionComplete || !feedback.nextChallenge) {
+  const handleContinue = async () => {
+    if (!feedback || continuingRef.current) return;
+    if (feedback.sessionComplete) {
       completedRef.current = true;
       trackEvent('ARCADE_SESSION_COMPLETED', { game: 'COMPLETE_IT' });
       // A head-to-head play counts toward the daily cap only once finished.
@@ -250,8 +249,31 @@ export function CompleteItScreen({ navigation, route }: Props) {
       setPhase('complete');
       return;
     }
-    setChallenge(feedback.nextChallenge);
+    // The server holds the next word back until now, so its clock starts when
+    // the player actually moves on to it, not while they read this result.
+    // (An older server sends the word straight away; then there is nothing to begin.)
+    let next = feedback.nextChallenge;
+    if (!next) {
+      if (!accessToken || !challenge) return;
+      continuingRef.current = true;
+      setContinueFailed(false);
+      try {
+        next = await beginCompleteItWord(accessToken, challenge.sessionId);
+      } catch (err) {
+        trackEvent('GAMEPLAY_ERROR', {
+          game: 'COMPLETE_IT',
+          step: 'begin',
+          status: err instanceof ApiError ? err.status : undefined,
+        });
+        setContinueFailed(true); // Continue is safe to tap again
+        return;
+      } finally {
+        continuingRef.current = false;
+      }
+    }
+    setChallenge(next);
     setFeedback(null);
+    setContinueFailed(false);
     setAnswer('');
     autoSubmittedRef.current = false;
     setPhase('active');
@@ -449,12 +471,13 @@ export function CompleteItScreen({ navigation, route }: Props) {
             />
             <Pressable
               style={styles.button}
-              onPress={handleContinue}
+              onPress={() => void handleContinue()}
               accessibilityRole="button"
               accessibilityLabel={t('scrambleQuest:continue')}
             >
               <Text style={styles.buttonText}>{t('scrambleQuest:continue')}</Text>
             </Pressable>
+            {continueFailed && <Text style={styles.error}>{t('completeIt:genericError')}</Text>}
           </View>
         )}
       </ScrollView>

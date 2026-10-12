@@ -15,7 +15,8 @@ import {
 /**
  * POST /api/v1/arcade/scramble-quest/start
  * POST /api/v1/arcade/scramble-quest/:sessionId/hint
- * POST /api/v1/arcade/scramble-quest/:sessionId/answer
+ * POST /api/v1/arcade/scramble-quest/:sessionId/answer   { answer, deferNext? }
+ * POST /api/v1/arcade/scramble-quest/:sessionId/begin    start the held-back next word's clock
  *
  * All routes act only on the authenticated player's own session
  * (enforced again inside the service). Answer/hint get a tighter rate
@@ -53,6 +54,12 @@ export class ScrambleQuestController {
     @Param('sessionId') sessionId: string,
     @Body() dto: SubmitScrambleAnswerDto,
   ) {
-    return this.scrambleQuest.submitAnswer(userId, sessionId, dto.answer);
+    return this.scrambleQuest.submitAnswer(userId, sessionId, dto.answer, dto.deferNext === true);
+  }
+
+  @Post(':sessionId/begin')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  beginWord(@CurrentUserId() userId: string, @Param('sessionId') sessionId: string) {
+    return this.scrambleQuest.beginWord(userId, sessionId);
   }
 }

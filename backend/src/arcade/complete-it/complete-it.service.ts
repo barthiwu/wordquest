@@ -21,6 +21,7 @@ import { blankSentence, isCompleteItSentenceUsable } from './complete-it.util';
 import { hintRevealOrder } from '../scramble-quest/scramble.util';
 import { renderWord } from '../../vocabulary/english-variant';
 import { resolveEnglishVariant } from '../../vocabulary/resolve-english-variant';
+import { beginPendingWord } from '../word-clock';
 import {
   AliService,
   type AliEvent,
@@ -172,10 +173,13 @@ export class CompleteItService {
     const variant = await resolveEnglishVariant(this.prisma, userId);
 
     if (existing) {
+      // A word held back after the last answer starts its clock now: the
+      // player is back on the game, looking at it.
+      const current = await beginPendingWord(this.prisma, existing);
       const deadlineMs =
-        existing.currentWordStartedAt.getTime() + COMPLETE_IT_CONFIG.TIMER_SECONDS * 1000;
+        current.currentWordStartedAt.getTime() + COMPLETE_IT_CONFIG.TIMER_SECONDS * 1000;
       if (Date.now() < deadlineMs) {
-        return this.buildChallengeView(existing, variant);
+        return this.buildChallengeView(current, variant);
       }
       await this.prisma.arcadeGameSession.update({
         where: { id: existing.id },
@@ -228,19 +232,28 @@ export class CompleteItService {
    */
   private async startVersus(userId: string, versusMatchId: string) {
     const variant = await resolveEnglishVariant(this.prisma, userId);
-    const resolved = await this.versus.resolveStart(userId, versusMatchId, 'COMPLETE_IT', async () =>
-      (
-        await this.challenges.pickChallenges(
-          userId,
-          COMPLETE_IT_CONFIG.WORDS_PER_SESSION,
-          [],
-          COMPLETE_IT_CONFIG.MIN_WORD_LENGTH,
-          COMPLETE_IT_CONFIG.MAX_WORD_LENGTH,
-          (c) => isCompleteItSentenceUsable(c.word.exampleSentence, c.word.word),
-        )
-      ).map((c) => c.word.id),
+    const resolved = await this.versus.resolveStart(
+      userId,
+      versusMatchId,
+      'COMPLETE_IT',
+      async () =>
+        (
+          await this.challenges.pickChallenges(
+            userId,
+            COMPLETE_IT_CONFIG.WORDS_PER_SESSION,
+            [],
+            COMPLETE_IT_CONFIG.MIN_WORD_LENGTH,
+            COMPLETE_IT_CONFIG.MAX_WORD_LENGTH,
+            (c) => isCompleteItSentenceUsable(c.word.exampleSentence, c.word.word),
+          )
+        ).map((c) => c.word.id),
     );
-    if (resolved.existing) return this.buildChallengeView(resolved.existing, variant);
+    if (resolved.existing) {
+      return this.buildChallengeView(
+        await beginPendingWord(this.prisma, resolved.existing),
+        variant,
+      );
+    }
 
     // A head-to-head play is counted when it is finished (see submitAnswer),
     // so starting only checks that today's plays are not already used up.
@@ -263,7 +276,7 @@ export class CompleteItService {
       const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { versusMatchId_userId: { versusMatchId, userId } },
       });
-      return this.buildChallengeView(existing, variant);
+      return this.buildChallengeView(await beginPendingWord(this.prisma, existing), variant);
     }
   }
 
@@ -287,7 +300,12 @@ export class CompleteItService {
         )
       ).map((c) => c.word.id),
     );
-    if (resolved.existing) return this.buildChallengeView(resolved.existing, variant);
+    if (resolved.existing) {
+      return this.buildChallengeView(
+        await beginPendingWord(this.prisma, resolved.existing),
+        variant,
+      );
+    }
 
     try {
       const session = await this.prisma.arcadeGameSession.create({
@@ -306,7 +324,7 @@ export class CompleteItService {
       const existing = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { groupId_userId: { groupId, userId } },
       });
-      return this.buildChallengeView(existing, variant);
+      return this.buildChallengeView(await beginPendingWord(this.prisma, existing), variant);
     }
   }
 
@@ -354,10 +372,21 @@ export class CompleteItService {
     };
   }
 
+  /**
+   * The player moved on to the next word (tapped Continue): start its clock.
+   * Idempotent -- a retry or double tap returns the same word and deadline.
+   */
+  async beginWord(userId: string, sessionId: string): Promise<CompleteItChallengeView> {
+    const session = await this.loadActiveSession(userId, sessionId, { allowPending: true });
+    const variant = await resolveEnglishVariant(this.prisma, userId);
+    return this.buildChallengeView(await beginPendingWord(this.prisma, session), variant);
+  }
+
   async submitAnswer(
     userId: string,
     sessionId: string,
     rawAnswer: string,
+    deferNext = false,
   ): Promise<CompleteItAnswerResult> {
     const session = await this.loadActiveSession(userId, sessionId);
     const word = await this.currentWord(session);
@@ -447,6 +476,9 @@ export class CompleteItService {
             longestStreak: newLongestStreak,
             totalXpAwarded: { increment: reward.finalXp },
             currentWordStartedAt: new Date(),
+            // deferNext: hold the next word back until the player taps Continue
+            // (the app then calls /begin, which starts the real clock).
+            currentWordPending: deferNext && !isLastWord,
             currentWordHintsUsed: 0,
             ...(isLastWord ? { status: 'COMPLETED' as const, endedAt: new Date() } : {}),
           },
@@ -480,7 +512,7 @@ export class CompleteItService {
     );
 
     let nextChallenge: CompleteItChallengeView | null = null;
-    if (!isLastWord) {
+    if (!isLastWord && !deferNext) {
       const refreshed = await this.prisma.arcadeGameSession.findUniqueOrThrow({
         where: { id: sessionId },
       });
@@ -548,6 +580,7 @@ export class CompleteItService {
   private async loadActiveSession(
     userId: string,
     sessionId: string,
+    options: { allowPending?: boolean } = {},
   ): Promise<ArcadeGameSessionRow> {
     const session = await this.prisma.arcadeGameSession.findUnique({ where: { id: sessionId } });
     if (!session) throw new NotFoundException('Complete It session not found');
@@ -557,6 +590,11 @@ export class CompleteItService {
     }
     if (session.status !== 'ACTIVE') {
       throw new BadRequestException('This Complete It session has already ended');
+    }
+    // The previous word was answered and the player has not moved on yet: no
+    // answer, hint or timeout can apply to a word whose clock has not started.
+    if (session.currentWordPending && !options.allowPending) {
+      throw new ConflictException('Start the next word first.');
     }
     return session;
   }

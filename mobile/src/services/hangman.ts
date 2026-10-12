@@ -94,7 +94,8 @@ export function guessHangmanLetter(
 ): Promise<HangmanGuessResult> {
   return apiRequest<HangmanGuessResult>(`/arcade/hangman/${sessionId}/guess`, {
     method: 'POST',
-    body: { letter },
+    // deferNext: don't send the next word yet (its 45s clock starts on Continue).
+    body: { letter, deferNext: true },
     accessToken,
   });
 }
@@ -115,6 +116,18 @@ export function timeoutHangmanWord(
   sessionId: string,
 ): Promise<HangmanGuessResult> {
   return apiRequest<HangmanGuessResult>(`/arcade/hangman/${sessionId}/timeout`, {
+    method: 'POST',
+    body: { deferNext: true },
+    accessToken,
+  });
+}
+
+/** The player tapped Continue: starts the held-back next word's 45s clock and returns the word. Safe to repeat. */
+export function beginHangmanWord(
+  accessToken: string,
+  sessionId: string,
+): Promise<HangmanChallenge> {
+  return apiRequest<HangmanChallenge>(`/arcade/hangman/${sessionId}/begin`, {
     method: 'POST',
     accessToken,
   });

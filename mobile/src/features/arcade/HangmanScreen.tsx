@@ -16,6 +16,7 @@ import { radius, spacing, typography, type ThemeColors } from '@/constants/theme
 import { useThemeColors } from '@/state/themeStore';
 import { useAuthStore } from '@/state/authStore';
 import {
+  beginHangmanWord,
   guessHangmanLetter,
   requestHangmanHint,
   startHangman,
@@ -97,6 +98,8 @@ export function HangmanScreen({ navigation, route }: Props) {
   } | null>(null);
   const aliBubbleCounter = useRef(0);
   const completedRef = useRef(false);
+  const continuingRef = useRef(false);
+  const [continueFailed, setContinueFailed] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(45);
   // The word the "time is up" call was already sent for, and when it may be retried.
   const timeoutSentForRef = useRef<string | null>(null);
@@ -265,9 +268,9 @@ export function HangmanScreen({ navigation, route }: Props) {
     setPhase('active');
   };
 
-  const handleContinue = () => {
-    if (!completion) return;
-    if (completion.sessionComplete || !completion.nextChallenge) {
+  const handleContinue = async () => {
+    if (!completion || continuingRef.current) return;
+    if (completion.sessionComplete) {
       completedRef.current = true;
       trackEvent('ARCADE_SESSION_COMPLETED', { game: 'HANGMAN' });
       // A head-to-head play counts toward the daily cap only once finished.
@@ -275,8 +278,31 @@ export function HangmanScreen({ navigation, route }: Props) {
       setPhase('complete');
       return;
     }
-    setChallenge(completion.nextChallenge);
+    // The server holds the next word back until now, so its 45 seconds start
+    // when the player actually moves on to it, not while they read this result.
+    // (An older server sends the word straight away; then there is nothing to begin.)
+    let next = completion.nextChallenge;
+    if (!next) {
+      if (!accessToken || !challenge) return;
+      continuingRef.current = true;
+      setContinueFailed(false);
+      try {
+        next = await beginHangmanWord(accessToken, challenge.sessionId);
+      } catch (err) {
+        trackEvent('GAMEPLAY_ERROR', {
+          game: 'HANGMAN',
+          step: 'begin',
+          status: err instanceof ApiError ? err.status : undefined,
+        });
+        setContinueFailed(true); // Continue is safe to tap again
+        return;
+      } finally {
+        continuingRef.current = false;
+      }
+    }
+    setChallenge(next);
     setCompletion(null);
+    setContinueFailed(false);
     setShowMeaning(false);
     setShowSynonyms(false);
     setPhase('active');
@@ -292,7 +318,7 @@ export function HangmanScreen({ navigation, route }: Props) {
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (/^[a-zA-Z]$/.test(e.key)) void guessRef.current(e.key.toLowerCase());
-      else if (e.key === 'Enter') continueRef.current();
+      else if (e.key === 'Enter') void continueRef.current();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -604,12 +630,13 @@ export function HangmanScreen({ navigation, route }: Props) {
               )}
               <Pressable
                 style={styles.button}
-                onPress={handleContinue}
+                onPress={() => void handleContinue()}
                 accessibilityRole="button"
                 accessibilityLabel={t('continue')}
               >
                 <Text style={styles.buttonText}>{t('continue')}</Text>
               </Pressable>
+              {continueFailed && <Text style={styles.error}>{t('genericError')}</Text>}
             </View>
           )}
         </View>

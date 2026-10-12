@@ -1,4 +1,4 @@
-import { startCompleteIt, submitCompleteItAnswer } from './completeIt';
+import { beginCompleteItWord, startCompleteIt, submitCompleteItAnswer } from './completeIt';
 import { apiRequest } from './apiClient';
 
 jest.mock('./apiClient', () => ({ apiRequest: jest.fn() }));
@@ -22,7 +22,16 @@ describe('completeIt service', () => {
     await submitCompleteItAnswer('tok', 's1', 'train');
     expect(apiRequest).toHaveBeenCalledWith('/arcade/complete-it/s1/answer', {
       method: 'POST',
-      body: { answer: 'train' },
+      body: { answer: 'train', deferNext: true },
+      accessToken: 'tok',
+    });
+  });
+
+  it('asks the server to hold the next word back, so its clock starts on Continue', async () => {
+    (apiRequest as jest.Mock).mockResolvedValueOnce({});
+    await beginCompleteItWord('tok', 's1');
+    expect(apiRequest).toHaveBeenCalledWith('/arcade/complete-it/s1/begin', {
+      method: 'POST',
       accessToken: 'tok',
     });
   });

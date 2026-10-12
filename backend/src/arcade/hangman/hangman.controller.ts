@@ -2,6 +2,7 @@ import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { HangmanService } from './hangman.service';
 import { GuessHangmanLetterDto } from './dto/guess-hangman-letter.dto';
+import { TimeoutHangmanWordDto } from './dto/timeout-hangman-word.dto';
 import { StartArcadeGameDto } from '../dto/start-arcade-game.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { EmailVerificationGuard } from '../../auth/guards/email-verification.guard';
@@ -14,7 +15,8 @@ import {
 
 /**
  * POST /api/v1/arcade/hangman/start
- * POST /api/v1/arcade/hangman/:sessionId/guess   { letter }
+ * POST /api/v1/arcade/hangman/:sessionId/guess   { letter, deferNext? }
+ * POST /api/v1/arcade/hangman/:sessionId/begin   start the held-back next word's clock
  * POST /api/v1/arcade/hangman/:sessionId/hint
  * POST /api/v1/arcade/hangman/:sessionId/timeout   the 45s countdown hit zero
  *
@@ -45,7 +47,7 @@ export class HangmanController {
     @Param('sessionId') sessionId: string,
     @Body() dto: GuessHangmanLetterDto,
   ) {
-    return this.hangman.guessLetter(userId, sessionId, dto.letter);
+    return this.hangman.guessLetter(userId, sessionId, dto.letter, dto.deferNext === true);
   }
 
   @Post(':sessionId/hint')
@@ -56,7 +58,17 @@ export class HangmanController {
 
   @Post(':sessionId/timeout')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
-  timeout(@CurrentUserId() userId: string, @Param('sessionId') sessionId: string) {
-    return this.hangman.timeoutWord(userId, sessionId);
+  timeout(
+    @CurrentUserId() userId: string,
+    @Param('sessionId') sessionId: string,
+    @Body() dto: TimeoutHangmanWordDto,
+  ) {
+    return this.hangman.timeoutWord(userId, sessionId, dto?.deferNext === true);
+  }
+
+  @Post(':sessionId/begin')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  beginWord(@CurrentUserId() userId: string, @Param('sessionId') sessionId: string) {
+    return this.hangman.beginWord(userId, sessionId);
   }
 }

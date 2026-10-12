@@ -1,4 +1,9 @@
-import { requestScrambleHint, startScrambleQuest, submitScrambleAnswer } from './scrambleQuest';
+import {
+  beginScrambleWord,
+  requestScrambleHint,
+  startScrambleQuest,
+  submitScrambleAnswer,
+} from './scrambleQuest';
 import { apiRequest } from './apiClient';
 
 jest.mock('./apiClient', () => ({ apiRequest: jest.fn() }));
@@ -31,7 +36,16 @@ describe('scrambleQuest service', () => {
     await submitScrambleAnswer('tok', 's1', 'train');
     expect(apiRequest).toHaveBeenCalledWith('/arcade/scramble-quest/s1/answer', {
       method: 'POST',
-      body: { answer: 'train' },
+      body: { answer: 'train', deferNext: true },
+      accessToken: 'tok',
+    });
+  });
+
+  it('asks the server to hold the next word back, so its clock starts on Continue', async () => {
+    (apiRequest as jest.Mock).mockResolvedValueOnce({});
+    await beginScrambleWord('tok', 's1');
+    expect(apiRequest).toHaveBeenCalledWith('/arcade/scramble-quest/s1/begin', {
+      method: 'POST',
       accessToken: 'tok',
     });
   });

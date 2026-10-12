@@ -147,8 +147,15 @@ describe('HangmanService', () => {
     });
 
     it('a head-to-head start takes no play yet (it counts when the match is finished)', async () => {
-      versusMock.resolveStart.mockResolvedValueOnce({ existing: null, wordIds: ['w1'], matchId: 'm1' });
-      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({ ...baseSession(), versusMatchId: 'm1' });
+      versusMock.resolveStart.mockResolvedValueOnce({
+        existing: null,
+        wordIds: ['w1'],
+        matchId: 'm1',
+      });
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({
+        ...baseSession(),
+        versusMatchId: 'm1',
+      });
 
       await service.start('u1', 'm1');
 
@@ -159,12 +166,24 @@ describe('HangmanService', () => {
 
   describe('start (group play)', () => {
     it("creates the session on the group's shared words and ties it to the group", async () => {
-      groupMock.resolveStart.mockResolvedValueOnce({ existing: null, wordIds: ['w1', 'w2'], groupId: 'g1' });
-      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({ ...baseSession(), groupId: 'g1' });
+      groupMock.resolveStart.mockResolvedValueOnce({
+        existing: null,
+        wordIds: ['w1', 'w2'],
+        groupId: 'g1',
+      });
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({
+        ...baseSession(),
+        groupId: 'g1',
+      });
 
       await service.start('u1', undefined, 'g1');
 
-      expect(groupMock.resolveStart).toHaveBeenCalledWith('u1', 'g1', 'HANGMAN', expect.any(Function));
+      expect(groupMock.resolveStart).toHaveBeenCalledWith(
+        'u1',
+        'g1',
+        'HANGMAN',
+        expect.any(Function),
+      );
       expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           userId: 'u1',
@@ -179,8 +198,15 @@ describe('HangmanService', () => {
     });
 
     it('is not counted against the daily limit, so a locked-out player can still join their class', async () => {
-      groupMock.resolveStart.mockResolvedValueOnce({ existing: null, wordIds: ['w1'], groupId: 'g1' });
-      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({ ...baseSession(), groupId: 'g1' });
+      groupMock.resolveStart.mockResolvedValueOnce({
+        existing: null,
+        wordIds: ['w1'],
+        groupId: 'g1',
+      });
+      prismaMock.arcadeGameSession.create.mockResolvedValueOnce({
+        ...baseSession(),
+        groupId: 'g1',
+      });
 
       await service.start('u1', undefined, 'g1');
 
@@ -190,7 +216,11 @@ describe('HangmanService', () => {
 
     it("resumes the member's play after a relaunch", async () => {
       const existing = { ...baseSession(), groupId: 'g1' };
-      groupMock.resolveStart.mockResolvedValueOnce({ existing, wordIds: existing.wordIds, groupId: 'g1' });
+      groupMock.resolveStart.mockResolvedValueOnce({
+        existing,
+        wordIds: existing.wordIds,
+        groupId: 'g1',
+      });
 
       await service.start('u1', undefined, 'g1');
 
@@ -217,7 +247,7 @@ describe('HangmanService', () => {
   });
 
   describe('start (head-to-head)', () => {
-    it('creates the session on the match\'s shared words and ties it to the match', async () => {
+    it("creates the session on the match's shared words and ties it to the match", async () => {
       versusMock.resolveStart.mockResolvedValueOnce({
         existing: null,
         wordIds: ['w1', 'w2'],
@@ -249,7 +279,7 @@ describe('HangmanService', () => {
       expect(prismaMock.arcadeGameSession.findFirst).not.toHaveBeenCalled();
     });
 
-    it('resumes the player\'s half of the match after a relaunch', async () => {
+    it("resumes the player's half of the match after a relaunch", async () => {
       const existing = { ...baseSession(), versusMatchId: 'm1' };
       versusMock.resolveStart.mockResolvedValueOnce({
         existing,
@@ -262,7 +292,7 @@ describe('HangmanService', () => {
       expect(prismaMock.arcadeGameSession.create).not.toHaveBeenCalled();
     });
 
-    it('the first player\'s word pick uses this game\'s own picker', async () => {
+    it("the first player's word pick uses this game's own picker", async () => {
       challengesMock.pickChallenges.mockResolvedValueOnce([{ word: { id: 'w9' } }]);
       versusMock.resolveStart.mockImplementationOnce(
         async (_u: string, _m: string, _g: string, pick: () => Promise<string[]>) => ({
@@ -292,7 +322,7 @@ describe('HangmanService', () => {
 
       const view = await service.start('u1');
 
-      expect(challengesMock.pickChallenges).toHaveBeenCalledWith('u1', 5, [], 3, 10);
+      expect(challengesMock.pickChallenges).toHaveBeenCalledWith('u1', 10, [], 3, 10);
       expect(prismaMock.arcadeGameSession.create).toHaveBeenCalledWith({
         data: expect.objectContaining({ userId: 'u1', game: 'HANGMAN', wordsTotal: 2 }),
       });
@@ -507,7 +537,6 @@ describe('HangmanService', () => {
       expect(playLimitMock.consumePlay).toHaveBeenCalledWith('u1', 'HANGMAN', { force: true });
     });
 
-
     it('never counts a Group Play round against the daily cap', async () => {
       prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
         ...baseSession(),
@@ -653,7 +682,9 @@ describe('HangmanService', () => {
       expect(result.completion?.currentStreak).toBe(0);
       expect(progressionMock.awardXp).not.toHaveBeenCalled();
       expect(prismaMock.arcadeAnswer.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ timedOut: true, isCorrect: false }) }),
+        expect.objectContaining({
+          data: expect.objectContaining({ timedOut: true, isCorrect: false }),
+        }),
       );
     });
 
@@ -680,6 +711,90 @@ describe('HangmanService', () => {
     it('refuses a hint once time is up', async () => {
       prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce(expired());
       await expect(service.requestHint('u1', 's1')).rejects.toThrow(BadRequestException);
+    });
+  });
+  describe('held-back next word (the clock starts when the player moves on)', () => {
+    it('with deferNext, finishing a word sends no next word and marks the next one pending', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        currentWordGuesses: ['c', 'a'],
+        currentWordGuessCount: 2,
+      });
+
+      const result = await service.guessLetter('u1', 's1', 't', true);
+
+      expect(result.completion?.outcome).toBe('WON');
+      expect(result.completion?.sessionComplete).toBe(false);
+      expect(result.completion?.nextChallenge).toBeNull();
+      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ currentWordPending: true }),
+        }),
+      );
+    });
+
+    it('a timeout also honours deferNext', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        currentWordStartedAt: new Date(Date.now() - 50_000),
+      });
+      prismaMock.arcadeAnswer.count.mockResolvedValueOnce(0);
+
+      const result = await service.timeoutWord('u1', 's1', true);
+
+      expect(result.completion?.nextChallenge).toBeNull();
+      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ currentWordPending: true }),
+        }),
+      );
+    });
+
+    it('beginWord starts the 45 seconds now, however long the result screen was open', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 1,
+        currentWordPending: true,
+        currentWordStartedAt: new Date(Date.now() - 600_000),
+      });
+
+      const view = await service.beginWord('u1', 's1');
+
+      expect(prismaMock.arcadeGameSession.updateMany).toHaveBeenCalledWith({
+        where: { id: 's1', currentIndex: 1, currentWordPending: true },
+        data: { currentWordPending: false, currentWordStartedAt: expect.any(Date) },
+      });
+      const left = new Date(view.deadlineAt).getTime() - Date.now();
+      expect(left).toBeGreaterThan(44_000);
+      expect(left).toBeLessThanOrEqual(45_000);
+    });
+
+    it('refuses a guess, hint or timeout before the word has begun', async () => {
+      prismaMock.arcadeGameSession.findUnique.mockResolvedValue({
+        ...baseSession(),
+        currentIndex: 1,
+        currentWordPending: true,
+        currentWordStartedAt: new Date(Date.now() - 600_000),
+      });
+
+      await expect(service.guessLetter('u1', 's1', 'c')).rejects.toThrow(ConflictException);
+      await expect(service.requestHint('u1', 's1')).rejects.toThrow(ConflictException);
+      await expect(service.timeoutWord('u1', 's1')).rejects.toThrow(ConflictException);
+      expect(prismaMock.arcadeAnswer.create).not.toHaveBeenCalled();
+      prismaMock.arcadeGameSession.findUnique.mockReset();
+    });
+
+    it('a relaunch on a held-back word begins it rather than losing it to the old clock', async () => {
+      prismaMock.arcadeGameSession.findFirst.mockResolvedValueOnce({
+        ...baseSession(),
+        currentIndex: 1,
+        currentWordPending: true,
+        currentWordStartedAt: new Date(Date.now() - 600_000),
+      });
+
+      const view = await service.start('u1');
+
+      expect(new Date(view.deadlineAt).getTime()).toBeGreaterThan(Date.now());
     });
   });
 });

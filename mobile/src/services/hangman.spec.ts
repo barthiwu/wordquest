@@ -1,4 +1,10 @@
-import { guessHangmanLetter, requestHangmanHint, startHangman } from './hangman';
+import {
+  beginHangmanWord,
+  guessHangmanLetter,
+  requestHangmanHint,
+  startHangman,
+  timeoutHangmanWord,
+} from './hangman';
 import { apiRequest } from './apiClient';
 
 jest.mock('./apiClient', () => ({ apiRequest: jest.fn() }));
@@ -21,7 +27,7 @@ describe('hangman service', () => {
     await guessHangmanLetter('tok', 's1', 'e');
     expect(apiRequest).toHaveBeenCalledWith('/arcade/hangman/s1/guess', {
       method: 'POST',
-      body: { letter: 'e' },
+      body: { letter: 'e', deferNext: true },
       accessToken: 'tok',
     });
   });
@@ -29,6 +35,20 @@ describe('hangman service', () => {
   it('requests a hint for a session', async () => {
     await requestHangmanHint('tok', 's1');
     expect(apiRequest).toHaveBeenCalledWith('/arcade/hangman/s1/hint', {
+      method: 'POST',
+      accessToken: 'tok',
+    });
+  });
+
+  it('asks for deferral on a timeout too, and begins the held-back word on Continue', async () => {
+    await timeoutHangmanWord('tok', 's1');
+    expect(apiRequest).toHaveBeenCalledWith('/arcade/hangman/s1/timeout', {
+      method: 'POST',
+      body: { deferNext: true },
+      accessToken: 'tok',
+    });
+    await beginHangmanWord('tok', 's1');
+    expect(apiRequest).toHaveBeenCalledWith('/arcade/hangman/s1/begin', {
       method: 'POST',
       accessToken: 'tok',
     });
